@@ -1,0 +1,4 @@
+{
+    "verbose": 2,
+    "coverage-instrument-spec": "dist/**/*.js"
+}

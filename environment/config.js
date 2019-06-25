@@ -20,7 +20,8 @@ requirejs.config({
     baseUrl: '/',
     paths: {
         css: '/node_modules/require-css/css',
-        // text: '/node_modules/requirejs-plugins/lib/text',
+        json: '/node_modules/requirejs-plugins/src/json',
+        text: '/node_modules/requirejs-plugins/lib/text',
         // tpl: '/environment/tpl',
 
         /* TEST related */
@@ -44,6 +45,7 @@ requirejs.config({
         // 'lib/moment-timezone.min': '/node_modules/moment-timezone/builds/moment-timezone-with-data.min',
         // async: '/node_modules/async/lib/async',
         /* LIBS END */
+        helpers: '../helpers',
         lib: '/node_modules/@oat-sa/tao-core-libs/dist'
     },
     shim: {
@@ -63,7 +65,12 @@ define('context', ['module'], function(module) {
     return module.config();
 });
 
-define('i18n', [], () => text => text);
+define('i18n', ['core/format'], format => (text, ...variables) => {
+    if (variables) {
+        text = format(text, ...variables);
+    }
+    return text;
+});
 
 define('taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', [], () => ({
     name: 'mock',

@@ -61,6 +61,7 @@
         "postcss-node-sass": "^2.1.8",
         "postcss-scss": "^2.0.0",
         "qunit": "^2.9.2",
+        "require-css": "^0.1.10",
         "rollup": "^1.16.2",
         "rollup-plugin-alias": "^1.5.2",
         "rollup-plugin-babel": "^4.3.3",

@@ -16,21 +16,14 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
  */
 
-/**
- * This file contains path definitions for build scripts.
- */
 const path = require('path');
-const rootPath = path.resolve(__dirname, '..');
-const srcDir = path.resolve(rootPath, 'src');
+const { rootPath } = require('./path');
 
 module.exports = {
-    rootPath,
-    srcDir,
-    testDir: path.resolve(rootPath, 'test'),
-    outputDir: path.resolve(rootPath, 'dist'),
-    testOutputDir: path.resolve(rootPath, 'test'),
-    scssVendorDir: path.resolve(rootPath, 'node_modules', '@oat-sa', 'tao-core-ui', 'scss'),
-    aliases: {
-        'taoQtiTest/runner': srcDir
-    }
+    plugins: [
+        require('postcss-node-sass')({
+            includePaths: [path.resolve(rootPath, 'scss')]
+        }),
+        require('autoprefixer')
+    ]
 };

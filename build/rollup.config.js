@@ -20,6 +20,7 @@ import path from 'path';
 import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
+import cssResolve from './css-resolve';
 import externalAlias from './external-alias';
 import babel from 'rollup-plugin-babel';
 
@@ -49,7 +50,7 @@ const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
  */
 const localExternals = inputs.map(
     input =>
-        `taoTests/runner/${path
+        `taoQtiTest/runner/${path
             .relative(srcDir, input)
             .replace(/\\/g, '/')
             .replace(/\.js$/, '')}`
@@ -66,9 +67,20 @@ export default inputs.map(input => {
             format: 'amd',
             name
         },
-        external: [...localExternals],
+        external: [
+            ...localExternals,
+            'handlebars',
+            'jquery',
+            'lodash',
+            'moment',
+            'module',
+            'i18n',
+            'ckeditor',
+            'layout/loading-bar'
+        ],
         plugins: [
-            externalAlias(['core', 'ui', 'lib']),
+            cssResolve(),
+            externalAlias(['core', 'ui', 'util', 'lib', 'taoTests', 'taoItems', 'taoQtiItem']),
             alias({
                 resolve: ['.js', '.tpl'],
                 ...aliases

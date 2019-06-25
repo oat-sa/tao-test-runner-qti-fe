@@ -13,8 +13,9 @@
         "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",
         "build": "rollup --config ./build/rollup.config.js",
         "build:watch": "rollup --config ./build/rollup.config.js --watch",
+        "buildScss": "node ./build/scss.js",
         "lint": "eslint src",
-        "prepare": "npm run build"
+        "prepare": "npm run buildScss && npm run build"
     },
     "repository": {
         "type": "git",
@@ -42,7 +43,11 @@
         "@oat-sa/tao-core-libs": "^0.1.0",
         "@oat-sa/tao-core-sdk": "^0.4.1",
         "@oat-sa/tao-core-ui": "^0.16.1",
+        "@oat-sa/tao-item-runner": "github:oat-sa/tao-item-runner-fe#develop",
+        "@oat-sa/tao-item-runner-qti": "github:oat-sa/tao-item-runner-qti-fe#develop",
         "@oat-sa/tao-qunit-testrunner": "^0.1.0",
+        "@oat-sa/tao-test-runner": "github:oat-sa/tao-test-runner-fe#feature/NEX-92_initial-copy-of-test-runner-sources",
+        "autoprefixer": "^9.6.0",
         "eslint": "^6.0.1",
         "eslint-plugin-es": "^1.4.0",
         "eslint-plugin-jsdoc": "^8.6.0",
@@ -53,6 +58,8 @@
         "moment": "^2.11.1",
         "nyc": "^14.1.1",
         "open-cli": "^5.0.0",
+        "postcss-node-sass": "^2.1.8",
+        "postcss-scss": "^2.0.0",
         "qunit": "^2.9.2",
         "rollup": "^1.16.2",
         "rollup-plugin-alias": "^1.5.2",

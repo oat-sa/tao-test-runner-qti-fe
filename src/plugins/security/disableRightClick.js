@@ -13,24 +13,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
  */
-
 /**
- * This file contains path definitions for build scripts.
+ * @author Christophe Noël <christophe@taotesting.com>
  */
-const path = require('path');
-const rootPath = path.resolve(__dirname, '..');
-const srcDir = path.resolve(rootPath, 'src');
+import pluginFactory from 'taoTests/runner/plugin';
 
-module.exports = {
-    rootPath,
-    srcDir,
-    testDir: path.resolve(rootPath, 'test'),
-    outputDir: path.resolve(rootPath, 'dist'),
-    testOutputDir: path.resolve(rootPath, 'test'),
-    scssVendorDir: path.resolve(rootPath, 'node_modules', '@oat-sa', 'tao-core-ui', 'scss'),
-    aliases: {
-        'taoQtiTest/runner': srcDir
+export default pluginFactory({
+    name: 'disableRightClick',
+
+    /**
+     * Initializes the plugin (called during runner's init)
+     */
+    init: function init() {
+        var rightClickEvents = ['contextmenu', 'mousedown', 'mouseup'];
+
+        rightClickEvents.forEach(function(eventName) {
+            window.document.addEventListener(eventName, function disableRightClick(event) {
+                if (event.button === 2) {
+                    event.preventDefault();
+                }
+            });
+        });
     }
-};
+});

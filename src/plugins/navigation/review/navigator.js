@@ -23,7 +23,7 @@ import _ from 'lodash';
 import component from 'ui/component';
 import autoscroll from 'ui/autoscroll';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
-import navigatorTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator';
+import navigatorTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
 import navigatorTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
 
 /**

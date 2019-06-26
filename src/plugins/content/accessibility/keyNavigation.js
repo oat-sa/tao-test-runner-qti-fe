@@ -27,7 +27,7 @@ import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import shortcut from 'util/shortcut';
 import pluginFactory from 'taoTests/runner/plugin';
-import 'taoQtiTestCss/plugins/key-navigation.css';
+import 'taoQtiTest/runner/plugins/content/accessibility/css/key-navigation.css';
 
 /**
  * When either an element or its parents have this class - navigation from it would be disabled.

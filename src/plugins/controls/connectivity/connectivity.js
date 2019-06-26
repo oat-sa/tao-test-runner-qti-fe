@@ -25,7 +25,7 @@ import __ from 'i18n';
 import pollingFactory from 'core/polling';
 import waitingDialog from 'ui/waitingDialog/waitingDialog';
 import pluginFactory from 'taoTests/runner/plugin';
-import connectivityTpl from 'taoQtiTest/runner/plugins/controls/connectivity/connectivity';
+import connectivityTpl from 'taoQtiTest/runner/plugins/controls/connectivity/connectivity.tpl';
 
 /**
  * The plugin default configuration

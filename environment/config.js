@@ -33,6 +33,8 @@ requirejs.config({
         // because of templates
         'taoQtiTestSource/runner': '/src',
 
+        basicStyle: '/css',
+
         ui: '/node_modules/@oat-sa/tao-core-ui/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
         util: '/node_modules/@oat-sa/tao-core-sdk/dist/util',
@@ -72,7 +74,12 @@ requirejs.config({
     waitSeconds: 15
 });
 
-define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
+define('qunitLibs', [
+    'qunit/qunit',
+    'css!qunit/qunit.css',
+    'css!basicStyle/tao-main-style.css',
+    'css!basicStyle/new-test-runner.css'
+]);
 define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function() {
     requirejs.config({ nodeIdCompat: true });
 });

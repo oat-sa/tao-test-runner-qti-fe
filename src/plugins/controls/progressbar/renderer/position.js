@@ -20,7 +20,7 @@
  */
 import _ from 'lodash';
 import component from 'ui/component';
-import positionTpl from 'taoQtiTest/runner/plugins/controls/progressbar/renderer/position';
+import positionTpl from 'taoQtiTest/runner/plugins/controls/progressbar/renderer/position.tpl';
 import pointTpl from 'taoQtiTest/runner/plugins/controls/progressbar/renderer/position-point';
 
 /**

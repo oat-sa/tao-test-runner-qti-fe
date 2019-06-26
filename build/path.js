@@ -30,6 +30,7 @@ module.exports = {
     outputDir: path.resolve(rootPath, 'dist'),
     testOutputDir: path.resolve(rootPath, 'test'),
     scssVendorDir: path.resolve(rootPath, 'node_modules', '@oat-sa', 'tao-core-ui', 'scss'),
+    scssMainDir: path.resolve(rootPath, 'scss'),
     aliases: {
         'taoQtiTest/runner': srcDir
     }

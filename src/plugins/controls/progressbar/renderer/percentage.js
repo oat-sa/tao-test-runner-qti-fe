@@ -19,7 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import component from 'ui/component';
-import percentageTpl from 'taoQtiTest/runner/plugins/controls/progressbar/renderer/percentage';
+import percentageTpl from 'taoQtiTest/runner/plugins/controls/progressbar/renderer/percentage.tpl';
 import 'ui/progressbar';
 
 /**

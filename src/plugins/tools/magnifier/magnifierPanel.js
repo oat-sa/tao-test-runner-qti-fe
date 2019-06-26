@@ -21,7 +21,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import component from 'ui/component';
-import magnifierPanelTpl from 'taoQtiTest/runner/plugins/tools/magnifier/magnifierPanel';
+import magnifierPanelTpl from 'taoQtiTest/runner/plugins/tools/magnifier/magnifierPanel.tpl';
 import dynamicComponent from 'ui/dynamicComponent';
 
 /**

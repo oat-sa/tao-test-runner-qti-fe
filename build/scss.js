@@ -16,13 +16,13 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
  */
 
-const { mkdirp, copy, writeFile, readFile, access, constants } = require('fs-extra');
+const { mkdirp, writeFile, readFile, access, constants } = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
 const postcss = require('postcss');
 const postcssScss = require('postcss-scss');
 const promiseLimit = require('promise-limit');
-const { srcDir, scssVendorDir, rootPath } = require('./path');
+const { srcDir, scssMainDir, rootPath } = require('./path');
 const postcssConfig = require('./postcss.config');
 
 const limit = promiseLimit(5);
@@ -88,7 +88,7 @@ const writeOutResult = async result => {
 /**
  * Build scss files to css files
  */
-const scssDirectories = [scssVendorDir, srcDir];
+const scssDirectories = [scssMainDir, srcDir];
 
 glob(
     path.join(rootPath, `+(${scssDirectories.map(dir => path.relative(rootPath, dir)).join('|')})`, '**', '[^_]*.scss'),

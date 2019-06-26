@@ -23,7 +23,7 @@
  */
 import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';
-import titleTpl from 'taoQtiTest/runner/plugins/controls/title/title';
+import titleTpl from 'taoQtiTest/runner/plugins/controls/title/title.tpl';
 
 export default pluginFactory({
     name: 'title',

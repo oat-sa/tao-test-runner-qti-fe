@@ -28,7 +28,7 @@ import hider from 'ui/hider';
 import stackerFactory from 'ui/stacker';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
-import commentTpl from 'taoQtiTest/runner/plugins/tools/comment/comment';
+import commentTpl from 'taoQtiTest/runner/plugins/tools/comment/comment.tpl';
 
 /**
  * Returns the configured plugin

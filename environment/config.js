@@ -34,7 +34,12 @@ requirejs.config({
         ui: '/node_modules/@oat-sa/tao-core-ui/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
         util: '/node_modules/@oat-sa/tao-core-sdk/dist/util',
-        taoItems: '/node_modules/@oat-sa/tao-item-runner/dist',
+        'taoItems/assets': '/node_modules/@oat-sa/tao-item-runner/dist/assets',
+        'taoItems/runner': '/node_modules/@oat-sa/tao-item-runner/dist/runner',
+        'taoQtiItem/runner': '/node_modules/@oat-sa/tao-item-runner-qti/dist/runner',
+        'taoQtiItem/qtiItem': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiItem',
+        'taoQtiItem/qtiCommonRenderer': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiCommonRenderer',
+        'taoQtiItem/qtiRunner': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiRunner',
         jquery: '/node_modules/jquery/jquery',
         lodash: '/node_modules/lodash/lodash',
         moment: '/node_modules/moment/min/moment-with-locales',
@@ -42,6 +47,7 @@ requirejs.config({
 
         /* LIBS */
         'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
+        class: '/lib/class',
         // 'lib/moment-timezone.min': '/node_modules/moment-timezone/builds/moment-timezone-with-data.min',
         // async: '/node_modules/async/lib/async',
         /* LIBS END */
@@ -76,3 +82,21 @@ define('taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', 
     name: 'mock',
     handle: () => {}
 }));
+
+define('taoQtiItem/portableElementRegistry/ciRegistry', [], () => ({
+    resetProviders() {
+        throw new Error('Not implemented');
+    },
+    registerProvider() {
+        throw new Error('Not implemented');
+    }
+}));
+define('taoQtiItem/portableElementRegistry/icRegistry', [], () => ({
+    resetProviders() {
+        throw new Error('Not implemented');
+    },
+    registerProvider() {
+        throw new Error('Not implemented');
+    }
+}));
+define('taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory', [], () => {});

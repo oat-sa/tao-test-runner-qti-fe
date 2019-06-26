@@ -41,7 +41,7 @@ requirejs.config({
         handlebars: '/node_modules/handlebars/dist/handlebars.amd',
 
         /* LIBS */
-        // 'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
+        'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
         // 'lib/moment-timezone.min': '/node_modules/moment-timezone/builds/moment-timezone-with-data.min',
         // async: '/node_modules/async/lib/async',
         /* LIBS END */

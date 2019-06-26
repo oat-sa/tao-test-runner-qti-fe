@@ -403,7 +403,7 @@ var qtiProvider = {
                         new Promise(function(resolve) {
                             if (
                                 context.options &&
-                                context.options.hasOwnProperty('noAlertTimeout') &&
+                                Object.prototype.hasOwnProperty.call(context.options, 'noAlertTimeout') &&
                                 context.options.noAlertTimeout
                             ) {
                                 resolve();

@@ -18,6 +18,8 @@
 /**
  * @author Péter Halász <peter@taotesting.com>
  */
+
+import _ from 'lodash';
 import __ from 'i18n';
 
 /**

@@ -46,10 +46,10 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
     function addResponsesToResponseStore(params) {
         if (params.itemResponse) {
             _.forEach(params.itemResponse, function(response, itemResponseIdentifier) {
-                var responseIdentifier = params.itemDefinition + '.' + itemResponseIdentifier;
+                var responseIdentifier = `${params.itemDefinition}.${itemResponseIdentifier}`;
 
                 _.forEach(response, function(responseEntry) {
-                    var responseId = responseEntry ? responseEntry.identifier : undefined;
+                    var responseId = responseEntry && responseEntry.identifier;
 
                     if (Array.isArray(responseId)) {
                         responseId.forEach(function(id) {
@@ -178,7 +178,7 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
                     .then(function(item) {
                         if (item) {
                             _.forEach(item.itemData.data.responses, function(response) {
-                                var responseIdentifier = item.itemIdentifier + '.' + response.identifier;
+                                var responseIdentifier = `${item.itemIdentifier}.${response.identifier}`;
 
                                 responseStore.addCorrectResponse(responseIdentifier, response.correctResponses);
                             });
@@ -334,10 +334,9 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
         /**
          * Adds the first item of the next section to the end of the jump table
          *
-         * @param {Object} [params]]
          * @returns {Promise}
          */
-        jumpToNextSection: function jumpToNextSection(params) {
+        jumpToNextSection: function jumpToNextSection() {
             var self = this;
 
             return new Promise(function(resolve) {
@@ -363,10 +362,9 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
         /**
          * Jumps to the previous item by deleting the last entry of the jump table.
          *
-         * @param {Object} [params]
          * @returns {Promise}
          */
-        jumpToPreviousItem: function jumpToPreviousItem(params) {
+        jumpToPreviousItem: function jumpToPreviousItem() {
             return new Promise(function(resolve) {
                 jumpTable.pop();
 

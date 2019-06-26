@@ -43,10 +43,10 @@ export default pluginFactory({
             e.stopPropagation();
         });
 
-        var shield = function shield() {
+        const shield = function shield() {
             self.enable();
         };
-        var unshield = function unshield(itemRef) {
+        const unshield = function unshield() {
             self.disable();
         };
 

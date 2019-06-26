@@ -38,10 +38,10 @@ define([
         get : function get(what, ns){
             var localConfig = this.getConfig();
             if (ns) {
-                what += '_' + ns;
+                what += `_${  ns}`;
 
-            } else if (localConfig.activeNamespace && config[what + '_' + localConfig.activeNamespace]) {
-                what += '_' + localConfig.activeNamespace;
+            } else if (localConfig.activeNamespace && config[`${what  }_${  localConfig.activeNamespace}`]) {
+                what += `_${  localConfig.activeNamespace}`;
             }
             if(_.isPlainObject(localConfig[what])){
                 return localConfig[what];

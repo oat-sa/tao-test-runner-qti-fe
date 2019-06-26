@@ -109,7 +109,7 @@ export default function compoundMaskFactory(options, dimensions, position) {
                     var $element = this.getElement();
                     _.forOwn(this.config.edgesBorders, function(isResizable, edgeId) {
                         if (isResizable) {
-                            $element.addClass(`border-${  edgeId}`);
+                            $element.addClass(`border-${edgeId}`);
                         }
                     });
                 },
@@ -137,7 +137,7 @@ export default function compoundMaskFactory(options, dimensions, position) {
                     this.addResizeControll();
                 }
 
-                $element.addClass(`line-reader-mask ${  maskConfig.id}`).on('mousedown touchstart', function() {
+                $element.addClass(`line-reader-mask ${maskConfig.id}`).on('mousedown touchstart', function() {
                     bringAllToFront();
                 });
 
@@ -257,12 +257,12 @@ export default function compoundMaskFactory(options, dimensions, position) {
                     });
 
                 $element
-                    .addClass(`line-reader-overlay ${  overlayConfig.id}`)
-                    .on(`${pointerEventsPrefix  }down` + ` touchstart`, function() {
+                    .addClass(`line-reader-overlay ${overlayConfig.id}`)
+                    .on(`${pointerEventsPrefix}down` + ` touchstart`, function() {
                         bringAllToFront();
                         self.transformOverlay();
                     })
-                    .on(`${pointerEventsPrefix  }up` + ` touchend`, function() {
+                    .on(`${pointerEventsPrefix}up` + ` touchend`, function() {
                         self.restoreOverlay();
                     })
                     .prepend($moveIcon);
@@ -437,7 +437,7 @@ export default function compoundMaskFactory(options, dimensions, position) {
     function invokeOn(target, fn, args) {
         _.forOwn(allParts, function(part) {
             if (_.isObject(part[target]) && _.isFunction(part[target][fn])) {
-                part[target][fn].apply(part[target], args);
+                part[target][fn](...args);
             }
         });
     }

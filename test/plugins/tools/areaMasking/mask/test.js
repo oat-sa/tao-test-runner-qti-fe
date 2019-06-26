@@ -55,7 +55,7 @@ define(['jquery', 'ui/component/placeable', 'taoQtiTest/runner/plugins/tools/are
         .test('component API contains ', function(data, assert) {
             var component = maskComponentFactory();
             assert.expect(1);
-            assert.equal(typeof component[data.name], 'function', `The component has the method ${  data.name}`);
+            assert.equal(typeof component[data.name], 'function', `The component has the method ${data.name}`);
         });
 
     QUnit.test('component is placeable', function(assert) {
@@ -128,12 +128,12 @@ define(['jquery', 'ui/component/placeable', 'taoQtiTest/runner/plugins/tools/are
             })
             .on('preview', function() {
                 var self = this;
-                var $container = this.getElement();
-                var $element = $('.mask', $container);
+                const $localContainer = this.getElement();
+                var $element = $('.mask', $localContainer);
                 var $inner = $('.inner', $element);
 
                 assert.ok(this.is('previewing'), 'We are previewing');
-                assert.ok($container.hasClass('previewing'), 'We are previewing');
+                assert.ok($localContainer.hasClass('previewing'), 'We are previewing');
 
                 //Takes into account the CSS transition
                 setTimeout(function() {

@@ -135,7 +135,7 @@ export default pluginFactory({
             testRunner.trigger('disablenav');
 
             if (self.getState('enabled') !== false) {
-                var warningHelper = nextWarningHelper({
+                const warningHelper = nextWarningHelper({
                     endTestWarning: testOptions.endTestWarning,
                     isLast: context.isLast,
                     isLinear: context.isLinear,
@@ -194,7 +194,7 @@ export default pluginFactory({
         if (testConfig.allowShortcuts && pluginShortcuts.trigger) {
             shortcut.add(
                 namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
-                function(e) {
+                function() {
                     if (self.getState('enabled') === true) {
                         testRunner.trigger('nav-next', true);
                     }

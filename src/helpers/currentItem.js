@@ -190,7 +190,7 @@ var currentItemHelper = {
             var qtiClass = interaction.__proto__.qtiClass;
             var constraintProperty;
 
-            if (interactionMinConstraintProperties.hasOwnProperty(qtiClass)) {
+            if (Object.prototype.hasOwnProperty.call(interactionMinConstraintProperties, qtiClass)) {
                 constraintProperty = interactionMinConstraintProperties[qtiClass];
                 constraintValues[attributes.responseIdentifier] = attributes[constraintProperty];
             }
@@ -277,7 +277,7 @@ var currentItemHelper = {
         if (stimuli.length > 0) {
             // Filter the ones containing text:
             textStimuli = stimuli.filter(function(stimulusHref) {
-                var domNode = document.querySelector('.qti-include[data-href="' + stimulusHref + '"]');
+                var domNode = document.querySelector(`.qti-include[data-href="${stimulusHref}"]`);
                 return _(domNode.childNodes).some(function(child) {
                     return child.nodeType === child.TEXT_NODE;
                 });

@@ -67,7 +67,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/perce
             assert.equal(
                 typeof instance[data.title],
                 'function',
-                'The percentageRendererFactory exposes the component method "' + data.title
+                `The percentageRendererFactory exposes the component method "${  data.title}`
             );
         });
 
@@ -78,7 +78,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/perce
             assert.equal(
                 typeof instance[data.title],
                 'function',
-                'The percentageRendererFactory exposes the eventifier method "' + data.title
+                `The percentageRendererFactory exposes the eventifier method "${  data.title}`
             );
         });
 
@@ -87,7 +87,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/perce
         assert.equal(
             typeof instance[data.title],
             'function',
-            'The percentageRendererFactory exposes the method "' + data.title
+            `The percentageRendererFactory exposes the method "${  data.title}`
         );
     });
 
@@ -169,7 +169,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/perce
                 );
                 assert.equal(
                     $('[data-control="progress-bar"] span', $container).get(0).style.width,
-                    data.ratio + '%',
+                    `${data.ratio  }%`,
                     'The component bar is correct'
                 );
 
@@ -226,7 +226,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/perce
                 );
                 assert.equal(
                     $('[data-control="progress-bar"] span', $container).get(0).style.width,
-                    data.ratio + '%',
+                    `${data.ratio  }%`,
                     'The component bar is correct'
                 );
 
@@ -291,7 +291,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/perce
                 );
                 assert.equal(
                     $('[data-control="progress-bar"] span', $container).get(0).style.width,
-                    data.ratio + '%',
+                    `${data.ratio  }%`,
                     'The component bar is correct'
                 );
 

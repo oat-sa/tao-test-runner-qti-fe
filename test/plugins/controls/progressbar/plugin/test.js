@@ -225,9 +225,6 @@ define([
         plugin
             .init()
             .then(function() {
-                var testRunner = plugin.getTestRunner();
-                var testData = testRunner.getTestData();
-
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 assert.equal($container.find('.progress-box').length, 0, 'The plugin has not been inserted yet');

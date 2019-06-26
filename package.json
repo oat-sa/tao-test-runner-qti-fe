@@ -14,7 +14,7 @@
         "build": "rollup --config ./build/rollup.config.js",
         "build:watch": "rollup --config ./build/rollup.config.js --watch",
         "buildScss": "node ./build/scss.js",
-        "lint": "eslint src",
+        "lint": "eslint src test",
         "prepare": "npm run buildScss && npm run build"
     },
     "repository": {

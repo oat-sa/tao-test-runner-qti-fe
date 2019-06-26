@@ -122,8 +122,8 @@ define([
                 case 1: {
                     collapsedBtns = 0;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     $actionsBar.width(ALL_EXPANDED - 1);
                     runner.trigger('collapseTools');
@@ -132,8 +132,8 @@ define([
                 case 2: {
                     collapsedBtns = 1;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find(collapseOrder[0]).hasClass(noLabelCls), 'button1 has been collapsed');
 
@@ -145,8 +145,8 @@ define([
                 case 3: {
                     collapsedBtns = 3;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find(collapseOrder[0]).hasClass(noLabelCls), 'button1 has been collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
@@ -161,8 +161,8 @@ define([
                 case 4: {
                     collapsedBtns = 4;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find(collapseOrder[0]).hasClass(noLabelCls), 'button1 has been collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
@@ -178,8 +178,8 @@ define([
                 case 5: {
                     collapsedBtns = 6;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find(collapseOrder[0]).hasClass(noLabelCls), 'button1 has been collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
@@ -197,8 +197,8 @@ define([
                 case 6: {
                     collapsedBtns = 4;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find(collapseOrder[0]).hasClass(noLabelCls), 'button1 remain collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 remain collapsed');
@@ -216,8 +216,8 @@ define([
                 case 7: {
                     collapsedBtns = 3;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find(collapseOrder[0]).hasClass(noLabelCls), 'button1 remain collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 remain collapsed');
@@ -235,8 +235,8 @@ define([
                 case 8: {
                     collapsedBtns = 1;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find(collapseOrder[0]).hasClass(noLabelCls), 'button1 remain collapsed');
                     assert.ok(! $container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been expanded');
@@ -253,8 +253,8 @@ define([
                 case 9: {
                     collapsedBtns = 0;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok(! $container.find(collapseOrder[0]).hasClass(noLabelCls), 'button1 has been expanded');
                     assert.ok(! $container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been expanded');
@@ -277,7 +277,7 @@ define([
                 runner.trigger('loaditem');
             })
             .catch(function(err) {
-                assert.ok(false, 'Error in init method: ' + err);
+                assert.ok(false, `Error in init method: ${  err}`);
                 ready();
             });
     });
@@ -334,8 +334,8 @@ define([
                 case 1: {
                     collapsedBtns = 0;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     $actionsBar.width(ALL_EXPANDED - 1);
                     runner.trigger('collapseTools');
@@ -344,8 +344,8 @@ define([
                 case 2: {
                     collapsedBtns = 2;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
                     assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
 
@@ -357,8 +357,8 @@ define([
                 case 3: {
                     collapsedBtns = 3;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
@@ -374,8 +374,8 @@ define([
                 case 4: {
                     collapsedBtns = 4;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
@@ -392,8 +392,8 @@ define([
                 case 5: {
                     collapsedBtns = 6;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
@@ -412,8 +412,8 @@ define([
                 case 6: {
                     collapsedBtns = 4;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 remains collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 remains collapsed');
@@ -432,8 +432,8 @@ define([
                 case 7: {
                     collapsedBtns = 3;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 remains collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 remains collapsed');
@@ -454,8 +454,8 @@ define([
                     //Two because the first two buttons are in a group
                     collapsedBtns = 2;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 remains collapsed');
                     assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 remains collapsed');
@@ -474,8 +474,8 @@ define([
                 case 9: {
                     collapsedBtns = 0;
 
-                    $collapsed = $container.find('.' + noLabelCls);
-                    assert.equal($collapsed.length, collapsedBtns, collapsedBtns + ' buttons are collapsed');
+                    $collapsed = $container.find(`.${  noLabelCls}`);
+                    assert.equal($collapsed.length, collapsedBtns, `${collapsedBtns  } buttons are collapsed`);
 
                     assert.ok(! $container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been expanded');
                     assert.ok(! $container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been expanded');
@@ -499,7 +499,7 @@ define([
                 runner.trigger('loaditem');
             })
             .catch(function(err) {
-                assert.ok(false, 'Error in init method: ' + err);
+                assert.ok(false, `Error in init method: ${  err}`);
                 ready();
             });
     });
@@ -622,7 +622,7 @@ define([
                     runner.trigger('loaditem');
                 })
                 .catch(function(err) {
-                    assert.ok(false, 'Error in init method: ' + err);
+                    assert.ok(false, `Error in init method: ${  err}`);
                     ready();
                 });
         });

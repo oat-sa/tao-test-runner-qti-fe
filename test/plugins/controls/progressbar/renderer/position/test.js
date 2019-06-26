@@ -67,7 +67,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/posit
             assert.equal(
                 typeof instance[data.title],
                 'function',
-                'The positionRendererFactory exposes the component method "' + data.title
+                `The positionRendererFactory exposes the component method "${  data.title}`
             );
         });
 
@@ -78,7 +78,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/posit
             assert.equal(
                 typeof instance[data.title],
                 'function',
-                'The positionRendererFactory exposes the eventifier method "' + data.title
+                `The positionRendererFactory exposes the eventifier method "${  data.title}`
             );
         });
 
@@ -87,7 +87,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/posit
         assert.equal(
             typeof instance[data.title],
             'function',
-            'The positionRendererFactory exposes the method "' + data.title
+            `The positionRendererFactory exposes the method "${  data.title}`
         );
     });
 
@@ -181,7 +181,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/posit
                 );
                 assert.equal(
                     $(
-                        '[data-control="progress-bar"] .progressbar-point:eq(' + (data.position - 1) + ')',
+                        `[data-control="progress-bar"] .progressbar-point:eq(${  data.position - 1  })`,
                         $container
                     ).hasClass('current'),
                     true,
@@ -253,7 +253,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/posit
                 );
                 assert.equal(
                     $(
-                        '[data-control="progress-bar"] .progressbar-point:eq(' + (data.position - 1) + ')',
+                        `[data-control="progress-bar"] .progressbar-point:eq(${  data.position - 1  })`,
                         $container
                     ).hasClass('current'),
                     true,
@@ -333,7 +333,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/progressbar/renderer/posit
                 );
                 assert.equal(
                     $(
-                        '[data-control="progress-bar"] .progressbar-point:eq(' + (data.position - 1) + ')',
+                        `[data-control="progress-bar"] .progressbar-point:eq(${  data.position - 1  })`,
                         $container
                     ).hasClass('current'),
                     true,

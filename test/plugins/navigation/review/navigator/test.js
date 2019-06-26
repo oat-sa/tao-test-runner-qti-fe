@@ -103,7 +103,7 @@ define([
         .test('component API contains ', function(data, assert) {
             var component = navigatorFactory(sample.config, sample.map, sample.context);
             assert.expect(1);
-            assert.equal(typeof component[data.name], 'function', 'The component has the method ' + data.name);
+            assert.equal(typeof component[data.name], 'function', `The component has the method ${  data.name}`);
         });
 
     QUnit.cases
@@ -124,7 +124,7 @@ define([
         .test('eventifier API contains ', function(data, assert) {
             var component = navigatorFactory(sample.config, sample.map, sample.context);
             assert.expect(1);
-            assert.equal(typeof component[data.name], 'function', 'The component has the method ' + data.name);
+            assert.equal(typeof component[data.name], 'function', `The component has the method ${  data.name}`);
         });
 
     QUnit.module('Behavior');

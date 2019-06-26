@@ -409,7 +409,7 @@ function magnifierPanelFactory(config) {
             return;
         }
 
-        var $window = $(window);
+        const $window = $(window);
         dynamicComponentInstance.config.maxWidth = $window.width() * maxRatio;
         dynamicComponentInstance.config.maxHeight = $window.height() * maxRatio;
     }

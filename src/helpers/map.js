@@ -101,7 +101,7 @@ export default {
             if (sections) {
                 _.forEach(sections, function(section) {
                     if (section.active) {
-                        var items = section.items;
+                        const items = section.items;
                         _.forEach(items, function(item) {
                             if (item.active) {
                                 result = item;

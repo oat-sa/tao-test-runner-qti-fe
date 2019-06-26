@@ -44,7 +44,7 @@ define([
 
             assert.expect(1);
 
-            assert.ok(typeof answerMasking[data.title] === 'function', 'The instance has a ' + data.title + ' method');
+            assert.ok(typeof answerMasking[data.title] === 'function', `The instance has a ${  data.title  } method`);
         });
 
     QUnit.module('Area Masking');

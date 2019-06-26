@@ -76,12 +76,12 @@ define([
         assert.equal(mapHelper.getJumps(map), map.jumps, 'The map helper getJumps provides the map jumps');
         assert.equal(
             mapHelper.getJumps({}),
-            undefined,
+            void 0,
             'The map helper getJumps does not provide the map jumps when the map is wrong'
         );
         assert.equal(
             mapHelper.getJumps(),
-            undefined,
+            void 0,
             'The map helper getJumps does not provide the map jumps when the map does not exist'
         );
     });
@@ -96,12 +96,12 @@ define([
         assert.equal(mapHelper.getParts(map), map.parts, 'The map helper getParts provides the map parts');
         assert.equal(
             mapHelper.getParts({}),
-            undefined,
+            void 0,
             'The map helper getParts does not provide the map parts when the map is wrong'
         );
         assert.equal(
             mapHelper.getParts(),
-            undefined,
+            void 0,
             'The map helper getParts does not provide the map parts when the map does not exist'
         );
     });
@@ -116,17 +116,17 @@ define([
         assert.equal(mapHelper.getJump(map, 1), map.jumps[1], 'The map helper getJump provides the right jump');
         assert.equal(
             mapHelper.getJump(map, 10),
-            undefined,
+            void 0,
             'The map helper getJump does not provide any jump when the position does not exist'
         );
         assert.equal(
             mapHelper.getJump({}),
-            undefined,
+            void 0,
             'The map helper getJump does not provide any jump when the map is wrong'
         );
         assert.equal(
             mapHelper.getJump(),
-            undefined,
+            void 0,
             'The map helper getJump does not provide any jump when the map does not exist'
         );
     });
@@ -141,17 +141,17 @@ define([
         );
         assert.equal(
             mapHelper.getPart(mapSample, 'testPart-0'),
-            undefined,
+            void 0,
             'The map helper getPart does not provide any part when the part does not exist'
         );
         assert.equal(
             mapHelper.getPart({}),
-            undefined,
+            void 0,
             'The map helper getPart does not provide any part when the map is wrong'
         );
         assert.equal(
             mapHelper.getPart(),
-            undefined,
+            void 0,
             'The map helper getPart does not provide any part when the map does not exist'
         );
     });
@@ -166,17 +166,17 @@ define([
         );
         assert.equal(
             mapHelper.getSection(mapSample, 'assessmentSection-0'),
-            undefined,
+            void 0,
             'The map helper getSection does not provide any section when the section does not exist'
         );
         assert.equal(
             mapHelper.getSection({}),
-            undefined,
+            void 0,
             'The map helper getSection does not provide any section when the map is wrong'
         );
         assert.equal(
             mapHelper.getSection(),
-            undefined,
+            void 0,
             'The map helper getSection does not provide any section when the map does not exist'
         );
     });
@@ -253,17 +253,17 @@ define([
         );
         assert.equal(
             mapHelper.getItem(mapSample, 'item-0'),
-            undefined,
+            void 0,
             'The map helper getItem does not provide any item when the item does not exist'
         );
         assert.equal(
             mapHelper.getItem({}),
-            undefined,
+            void 0,
             'The map helper getItem does not provide any item when the map is wrong'
         );
         assert.equal(
             mapHelper.getItem(),
-            undefined,
+            void 0,
             'The map helper getItem does not provide any item when the map does not exist'
         );
     });
@@ -278,12 +278,12 @@ define([
         assert.equal(mapHelper.getTestStats(map), map.stats, 'The map helper getTestStats provides the right stats');
         assert.equal(
             mapHelper.getTestStats({}),
-            undefined,
+            void 0,
             'The map helper getTestStats does not provide any stats when the map is wrong'
         );
         assert.equal(
             mapHelper.getTestStats(),
-            undefined,
+            void 0,
             'The map helper getTestStats does not provide any stats when the map does not exist'
         );
     });
@@ -298,17 +298,17 @@ define([
         );
         assert.equal(
             mapHelper.getPartStats(mapSample, 'testPart-0'),
-            undefined,
+            void 0,
             'The map helper getPartStats does not provide any stats when the part does not exist'
         );
         assert.equal(
             mapHelper.getPartStats({}),
-            undefined,
+            void 0,
             'The map helper getPartStats does not provide any stats when the map is wrong'
         );
         assert.equal(
             mapHelper.getPartStats(),
-            undefined,
+            void 0,
             'The map helper getPartStats does not provide any stats when the map does not exist'
         );
     });
@@ -323,17 +323,17 @@ define([
         );
         assert.equal(
             mapHelper.getSectionStats(mapSample, 'assessmentSection-0'),
-            undefined,
+            void 0,
             'The map helper getSectionStats does not provide any stats when the section does not exist'
         );
         assert.equal(
             mapHelper.getSectionStats({}),
-            undefined,
+            void 0,
             'The map helper getSectionStats does not provide any stats when the map is wrong'
         );
         assert.equal(
             mapHelper.getSectionStats(),
-            undefined,
+            void 0,
             'The map helper getSectionStats does not provide any stats when the map does not exist'
         );
     });
@@ -368,22 +368,22 @@ define([
         );
         assert.equal(
             mapHelper.getScopeStats(mapSample, 100, 'part'),
-            undefined,
+            void 0,
             'The map helper getScopeStats does not provide any stats when the position does not exist and the scope is "part"'
         );
         assert.equal(
             mapHelper.getScopeStats(mapSample, 100, 'section'),
-            undefined,
+            void 0,
             'The map helper getScopeStats does not provide any stats when the section does not exist and the scope is "section"'
         );
         assert.equal(
             mapHelper.getScopeStats({}, 1),
-            undefined,
+            void 0,
             'The map helper getScopeStats does not provide any stats when the map is wrong'
         );
         assert.equal(
             mapHelper.getScopeStats(),
-            undefined,
+            void 0,
             'The map helper getScopeStats does not provide any stats when the map does not exist'
         );
     });
@@ -495,17 +495,17 @@ define([
         );
         assert.equal(
             mapHelper.getItemPart(mapSample, 100),
-            undefined,
+            void 0,
             'The map helper getItemPart does not provide any part when the position does not exist'
         );
         assert.equal(
             mapHelper.getItemPart({}),
-            undefined,
+            void 0,
             'The map helper getItemPart does not provide any part when the map is wrong'
         );
         assert.equal(
             mapHelper.getItemPart(),
-            undefined,
+            void 0,
             'The map helper getItemPart does not provide any part when the map does not exist'
         );
     });
@@ -520,17 +520,17 @@ define([
         );
         assert.equal(
             mapHelper.getItemSection(mapSample, 100),
-            undefined,
+            void 0,
             'The map helper getItemSection does not provide any section when the position does not exist'
         );
         assert.equal(
             mapHelper.getItemSection({}),
-            undefined,
+            void 0,
             'The map helper getItemSection does not provide any section when the map is wrong'
         );
         assert.equal(
             mapHelper.getItemSection(),
-            undefined,
+            void 0,
             'The map helper getItemSection does not provide any section when the map does not exist'
         );
     });
@@ -545,17 +545,17 @@ define([
         );
         assert.equal(
             mapHelper.getItemAt(mapSample, 100),
-            undefined,
+            void 0,
             'The map helper getItemAt does not provide any item when the position does not exist'
         );
         assert.equal(
             mapHelper.getItemAt({}),
-            undefined,
+            void 0,
             'The map helper getItemAt does not provide any item when the map is wrong'
         );
         assert.equal(
             mapHelper.getItemAt(),
-            undefined,
+            void 0,
             'The map helper getItemAt does not provide any item when the map does not exist'
         );
     });
@@ -575,22 +575,22 @@ define([
         );
         assert.equal(
             mapHelper.getItemIdentifier(mapSample, 'item-100'),
-            undefined,
+            void 0,
             'The map helper getItemIdentifier does not provide the identifier if the item does not exist'
         );
         assert.equal(
             mapHelper.getItemIdentifier(mapSample, 100),
-            undefined,
+            void 0,
             'The map helper getItemIdentifier does not provide any identifier when the position does not exist'
         );
         assert.equal(
             mapHelper.getItemIdentifier({}),
-            undefined,
+            void 0,
             'The map helper getItemIdentifier does not provide any identifier when the map is wrong'
         );
         assert.equal(
             mapHelper.getItemIdentifier(),
-            undefined,
+            void 0,
             'The map helper getItemIdentifier does not provide any identifier when the map does not exist'
         );
     });

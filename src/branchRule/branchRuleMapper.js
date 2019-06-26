@@ -47,7 +47,7 @@ export default function branchRuleMapperFactory(
     responseStore
 ) {
     if (!(branchRuleName in branchRuleMap)) {
-        throw new Error('Invalid branch rule name: ' + branchRuleName);
+        throw new Error(`Invalid branch rule name: ${  branchRuleName}`);
     }
 
     return branchRuleMap[branchRuleName](

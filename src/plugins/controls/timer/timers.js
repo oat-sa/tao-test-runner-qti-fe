@@ -136,7 +136,7 @@ export default function getTimers(timeConstraints, isLinear, config) {
         timer.allowLateSubmission = constraintData.allowLateSubmission;
 
         if (type === 'min') {
-            timer.id = type + '-' + constraintData.scope + '-' + constraintData.source;
+            timer.id = `${type  }-${  constraintData.scope  }-${  constraintData.source}`;
             timer.originalTime = constraintData.minTime * precision;
             timer.remainingTime = constraintData.minTimeRemaining * precision;
         } else {

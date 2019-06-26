@@ -157,6 +157,7 @@ define([
              * We call the proxy in order to get the item data
              *
              * @this {runner} the runner context, not the provider
+             * @param {number} itemIndex
              * @returns {Promise} that calls in parallel the state and the item data
              */
             loadItem: function loadItem(itemIndex) {
@@ -184,7 +185,8 @@ define([
              * Here we iniitialize the item runner and wrap it's call to the test runner
              *
              * @this {runner} the runner context, not the provider
-             * @returns {Promise} resolves when the item is ready
+             * @param {number} itemIndex
+             * @param {object} item
              */
             renderItem: function renderItem(itemIndex, item) {
                 var broker = this.getAreaBroker();
@@ -198,7 +200,6 @@ define([
              * Calls proxy.finish to close the testj
              *
              * @this {runner} the runner context, not the provider
-             * @returns {Promise} proxy.finish
              */
             finish: function() {
                 var broker = this.getAreaBroker();

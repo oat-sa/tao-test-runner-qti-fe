@@ -42,7 +42,7 @@ define(function() {
      * Returns the mock branchRuleMapper which supports two mock branchRule:
      *      - MOCK_TRUE_BRANCH_RULE, which will return true
      *      - MOCK_FALSE_BRANCH_RULE, which will return false
-     * @param branchRuleName
+     * @param {string} branchRuleName
      * @returns {Object}
      */
     function getMockBranchRuleMapper(branchRuleName) {

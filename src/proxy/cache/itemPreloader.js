@@ -35,7 +35,6 @@ var logger = loggerFactory('taoQtiTest/runner/proxy/cache/itemPreloader');
  * @returns {Boolean}
  */
 var relSupport = function relSupport(feature) {
-    var tokenList;
     var fakeLink = document.createElement('link');
     try {
         if (fakeLink.relList && _.isFunction(fakeLink.relList.supports)) {
@@ -339,7 +338,7 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
          * @param {String} itemIdentifier - the item identifier
          * @returns {Promise}
          */
-        unload: function unload(item, itemIdentifier) {
+        unload: function unload(item) {
             if (isItemObjectValid(item) && _.size(item.itemData.assets) > 0) {
                 return resolveAssets(item.baseUrl, item.itemData.assets).then(function(resolved) {
                     _.forEach(resolved, function(assets, type) {

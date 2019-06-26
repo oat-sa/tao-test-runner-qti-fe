@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test Runner - Item Theme Switcher</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function() {
+                require(['qunitEnv'], function() {
+                    //some mocks
+                    requirejs.config({
+                        paths: {
+                            'ui/themes': '/test/plugins/tools/itemThemeSwitcher/themesMock'
+                        }
+                    });
+                    require(['taoQtiTest/test/runner/plugins/tools/itemThemeSwitcher/test'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+        <link rel="stylesheet" type="text/css" href="css/tao-main-style.css" />
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>

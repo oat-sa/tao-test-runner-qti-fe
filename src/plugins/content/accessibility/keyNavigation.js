@@ -392,7 +392,7 @@ function initInteractionNavigation($interaction) {
     interactionNavigables = navigableDomElement.createFromDoms($inputs);
 
     if (interactionNavigables.length) {
-        var keyNavigatorItem = keyNavigator({
+        const keyNavigatorItem = keyNavigator({
             elements: interactionNavigables,
             group: $interaction,
             loop: false

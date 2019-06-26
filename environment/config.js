@@ -22,14 +22,16 @@ requirejs.config({
         css: '/node_modules/require-css/css',
         json: '/node_modules/requirejs-plugins/src/json',
         text: '/node_modules/requirejs-plugins/lib/text',
-        // tpl: '/environment/tpl',
 
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',
         qunit: '/node_modules/qunit/qunit',
         'taoQtiTest/test/runner': '/test',
+        'taoQtiItem/test/samples': '/test/samples',
 
         'taoQtiTest/runner': '/dist',
+        // because of templates
+        'taoQtiTestSource/runner': '/src',
 
         ui: '/node_modules/@oat-sa/tao-core-ui/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
@@ -40,6 +42,7 @@ requirejs.config({
         'taoQtiItem/qtiItem': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiItem',
         'taoQtiItem/qtiCommonRenderer': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiCommonRenderer',
         'taoQtiItem/qtiRunner': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiRunner',
+        'taoTests/runner': '/node_modules/@oat-sa/tao-test-runner/dist',
         jquery: '/node_modules/jquery/jquery',
         lodash: '/node_modules/lodash/lodash',
         moment: '/node_modules/moment/min/moment-with-locales',
@@ -47,11 +50,18 @@ requirejs.config({
 
         /* LIBS */
         'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
+        'lib/simulator': '/lib/simulator',
+        'lib/unmatrix': '/lib/unmatrix',
         class: '/lib/class',
+        tpl: '/lib/tpl',
         // 'lib/moment-timezone.min': '/node_modules/moment-timezone/builds/moment-timezone-with-data.min',
-        // async: '/node_modules/async/lib/async',
+        async: '/node_modules/async/lib/async',
+        'lib/gamp/gamp': '/node_modules/gamp/src/gamp',
+        select2: '/node_modules/select2/select2',
+        interact: '/node_modules/interactjs/dist/interact',
+        'lib/popper/tooltip': '/node_modules/tooltip.js/dist/umd/tooltip',
+        popper: '/node_modules/popper.js/dist/umd/popper',
         /* LIBS END */
-        helpers: '../helpers',
         lib: '/node_modules/@oat-sa/tao-core-libs/dist'
     },
     shim: {

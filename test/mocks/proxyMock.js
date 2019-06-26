@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define(['jquery', 'lodash'], function($, _) {
+define(['lodash'], function(_) {
     'use strict';
 
     /**
@@ -42,7 +42,7 @@ define(['jquery', 'lodash'], function($, _) {
          * @returns {Promise}
          */
         function request(scope, action, params) {
-            var mockBaseName = `${scope  }Actions`;
+            var mockBaseName = `${scope}Actions`;
             var mockBase = mockConfig[mockBaseName];
             var mockAction = mockBase && mockBase[action];
             var response, message;
@@ -50,7 +50,7 @@ define(['jquery', 'lodash'], function($, _) {
             if (_.isFunction(mockAction)) {
                 response = mockAction.apply(this, params);
             } else {
-                message = `Missing proxy mock implementation for ${  scope  } action: ${  action}`;
+                message = `Missing proxy mock implementation for ${scope} action: ${action}`;
                 response = Promise.reject({
                     success: false,
                     type: 'error',
@@ -65,12 +65,12 @@ define(['jquery', 'lodash'], function($, _) {
         return {
             /**
              * Initializes the proxy
-             * @param {Object} [config] - The config provided to the proxy factory
+             * @param {Object} [proxyFactoryConfig] - The config provided to the proxy factory
              * @returns {Promise} - Returns a promise. The proxy will be fully initialized on resolve.
              *                      Any error will be provided if rejected.
              */
-            init: function init(config) {
-                initConfig = config || {};
+            init: function init(proxyFactoryConfig = {}) {
+                initConfig = proxyFactoryConfig || {};
 
                 storage = {
                     responses: {},

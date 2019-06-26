@@ -22,7 +22,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import areaMaskingTpl from 'taoQtiTest/runner/plugins/tools/areaMasking/mask';
+import areaMaskingTpl from 'taoQtiTest/runner/plugins/tools/areaMasking/mask.tpl';
 import dynamicComponent from 'ui/dynamicComponent';
 
 var defaultConfig = {

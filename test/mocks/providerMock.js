@@ -70,10 +70,10 @@ define([
              * @returns {testStore}
              */
             loadTestStore: function loadTestStore() {
-                var config = this.getConfig();
+                const localConfig = this.getConfig();
 
                 //the test run needs to be identified uniquely
-                var identifier = config.serviceCallId || `test-${Date.now()}`;
+                var identifier = localConfig.serviceCallId || `test-${Date.now()}`;
                 return testStoreFactory(identifier, store.backends.memory);
             },
 

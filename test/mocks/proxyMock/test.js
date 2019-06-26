@@ -519,18 +519,18 @@ define(['lodash', 'taoQtiTest/test/runner/mocks/proxyMock'], function(_, proxyMo
 
                 proxy
                     .submitItem(uri, state, response)
-                    .then(function(data) {
+                    .then(function(data1) {
                         assert.ok(true, 'The submitItem promise is resolved');
-                        assert.equal(typeof data, 'object', 'The mock has provided a response');
-                        assert.equal(data.success, true, 'The mock has provided a successful response');
+                        assert.equal(typeof data1, 'object', 'The mock has provided a response');
+                        assert.equal(data1.success, true, 'The mock has provided a successful response');
 
                         proxy
                             .getItem(uri)
-                            .then(function(data) {
+                            .then(function(data2) {
                                 assert.ok(true, 'The getItem promise is resolved');
-                                assert.equal(typeof data, 'object', 'The mock has provided a response');
-                                assert.equal(data.success, true, 'The mock has provided a successful response');
-                                assert.equal(data.itemState, state, 'The mock has provided the data');
+                                assert.equal(typeof data2, 'object', 'The mock has provided a response');
+                                assert.equal(data2.success, true, 'The mock has provided a successful response');
+                                assert.equal(data2.itemState, state, 'The mock has provided the data');
                                 ready();
                             })
                             .catch(function() {

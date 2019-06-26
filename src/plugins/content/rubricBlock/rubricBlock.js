@@ -24,7 +24,7 @@
 import $ from 'jquery';
 import hider from 'ui/hider';
 import pluginFactory from 'taoTests/runner/plugin';
-import containerTpl from 'taoQtiTest/runner/plugins/content/rubricBlock/rubricBlock';
+import containerTpl from 'taoQtiTest/runner/plugins/content/rubricBlock/rubricBlock.tpl';
 
 /**
  * Ensure the <a> links opens to blank pages

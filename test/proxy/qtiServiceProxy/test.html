@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test Runner - qtiServiceProxy</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function() {
+                require(['qunitEnv'], function() {
+                    // mock Client Config data:
+                    requirejs.config({
+                        config: {
+                            'core/tokenHandler': {
+                                tokens: ['token1', 'token2', 'token3', 'token4', 'token5']
+                            }
+                        }
+                    });
+                    require(['taoQtiTest/test/runner/proxy/qtiServiceProxy/test'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <div id="feedback-box"></div>
+    </body>
+</html>

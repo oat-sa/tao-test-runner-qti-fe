@@ -16,13 +16,13 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
  */
 
-const { mkdirp, writeFile, readFile, access, constants } = require('fs-extra');
+const { mkdirp, writeFile, readFile, access, constants, copy } = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
 const postcss = require('postcss');
 const postcssScss = require('postcss-scss');
 const promiseLimit = require('promise-limit');
-const { srcDir, scssMainDir, rootPath } = require('./path');
+const { srcDir, scssMainDir, rootPath, scssVendorDir } = require('./path');
 const postcssConfig = require('./postcss.config');
 
 const limit = promiseLimit(5);
@@ -100,3 +100,9 @@ glob(
         files.forEach(file => limit(() => buildScss(file)));
     }
 );
+
+/**
+ * Copy font files
+ */
+
+copy(path.join(scssVendorDir, 'font'), path.join(rootPath, 'css', 'font'));

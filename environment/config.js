@@ -56,6 +56,7 @@ requirejs.config({
         'lib/unmatrix': '/lib/unmatrix',
         class: '/lib/class',
         tpl: '/lib/tpl',
+        'lib/jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
         // 'lib/moment-timezone.min': '/node_modules/moment-timezone/builds/moment-timezone-with-data.min',
         async: '/node_modules/async/lib/async',
         'lib/gamp/gamp': '/node_modules/gamp/src/gamp',

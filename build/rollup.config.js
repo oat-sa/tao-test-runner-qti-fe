@@ -21,7 +21,7 @@ import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import cssResolve from './css-resolve';
-import externalAlias from './external-alias';
+import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
 import babel from 'rollup-plugin-babel';
 
 const { srcDir, outputDir, aliases } = require('./path');
@@ -80,7 +80,7 @@ export default inputs.map(input => {
         ],
         plugins: [
             cssResolve(),
-            externalAlias(['core', 'ui', 'util', 'lib', 'taoTests', 'taoItems', 'taoQtiItem']),
+            wildcardExternal(['core/**', 'ui/**', 'util/**', 'lib/**', 'taoTests/**', 'taoItems/**', 'taoQtiItem/**']),
             alias({
                 resolve: ['.js', '.tpl'],
                 ...aliases

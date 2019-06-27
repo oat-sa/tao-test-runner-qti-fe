@@ -437,7 +437,7 @@ export default function compoundMaskFactory(options, dimensions, position) {
     function invokeOn(target, fn, args) {
         _.forOwn(allParts, function(part) {
             if (_.isObject(part[target]) && _.isFunction(part[target][fn])) {
-                part[target][fn](...args);
+                part[target][fn](...args||[]);
             }
         });
     }

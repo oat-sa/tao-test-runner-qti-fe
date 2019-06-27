@@ -23,6 +23,7 @@ import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import cssResolve from './css-resolve';
 import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
 import babel from 'rollup-plugin-babel';
+import istanbul from 'rollup-plugin-istanbul';
 
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
@@ -96,6 +97,7 @@ export default inputs.map(input => {
                 // helpers: ['build/tpl.js'],
                 templateExtension: '.tpl'
             }),
+            ...(process.env.COVERAGE ? [istanbul()] : []),
             babel({
                 presets: [
                     [

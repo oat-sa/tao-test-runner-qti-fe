@@ -43,7 +43,7 @@
         "@babel/core": "^7.4.5",
         "@babel/preset-env": "^7.4.5",
         "@oat-sa/browserslist-config-tao": "^0.1.0",
-        "@oat-sa/rollup-plugin-wildcard-external": "github:oat-sa/rollup-plugin-wildcard-external#feature/initial-wildcard-external-plugin",
+        "@oat-sa/rollup-plugin-wildcard-external": "^0.1.0",
         "@oat-sa/tao-core-libs": "^0.1.0",
         "@oat-sa/tao-core-sdk": "^0.4.1",
         "@oat-sa/tao-core-ui": "^0.16.1",

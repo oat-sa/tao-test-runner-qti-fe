@@ -51,8 +51,11 @@ var loadNextDelay = 450;
  */
 export default _.defaults(
     {
+        name: 'precaching',
+
         /**
          * Installs the proxy
+         * @param {Object} config
          */
         install: function install(config) {
             var self = this;
@@ -188,7 +191,7 @@ export default _.defaults(
              * @param action
              * @param actionParams
              * @param deferred
-             * @return {Promise} resolves with the action result
+             * @returns {Promise} resolves with the action result
              */
             this.processSyncAction = function processSyncAction(action, actionParams, deferred) {
                 return new Promise(function(resolve, reject) {

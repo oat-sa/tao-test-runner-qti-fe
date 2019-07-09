@@ -69,7 +69,7 @@ var qtiProvider = {
     loadProxy: function loadProxy() {
         var config = this.getConfig();
 
-        var proxyProvider = config.proxyProvider || 'qtiServiceProxy';
+        var proxyProvider = config.provider.proxy || 'qtiServiceProxy';
         var proxyConfig = _.pick(config, ['testDefinition', 'testCompilation', 'serviceCallId', 'bootstrap']);
 
         return proxyFactory(proxyProvider, proxyConfig);
@@ -155,7 +155,6 @@ var qtiProvider = {
      * Install step : install new methods/behavior
      *
      * @this {runner} the runner context, not the provider
-     * @returns {Promise} to chain
      */
     install: function install() {
         /**
@@ -680,6 +679,7 @@ var qtiProvider = {
      * Clean up
      *
      * @this {runner} the runner context, not the provider
+     * @returns {Promise}
      */
     flush: function flush() {
         var self = this;
@@ -738,6 +738,7 @@ var qtiProvider = {
      * Clean up
      *
      * @this {runner} the runner context, not the provider
+     * @returns void
      */
     destroy: function destroy() {
         var areaBroker = this.getAreaBroker();

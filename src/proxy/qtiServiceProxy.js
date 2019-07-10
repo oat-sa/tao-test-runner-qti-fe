@@ -32,6 +32,8 @@ import coreRequest from 'core/request';
  * @type {Object}
  */
 var qtiServiceProxy = {
+    name: 'qtiServiceProxy',
+
     /**
      * Installs the proxy
      */

@@ -36,8 +36,11 @@ import download from 'util/download';
  */
 export default _.defaults(
     {
+        name: 'offline',
+
         /**
          * Installs the proxy
+         * @param {object} config
          */
         install: function install(config) {
             var self = this;

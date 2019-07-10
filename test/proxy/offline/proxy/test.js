@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2018 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Same test cases like in case of qtiServiceProxy, updated to work with offline proxy
@@ -177,7 +177,7 @@ define([
                             }
                         })
                         .catch(function(err) {
-                            assert.ok(!caseData.success, `The proxy has thrown an error! #${  err}`);
+                            assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
                         })
                         .then(function() {
                             if (caseData.sendToken) {
@@ -384,7 +384,7 @@ define([
                     }
                 })
                 .catch(function(err) {
-                    assert.ok(!caseData.success, `The proxy has thrown an error! #${  err}`);
+                    assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
                 })
                 .then(function() {
                     if (caseData.sendToken) {
@@ -764,7 +764,7 @@ define([
 
                     ready();
                 }).catch(function(err) {
-                    assert.ok(!caseData.success, `The proxy has thrown an error! #${  err}`);
+                    assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
 
                     if (err.token) {
                         assert.equal(proxy.getTokenHandler().getToken(), err.token, 'The proxy must update the security token');
@@ -909,7 +909,7 @@ define([
 
                     ready();
                 }).catch(function(err) {
-                    assert.ok(!caseData.success, `The proxy has thrown an error! #${  err}`);
+                    assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
 
                     if (err.token) {
                         assert.equal(proxy.getTokenHandler().getToken(), err.token, 'The proxy must update the security token');
@@ -1153,7 +1153,7 @@ define([
                         assert.ok(false, 'The proxy must throw an error!');
                     }
                 }).catch(function(err) {
-                    assert.ok(!caseData.success, `The proxy has thrown an error! #${  err}`);
+                    assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
                 })
                 .then(function() {
                     if (caseData.sendToken) {
@@ -1286,7 +1286,7 @@ define([
 
                     ready();
                 }).catch(function(err) {
-                    assert.ok(!caseData.success, `The proxy has thrown an error! #${  err}`);
+                    assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
 
                     if (err.token) {
                         assert.equal(proxy.getTokenHandler().getToken(), err.token, 'The proxy must update the security token');
@@ -1420,7 +1420,7 @@ define([
                             assert.ok(false, 'The proxy must throw an error!');
                         }
                     }).catch(function(err) {
-                        assert.ok(!caseData.success, `The proxy has thrown an error! #${  err}`);
+                        assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
                     })
                     .then(function() {
                         tokenHandler.getToken().then(function(storedToken) {

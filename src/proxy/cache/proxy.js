@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 Open Assessment Technologies SA
+ * Copyright (c) 2017-2019 Open Assessment Technologies SA
  */
 
 /**
@@ -51,8 +51,11 @@ var loadNextDelay = 450;
  */
 export default _.defaults(
     {
+        name: 'precaching',
+
         /**
          * Installs the proxy
+         * @param {Object} config
          */
         install: function install(config) {
             var self = this;
@@ -188,7 +191,7 @@ export default _.defaults(
              * @param action
              * @param actionParams
              * @param deferred
-             * @return {Promise} resolves with the action result
+             * @returns {Promise} resolves with the action result
              */
             this.processSyncAction = function processSyncAction(action, actionParams, deferred) {
                 return new Promise(function(resolve, reject) {

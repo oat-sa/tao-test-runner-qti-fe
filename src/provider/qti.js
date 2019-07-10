@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Test Runner provider for QTI Tests.
@@ -69,7 +69,7 @@ var qtiProvider = {
     loadProxy: function loadProxy() {
         var config = this.getConfig();
 
-        var proxyProvider = config.proxyProvider || 'qtiServiceProxy';
+        var proxyProvider = config.provider.proxy || 'qtiServiceProxy';
         var proxyConfig = _.pick(config, ['testDefinition', 'testCompilation', 'serviceCallId', 'bootstrap']);
 
         return proxyFactory(proxyProvider, proxyConfig);
@@ -155,7 +155,6 @@ var qtiProvider = {
      * Install step : install new methods/behavior
      *
      * @this {runner} the runner context, not the provider
-     * @returns {Promise} to chain
      */
     install: function install() {
         /**
@@ -680,6 +679,7 @@ var qtiProvider = {
      * Clean up
      *
      * @this {runner} the runner context, not the provider
+     * @returns {Promise}
      */
     flush: function flush() {
         var self = this;
@@ -738,6 +738,7 @@ var qtiProvider = {
      * Clean up
      *
      * @this {runner} the runner context, not the provider
+     * @returns void
      */
     destroy: function destroy() {
         var areaBroker = this.getAreaBroker();

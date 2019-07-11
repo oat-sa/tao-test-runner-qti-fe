@@ -17,13 +17,14 @@
  */
 
 import path from 'path';
-import glob from 'glob';
+import glob from 'glob-promise';
 import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import cssResolve from './css-resolve';
 import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
 import babel from 'rollup-plugin-babel';
 import istanbul from 'rollup-plugin-istanbul';
+import { copyFile, mkdirp } from 'fs-extra';
 
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
@@ -110,4 +111,17 @@ export default inputs.map(input => {
             })
         ]
     };
+});
+
+/**
+ * copy template files into dist, because other modules require them
+ * It is asyncronous and it was made with purpose to run parallely with build,
+ * because they do not effect each other
+ */
+glob(path.join(srcDir, '**', '*.tpl')).then(files => {
+    files.forEach(async (file) => {
+        const targetFile = path.resolve(outputDir, path.relative(srcDir, file));
+        await mkdirp(path.dirname(targetFile));
+        copyFile(file, targetFile);
+    });
 });

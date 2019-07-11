@@ -114,9 +114,9 @@ export default inputs.map(input => {
 });
 
 /**
- * copy template files into dist, because other modules requires them
+ * copy template files into dist, because other modules require them
  * It is asyncronous and it was made with purpose to run parallely with build,
- * becasue they do not effect each other
+ * because they do not effect each other
  */
 glob(path.join(srcDir, '**', '*.tpl')).then(files => {
     files.forEach(async (file) => {

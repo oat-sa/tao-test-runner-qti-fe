@@ -288,7 +288,7 @@ export default _.defaults(
                             if (self.isConnectivityError(err)) {
                                 self.setOffline('communicator');
                                 _.forEach(actions, function(action) {
-                                    self.actionStore.push(action.action, action.parameters);
+                                    self.actionStore.push(action.action, action.parameters, action.timestamp);
                                 });
                             }
 
@@ -321,7 +321,7 @@ export default _.defaults(
                         .flush()
                         .then(function(actions) {
                             _.forEach(actions, function(action) {
-                                self.actionStore.push(action.action, action.parameters);
+                                self.actionStore.push(action.action, action.parameters, action.timestamp);
                             });
 
                             return actions;

@@ -874,7 +874,7 @@ export default function compoundMaskFactory(options, dimensions, position) {
         minWidth: options.resizeHandleSize * 2 + options.dragMinWidth,
         minHeight: options.resizeHandleSize * 2 + options.dragMinHeight,
         minBottomHeight: options.resizeHandleSize * 2 + options.innerDragHeight,
-        minTopHeight: options.resizeHandleSize * 2 + 30 // make sure that top will fit header size
+        minTopHeight: options.resizeHandleSize * 2 + 18 // make sure that top will fit header size
     };
 
     compoundMask = {

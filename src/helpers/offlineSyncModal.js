@@ -26,6 +26,7 @@ import polling from 'core/polling';
 import hider from 'ui/hider';
 import waitingDialogFactory from 'ui/waitingDialog/waitingDialog';
 import offlineSyncModalCountdownTpl from 'taoQtiTest/runner/helpers/templates/offlineSyncModalCountdown';
+import offlineSyncModalWaitContentTpl from 'taoQtiTest/runner/helpers/templates/offlineSyncModalWaitContent';
 
 /**
  * Display the waiting dialog, while waiting the connection to be back
@@ -35,9 +36,7 @@ import offlineSyncModalCountdownTpl from 'taoQtiTest/runner/helpers/templates/of
 var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
     var waitingConfig = {
         message: __('You are encountering a prolonged connectivity loss.'),
-        waitContent: __(
-            'Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually.'
-        ),
+        waitContent: offlineSyncModalWaitContentTpl(),
         proceedContent: __('The connection seems to be back, please proceed.'),
         proceedButtonText: __('Proceed & End Test'),
         showSecondary: true,
@@ -48,7 +47,6 @@ var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
     };
     var $secondaryButton;
     var secondaryButtonWait = 60; // seconds to wait until it enables
-    var $countdownText;
     var $countdown = $(offlineSyncModalCountdownTpl());
     var countdownPolling;
 
@@ -96,7 +94,7 @@ var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
         .on('unwait', function() {
             countdownPolling.stop();
             $secondaryButton.prop('disabled', true);
-            $countdownText.remove();
+            $countdown.remove();
             hider.hide('.between-buttons-text');
         });
 

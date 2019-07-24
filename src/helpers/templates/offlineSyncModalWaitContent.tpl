@@ -8,7 +8,7 @@
     </ol>
     <p>{{__ 'The file will save into the Downloads folder on your PC.'}}</p>
     <p>{{__ 'DO NOT CHANGE THE NAME OF THE FILE.'}}</p>
-    <p>{{__ 'Note the name of the child you were assessing.'}}</p>
+    <p>{{__ 'Note the name of the child you were assessing. Do not try to re-access the assessment for that child until it no longer shows as ‘in progress’.'}}</p>
     <p>{{{__ 'When you have a network connection, navigate to the download folder, select the file and email it to your teacher'}}}</p>
     <br />
     <p>{{__ 'If you need help, please contact us.'}}</p>

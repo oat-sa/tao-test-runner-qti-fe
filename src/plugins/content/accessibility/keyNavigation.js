@@ -427,9 +427,9 @@ function initInteractionNavigation($interaction, testRunner) {
                 }
             })
             .on('focus', function(cursor) {
-                const $elt = cursor.navigable.getElement().closest('.qti-choice');
-                $elt.addClass('key-navigation-hightlight');
-                showElementsContent($elt, testRunner.getAreaBroker().getContentArea());
+		var $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
+                $qtiChoice.addClass('key-navigation-highlight');
+                showElementsContent($qtiChoice, testRunner.getAreaBroker().getContentArea());
             })
             .on('blur', function(cursor) {
                 cursor.navigable
@@ -447,11 +447,9 @@ function initInteractionNavigation($interaction, testRunner) {
 /**
  * Scrolling to the top of the required element
  */
-function showElementsContent($el, $container) {
-    const $wrapper = $container.closest('.content-wrapper');
-    if ($wrapper.lenght) {
-        $wrapper.scrollTop($el.offset().top + $wrapper.scrollTop() - $wrapper.offset().top);
-    }
+function showElementsContent($el, $visibleContainer) {
+    const $wrapper = $visibleContainer.closest('.content-wrapper');
+    $wrapper.scrollTop($el.offset().top + $wrapper.scrollTop() - $wrapper.offset().top);
 }
 
 /**

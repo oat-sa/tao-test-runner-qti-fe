@@ -428,7 +428,7 @@ function initInteractionNavigation($interaction, testRunner) {
             })
             .on('focus', function(cursor) {
                 const $elt = cursor.navigable.getElement().closest('.qti-choice');
-                $elt.addClass('key-navigation-gightlight');
+                $elt.addClass('key-navigation-hightlight');
                 showElementsContent($elt, testRunner.getAreaBroker().getContentArea());
             })
             .on('blur', function(cursor) {

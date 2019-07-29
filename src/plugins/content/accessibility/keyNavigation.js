@@ -297,7 +297,7 @@ function initDefaultContentNavigation(testRunner) {
         .each(function() {
             var $itemElement = $(this);
             if ($itemElement.hasClass('qti-interaction')) {
-                itemNavigators = _.union(itemNavigators, initInteractionNavigation($itemElement));
+                itemNavigators = _.union(itemNavigators, initInteractionNavigation($itemElement, testRunner));
             } else {
                 itemNavigators.push(
                     keyNavigator({
@@ -365,7 +365,7 @@ function initAllContentButtonsNavigation(testRunner) {
  * @param {JQuery} $interaction - the interaction container
  * @returns {Array} array of navigators created from interaction container
  */
-function initInteractionNavigation($interaction) {
+function initInteractionNavigation($interaction, testRunner) {
     var $inputs;
     var interactionNavigables;
     var interactionNavigators = [];

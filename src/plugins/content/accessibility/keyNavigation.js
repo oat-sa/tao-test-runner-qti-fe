@@ -427,7 +427,7 @@ function initInteractionNavigation($interaction, testRunner) {
                 }
             })
             .on('focus', function(cursor) {
-                var $elt = cursor.navigable.getElement().closest('.qti-choice');
+                const $elt = cursor.navigable.getElement().closest('.qti-choice');
                 $elt.addClass('key-navigation-gightlight');
                 showElementsContent($elt, testRunner.getAreaBroker().getContentArea());
             })
@@ -444,8 +444,11 @@ function initInteractionNavigation($interaction, testRunner) {
     return interactionNavigators;
 }
 
+/**
+ * Scrolling to the top of the required element
+ */
 function showElementsContent($el, $container) {
-    var $wrapper = $container.closest('.content-wrapper');
+    const $wrapper = $container.closest('.content-wrapper');
     if ($wrapper.lenght) {
         $wrapper.scrollTop($el.offset().top + $wrapper.scrollTop() - $wrapper.offset().top);
     }

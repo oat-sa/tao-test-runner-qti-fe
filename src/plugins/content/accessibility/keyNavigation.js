@@ -427,10 +427,9 @@ function initInteractionNavigation($interaction) {
                 }
             })
             .on('focus', function(cursor) {
-                cursor.navigable
-                    .getElement()
-                    .closest('.qti-choice')
-                    .addClass('key-navigation-highlight');
+                var $elt = cursor.navigable.getElement().closest('.qti-choice');
+                $elt.addClass('key-navigation-gightlight');
+                showElementsContent($elt, testRunner.getAreaBroker().getContentArea());
             })
             .on('blur', function(cursor) {
                 cursor.navigable
@@ -443,6 +442,13 @@ function initInteractionNavigation($interaction) {
     }
 
     return interactionNavigators;
+}
+
+function showElementsContent($el, $container) {
+    var $wrapper = $container.closest('.content-wrapper');
+    if ($wrapper.lenght) {
+        $wrapper.scrollTop($el.offset().top + $wrapper.scrollTop() - $wrapper.offset().top);
+    }
 }
 
 /**

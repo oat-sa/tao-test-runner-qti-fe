@@ -427,7 +427,7 @@ function initInteractionNavigation($interaction, testRunner) {
                 }
             })
             .on('focus', function(cursor) {
-		var $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
+		const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
                 $qtiChoice.addClass('key-navigation-highlight');
                 showElementsContent($qtiChoice, testRunner.getAreaBroker().getContentArea());
             })

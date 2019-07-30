@@ -297,7 +297,7 @@ function initDefaultContentNavigation(testRunner) {
         .each(function() {
             var $itemElement = $(this);
             if ($itemElement.hasClass('qti-interaction')) {
-                itemNavigators = _.union(itemNavigators, initInteractionNavigation($itemElement));
+                itemNavigators = _.union(itemNavigators, initInteractionNavigation($itemElement, testRunner));
             } else {
                 itemNavigators.push(
                     keyNavigator({
@@ -365,7 +365,7 @@ function initAllContentButtonsNavigation(testRunner) {
  * @param {JQuery} $interaction - the interaction container
  * @returns {Array} array of navigators created from interaction container
  */
-function initInteractionNavigation($interaction) {
+function initInteractionNavigation($interaction, testRunner) {
     var $inputs;
     var interactionNavigables;
     var interactionNavigators = [];
@@ -427,10 +427,9 @@ function initInteractionNavigation($interaction) {
                 }
             })
             .on('focus', function(cursor) {
-                cursor.navigable
-                    .getElement()
-                    .closest('.qti-choice')
-                    .addClass('key-navigation-highlight');
+		const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
+                $qtiChoice.addClass('key-navigation-highlight');
+                showElementsContent($qtiChoice, testRunner.getAreaBroker().getContentArea());
             })
             .on('blur', function(cursor) {
                 cursor.navigable
@@ -443,6 +442,14 @@ function initInteractionNavigation($interaction) {
     }
 
     return interactionNavigators;
+}
+
+/**
+ * Scrolling to the top of the required element
+ */
+function showElementsContent($el, $visibleContainer) {
+    const $wrapper = $visibleContainer.closest('.content-wrapper');
+    $wrapper.scrollTop($el.offset().top + $wrapper.scrollTop() - $wrapper.offset().top);
 }
 
 /**

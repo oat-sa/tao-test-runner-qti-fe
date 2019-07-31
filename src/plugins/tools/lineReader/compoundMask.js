@@ -589,6 +589,14 @@ export default function compoundMaskFactory(options, dimensions, position) {
     }
 
     /**
+     * Update the transform model during a resize affecting inner height
+     * @param {Number} newHeight
+     */
+    const setInnerHeight = (newHeight) => {
+        dimensions.innerHeight = newHeight;
+        dimensions.bottomHeight = dimensions.outerHeight - dimensions.innerHeight - dimensions.topHeight;
+    };
+    /**
      * ======================================
      * Mask parts and other elements creation
      * ======================================
@@ -692,7 +700,7 @@ export default function compoundMaskFactory(options, dimensions, position) {
         // East
         createPart({
             id: 'e',
-            edges: { top: false, right: false, bottom: false, left: '.resize-control' },
+            edges: { top: false, right: false, bottom: '.resize-control', left: '.resize-control' },
             edgesBorders: { top: false, right: true, bottom: false, left: true },
             resizeControll: true,
 
@@ -715,10 +723,12 @@ export default function compoundMaskFactory(options, dimensions, position) {
                 this.config.maxWidth = fromLeft
                     ? dimensions.rightWidth + (dimensions.innerWidth - constrains.minWidth)
                     : null;
+                this.config.maxHeight =  dimensions.outerHeight - dimensions.topHeight - constrains.minBottomHeight;
             },
 
             onResize: function onResize(width, height, fromLeft, fromTop, x) {
                 setRightWidth(width, x, fromLeft);
+                setInnerHeight(height);
                 applyTransformsToMasks();
             }
         });
@@ -726,10 +736,9 @@ export default function compoundMaskFactory(options, dimensions, position) {
         // South
         createPart({
             id: 's',
-            edges: { top: '.resize-control', right: false, bottom: false, left: false },
+            edges: { top: false, right: false, bottom: false, left: false },
             edgesBorders: { top: true, right: false, bottom: true, left: false },
             minHeight: constrains.minBottomHeight,
-            resizeControll: true,
 
             place: function place() {
                 this.moveTo(position.innerX, position.innerY + dimensions.innerHeight).setSize(

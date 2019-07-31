@@ -56,10 +56,12 @@ $lrMaskBgTransparent: rgba($lrMaskBg, 0.8);
     &.e {
         .resize-control {
             position: absolute;
-            width: 10px;
+            width: 20px;
             height: 20px;
             bottom: -10px;
+            left: -10px;
             border-right: 1px solid $pluginLink;
+            border-bottom: 1px solid $pluginLink;
         }
     }
 

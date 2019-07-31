@@ -697,6 +697,40 @@ export default function compoundMaskFactory(options, dimensions, position) {
             }
         });
 
+        // South
+        createPart({
+            id: 's',
+            edges: { top: false, right: false, bottom: false, left: false },
+            edgesBorders: { top: true, right: false, bottom: true, left: false },
+            minHeight: constrains.minBottomHeight,
+
+            place: function place() {
+                this.moveTo(position.innerX, position.innerY + dimensions.innerHeight).setSize(
+                    dimensions.innerWidth,
+                    dimensions.bottomHeight
+                );
+            },
+
+            placeOverlay: function placeOverlay(overlay) {
+                var pos = this.getPosition(),
+                    size = this.getSize();
+                overlay
+                    .moveTo(pos.x, pos.y + options.resizeHandleSize)
+                    .setSize(size.width, size.height - options.resizeHandleSize * 2);
+            },
+
+            beforeResize: function beforeResize(width, height, fromLeft, fromTop) {
+                this.config.maxHeight = fromTop
+                    ? dimensions.bottomHeight + (dimensions.innerHeight - constrains.minHeight)
+                    : null;
+            },
+
+            onResize: function onResize(width, height, fromLeft, fromTop, x, y) {
+                setBottomHeight(height, y, fromTop);
+                applyTransformsToMasks();
+            }
+        });
+
         // East
         createPart({
             id: 'e',
@@ -729,40 +763,6 @@ export default function compoundMaskFactory(options, dimensions, position) {
             onResize: function onResize(width, height, fromLeft, fromTop, x) {
                 setRightWidth(width, x, fromLeft);
                 setInnerHeight(height);
-                applyTransformsToMasks();
-            }
-        });
-
-        // South
-        createPart({
-            id: 's',
-            edges: { top: false, right: false, bottom: false, left: false },
-            edgesBorders: { top: true, right: false, bottom: true, left: false },
-            minHeight: constrains.minBottomHeight,
-
-            place: function place() {
-                this.moveTo(position.innerX, position.innerY + dimensions.innerHeight).setSize(
-                    dimensions.innerWidth,
-                    dimensions.bottomHeight
-                );
-            },
-
-            placeOverlay: function placeOverlay(overlay) {
-                var pos = this.getPosition(),
-                    size = this.getSize();
-                overlay
-                    .moveTo(pos.x, pos.y + options.resizeHandleSize)
-                    .setSize(size.width, size.height - options.resizeHandleSize * 2);
-            },
-
-            beforeResize: function beforeResize(width, height, fromLeft, fromTop) {
-                this.config.maxHeight = fromTop
-                    ? dimensions.bottomHeight + (dimensions.innerHeight - constrains.minHeight)
-                    : null;
-            },
-
-            onResize: function onResize(width, height, fromLeft, fromTop, x, y) {
-                setBottomHeight(height, y, fromTop);
                 applyTransformsToMasks();
             }
         });

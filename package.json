@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-test-runner-qti",
-    "version": "0.3.0",
+    "version": "0.3.2",
     "description": "TAO Test Runner QTI implementation",
     "files": [
         "dist",
@@ -75,6 +75,7 @@
         "postcss-node-sass": "^2.1.8",
         "postcss-scss": "^2.0.0",
         "qunit": "^2.9.2",
+        "raphael": "2.1.4",
         "require-css": "^0.1.10",
         "requirejs-plugins": "^1.0.2",
         "rollup": "^1.16.7",

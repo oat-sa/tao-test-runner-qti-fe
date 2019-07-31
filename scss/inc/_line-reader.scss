@@ -50,6 +50,7 @@ $lrMaskBgTransparent: rgba($lrMaskBg, 0.8);
             position: absolute;
             right: 0;
             bottom: 0;
+            cursor: nwse-resize;
         }
     }
 
@@ -62,6 +63,7 @@ $lrMaskBgTransparent: rgba($lrMaskBg, 0.8);
             left: -10px;
             border-right: 1px solid $pluginLink;
             border-bottom: 1px solid $pluginLink;
+            cursor: nesw-resize;
         }
     }
 

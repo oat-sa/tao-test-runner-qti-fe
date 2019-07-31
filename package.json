@@ -1,11 +1,12 @@
 {
     "name": "@oat-sa/tao-test-runner-qti",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "TAO Test Runner QTI implementation",
     "files": [
         "dist",
         "src",
-        "scss"
+        "scss",
+        "css"
     ],
     "scripts": {
         "test": "npx qunit-testrunner",

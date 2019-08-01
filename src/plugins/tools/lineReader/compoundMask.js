@@ -754,9 +754,7 @@ export default function compoundMaskFactory(options, dimensions, position) {
             },
 
             beforeResize: function beforeResize(width, height, fromLeft) {
-                this.config.maxWidth = fromLeft
-                    ? dimensions.rightWidth + (dimensions.innerWidth - constrains.minWidth)
-                    : null;
+                this.config.maxWidth = dimensions.rightWidth + (dimensions.innerWidth - constrains.minWidth);
                 this.config.maxHeight =  dimensions.outerHeight - dimensions.topHeight - constrains.minBottomHeight;
             },
 

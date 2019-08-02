@@ -333,8 +333,8 @@ define(['jquery', 'lodash', 'taoQtiTest/runner/plugins/tools/lineReader/compound
             {
                 title: 'topHeight too short',
                 positionIn: { innerY: 10 },
-                positionOut: { innerY: 50 },
-                dimensionsOut: { topHeight: 50, outerHeight: 240, bottomHeight: 200 - (50 + 10) }
+                positionOut: { innerY: 38 },
+                dimensionsOut: { topHeight: 38, outerHeight: 228, bottomHeight: 200 - (50 + 10) }
             },
             {
                 title: 'innerHeight too short',

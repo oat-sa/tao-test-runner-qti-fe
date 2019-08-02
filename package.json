@@ -5,7 +5,8 @@
     "files": [
         "dist",
         "src",
-        "scss"
+        "scss",
+        "css"
     ],
     "scripts": {
         "test": "npx qunit-testrunner",

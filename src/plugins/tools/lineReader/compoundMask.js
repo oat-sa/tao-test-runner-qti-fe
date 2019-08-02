@@ -589,6 +589,14 @@ export default function compoundMaskFactory(options, dimensions, position) {
     }
 
     /**
+     * Update the transform model during a resize affecting inner height
+     * @param {Number} newHeight
+     */
+    const setInnerHeight = (newHeight) => {
+        dimensions.innerHeight = newHeight;
+        dimensions.bottomHeight = dimensions.outerHeight - dimensions.innerHeight - dimensions.topHeight;
+    };
+    /**
      * ======================================
      * Mask parts and other elements creation
      * ======================================
@@ -689,47 +697,12 @@ export default function compoundMaskFactory(options, dimensions, position) {
             }
         });
 
-        // East
-        createPart({
-            id: 'e',
-            edges: { top: false, right: false, bottom: false, left: '.resize-control' },
-            edgesBorders: { top: false, right: true, bottom: false, left: true },
-            resizeControll: true,
-
-            place: function place() {
-                this.moveTo(position.innerX + dimensions.innerWidth, position.innerY).setSize(
-                    dimensions.rightWidth,
-                    dimensions.innerHeight
-                );
-            },
-
-            placeOverlay: function placeOverlay(overlay) {
-                var pos = this.getPosition(),
-                    size = this.getSize();
-                overlay
-                    .moveTo(pos.x + options.resizeHandleSize, pos.y - options.resizeHandleSize)
-                    .setSize(size.width - options.resizeHandleSize * 2, size.height + options.resizeHandleSize * 2);
-            },
-
-            beforeResize: function beforeResize(width, height, fromLeft) {
-                this.config.maxWidth = fromLeft
-                    ? dimensions.rightWidth + (dimensions.innerWidth - constrains.minWidth)
-                    : null;
-            },
-
-            onResize: function onResize(width, height, fromLeft, fromTop, x) {
-                setRightWidth(width, x, fromLeft);
-                applyTransformsToMasks();
-            }
-        });
-
         // South
         createPart({
             id: 's',
-            edges: { top: '.resize-control', right: false, bottom: false, left: false },
+            edges: { top: false, right: false, bottom: false, left: false },
             edgesBorders: { top: true, right: false, bottom: true, left: false },
             minHeight: constrains.minBottomHeight,
-            resizeControll: true,
 
             place: function place() {
                 this.moveTo(position.innerX, position.innerY + dimensions.innerHeight).setSize(
@@ -754,6 +727,41 @@ export default function compoundMaskFactory(options, dimensions, position) {
 
             onResize: function onResize(width, height, fromLeft, fromTop, x, y) {
                 setBottomHeight(height, y, fromTop);
+                applyTransformsToMasks();
+            }
+        });
+
+        // East
+        createPart({
+            id: 'e',
+            edges: { top: false, right: false, bottom: '.resize-control', left: '.resize-control' },
+            edgesBorders: { top: false, right: true, bottom: false, left: true },
+            resizeControll: true,
+
+            place: function place() {
+                this.moveTo(position.innerX + dimensions.innerWidth, position.innerY).setSize(
+                    dimensions.rightWidth,
+                    dimensions.innerHeight
+                );
+            },
+
+            placeOverlay: function placeOverlay(overlay) {
+                var pos = this.getPosition(),
+                    size = this.getSize();
+                overlay
+                    .moveTo(pos.x + options.resizeHandleSize, pos.y - options.resizeHandleSize)
+                    .setSize(size.width - options.resizeHandleSize * 2, size.height + options.resizeHandleSize * 2);
+            },
+
+            beforeResize: function beforeResize(width, height, fromLeft) {
+                this.config.maxWidth = dimensions.rightWidth + (dimensions.innerWidth - constrains.minWidth);
+                this.config.minWidth = constrains.minWidth;
+                this.config.maxHeight =  dimensions.outerHeight - dimensions.topHeight - constrains.minBottomHeight;
+            },
+
+            onResize: function onResize(width, height, fromLeft, fromTop, x) {
+                setRightWidth(width, x, fromLeft);
+                setInnerHeight(height);
                 applyTransformsToMasks();
             }
         });

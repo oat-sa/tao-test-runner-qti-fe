@@ -42,7 +42,6 @@
             @include border-radius(5);
             @include vendor-prefix(property, transform, translateZ(0));
             box-sizing: content-box;
-            padding-bottom: 30px;
 
             @include keyframes(fadeIn) {
                 0%   {opacity:0; visibility: visible;}

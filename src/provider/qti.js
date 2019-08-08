@@ -614,6 +614,9 @@ var qtiProvider = {
                     self.trigger('enablenav');
                     reject(err);
                 })
+                .on('error.itemrender', function (err) {
+                    self.trigger('pause', {message : err});
+                })
                 .on('init', function() {
                     var itemContainer = self.getAreaBroker().getContentArea();
                     var itemRenderingOptions = _.pick(itemData, ['state', 'portableElements']);

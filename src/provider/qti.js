@@ -614,7 +614,7 @@ var qtiProvider = {
                     self.trigger('enablenav');
                     reject(err);
                 })
-                .on('error.itemrender', function (err) {
+                .on('itemrender.error', function (err) {
                     self.trigger('pause', {message : err});
                 })
                 .on('init', function() {

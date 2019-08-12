@@ -27,7 +27,7 @@ import _ from 'lodash';
 import __ from 'i18n';
 import messages from 'taoQtiTest/runner/helpers/messages';
 import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
-import { itemSessionStates }  from 'taoQtiTest/runner/config/states';
+import states from 'taoQtiTest/runner/config/states';
 
 
 /**
@@ -54,7 +54,7 @@ export default function warnSectionLeavingStrategy(testRunner, timer) {
         var map = testRunner.getTestMap();
         if (
             !context.isTimeout &&
-            context.itemSessionState !== itemSessionStates.closed &&
+            context.itemSessionState !== states.itemSession.closed &&
             context.sectionId === timer.source
         ) {
             return navigationHelper.isLeavingSection(context, map, direction, scope, position);

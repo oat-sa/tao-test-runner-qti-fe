@@ -23,7 +23,7 @@
 export default {
 
     //the test session states
-    testSessionStates : {
+    testSession : {
         initial : 0,
         interacting : 1,
         modalFeedback : 2,
@@ -32,7 +32,7 @@ export default {
     },
 
     //the item session states
-    itemSessionStates : {
+    itemSession : {
         initial : 0,
         interacting : 1,
         modalFeedback : 2,
@@ -41,5 +41,4 @@ export default {
         solution : 5,
         notSelected : 255
     }
-
 };

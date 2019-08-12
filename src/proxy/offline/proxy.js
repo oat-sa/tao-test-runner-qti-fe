@@ -28,8 +28,8 @@ import actionStoreFactory from 'taoQtiTest/runner/proxy/cache/actionStore';
 import offlineErrorHelper from 'taoQtiTest/runner/helpers/offlineErrorHelper';
 import offlineSyncModal from 'taoQtiTest/runner/helpers/offlineSyncModal';
 import responseStoreFactory from 'taoQtiTest/runner/services/responseStore';
-import { testSessionStates } from 'taoQtiTest/runner/config/states';
 import download from 'util/download';
+import states from 'taoQtiTest/runner/config/states';
 
 /**
  * Overrides the qtiServiceProxy with the offline behavior
@@ -176,7 +176,7 @@ export default _.defaults(
                     if (isBlocked || (isNavigationAction && isLast)) {
                         // the last item of the test
                         result.testContext = {
-                            state: testSessionStates.closed
+                            state: states.testSession.closed
                         };
                         if (isOffline) {
                             return new Promise(function() {

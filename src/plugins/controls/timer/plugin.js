@@ -97,7 +97,7 @@ export default pluginFactory({
     init: function init() {
         var self = this;
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
+        var testRunnerConfig = testRunner.getConfig().options || {};
 
         /**
          * Plugin config,
@@ -111,17 +111,17 @@ export default pluginFactory({
             /**
              * The list of configured warnings
              */
-            warnings: (testData && testData.config && testData.config.timerWarning) || {},
+            warnings: (testRunnerConfig.timerWarning) || {},
 
             /**
              * The guided navigation option
              */
-            guidedNavigation: testData && testData.config && testData.config.guidedNavigation,
+            guidedNavigation: testRunnerConfig.guidedNavigation,
 
             /**
              * Restore timer from client.
              */
-            restoreTimerFromClient: testData && testData.config && testData.config.timer.restoreTimerFromClient
+            restoreTimerFromClient: testRunnerConfig.restoreTimerFromClient
         });
 
         /**

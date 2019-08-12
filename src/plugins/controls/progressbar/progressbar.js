@@ -48,8 +48,8 @@ export default pluginFactory({
      */
     init: function init() {
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var config = _.defaults(this.getConfig(), testData.config.progressIndicator || {});
+        var testRunnerConfig = testRunner.getConfig();
+        var config = _.defaults(this.getConfig(), testRunnerConfig.progressIndicator || {});
         var self = this;
 
         var rendererFactory = renderers[config.renderer] || renderers.percentage;

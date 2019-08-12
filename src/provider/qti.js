@@ -36,7 +36,7 @@ import toolboxFactory from 'taoQtiTest/runner/ui/toolbox/toolbox';
 import qtiItemRunner from 'taoQtiItem/runner/qtiItemRunner';
 import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
-import { testSessionStates, itemSessionStates } from 'taoQtiTest/runner/config/states';
+import states from 'taoQtiTest/runner/config/states';
 
 /**
  * A Test runner provider to be registered against the runner
@@ -177,8 +177,9 @@ var qtiProvider = {
      * @returns {Promise} to chain proxy.init
      */
     init: function init() {
-        var self = this;
-        var areaBroker = this.getAreaBroker();
+        const self = this;
+        const config = this.getConfig();
+        const areaBroker = this.getAreaBroker();
 
         /**
          * Retrieve the item results
@@ -187,7 +188,7 @@ var qtiProvider = {
         function getItemResults() {
             var results = {};
             var context = self.getTestContext();
-            if (context && self.itemRunner && context.itemSessionState <= itemSessionStates.interacting) {
+            if (context && self.itemRunner && context.itemSessionState <= states.itemSession.interacting) {
                 results = {
                     itemResponse: self.itemRunner.getResponses(),
                     itemState: self.itemRunner.getState()
@@ -303,9 +304,9 @@ var qtiProvider = {
          */
         function load() {
             var context = self.getTestContext();
-            if (context.state <= testSessionStates.interacting) {
+            if (context.state <= states.testSession.interacting) {
                 self.loadItem(context.itemIdentifier);
-            } else if (context.state === testSessionStates.closed) {
+            } else if (context.state === states.testSession.closed) {
                 self.finish();
             }
         }
@@ -428,7 +429,7 @@ var qtiProvider = {
                     })
                     .then(function() {
                         self.trigger('leave', {
-                            code: testSessionStates.suspended,
+                            code: states.testSession.suspended,
                             message: data && data.message
                         });
                     })
@@ -452,7 +453,7 @@ var qtiProvider = {
                 //The item is rendered but in a state that prevents us from interacting
                 if (context.isTimeout) {
                     warning = __('Time limit reached for item "%s".', getItemLabel());
-                } else if (context.itemSessionState > itemSessionStates.interacting) {
+                } else if (context.itemSessionState > states.itemSession.interacting) {
                     if (context.remainingAttempts === 0) {
                         warning = __('No more attempts allowed for item "%s".', getItemLabel());
                     } else {
@@ -513,11 +514,20 @@ var qtiProvider = {
                         storeId: storeId
                     })
                     .then(function(response) {
+
+                        //handle backward compatibility with testData
+                        if( response.testData ) {
+                            Object.assign(config.options, response.testData.config);
+                        }
+
                         //fill the dataHolder, build the jump table, etc.
                         self.dataUpdater.update(response);
 
-                        //set the plugin config from the test data
-                        self.dataUpdater.updatePluginsConfig(self.getPlugins());
+                        //set the plugin config
+                        self.dataUpdater.updatePluginsConfig(
+                            self.getPlugins(),
+                            self.getPluginsConfig()
+                        );
 
                         //this checks the received storeId and clear the volatiles stores
                         return self

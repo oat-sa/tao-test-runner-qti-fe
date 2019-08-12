@@ -87,8 +87,10 @@ export default pluginFactory({
         var testRunner = this.getTestRunner();
 
         var toggle = function toggle() {
-            var context = testRunner.getTestContext();
-            if (context.options.allowSkipping === true) {
+            const testContext = testRunner.getTestContext();
+            const contextOptions = testContext.options || {};
+
+            if (contextOptions.allowSkipping === true) {
                 self.show();
                 return true;
             }
@@ -111,7 +113,7 @@ export default pluginFactory({
 
             if (self.getState('enabled') !== false) {
                 self.disable();
-                if (context.options.endTestWarning && context.isLast) {
+                if (context.options && context.options.endTestWarning && context.isLast) {
                     testRunner.trigger(
                         'confirm.endTest',
                         messages.getExitMessage(

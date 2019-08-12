@@ -45,9 +45,10 @@ export default pluginFactory({
         var self = this;
 
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+        //var testData = testRunner.getTestData();
+        //var testConfig = testData.config || {};
+        const testRunnerOptions = testRunner.getOptions();
+        var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
          * Check if the "Previous" functionality should be available or not
@@ -55,6 +56,7 @@ export default pluginFactory({
         var canDoPrevious = function canDoPrevious() {
             var testMap = testRunner.getTestMap();
             var context = testRunner.getTestContext();
+            var contextOptions = context.options || {};
             var previousSection;
             var previousPart;
 
@@ -80,7 +82,7 @@ export default pluginFactory({
                 previousSection = mapHelper.getItemSection(testMap, context.itemPosition - 1);
                 if (
                     previousSection.isCatAdaptive ||
-                    (previousSection.timeConstraint && !context.options.noExitTimedSectionWarning)
+                    (previousSection.timeConstraint && !contextOptions.noExitTimedSectionWarning)
                 ) {
                     return false;
                 }
@@ -148,7 +150,7 @@ export default pluginFactory({
             testRunner.trigger('nav-previous');
         });
 
-        if (testConfig.allowShortcuts && pluginShortcuts.trigger) {
+        if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
             shortcut.add(
                 namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
                 function() {

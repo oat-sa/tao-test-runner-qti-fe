@@ -95,12 +95,9 @@ export default pluginFactory({
      * Installs the plugin (called when the runner bind the plugin)
      */
     init: function init() {
-        var testRunner = this.getTestRunner(),
-            testData = testRunner.getTestData() || {},
-            testConfig = testData.config || {},
-            pluginsConfig = testConfig.plugins || {},
-            config = _.defaults(pluginsConfig.collapser || {}, defaults),
-            collapseCls = config.hover ? noLabelHoverCls : noLabelCls;
+        const testRunner = this.getTestRunner();
+        const config = _.defaults(this.getConfig(), defaults);
+        const collapseCls = config.hover ? noLabelHoverCls : noLabelCls;
 
         var areaBroker = testRunner.getAreaBroker();
 

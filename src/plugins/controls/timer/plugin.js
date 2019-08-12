@@ -95,14 +95,14 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testRunnerConfig = testRunner.getConfig().options || {};
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
 
         /**
          * Plugin config,
          */
-        var config = _.merge({}, this.getConfig(), {
+        const config = _.defaults(this.getConfig(), {
             /**
              * An option to control is the warnings are contextual or global
              */
@@ -111,17 +111,17 @@ export default pluginFactory({
             /**
              * The list of configured warnings
              */
-            warnings: (testRunnerConfig.timerWarning) || {},
+            warnings: (testRunnerOptions.timerWarning) || {},
 
             /**
              * The guided navigation option
              */
-            guidedNavigation: testRunnerConfig.guidedNavigation,
+            guidedNavigation: testRunnerOptions.guidedNavigation,
 
             /**
              * Restore timer from client.
              */
-            restoreTimerFromClient: testRunnerConfig.restoreTimerFromClient
+            restoreTimerFromClient: testRunnerOptions.restoreTimerFromClient
         });
 
         /**

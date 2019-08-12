@@ -47,10 +47,10 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var testRunner = this.getTestRunner();
-        var testRunnerConfig = testRunner.getConfig();
-        var config = _.defaults(this.getConfig(), testRunnerConfig.progressIndicator || {});
-        var self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerConfig = testRunner.getOptions();
+        const config = _.defaults(this.getConfig(), testRunnerConfig.progressIndicator || {});
+        const self = this;
 
         var rendererFactory = renderers[config.renderer] || renderers.percentage;
         var progressConfig = {

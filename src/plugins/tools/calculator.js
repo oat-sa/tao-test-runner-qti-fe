@@ -83,14 +83,13 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var areaBroker = this.getAreaBroker();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginsConfig = testConfig.plugins || {};
-        var config = pluginsConfig.calculator || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+        const self = this;
+
+        const testRunner = this.getTestRunner();
+        const areaBroker = this.getAreaBroker();
+        const testRunnerOptions = testRunner.getOptions();
+        const config = this.getConfig();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
          * Checks if the plugin is currently available
@@ -220,7 +219,7 @@ export default pluginFactory({
             testRunner.trigger('tool-calculator');
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.toggle) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),

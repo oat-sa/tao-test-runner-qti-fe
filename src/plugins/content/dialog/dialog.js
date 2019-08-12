@@ -66,10 +66,9 @@ export default pluginFactory({
      */
     init: function init() {
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginConfig = _.defaults((testConfig.plugins || {})[pluginName] || {}, defaultOptions);
-        var pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
+        var testOptions = testRunner.getOptions();
+        var pluginConfig = _.defaults(this.getConfig(), defaultOptions);
+        var pluginShortcuts = (testOptions.shortcuts || {})[pluginName] || {};
         var alerts = [];
         var confirms = [];
         var opened = [];
@@ -203,7 +202,7 @@ export default pluginFactory({
         dialogShortcut.disable().set('Tab Shift+Tab');
 
         // handle the plugin's shortcuts
-        if (testConfig.allowShortcuts) {
+        if (testOptions.allowShortcuts) {
             _.forEach(pluginShortcuts, function(command, key) {
                 dialogShortcut.add(namespaceHelper.namespaceAll(command, pluginName, true), function(e, shortcut) {
                     // just fire the action using the event loop

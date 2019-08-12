@@ -64,14 +64,13 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
+        const self = this;
 
-        var testRunner = this.getTestRunner(),
-            testData = testRunner.getTestData() || {},
-            testConfig = testData.config || {},
-            pluginConfig = _.defaults((testConfig.plugins || {})[pluginName] || {}, defaultConfig),
-            pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {},
-            $contentArea = this.getAreaBroker().getContentArea();
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginConfig = _.defaults(this.getConfig(), defaultConfig);
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
+        const $contentArea = this.getAreaBroker().getContentArea();
 
         var answerMasking = answerMaskingFactory($contentArea);
 
@@ -147,7 +146,7 @@ export default pluginFactory({
             testRunner.trigger(`${actionPrefix}toggle`);
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.toggle) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),

@@ -34,11 +34,12 @@ export default pluginFactory({
     init: function init() {
         var self = this;
         var testRunner = this.getTestRunner();
-        var testConfig = testRunner.getTestData().config;
+        const testRunnerOptions = testRunner.getOptions();
 
         function toggle() {
-            var options = testRunner.getTestContext().options;
-            if (testConfig.nextSection && (options.nextSection || options.nextSectionWarning)) {
+            const testContext = testRunner.getTestContext();
+            const contextOptions = testContext.options || {};
+            if (testRunnerOptions.nextSection && (contextOptions.nextSection || contextOptions.nextSectionWarning)) {
                 self.show();
             } else {
                 self.hide();

@@ -54,14 +54,12 @@ export default pluginFactory({
      * @returns {this}
      */
     init: function init() {
-        this.getTestRunner().before('move', function(e, direction) {
-            var self = this;
-            var testContext = this.getTestContext();
-            var isInteracting = !this.getItemState(testContext.itemIdentifier, 'disabled');
+        const pluginConfig = this.getConfig();
 
-            var testData = this.getTestData() || {};
-            var testConfig = testData.config || {};
-            var pluginConfig = _.defaults((testConfig.plugins || {})[pluginName] || {});
+        this.getTestRunner().before('move', function(e, direction) {
+            const self = this;
+            const testContext = this.getTestContext();
+            const isInteracting = !this.getItemState(testContext.itemIdentifier, 'disabled');
 
             if (!pluginConfig.validateOnPreviousMove && direction === 'previous') {
                 return Promise.resolve();

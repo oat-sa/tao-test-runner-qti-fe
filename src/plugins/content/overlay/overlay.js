@@ -75,11 +75,7 @@ export default pluginFactory({
      * Enable the overlay
      */
     enable: function enable() {
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginsConfig = testConfig.plugins || {};
-        var overlayConfig = pluginsConfig.overlay || {};
+        var overlayConfig = this.getConfig().overlay || {};
 
         this.$element.addClass('overlay');
 

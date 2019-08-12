@@ -23,6 +23,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
+import { testSessionStates } from 'taoQtiTest/runner/config/states';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
@@ -124,20 +125,18 @@ export default function dataUpdaterFactory(testDataHolder) {
         /**
          * Update current map stats based on the context
          *
-         * @param {Object} testMap - the testMap to update
          * @returns {Object} the updated testMap
          */
         updateStats: function updateStats() {
             var testMap = testDataHolder.get('testMap');
             var testContext = testDataHolder.get('testContext');
-            var testData = testDataHolder.get('testData');
             var updatedTestMap = null;
             var item;
 
-            if (testMap && testContext && _.isNumber(testContext.itemPosition) && testData && testData.states) {
+            if (testMap && testContext && _.isNumber(testContext.itemPosition)) {
                 item = mapHelper.getItemAt(testMap, testContext.itemPosition);
 
-                if (item && testContext.state === testData.states.interacting) {
+                if (item && testContext.state === testSessionStates.interacting) {
                     //flag as viewed, always
                     item.viewed = true;
 

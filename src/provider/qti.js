@@ -36,6 +36,7 @@ import toolboxFactory from 'taoQtiTest/runner/ui/toolbox/toolbox';
 import qtiItemRunner from 'taoQtiItem/runner/qtiItemRunner';
 import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
+import { testSessionStates, itemSessionStates } from 'taoQtiTest/runner/config/states';
 
 /**
  * A Test runner provider to be registered against the runner
@@ -186,8 +187,7 @@ var qtiProvider = {
         function getItemResults() {
             var results = {};
             var context = self.getTestContext();
-            var states = self.getTestData().states;
-            if (context && self.itemRunner && context.itemSessionState <= states.interacting) {
+            if (context && self.itemRunner && context.itemSessionState <= itemSessionStates.interacting) {
                 results = {
                     itemResponse: self.itemRunner.getResponses(),
                     itemState: self.itemRunner.getState()
@@ -303,10 +303,9 @@ var qtiProvider = {
          */
         function load() {
             var context = self.getTestContext();
-            var states = self.getTestData().states;
-            if (context.state <= states.interacting) {
+            if (context.state <= testSessionStates.interacting) {
                 self.loadItem(context.itemIdentifier);
-            } else if (context.state === states.closed) {
+            } else if (context.state === testSessionStates.closed) {
                 self.finish();
             }
         }
@@ -429,7 +428,7 @@ var qtiProvider = {
                     })
                     .then(function() {
                         self.trigger('leave', {
-                            code: self.getTestData().states.suspended,
+                            code: testSessionStates.suspended,
                             message: data && data.message
                         });
                     })
@@ -439,7 +438,6 @@ var qtiProvider = {
             })
             .on('loaditem', function() {
                 var context = this.getTestContext();
-                var states = this.getTestData().itemStates;
                 var warning = false;
 
                 /**
@@ -454,7 +452,7 @@ var qtiProvider = {
                 //The item is rendered but in a state that prevents us from interacting
                 if (context.isTimeout) {
                     warning = __('Time limit reached for item "%s".', getItemLabel());
-                } else if (context.itemSessionState > states.interacting) {
+                } else if (context.itemSessionState > itemSessionStates.interacting) {
                     if (context.remainingAttempts === 0) {
                         warning = __('No more attempts allowed for item "%s".', getItemLabel());
                     } else {

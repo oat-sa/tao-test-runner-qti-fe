@@ -28,6 +28,7 @@ import actionStoreFactory from 'taoQtiTest/runner/proxy/cache/actionStore';
 import offlineErrorHelper from 'taoQtiTest/runner/helpers/offlineErrorHelper';
 import offlineSyncModal from 'taoQtiTest/runner/helpers/offlineSyncModal';
 import responseStoreFactory from 'taoQtiTest/runner/services/responseStore';
+import { testSessionStates } from 'taoQtiTest/runner/config/states';
 import download from 'util/download';
 
 /**
@@ -175,7 +176,7 @@ export default _.defaults(
                     if (isBlocked || (isNavigationAction && isLast)) {
                         // the last item of the test
                         result.testContext = {
-                            state: testData.states.closed
+                            state: testSessionStates.closed
                         };
                         if (isOffline) {
                             return new Promise(function() {

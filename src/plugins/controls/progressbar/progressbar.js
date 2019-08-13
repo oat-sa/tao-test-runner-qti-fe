@@ -49,7 +49,7 @@ export default pluginFactory({
     init: function init() {
         const testRunner = this.getTestRunner();
         const testRunnerConfig = testRunner.getOptions();
-        const config = _.defaults(this.getConfig(), testRunnerConfig.progressIndicator || {});
+        const config = Object.assign({}, testRunnerConfig.progressIndicator || {}, this.getConfig());
         const self = this;
 
         var rendererFactory = renderers[config.renderer] || renderers.percentage;

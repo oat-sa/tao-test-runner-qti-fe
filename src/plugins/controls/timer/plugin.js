@@ -102,7 +102,7 @@ export default pluginFactory({
         /**
          * Plugin config,
          */
-        const config = _.defaults(this.getConfig(), {
+        const config = Object.assign({
             /**
              * An option to control is the warnings are contextual or global
              */
@@ -122,7 +122,7 @@ export default pluginFactory({
              * Restore timer from client.
              */
             restoreTimerFromClient: testRunnerOptions.restoreTimerFromClient
-        });
+        }, this.getConfig());
 
         /**
          * Set up the strategy handler

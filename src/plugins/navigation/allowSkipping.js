@@ -66,7 +66,7 @@ export default pluginFactory({
             var self = this;
             var testContext = this.getTestContext();
             var isInteracting = !this.getItemState(testContext.itemIdentifier, 'disabled');
-            var config = _.defaults(this.getConfig(), defaults);
+            var config = Object.assign({}, defaults, this.getConfig());
             var warning = config.allowPartial
                 ? __('A response to every question in this item is required.')
                 : __('A response to this item is required.');

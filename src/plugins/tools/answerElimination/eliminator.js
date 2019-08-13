@@ -80,7 +80,7 @@ export default pluginFactory({
 
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
-        const config = _.defaults(this.getConfig(), defaultConfig);
+        const config = Object.assign({}, defaultConfig, this.getConfig());
 
         // register the button in the toolbox
         this.button = this.getAreaBroker()

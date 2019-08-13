@@ -588,7 +588,7 @@ export default pluginFactory({
     init: function init() {
         var self = this;
         var testRunner = this.getTestRunner();
-        var pluginConfig = _.defaults(this.getConfig(), defaultPluginConfig);
+        var pluginConfig = Object.assign({}, defaultPluginConfig, this.getConfig());
 
         //start disabled
         this.disable();

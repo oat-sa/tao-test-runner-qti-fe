@@ -67,7 +67,7 @@ export default pluginFactory({
     init: function init() {
         var testRunner = this.getTestRunner();
         var testOptions = testRunner.getOptions();
-        var pluginConfig = _.defaults(this.getConfig(), defaultOptions);
+        var pluginConfig = Object.assign({}, defaultOptions, this.getConfig());
         var pluginShortcuts = (testOptions.shortcuts || {})[pluginName] || {};
         var alerts = [];
         var confirms = [];

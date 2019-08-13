@@ -68,7 +68,7 @@ export default pluginFactory({
 
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
-        const pluginConfig = _.defaults(this.getConfig(), defaultConfig);
+        const pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
         const $contentArea = this.getAreaBroker().getContentArea();
 

@@ -69,7 +69,7 @@ export default pluginFactory({
             .getContentArea()
             .parent();
         const testRunnerOptions = testRunner.getOptions();
-        const config = _.defaults(this.getConfig(), defaultConfig);
+        const config = Object.assign({}, defaultConfig, this.getConfig());
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
 
         function addMask() {

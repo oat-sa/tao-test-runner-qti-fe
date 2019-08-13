@@ -227,19 +227,15 @@ define([
         ])
         .test('No dialog is triggered ', function(caseData, assert) {
             var ready = assert.async();
-            var runner = runnerFactory(providerName);
+            var runner = runnerFactory(providerName, {}, {
+                options : caseData.testConfig
+            });
             var plugin = pluginFactory(runner, runner.getAreaBroker());
 
             // mock test store init
             runner.getTestStore = function() {
                 return {
                     setVolatile: function() {}
-                };
-            };
-            // mock config
-            runner.getTestData = function() {
-                return {
-                    config: caseData.testConfig
                 };
             };
             // mock the item we will get (informational or not)
@@ -312,7 +308,9 @@ define([
         .test('Dialog will be triggered ', function(caseData, assert) {
             var ready = assert.async();
 
-            var runner = runnerFactory(providerName);
+            var runner = runnerFactory(providerName, {}, {
+                options : caseData.testConfig
+            });
             var plugin = pluginFactory(runner, runner.getAreaBroker());
 
             // mock test store init
@@ -322,12 +320,6 @@ define([
                         return Promise.reject();
                     },
                     setVolatile: function() {}
-                };
-            };
-            // mock config
-            runner.getTestData = function() {
-                return {
-                    config: caseData.testConfig
                 };
             };
 

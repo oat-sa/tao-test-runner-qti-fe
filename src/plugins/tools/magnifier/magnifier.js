@@ -62,7 +62,7 @@ export default pluginFactory({
         const self = this;
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
-        const pluginConfig = _.defaults(this.getConfig(), defaultOptions);
+        const pluginConfig = Object.assign({}, defaultOptions, this.getConfig());
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
         let magnifierPanel = null;
 

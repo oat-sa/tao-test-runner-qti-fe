@@ -96,7 +96,7 @@ export default pluginFactory({
      */
     init: function init() {
         const testRunner = this.getTestRunner();
-        const config = _.defaults(this.getConfig(), defaults);
+        const config = Object.assign({}, defaults, this.getConfig());
         const collapseCls = config.hover ? noLabelHoverCls : noLabelCls;
 
         var areaBroker = testRunner.getAreaBroker();

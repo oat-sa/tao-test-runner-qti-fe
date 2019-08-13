@@ -1,9 +1,6 @@
 {
   "state": 1,
-  "navigationMode": 1,
-  "submissionMode": 0,
   "remainingAttempts": -1,
-  "isAdaptive": false,
   "isLinear": false,
   "attempt": 1,
   "isTimeout": false,
@@ -27,10 +24,8 @@
   "numberItems": 17,
   "numberCompleted": 0,
   "numberPresented": 1,
-  "considerProgress": true,
   "isDeepestSectionVisible": true,
   "canMoveBackward": false,
-  "numberRubrics": 0,
   "preventEmptyResponses": false,
   "hasFeedbacks": false,
   "options": {

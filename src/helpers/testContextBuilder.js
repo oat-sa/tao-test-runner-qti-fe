@@ -26,13 +26,12 @@ import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
 /**
  * Returns the updated test context from an item in the given position.
  *
- * @param {Object} testData
  * @param {Object} testContext
  * @param {Object} testMap
  * @param {Integer} position
  * @returns {Object}
  */
-function buildTestContextFromPosition(testData, testContext, testMap, position) {
+function buildTestContextFromPosition(testContext, testMap, position) {
     var updatedMap = mapHelper.updateItemStats(testMap, position),
         item = mapHelper.getItemAt(updatedMap, position),
         section = mapHelper.getItemSection(updatedMap, position),
@@ -42,13 +41,12 @@ function buildTestContextFromPosition(testData, testContext, testMap, position) 
         return false;
     }
 
-    return getTestContext(testData, testContext, testMap, item, section, part, position);
+    return getTestContext(testContext, testMap, item, section, part, position);
 }
 
 /**
  * Returns the updated test context from a jump table entry.
  *
- * @param {Object} testData
  * @param {Object} testContext
  * @param {Object} testMap
  * @param {Object} jump
@@ -58,18 +56,17 @@ function buildTestContextFromPosition(testData, testContext, testMap, position) 
  * @param {Integer} jump.position
  * @returns {Object}
  */
-function buildTestContextFromJump(testData, testContext, testMap, jump) {
+function buildTestContextFromJump(testContext, testMap, jump) {
     var part = testMap.parts[jump.part],
         section = part.sections[jump.section],
         item = section.items[jump.item];
 
-    return getTestContext(testData, testContext, testMap, item, section, part, jump.position);
+    return getTestContext(testContext, testMap, item, section, part, jump.position);
 }
 
 /**
  * Returns the updated test context.
  *
- * @param {Object} testData
  * @param {Object} testContext
  * @param {Object} testMap
  * @param {Object} item
@@ -90,7 +87,7 @@ function buildTestContextFromJump(testData, testContext, testMap, jump) {
  * @returns {Object} the new test context
  * @private
  */
-function getTestContext(testData, testContext, testMap, item, section, part, position) {
+function getTestContext(testContext, testMap, item, section, part, position) {
     var isLeavingSection = section.id !== testContext.sectionId,
         isLeavingPart = part.id !== testContext.testPartId,
         newTestContext = _.defaults(

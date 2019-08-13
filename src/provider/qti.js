@@ -71,7 +71,7 @@ var qtiProvider = {
         var config = this.getConfig();
 
         var proxyProvider = config.provider.proxy || 'qtiServiceProxy';
-        var proxyConfig = _.pick(config, ['testDefinition', 'testCompilation', 'serviceCallId', 'bootstrap']);
+        var proxyConfig = _.pick(config, ['testDefinition', 'testCompilation', 'serviceCallId', 'bootstrap', 'options']);
 
         return proxyFactory(proxyProvider, proxyConfig);
     },

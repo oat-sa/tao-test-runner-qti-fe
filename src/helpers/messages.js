@@ -31,11 +31,10 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
  * @returns {String} Returns the message text
  */
 function getExitMessage(message, scope, runner, sync) {
-    var itemsCountMessage = '';
+    let itemsCountMessage = '';
 
-    var testData = runner.getTestData(),
-        testConfig = testData && testData.config,
-        messageEnabled = testConfig ? testConfig.enableUnansweredItemsWarning : true;
+    const testRunnerOptions = runner.getOptions();
+    const messageEnabled = testRunnerOptions.enableUnansweredItemsWarning;
 
     if (messageEnabled) {
         itemsCountMessage = getUnansweredItemsWarning(scope, runner, sync);

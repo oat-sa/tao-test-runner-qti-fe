@@ -42,13 +42,11 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
+        const self = this;
 
-        var testRunner = this.getTestRunner();
-        //var testData = testRunner.getTestData();
-        //var testConfig = testData.config || {};
+        const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
-        var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
          * Check if the "Previous" functionality should be available or not

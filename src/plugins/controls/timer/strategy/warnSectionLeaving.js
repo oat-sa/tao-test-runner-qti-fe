@@ -74,9 +74,8 @@ export default function warnSectionLeavingStrategy(testRunner, timer) {
                     .off('move.warntimedsection skip.warntimedsection')
                     .before('move.warntimedsection skip.warntimedsection', function(e, type, scope, position) {
                         var context = testRunner.getTestContext();
-                        var testDataBeforeMove = testRunner.getTestData();
-                        var config = testDataBeforeMove && testDataBeforeMove.config;
-                        var timerConfig = (config && config.timer) || {};
+                        var testRunnerOptions = testRunner.getOptions();
+                        var timerConfig = testRunnerOptions.timer || {};
                         var options = (context && context.options) || {};
                         var movePromise = new Promise(function(resolve, reject) {
                             // endTestWarning has already been displayed, so we don't repeat the warning

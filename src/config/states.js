@@ -23,16 +23,16 @@
 export default {
 
     //the test session states
-    testSession : {
+    testSession : Object.freeze({
         initial : 0,
         interacting : 1,
         modalFeedback : 2,
         suspended : 3,
         closed : 4
-    },
+    }),
 
     //the item session states
-    itemSession : {
+    itemSession : Object.freeze({
         initial : 0,
         interacting : 1,
         modalFeedback : 2,
@@ -40,5 +40,5 @@ export default {
         closed : 4,
         solution : 5,
         notSelected : 255
-    }
+    })
 };

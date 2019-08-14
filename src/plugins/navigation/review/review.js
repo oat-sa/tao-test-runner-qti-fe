@@ -112,10 +112,17 @@ function updateButton(button, data) {
  * @returns {Boolean}
  */
 function canFlag(testRunner) {
-    var context = testRunner.getTestContext();
-    var map = testRunner.getTestMap();
-    var item = mapHelper.getItemAt(map, context.itemPosition);
-    return !!(!context.isLinear && context.options.markReview && !(item && item.informational));
+    const testContext = testRunner.getTestContext();
+    const testMap = testRunner.getTestMap();
+    const item = mapHelper.getItemAt(testMap, testContext.itemPosition);
+    const markReviewCategory = mapHelper.hasItemCategory(
+        testMap,
+        testContext.itemIdentifier,
+        'markReview',
+        true
+    );
+
+    return !!(!testContext.isLinear && markReviewCategory && !(item && item.informational));
 }
 
 /**
@@ -138,13 +145,38 @@ export default pluginFactory({
         var navigatorConfig = testConfig.review || {};
         var previousItemPosition;
 
+
+        /**
+         * Retrieve the review categories of the current item
+         * @returns {Object} the calculator categories
+         */
+        function getReviewCategories(){
+            const currentContext = testRunner.getTestContext();
+            const currentMap = testRunner.getTestMap();
+
+            return {
+                reviewScreen : mapHelper.hasItemCategory(
+                    currentMap,
+                    currentContext.itemIdentifier,
+                    'reviewScreen',
+                    true
+                ),
+                markReview : mapHelper.hasItemCategory(
+                    currentMap,
+                    currentContext.itemIdentifier,
+                    'markReview',
+                    true
+                )
+            };
+        }
+
         /**
          * Tells if the component is enabled
          * @returns {Boolean}
          */
         function isPluginAllowed() {
-            var context = testRunner.getTestContext();
-            return navigatorConfig.enabled && context && context.options && context.options.reviewScreen;
+            const categories = getReviewCategories();
+            return navigatorConfig.enabled && categories.reviewScreen;
         }
 
         /**
@@ -298,13 +330,14 @@ export default pluginFactory({
                 }
             })
             .on('loaditem', function() {
-                var context = testRunner.getTestContext();
-                var map = testRunner.getTestMap();
+                const context = testRunner.getTestContext();
+                const map = testRunner.getTestMap();
+                const categories = getReviewCategories();
 
                 if (isPluginAllowed()) {
                     updateButton(self.flagItemButton, getFlagItemButtonData(context));
                     self.navigator.update(map, context).updateConfig({
-                        canFlag: !context.isLinear && context.options.markReview
+                        canFlag: !context.isLinear && categories.markReview
                     });
                     self.show();
                     updateButton(self.toggleButton, getToggleButtonData(self.navigator));

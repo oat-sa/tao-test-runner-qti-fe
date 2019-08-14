@@ -365,7 +365,13 @@ var qtiProvider = {
                     });
             })
             .on('timeout', function(scope, ref, timer) {
-                var context = self.getTestContext();
+                const context = self.getTestContext();
+                const noAlertTimeout = mapHelper.hasItemCategory(
+                    self.getTestMap(),
+                    context.itemIdentifier,
+                    'noAlertTimeout',
+                    true
+                );
 
                 context.isTimeout = true;
 
@@ -400,11 +406,7 @@ var qtiProvider = {
                             ref: ref
                         }),
                         new Promise(function(resolve) {
-                            if (
-                                context.options &&
-                                Object.prototype.hasOwnProperty.call(context.options, 'noAlertTimeout') &&
-                                context.options.noAlertTimeout
-                            ) {
+                            if ( noAlertTimeout ) {
                                 resolve();
                             } else {
                                 self.trigger(

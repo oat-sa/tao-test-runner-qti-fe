@@ -26,6 +26,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import 'ui/hider';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 import answerMaskingFactory from 'taoQtiTest/runner/plugins/tools/answerMasking/answerMasking';
 
 /**
@@ -76,10 +77,14 @@ export default pluginFactory({
         var answerMasking = answerMaskingFactory($contentArea);
 
         function isPluginEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-answerMasking
-            return options.answerMasking && itemContainsChoiceInteraction();
+            const answerMaskingCategory = mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'answerMasking',
+                true
+            );
+            return answerMaskingCategory && itemContainsChoiceInteraction();
         }
 
         function itemContainsChoiceInteraction() {

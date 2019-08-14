@@ -31,6 +31,7 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import itemHelper from 'taoQtiTest/runner/helpers/currentItem';
 import highlighterCollection from 'taoQtiTest/runner/plugins/tools/highlighter/collection';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * Returns the configured plugin
@@ -147,10 +148,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isPluginEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-highlighter
-            return !!options.highlighter;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'highlighter',
+                true
+            );
         }
 
         /**

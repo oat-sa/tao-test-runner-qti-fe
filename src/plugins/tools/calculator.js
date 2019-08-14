@@ -31,6 +31,7 @@ import scientificCalculatorFactory from 'ui/maths/calculator/scientificCalculato
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * Default config for calculator components
@@ -93,18 +94,32 @@ export default pluginFactory({
         var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
 
         /**
+         * Retrieve the calculators categories of the current item
+         * @returns {Object} the calculator categories
+         */
+        function getCalculatorCategories() {
+            const testContext = testRunner.getTestContext();
+            const itemIdentifier= testContext.itemIdentifier;
+            const testMap     = testRunner.getTestMap();
+            return {
+                calculator : mapHelper.hasItemCategory(testMap, itemIdentifier, 'calculator', true),
+                bodmas     : mapHelper.hasItemCategory(testMap, itemIdentifier, 'calculator-bodmas', true),
+                scientific : mapHelper.hasItemCategory(testMap, itemIdentifier, 'calculator-scientific', true),
+            };
+        }
+
+        /**
          * Checks if the plugin is currently available
          * @returns {Boolean}
          */
         function isEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
-
             //to be activated with a special category from:
             // - x-tao-option-calculator
             // - x-tao-option-calculator-bodmas
             // - x-tao-option-calculator-scientific
-            return !!options.calculator || !!options.calculatorBodmas || !!options.calculatorScientific;
+            const categories = getCalculatorCategories();
+
+            return categories.calculator || categories.bodmas || categories.scientific;
         }
 
         /**
@@ -125,17 +140,16 @@ export default pluginFactory({
          *                               Only compatible with the four-functions version
          */
         function buildCalculator(calcTpl) {
-            var context = testRunner.getTestContext() || {};
-            var options = context.options || {};
-            var factory, calcConfig;
+            const categories = getCalculatorCategories();
+            let factory, calcConfig;
 
-            if (options.calculatorScientific) {
+            if (categories.scientific) {
                 factory = scientificCalculatorFactory;
                 calcConfig = scientificCalcConfig;
                 calcConfig.calculator.maths.degree = _.isUndefined(config.degree)
                     ? scientificCalcConfig.calculator.maths.degree
                     : config.degree;
-            } else if (options.calculatorBodmas) {
+            } else if (categories.bodmas) {
                 factory = basicCalculatorFactory;
                 calcConfig = bodmasCalcConfig;
             } else {

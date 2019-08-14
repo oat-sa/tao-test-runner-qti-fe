@@ -26,6 +26,7 @@ import 'ui/hider';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import magnifierPanelFactory from 'taoQtiTest/runner/plugins/tools/magnifier/magnifierPanel';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * The public name of the plugin
@@ -125,10 +126,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-magnifier
-            return !!options.magnifier;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'magnifier',
+                true
+            );
         }
 
         /**

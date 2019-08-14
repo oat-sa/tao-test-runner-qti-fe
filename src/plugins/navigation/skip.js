@@ -22,13 +22,13 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import $ from 'jquery';
-import _ from 'lodash';
 import __ from 'i18n';
 import hider from 'ui/hider';
 import pluginFactory from 'taoTests/runner/plugin';
 import messages from 'taoQtiTest/runner/helpers/messages';
 import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
 import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * The display of the skip
@@ -85,7 +85,6 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init() {
-        const self = this;
         const testRunner = this.getTestRunner();
 
         const toggle = () => {
@@ -106,15 +105,17 @@ export default pluginFactory({
         this.$element = createElement(testRunner.getTestContext());
 
         this.$element.on('click', e => {
+            const enable = this.enable.bind(this);
             const testContext = testRunner.getTestContext();
             const testMap = testRunner.getTestMap();
             const isLast  = navigationHelper.isLast(testMap, testContext.itemIdentifier);
+            const endTestWarning = mapHelper.hasCategory(testMap, testContext.itemIdentifier, 'endTestWarning', true);
 
             e.preventDefault();
 
-            if (self.getState('enabled') !== false) {
-                self.disable();
-                if (context.options.endTestWarning && isLast) {
+            if (this.getState('enabled') !== false) {
+                this.disable();
+                if (endTestWarning && isLast) {
                     testRunner.trigger(
                         'confirm.endTest',
                         messages.getExitMessage(
@@ -134,26 +135,22 @@ export default pluginFactory({
         });
 
         toggle();
-        self.disable();
+        this.disable();
 
         testRunner
-            .on('loaditem', function() {
+            .on('loaditem', () => {
                 if (toggle()) {
-                    updateElement(self.$element, testRunner.getTestContext());
+
+                    const testContext = testRunner.getTestContext();
+                    const testMap = testRunner.getTestMap();
+                    const isLast  = navigationHelper.isLast(testMap, testContext.itemIdentifier);
+                    updateElement(this.$element, isLast);
                 }
             })
-            .on('enablenav', function() {
-                self.enable();
-            })
-            .on('disablenav', function() {
-                self.disable();
-            })
-            .on('hidenav', function() {
-                self.hide();
-            })
-            .on('shownav', function() {
-                self.show();
-            });
+            .on('enablenav', () => this.enable() )
+            .on('disablenav', () => this.disable() )
+            .on('hidenav', () => this.hide() )
+            .on('shownav', () => this.show() );
     },
 
     /**

@@ -53,10 +53,16 @@ export default pluginFactory({
          * Check if the "Previous" functionality should be available or not
          */
         var canDoPrevious = function canDoPrevious() {
-            var testMap = testRunner.getTestMap();
-            var context = testRunner.getTestContext();
-            var previousSection;
-            var previousPart;
+            const testMap = testRunner.getTestMap();
+            const context = testRunner.getTestContext();
+            const noExitTimedSectionWarning = mapHelper.hasItemCategory(
+                testMap,
+                context.itemIdentifier,
+                'noExitTimedSectionWarning',
+                true
+            );
+            let previousSection;
+            let previousPart;
 
             // check TestMap if empty
             if (_.isPlainObject(testMap) && _.size(testMap) === 0) {
@@ -80,7 +86,7 @@ export default pluginFactory({
                 previousSection = mapHelper.getItemSection(testMap, context.itemPosition - 1);
                 if (
                     previousSection.isCatAdaptive ||
-                    (previousSection.timeConstraint && !context.options.noExitTimedSectionWarning)
+                    (previousSection.timeConstraint && !noExitTimedSectionWarning)
                 ) {
                     return false;
                 }

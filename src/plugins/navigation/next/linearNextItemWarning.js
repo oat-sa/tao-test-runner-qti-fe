@@ -46,6 +46,30 @@ export default pluginFactory({
         testStore.setVolatile(self.getName());
 
         /**
+         * Retrieve the required categories of the current item
+         * @returns {Object} the calculator categories
+         */
+        function getNextItemCategories(){
+            const testContext = testRunner.getTestContext();
+            const testMap = testRunner.getTestMap();
+
+            return {
+                nextPartWarning : mapHelper.hasItemCategory(
+                    testMap,
+                    testContext.itemIdentifier,
+                    'nextPartWarning',
+                    true
+                ),
+                nextSectionWarning : mapHelper.hasItemCategory(
+                    testMap,
+                    testContext.itemIdentifier,
+                    'nextSectionWarning',
+                    true
+                )
+            };
+        }
+
+        /**
          * Provides different variants of message text
          * @param {String} action - 'next' or 'skip'
          * @returns {String}
@@ -144,17 +168,18 @@ export default pluginFactory({
                 });
             })
             .before('move skip', function(e, type, scope) {
-                var context = testRunner.getTestContext();
-                var map = testRunner.getTestMap();
-                var item = mapHelper.getItemAt(map, context.itemPosition);
+                const context = testRunner.getTestContext();
+                const map = testRunner.getTestMap();
+                const item = mapHelper.getItemAt(map, context.itemPosition);
+                const categories = getNextItemCategories();
 
                 if (context.isLinear) {
                     // Do nothing if nextSection warning imminent:
-                    if (scope === 'section' && context.options.nextSectionWarning) {
+                    if (scope === 'section' && categories.nextSectionWarning) {
                         return;
                     }
                     // Do nothing if endOfPart warning imminent:
-                    else if (context.options.nextPartWarning) {
+                    else if (categories.nextPartWarning) {
                         return;
                     }
                     // Do nothing if 'informational item':

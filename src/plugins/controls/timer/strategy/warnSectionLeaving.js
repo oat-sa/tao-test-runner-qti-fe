@@ -27,6 +27,7 @@ import _ from 'lodash';
 import __ from 'i18n';
 import messages from 'taoQtiTest/runner/helpers/messages';
 import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * The message to display when exiting
@@ -72,19 +73,23 @@ export default function warnSectionLeavingStrategy(testRunner, timer) {
                 testRunner
                     .off('move.warntimedsection skip.warntimedsection')
                     .before('move.warntimedsection skip.warntimedsection', function(e, type, scope, position) {
-                        var context = testRunner.getTestContext();
+                        const testContext = testRunner.getTestContext();
+                        const testMap     = testRunner.getTestMap();
+                        const itemIdentifier = testContext.itemIdentifier;
+                        const isLast = navigationHelper.isLast(testMap, itemIdentifier);
+                        const endTestWarning = mapHelper.hasItemCategory(testMap, itemIdentifier, 'endTestWarning', true);
+                        const noExitTimedSectionWarning = mapHelper.hasItemCategory(testMap, itemIdentifier, 'noExitTimedSectionWarning', true);
                         var testDataBeforeMove = testRunner.getTestData();
                         var config = testDataBeforeMove && testDataBeforeMove.config;
                         var timerConfig = (config && config.timer) || {};
-                        var options = (context && context.options) || {};
                         var movePromise = new Promise(function(resolve, reject) {
                             // endTestWarning has already been displayed, so we don't repeat the warning
-                            if (context.isLast && options.endTestWarning) {
+                            if (isLast && endTestWarning) {
                                 resolve();
                                 // display a message if we exit a timed section
                             } else if (
                                 leaveTimedSection(type || 'next', scope, position) &&
-                                !options.noExitTimedSectionWarning &&
+                                !noExitTimedSectionWarning &&
                                 !timerConfig.keepUpToTimeout
                             ) {
                                 testRunner.trigger(

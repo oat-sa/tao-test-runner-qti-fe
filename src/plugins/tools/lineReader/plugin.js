@@ -28,6 +28,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import 'ui/hider';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 import compoundMaskFactory from 'taoQtiTest/runner/plugins/tools/lineReader/compoundMask';
 
 /**
@@ -132,10 +133,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-lineReader
-            return !!options.lineReader;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'lineReader',
+                true
+            );
         }
 
         function toggleButton() {
@@ -198,7 +202,7 @@ export default pluginFactory({
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),
                     function() {
-                        testRunner.trigger(`${actionPrefix  }toggle`);
+                        testRunner.trigger(`${actionPrefix}toggle`);
                     },
                     { avoidInput: true, prevent: true }
                 );

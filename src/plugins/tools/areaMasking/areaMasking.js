@@ -29,6 +29,7 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
 import maskComponent from 'taoQtiTest/runner/plugins/tools/areaMasking/mask';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * The public name of the plugin
@@ -144,10 +145,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isEnabled() {
-            var context = testRunner.getTestContext(),
-                options = context.options || {};
             //to be activated with the special category x-tao-option-areaMasking
-            return !!options.areaMasking;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'areaMasking',
+                true
+            );
         }
 
         /**

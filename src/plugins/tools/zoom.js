@@ -26,6 +26,7 @@ import transformer from 'ui/transformer';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * The standard zoom level, in percentage
@@ -113,10 +114,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isConfigured() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-zoom
-            return !!options.zoom;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'zoom',
+                true
+            );
         }
 
         /**

@@ -35,6 +35,7 @@ import __ from 'i18n';
 import 'ui/hider';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 import pluginFactory from 'taoTests/runner/plugin';
 
 /**
@@ -96,10 +97,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isPluginEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-eliminator
-            return !!options.eliminator;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'eliminator',
+                true
+            );
         }
 
         /**

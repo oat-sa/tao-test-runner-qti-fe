@@ -74,8 +74,8 @@ export default pluginFactory({
     /**
      * Enable the overlay
      */
-    enable: function enable() {
-        var overlayConfig = this.getConfig();
+    enable() {
+        const overlayConfig = this.getConfig();
 
         this.$element.addClass('overlay');
 

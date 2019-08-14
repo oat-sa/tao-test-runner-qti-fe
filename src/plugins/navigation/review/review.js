@@ -128,18 +128,18 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
+        const self = this;
+        const testRunner = this.getTestRunner();
 
-        var testContext = testRunner.getTestContext();
-        var testMap = testRunner.getTestMap();
+        const testContext = testRunner.getTestContext();
+        const testMap = testRunner.getTestMap();
 
-        var testRunnerOptions = testRunner.getOptions();
-        var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
-        var navigatorConfig = testRunnerOptions.review || {
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const navigatorConfig = testRunnerOptions.review || {
             defaultOpen : false
         };
-        var previousItemPosition;
+        let previousItemPosition;
 
         /**
          * Tells if the component is enabled

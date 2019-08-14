@@ -92,8 +92,10 @@ define([
                 title: 'when the option is not enabled',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: false,
                     validateResponses: true
+                },
+                options : {
+                    enableValidateResponses: false,
                 },
                 answered: false,
                 responses: ['foo']
@@ -102,8 +104,10 @@ define([
                 title: 'when the item has no interactions',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: true
+                },
+                options : {
+                    enableValidateResponses: true
                 },
                 answered: false,
                 responses: []
@@ -112,8 +116,10 @@ define([
                 title: 'when the item is configured without the validation',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: false
+                },
+                options : {
+                    enableValidateResponses: true
                 },
                 answered: false,
                 responses: ['foo']
@@ -122,8 +128,10 @@ define([
                 title: 'when the item is answered',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: true
+                },
+                options : {
+                    enableValidateResponses: true
                 },
                 answered: true,
                 responses: ['foo']
@@ -131,7 +139,9 @@ define([
         ])
         .test('Moving is allowed ', function(data, assert) {
             var ready = assert.async();
-            var runner = runnerFactory(providerName);
+            var runner = runnerFactory(providerName, {
+                options: data.options
+            });
             var plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(1);
@@ -161,8 +171,10 @@ define([
                 title: 'when the item not answered',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: true
+                },
+                options : {
+                    enableValidateResponses: true
                 },
                 answered: false,
                 responses: ['foo']
@@ -171,7 +183,9 @@ define([
         .test('Moving is prevented ', function(data, assert) {
             var ready = assert.async();
 
-            var runner = runnerFactory(providerName);
+            var runner = runnerFactory(providerName, {}, {
+                options : data.options
+            });
             var plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(2);
@@ -213,17 +227,14 @@ define([
                 title: 'when the item not answered, but the `validateOnPreviousMove` flag is set to `false`',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
+
                     validateResponses: true
                 },
-                testData: {
-                    config: {
-                        plugins: {
-                            validateResponses: {
-                                validateOnPreviousMove: false
-                            }
-                        }
-                    }
+                options :  {
+                    enableValidateResponses: true,
+                },
+                pluginConfig : {
+                    validateOnPreviousMove: false
                 },
                 answered: false,
                 responses: ['foo']
@@ -231,8 +242,10 @@ define([
         ])
         .test('Moving backwards is also allowed ', function(data, assert) {
             var ready = assert.async();
-            var runner = runnerFactory(providerName);
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+            var runner = runnerFactory(providerName, {}, {
+                options: data.options
+            });
+            var plugin = pluginFactory(runner, runner.getAreaBroker(), data.pluginConfig);
 
             assert.expect(1);
 

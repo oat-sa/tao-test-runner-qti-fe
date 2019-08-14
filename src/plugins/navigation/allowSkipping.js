@@ -62,24 +62,24 @@ export default pluginFactory({
      * @returns {this}
      */
     init: function init() {
-        this.getTestRunner().before('nav-next move', function() {
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginConfig = Object.assign({}, defaults, this.getConfig());
+
+        testRunner.before('nav-next move', function() {
             var self = this;
             var testContext = this.getTestContext();
             var isInteracting = !this.getItemState(testContext.itemIdentifier, 'disabled');
-            var testData = this.getTestData() || {};
-            var testConfig = testData.config || {};
-            var pluginsConfig = testConfig.plugins || {};
-            var config = _.defaults(pluginsConfig.allowSkipping || {}, defaults);
-            var warning = config.allowPartial
+            var warning = pluginConfig.allowPartial
                 ? __('A response to every question in this item is required.')
                 : __('A response to this item is required.');
 
-            if (isInteracting && testContext.enableAllowSkipping && !testContext.allowSkipping) {
+            if (isInteracting && testRunnerOptions.enableAllowSkipping && !testContext.allowSkipping) {
                 return new Promise(function(resolve, reject) {
                     if (_.size(currentItemHelper.getDeclarations(self)) === 0) {
                         return resolve();
                     }
-                    if (currentItemHelper.isAnswered(self, config.allowPartial)) {
+                    if (currentItemHelper.isAnswered(self, pluginConfig.allowPartial)) {
                         return resolve();
                     }
 

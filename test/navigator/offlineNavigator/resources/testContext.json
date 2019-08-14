@@ -23,7 +23,6 @@
   "canMoveBackward": false,
   "enableAllowSkipping": true,
   "allowSkipping": true,
-  "enableValidateResponses": true,
   "validateResponses": true,
   "hasFeedbacks": false,
   "options": {

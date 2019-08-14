@@ -40,6 +40,8 @@ export default pluginFactory({
                     text: testData.title
                 }
             ];
+
+            //@deprecated
             if (context.isDeepestSectionVisible) {
                 titles.push({
                     control: 'qti-test-position', //WTF !? isn't it the section title... ?

@@ -28,6 +28,7 @@ import hider from 'ui/hider';
 import pluginFactory from 'taoTests/runner/plugin';
 import messages from 'taoQtiTest/runner/helpers/messages';
 import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
+import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
 
 /**
  * The display of the skip
@@ -60,16 +61,17 @@ var createElement = function createElement(context) {
 /**
  * Update the button based on the context
  * @param {jQueryElement} $element - the element to update
- * @param {Object} context - the test context
+ * @param {Boolean} [isLast=false] - are we on the last item ?
  */
-var updateElement = function updateElement($element, context) {
-    var dataType = context.isLast ? 'end' : 'skip';
-    if ($element.attr('data-control') !== buttonData[dataType].control) {
+const updateElement = function updateElement($element, isLast = false) {
+    const dataType = isLast ? 'end' : 'skip';
+    const button   = buttonData[dataType];
+    if (button && $element.attr('data-control') !== button.control) {
         $element
-            .attr('data-control', buttonData[dataType].control)
-            .attr('title', buttonData[dataType].title)
+            .attr('data-control', button.control)
+            .attr('title', button.title)
             .find('.text')
-            .text(buttonData[dataType].text);
+            .text(button.text);
     }
 };
 
@@ -82,18 +84,18 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
+    init() {
+        const self = this;
+        const testRunner = this.getTestRunner();
 
-        var toggle = function toggle() {
-            var context = testRunner.getTestContext();
-            if (context.options.allowSkipping === true) {
-                self.show();
+        const toggle = () => {
+            const testContext = testRunner.getTestContext();
+            if (testContext.allowSkipping === true) {
+                this.show();
                 return true;
             }
 
-            self.hide();
+            this.hide();
             return false;
         };
 
@@ -103,15 +105,16 @@ export default pluginFactory({
 
         this.$element = createElement(testRunner.getTestContext());
 
-        this.$element.on('click', function(e) {
-            var enable = _.bind(self.enable, self);
-            var context = testRunner.getTestContext();
+        this.$element.on('click', e => {
+            const testContext = testRunner.getTestContext();
+            const testMap = testRunner.getTestMap();
+            const isLast  = navigationHelper.isLast(testMap, testContext.itemIdentifier);
 
             e.preventDefault();
 
             if (self.getState('enabled') !== false) {
                 self.disable();
-                if (context.options.endTestWarning && context.isLast) {
+                if (context.options.endTestWarning && isLast) {
                     testRunner.trigger(
                         'confirm.endTest',
                         messages.getExitMessage(

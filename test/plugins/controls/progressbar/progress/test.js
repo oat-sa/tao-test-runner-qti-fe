@@ -55,8 +55,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -110,8 +108,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -165,8 +161,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -224,8 +218,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -287,8 +279,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -350,8 +340,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -416,8 +404,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -479,8 +465,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -542,8 +526,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -608,8 +590,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -671,8 +651,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -734,8 +712,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
                 isLinear: false,
                 itemAnswered: true
             },
@@ -799,8 +775,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -854,8 +828,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -909,8 +881,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -968,8 +938,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -1031,8 +999,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -1094,8 +1060,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -1160,8 +1124,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -1223,8 +1185,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -1286,8 +1246,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -1352,8 +1310,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -1415,8 +1371,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },
@@ -1478,8 +1432,6 @@ define([
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
                 isLinear: true,
                 itemAnswered: true
             },

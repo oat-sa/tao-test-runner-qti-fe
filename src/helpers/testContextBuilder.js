@@ -98,8 +98,6 @@ function getTestContext(testData, testContext, testMap, item, section, part, pos
                 itemIdentifier: item.id,
                 itemPosition: position,
                 itemAnswered: item.answered || part.isLinear,
-                numberPresented: testMap.stats.viewed,
-                numberCompleted: testMap.stats.answered,
                 hasFeedbacks: false,
                 remainingAttempts: Math.max(-1, item.remainingAttempts - 1),
                 sectionId: section.id,

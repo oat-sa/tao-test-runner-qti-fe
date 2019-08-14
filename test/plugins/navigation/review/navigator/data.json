@@ -275,9 +275,6 @@
     "testPartId": "testPart-1",
     "sectionId": "assessmentSection-1",
     "sectionTitle": "Section 1",
-    "numberItems": 20,
-    "numberCompleted": 0,
-    "numberPresented": 1,
     "isDeepestSectionVisible": true,
     "canMoveBackward": false,
     "options": {

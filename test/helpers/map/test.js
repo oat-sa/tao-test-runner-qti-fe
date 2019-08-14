@@ -44,6 +44,8 @@ define([
             { title: 'getSections' },
             { title: 'getNextSections' },
             { title: 'getItem' },
+            { title: 'getItemCategories' },
+            { title: 'hasItemCategory' },
             { title: 'getTestStats' },
             { title: 'getPartStats' },
             { title: 'getSectionStats' },
@@ -267,6 +269,120 @@ define([
             'The map helper getItem does not provide any item when the map does not exist'
         );
     });
+
+    QUnit.cases.init([{
+        title : 'no categories',
+        item  : 'item-5',
+        expected : []
+    }, {
+        title : 'wrong item',
+        item  : 'item-19999',
+        expected : []
+    }, {
+        title : 'empty categories',
+        item  : 'item-4',
+        expected : []
+    }, {
+        title : 'sample categtories',
+        item  : 'item-6',
+        expected : ["foo", "bar"]
+    }, {
+        title : 'real categtories',
+        item  : 'item-7',
+        expected : ["x-tao-option-endTestWarning","x-tao-option-reviewScreen","x-tao-option-markReview","x-tao-option-calculator","x-tao-option-highlighter","x-tao-option-lineReader","x-tao-option-zoom","x-tao-option-noAlertTimeout","x-tao-option-nextSectionWarning","x-tao-option-nextPartWarning"]
+    }]).test('helpers/map.getItemCategories', (data, assert) => {
+
+        assert.deepEqual(
+            mapHelper.getItemCategories(mapSample, data.item),
+            data.expected,
+            'The categories match the item'
+        );
+    });
+
+    QUnit.cases.init([{
+        title : 'check without item categories',
+        item  : 'item-5',
+        fuzzyMatch : false,
+        category : 'highlighter',
+        expected : false
+    }, {
+        title : 'wrong item',
+        item  : 'item-19999',
+        fuzzyMatch : false,
+        category : 'x-tao-option-highlighter',
+        expected : false
+    }, {
+        title : 'empty categories',
+        item  : 'item-4',
+        fuzzyMatch : false,
+        category : 'x-tao-option-highlighter',
+        expected : false
+    }, {
+        title : 'check empty category',
+        item  : 'item-7',
+        fuzzyMatch : false,
+        category : '',
+        expected : false
+    }, {
+        title : 'matching with prefix',
+        item  : 'item-7',
+        fuzzyMatch : false,
+        category : 'x-tao-option-highlighter',
+        expected : true
+    }, {
+        title : 'matching without a prefix',
+        item  : 'item-6',
+        fuzzyMatch : false,
+        category : 'bar',
+        expected : true
+    }, {
+        title : 'exact match without the prefix',
+        item  : 'item-7',
+        fuzzyMatch : false,
+        category : 'highlighter',
+        expected : false
+    }, {
+        title : 'fuzzy match without the prefix',
+        item  : 'item-7',
+        fuzzyMatch : true,
+        category : 'highlighter',
+        expected : true
+    }, {
+        title : 'fuzzy match without the prefix and wrong case',
+        item  : 'item-7',
+        fuzzyMatch : true,
+        category : 'linereader',
+        expected : true
+    }, {
+        title : 'fuzzy match with the prefix and wrong case',
+        item  : 'item-7',
+        fuzzyMatch : true,
+        category : 'x-tao-option-linereader',
+        expected : true
+    }, {
+        title : 'fuzzy match with snake case',
+        item  : 'item-7',
+        fuzzyMatch : true,
+        category : 'no-alert-timeout',
+        expected : true
+    }, {
+        title : 'fuzzy match with exact category',
+        item  : 'item-7',
+        fuzzyMatch : true,
+        category : 'x-tao-option-nextSectionWarning',
+        expected : true
+    }, {
+        title : 'fuzzy match wrong with snake case',
+        item  : 'item-7',
+        fuzzyMatch : true,
+        category : 'yep-alert-timeout',
+        expected : false
+    }]).test('helpers/map.hasItemCategory', (data, assert) => {
+
+        const matching = mapHelper.hasItemCategory(mapSample, data.item, data.category, data.fuzzyMatch);
+        assert.equal(matching, data.expected, 'The matching is correct');
+    });
+
 
     QUnit.test('helpers/map.getTestStats', function(assert) {
         var map = {

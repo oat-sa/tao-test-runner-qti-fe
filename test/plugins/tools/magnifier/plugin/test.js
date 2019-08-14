@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 
 define([
@@ -27,6 +27,31 @@ define([
 
     var providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
+
+    const sampleTestContext = {
+        itemIdentifier : 'item-1'
+    };
+    const sampleTestMap = {
+        parts: {
+            p1 : {
+                sections : {
+                    s1 : {
+                        items : {
+                            'item-1' : {
+                                categories: ['x-tao-option-magnifier']
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        jumps : [{
+            identifier: 'item-1',
+            section: 's1',
+            part: 'p1',
+            position: 0
+        }]
+    };
 
     QUnit.module('API');
 
@@ -228,11 +253,8 @@ define([
 
         assert.expect(12);
 
-        runner.setTestContext({
-            options: {
-                magnifier: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         runner.on('plugin-magnifier-create.magnifier', function() {
             assert.equal($('.magnifier', $container).length, 1, 'A magnifier has been created');
@@ -295,11 +317,8 @@ define([
 
         assert.expect(8);
 
-        runner.setTestContext({
-            options: {
-                magnifier: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         runner.on('plugin-magnifier-create.magnifier', function() {
             assert.equal($('.magnifier', $container).length, 1, 'A magnifier has been created');

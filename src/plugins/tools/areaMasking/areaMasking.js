@@ -69,7 +69,8 @@ export default pluginFactory({
             .getAreaBroker()
             .getContentArea()
             .parent();
-        var testConfig = testRunner.getTestData().config || {};
+        var testData = testRunner.getTestData() || {};
+        var testConfig = testData.config || {};
         var config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
         var pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
 

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA
+ * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA
  */
 
 define([
@@ -26,6 +26,31 @@ define([
     var pluginApi;
     var providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
+
+    const sampleTestContext = {
+        itemIdentifier : 'item-1'
+    };
+    const sampleTestMap = {
+        parts: {
+            p1 : {
+                sections : {
+                    s1 : {
+                        items : {
+                            'item-1' : {
+                                categories: ['x-tao-option-eliminator']
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        jumps : [{
+            identifier: 'item-1',
+            section: 's1',
+            part: 'p1',
+            position: 0
+        }]
+    };
 
     /**
      * Generic tests
@@ -208,11 +233,8 @@ define([
             buttonSelector = '[data-control="eliminator"]',
             $button;
 
-        runner.setTestContext({
-            options: {
-                eliminator: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         assert.expect(4);
 
@@ -254,11 +276,8 @@ define([
 
         areaBroker.getContentArea().append(interaction);
 
-        runner.setTestContext({
-            options: {
-                eliminator: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         assert.expect(3);
 

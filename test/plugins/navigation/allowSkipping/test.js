@@ -206,8 +206,10 @@ define([
                 title: 'when the item not answered',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableAllowSkipping: true,
                     allowSkipping: false
+                },
+                options : {
+                    enableAllowSkipping: true
                 },
                 answered: false,
                 responses: ['foo']
@@ -216,7 +218,9 @@ define([
         .test('Moving is prevented ', function(data, assert) {
             var ready = assert.async();
 
-            var runner = runnerFactory(providerName);
+            var runner = runnerFactory(providerName, {}, {
+                options: data.options
+            });
             var plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(2);

@@ -32,6 +32,31 @@ define([
     var providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
+    const sampleTestContext = {
+        itemIdentifier : 'item-1'
+    };
+    const sampleTestMap = {
+        parts: {
+            p1 : {
+                sections : {
+                    s1 : {
+                        items : {
+                            'item-1' : {
+                                categories: ['x-tao-option-lineReader']
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        jumps : [{
+            identifier: 'item-1',
+            section: 's1',
+            part: 'p1',
+            position: 0
+        }]
+    };
+
     /**
      * The following tests applies to all plugins
      */
@@ -215,11 +240,8 @@ define([
 
         assert.expect(3);
 
-        runner.setTestContext({
-            options: {
-                lineReader: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         plugin
             .init()
@@ -294,11 +316,8 @@ define([
 
         assert.expect(4);
 
-        runner.setTestContext({
-            options: {
-                lineReader: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         plugin
             .init()
@@ -331,11 +350,8 @@ define([
 
         assert.expect(8);
 
-        runner.setTestContext({
-            options: {
-                lineReader: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         plugin
             .init()
@@ -383,11 +399,8 @@ define([
 
         assert.expect(6);
 
-        runner.setTestContext({
-            options: {
-                lineReader: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         runner.setTestData({
             config: {

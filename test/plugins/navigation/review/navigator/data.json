@@ -253,7 +253,6 @@
     "needMapUpdate": false,
     "isLast": false,
     "itemPosition": 0,
-    "itemFlagged": false,
     "itemAnswered": false,
     "timeConstraints": [{
       "label": "Section 1",

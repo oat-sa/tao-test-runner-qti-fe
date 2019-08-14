@@ -10,7 +10,6 @@
     "needMapUpdate": false,
     "isLast": false,
     "itemPosition": 0,
-    "itemFlagged": false,
     "itemAnswered": false,
     "timeConstraints": [],
     "extraTime": {
@@ -47,7 +46,6 @@
     "needMapUpdate": false,
     "isLast": false,
     "itemPosition": 2,
-    "itemFlagged": false,
     "itemAnswered": false,
     "timeConstraints": [],
     "extraTime": {
@@ -84,7 +82,6 @@
     "needMapUpdate": false,
     "isLast": false,
     "itemPosition": 13,
-    "itemFlagged": false,
     "itemAnswered": false,
     "timeConstraints": [],
     "extraTime": {
@@ -122,7 +119,6 @@
     "needMapUpdate": false,
     "isLast": false,
     "itemPosition": 5,
-    "itemFlagged": false,
     "itemAnswered": false,
     "timeConstraints": [{
       "label": "Item 3",
@@ -173,7 +169,6 @@
     "needMapUpdate": false,
     "isLast": true,
     "itemPosition": 16,
-    "itemFlagged": false,
     "itemAnswered": false,
     "timeConstraints": [],
     "extraTime": {

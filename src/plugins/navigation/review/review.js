@@ -145,7 +145,6 @@ export default pluginFactory({
         var navigatorConfig = testConfig.review || {};
         var previousItemPosition;
 
-
         /**
          * Retrieve the review categories of the current item
          * @returns {Object} the calculator categories
@@ -179,6 +178,12 @@ export default pluginFactory({
             return navigatorConfig.enabled && categories.reviewScreen;
         }
 
+        function isItemFlagged(position) {
+            const map = testRunner.getTestMap();
+            const item = mapHelper.getItemAt(map, position);
+            return !!item.flagged;
+        }
+
         /**
          * Mark an item for review
          * @param {Number} position
@@ -195,12 +200,12 @@ export default pluginFactory({
                     flag: flag
                 })
                 .then(function() {
-                    var context = testRunner.getTestContext();
+                    const context = testRunner.getTestContext();
+                    const map     = testRunner.getTestMap();
+                    const item    = mapHelper.getItemAt(map, position);
 
-                    // update the state in the context if the flagged item is the current one
-                    if (context.itemPosition === position) {
-                        context.itemFlagged = flag;
-                    }
+                    //update the value in the current testMap
+                    item.flagged = flag;
 
                     // update the display of the flag button
                     updateButton(self.flagItemButton, getFlagItemButtonData(context));
@@ -220,9 +225,10 @@ export default pluginFactory({
          * Mark the current item for review
          */
         function flagCurrentItem() {
-            var context = testRunner.getTestContext();
+            const context = testRunner.getTestContext();
+            const flagStatus = isItemFlagged(context.itemPosition);
             if (self.getState('enabled') !== false) {
-                flagItem(context.itemPosition, !context.itemFlagged);
+                flagItem(context.itemPosition, !flagStatus);
             }
         }
 

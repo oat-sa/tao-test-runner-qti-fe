@@ -25,7 +25,6 @@ define([
     'taoQtiTest/runner/helpers/map',
     'json!taoQtiTest/test/runner/services/offlineJumpTable/resources/items.json',
     'json!taoQtiTest/test/runner/navigator/offlineNavigator/resources/testMap.json',
-    'json!taoQtiTest/test/runner/navigator/offlineNavigator/resources/testData.json',
     'json!taoQtiTest/test/runner/navigator/offlineNavigator/resources/testContext.json'
 ], function(
     offlineNavigatorFactory,
@@ -34,7 +33,6 @@ define([
     mapHelper,
     itemsJson,
     testMapJson,
-    testDataJson,
     testContextJson
 ) {
     'use strict';
@@ -64,8 +62,7 @@ define([
     });
 
     QUnit.test('it has the required methods', function(assert) {
-        assert.expect(5);
-        assert.equal(typeof offlineNavigator['setTestData'], 'function');
+        assert.expect(4);
         assert.equal(typeof offlineNavigator['setTestContext'], 'function');
         assert.equal(typeof offlineNavigator['setTestMap'], 'function');
         assert.equal(typeof offlineNavigator['init'], 'function');
@@ -75,7 +72,6 @@ define([
     QUnit.test('it returns itself after calling the setters or init method', function(assert) {
         var mockTestMap = { parts: {} };
 
-        assert.equal(offlineNavigator['setTestData'](), offlineNavigator);
         assert.equal(offlineNavigator['setTestContext'](), offlineNavigator);
         assert.equal(offlineNavigator['setTestMap'](mockTestMap), offlineNavigator);
         assert.equal(offlineNavigator['init'](), offlineNavigator);
@@ -93,7 +89,6 @@ define([
             offlineNavigator
                 .setTestMap(mapHelper.createJumpTable(testMapJson))
                 .setTestContext(testContextJson)
-                .setTestData(testDataJson)
                 .clearJumpTable()
                 .init();
 
@@ -114,7 +109,6 @@ define([
         offlineNavigator
             .setTestMap(mapHelper.createJumpTable(testMapJson))
             .setTestContext(testContextJson)
-            .setTestData(testDataJson)
             .clearJumpTable()
             .init();
 

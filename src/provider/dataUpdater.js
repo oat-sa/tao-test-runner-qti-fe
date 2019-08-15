@@ -24,6 +24,7 @@
  */
 import _ from 'lodash';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
+import states from 'taoQtiTest/runner/config/states';
 
 /**
  * Get the updater
@@ -124,20 +125,18 @@ export default function dataUpdaterFactory(testDataHolder) {
         /**
          * Update current map stats based on the context
          *
-         * @param {Object} testMap - the testMap to update
          * @returns {Object} the updated testMap
          */
         updateStats: function updateStats() {
             var testMap = testDataHolder.get('testMap');
             var testContext = testDataHolder.get('testContext');
-            var testData = testDataHolder.get('testData');
             var updatedTestMap = null;
             var item;
 
-            if (testMap && testContext && _.isNumber(testContext.itemPosition) && testData && testData.states) {
+            if (testMap && testContext && _.isNumber(testContext.itemPosition)) {
                 item = mapHelper.getItemAt(testMap, testContext.itemPosition);
 
-                if (item && testContext.state === testData.states.interacting) {
+                if (item && testContext.state === states.testSession.interacting) {
                     //flag as viewed, always
                     item.viewed = true;
 
@@ -155,11 +154,18 @@ export default function dataUpdaterFactory(testDataHolder) {
         /**
          * Let's you update the plugins configuration from when filling testData
          * @param {plugin[]} plugins - the test runner plugins
+         * @param {Objectt} [pluginsConfig] - the configuration to set on the plugins
          */
-        updatePluginsConfig: function updatePluginsConfig(plugins) {
-            var testData = testDataHolder.get('testData');
-            if (plugins && testData && testData.config && testData.config.plugins) {
-                _.forEach(testData.config.plugins, function(config, pluginName) {
+        updatePluginsConfig(plugins, pluginsConfig) {
+
+            //to keep backward compatibility with the deprecated testData
+            if(!pluginsConfig){
+                const testData = testDataHolder.get('testData');
+                pluginsConfig = testData && testData.config && testData.config.plugins;
+            }
+
+            if (plugins && pluginsConfig) {
+                _.forEach(pluginsConfig, (config, pluginName) => {
                     if (
                         _.isPlainObject(plugins[pluginName]) &&
                         _.isFunction(plugins[pluginName].setConfig) &&

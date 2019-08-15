@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -102,9 +102,8 @@ export default pluginFactory({
      */
     init() {
         const testRunner = this.getTestRunner();
-        const testData = testRunner.getTestData();
-        const testConfig = testData.config || {};
-        const pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
          * Check if the currrent item is the last item
@@ -205,7 +204,7 @@ export default pluginFactory({
             testRunner.trigger('nav-next');
         });
 
-        if (testConfig.allowShortcuts && pluginShortcuts.trigger) {
+        if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
             shortcut.add(
                 namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
                 function() {

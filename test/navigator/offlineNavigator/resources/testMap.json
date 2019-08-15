@@ -1,5 +1,11 @@
 {
   "scope": "test",
+  "title": "NFER Math",
+  "identifier": "NFER_MATH_3",
+  "className": "assessmentTest",
+  "toolName": "",
+  "exclusivelyLinear": true,
+  "hasTimeLimits": false,
   "parts": {
     "P01": {
       "id": "P01",

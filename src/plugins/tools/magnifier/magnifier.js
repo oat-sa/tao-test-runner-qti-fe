@@ -60,14 +60,12 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginConfig = _.defaults((testConfig.plugins || {})[pluginName] || {}, defaultOptions);
-        var pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
-        var magnifierPanel = null;
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginConfig = Object.assign({}, defaultOptions, this.getConfig());
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
+        let magnifierPanel = null;
 
         /**
          * Creates the magnifier panel on demand
@@ -207,7 +205,7 @@ export default pluginFactory({
         });
 
         // handle the plugin's shortcuts
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             _.forEach(pluginShortcuts, function(command, key) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),

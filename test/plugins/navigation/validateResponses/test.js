@@ -227,7 +227,6 @@ define([
                 title: 'when the item not answered, but the `validateOnPreviousMove` flag is set to `false`',
                 context: {
                     itemIdentifier: 'item-1',
-
                     validateResponses: true
                 },
                 options :  {
@@ -252,7 +251,6 @@ define([
             plugin
                 .init()
                 .then(function() {
-                    runner.setTestData(_.assign(runner.getTestData(), data.testData));
                     runner.setTestContext(data.context);
                     runner.answered = data.answered;
                     runner.responses = data.responses;

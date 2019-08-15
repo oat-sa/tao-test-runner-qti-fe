@@ -31,7 +31,7 @@ export default pluginFactory({
     init: function init() {
         var self = this;
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
+        var testMap = testRunner.getTestMap();
 
         var createElement = function() {
             const testContext = testRunner.getTestContext();
@@ -39,7 +39,7 @@ export default pluginFactory({
             const titles = [
                 {
                     control: 'qti-test-title',
-                    text: testData.title
+                    text: testMap.title || ''
                 }
             ];
 

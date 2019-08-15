@@ -105,9 +105,8 @@ export default pluginFactory({
     init: function init() {
         var self = this;
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+        var testRunnerOptions = testRunner.getOptions();
+        var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
          * Checks if the plugin is currently available
@@ -208,7 +207,7 @@ export default pluginFactory({
             testRunner.trigger('tool-zoomout');
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.in) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.in, this.getName(), true),

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -32,10 +32,10 @@ import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 export default pluginFactory({
     name: 'nextsection',
-    init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testConfig = testRunner.getTestData().config;
+    init() {
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
 
         /**
          * Retrieve the nexSection categories of the current item
@@ -64,7 +64,7 @@ export default pluginFactory({
         function toggle() {
             const categories = getNextSectionCategories();
 
-            if (testConfig.nextSection && (categories.nextSection || categories.nextSectionWarning)) {
+            if (testRunnerOptions.nextSection && (categories.nextSection || categories.nextSectionWarning)) {
                 self.show();
             } else {
                 self.hide();

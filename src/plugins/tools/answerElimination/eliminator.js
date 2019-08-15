@@ -78,10 +78,10 @@ export default pluginFactory({
             .getAreaBroker()
             .getContentArea()
             .parent();
-        const testData = testRunner.getTestData() || {};
-        const testConfig = testData.config || {};
-        const pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
-        const config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
+
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
+        const config = Object.assign({}, defaultConfig, this.getConfig());
 
         // register the button in the toolbox
         this.button = this.getAreaBroker()
@@ -187,7 +187,7 @@ export default pluginFactory({
         });
 
         // handle the plugin's shortcuts
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             _.forEach(pluginShortcuts, function(command, key) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),

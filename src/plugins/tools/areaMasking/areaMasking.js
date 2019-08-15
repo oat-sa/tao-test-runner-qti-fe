@@ -69,10 +69,9 @@ export default pluginFactory({
             .getAreaBroker()
             .getContentArea()
             .parent();
-        const testData = testRunner.getTestData() || {};
-        const testConfig = testData.config || {};
-        const config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
-        const pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
+        const testRunnerOptions = testRunner.getOptions();
+        const config = Object.assign({}, defaultConfig, this.getConfig());
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
 
         function addMask() {
             maskComponent()
@@ -123,7 +122,7 @@ export default pluginFactory({
         });
 
         // handle the plugin's shortcuts
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             _.forEach(pluginShortcuts, function(command, key) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),

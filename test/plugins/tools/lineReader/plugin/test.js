@@ -393,17 +393,8 @@ define([
 
     QUnit.test('Toggle on keyboard shortcut', function(assert) {
         var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
-
-        assert.expect(6);
-
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
-        runner.setTestData({
-            config: {
+        var runner = runnerFactory(providerName, {}, {
+            options: {
                 allowShortcuts: true,
                 shortcuts: {
                     'line-reader': {
@@ -412,6 +403,13 @@ define([
                 }
             }
         });
+        var areaBroker = runner.getAreaBroker();
+        var plugin = pluginFactory(runner, runner.getAreaBroker());
+
+        assert.expect(6);
+
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         plugin
             .init()

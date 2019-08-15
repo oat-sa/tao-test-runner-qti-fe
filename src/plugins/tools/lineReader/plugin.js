@@ -110,12 +110,11 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this,
-            testRunner = this.getTestRunner(),
-            testData = testRunner.getTestData() || {},
-            testConfig = testData.config || {},
-            pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {},
-            $container = testRunner
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
+        const $container = testRunner
                 .getAreaBroker()
                 .getContentArea()
                 .parent();
@@ -197,7 +196,7 @@ export default pluginFactory({
             testRunner.trigger(`${actionPrefix  }toggle`);
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.toggle) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),

@@ -29,6 +29,7 @@ import offlineErrorHelper from 'taoQtiTest/runner/helpers/offlineErrorHelper';
 import offlineSyncModal from 'taoQtiTest/runner/helpers/offlineSyncModal';
 import responseStoreFactory from 'taoQtiTest/runner/services/responseStore';
 import download from 'util/download';
+import states from 'taoQtiTest/runner/config/states';
 
 /**
  * Overrides the qtiServiceProxy with the offline behavior
@@ -67,7 +68,7 @@ export default _.defaults(
             // scheduled action promises which supposed to be resolved after action synchronization.
             this.actionPromises = {};
 
-            // let's you update test data (testData, testContext and testMap)
+            // let's you update test data (testContext and testMap)
             this.dataUpdater = dataUpdater(this.getDataHolder());
 
             /**
@@ -118,7 +119,6 @@ export default _.defaults(
                     var dataHolder = self.getDataHolder();
                     var testContext = dataHolder.get('testContext');
                     var testMap = dataHolder.get('testMap');
-                    var testData = dataHolder.get('testData');
                     var isLast =
                         testContext && testMap ? navigationHelper.isLast(testMap, testContext.itemIdentifier) : false;
                     var isOffline = self.isOffline();
@@ -132,7 +132,6 @@ export default _.defaults(
                      * doesent need active internet connection
                      * @param navigator - navigator helper used with this proxy
                      * @param {Object} options - options to manage the navigation
-                     * @param {Object} options.testData - current test testData dataset
                      * @param {Object} options.testContext - current test testContext dataset
                      * @param {Object} results - navigtion result output object
                      */
@@ -140,7 +139,6 @@ export default _.defaults(
                         var newTestContext;
 
                         navigator
-                            .setTestData(options.testData)
                             .setTestContext(options.testContext)
                             .setTestMap(options.testMap)
                             .init()
@@ -175,7 +173,7 @@ export default _.defaults(
                     if (isBlocked || (isNavigationAction && isLast)) {
                         // the last item of the test
                         result.testContext = {
-                            state: testData.states.closed
+                            state: states.testSession.closed
                         };
                         if (isOffline) {
                             return new Promise(function() {
@@ -214,8 +212,7 @@ export default _.defaults(
                                 self.offlineNavigator,
                                 {
                                     testContext: testContext,
-                                    testMap: testMap,
-                                    testData: testData
+                                    testMap: testMap
                                 },
                                 result
                             );
@@ -227,8 +224,7 @@ export default _.defaults(
                                         self.offlineNavigator,
                                         {
                                             testContext: testContext,
-                                            testMap: testMap,
-                                            testData: testData
+                                            testMap: testMap
                                         },
                                         result
                                     );
@@ -298,11 +294,13 @@ export default _.defaults(
             };
 
             this.prepareDownload = function prepareDownload(actions) {
-                var timestamp = Date.now();
-                var dateTime = new Date(timestamp).toISOString();
-                var testData = self.getDataHolder().get('testData');
-                var testId = testData.title;
-                var niceFilename = `Download of ${testId} at ${dateTime}.json`;
+                const timestamp = Date.now();
+                const dateTime = new Date(timestamp).toISOString();
+
+                //@deprecated
+                const testData = self.getDataHolder().get('testData');
+                const testMap = self.getDataHolder().get('testMap');
+                const niceFilename = `Download of ${testMap.title} at ${dateTime}.json`;
 
                 return {
                     filename: niceFilename,

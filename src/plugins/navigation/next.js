@@ -101,6 +101,7 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init() {
+        const self = this;
         const testRunner = this.getTestRunner();
         const testData = testRunner.getTestData();
         const testConfig = testData.config || {};

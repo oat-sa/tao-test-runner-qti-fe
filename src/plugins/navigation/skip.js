@@ -109,7 +109,7 @@ export default pluginFactory({
             const testContext = testRunner.getTestContext();
             const testMap = testRunner.getTestMap();
             const isLast  = navigationHelper.isLast(testMap, testContext.itemIdentifier);
-            const endTestWarning = mapHelper.hasCategory(testMap, testContext.itemIdentifier, 'endTestWarning', true);
+            const endTestWarning = mapHelper.hasItemCategory(testMap, testContext.itemIdentifier, 'endTestWarning', true);
 
             e.preventDefault();
 

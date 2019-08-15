@@ -71,6 +71,18 @@ function getFlagItemButtonData(flag) {
     return buttonData[dataType];
 }
 
+
+/**
+ * Get the flagged value for the item at that position
+ * @param {Object} testMap
+ * @param {Number} position - the item position
+ * @returns {Boolean}
+ */
+function isItemFlagged(testMap, position) {
+    const item = mapHelper.getItemAt(testMap, position);
+    return !!item.flagged;
+}
+
 /**
  * Gets the definition of the toggleNavigator button related to the context
  * @param {Object} navigator - the navigator component
@@ -92,7 +104,7 @@ function updateButton(button, data) {
         if ($button.data('control') !== data.control) {
             $button.data('control', data.control).attr('title', data.title);
 
-            $button.find('.icon').attr('class', `icon icon-${  data.icon}`);
+            $button.find('.icon').attr('class', `icon icon-${data.icon}`);
             $button.find('.text').text(data.text);
 
             if (_.contains(data.control, 'flag')) {
@@ -182,17 +194,6 @@ export default pluginFactory({
         }
 
         /**
-         * Get the flagged value for the item at that position
-         * @param {Number} position - the item position
-         * @returns {Boolean}
-         */
-        function isItemFlagged(position) {
-            const map = testRunner.getTestMap();
-            const item = mapHelper.getItemAt(map, position);
-            return !!item.flagged;
-        }
-
-        /**
          * Mark an item for review
          * @param {Number} position
          * @param {Boolean} flag
@@ -204,8 +205,8 @@ export default pluginFactory({
             return testRunner
                 .getProxy()
                 .callTestAction('flagItem', {
-                    position: position,
-                    flag: flag
+                    position,
+                    flag
                 })
                 .then(function() {
                     const item = mapHelper.getItemAt(testRunner.getTestMap(), position);
@@ -231,10 +232,10 @@ export default pluginFactory({
          * Mark the current item for review
          */
         function flagCurrentItem() {
-            const context = testRunner.getTestContext();
-            const flagStatus = isItemFlagged(context.itemPosition);
             if (self.getState('enabled') !== false) {
-                flagItem(context.itemPosition, !flagStatus);
+                const itemPosition = testRunner.getTestContext().itemPosition;
+                const flagStatus = isItemFlagged(testRunner.getTestMap(), itemPosition);
+                flagItem(itemPosition, !flagStatus);
             }
         }
 
@@ -290,7 +291,7 @@ export default pluginFactory({
 
         this.flagItemButton = this.getAreaBroker()
             .getToolbox()
-            .createEntry(getFlagItemButtonData(isItemFlagged(testContext.itemPosition)));
+            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition)));
         this.flagItemButton.on('click', function(e) {
             e.preventDefault();
             testRunner.trigger('tool-flagitem');
@@ -349,7 +350,7 @@ export default pluginFactory({
                 if (isPluginAllowed()) {
                     updateButton(
                         self.flagItemButton,
-                        getFlagItemButtonData(isItemFlagged(context.itemPosition))
+                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition))
                     );
                     self.navigator.update(map, context).updateConfig({
                         canFlag: !context.isLinear && categories.markReview
@@ -411,13 +412,14 @@ export default pluginFactory({
      * Enables the button
      */
     enable: function enable() {
-        var testRunner = this.getTestRunner();
-        var testContext = testRunner.getTestContext();
+        const testRunner = this.getTestRunner();
+        const testContext = testRunner.getTestContext();
+        const testMap = testRunner.getTestMap();
 
         this.flagItemButton.enable();
         this.toggleButton.enable();
         this.navigator.enable();
-        if (testContext.itemFlagged) {
+        if (isItemFlagged(testMap, testContext.itemPosition)) {
             this.flagItemButton.turnOn();
         } else {
             this.flagItemButton.turnOff();

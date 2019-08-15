@@ -10,7 +10,7 @@
     ],
     "scripts": {
         "test": "npx qunit-testrunner",
-        "test:keepAlive": "PORT=36405 npx qunit-testrunner --keepalive",
+        "test:keepAlive": "npx qunit-testrunner --keepalive",
         "test:cov": "npm run build:cov && npx qunit-testrunner --cov",
         "coverage": "nyc report",
         "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",

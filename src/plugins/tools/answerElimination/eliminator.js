@@ -70,18 +70,18 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
-        var self = this;
+    init() {
+        const self = this;
 
-        var testRunner = this.getTestRunner();
-        var $container = testRunner
+        const testRunner = this.getTestRunner();
+        const $container = testRunner
             .getAreaBroker()
             .getContentArea()
             .parent();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
-        var config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
+        const testData = testRunner.getTestData() || {};
+        const testConfig = testData.config || {};
+        const pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
+        const config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
 
         // register the button in the toolbox
         this.button = this.getAreaBroker()

@@ -61,18 +61,18 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
-        var self = this;
+    init() {
+        const self = this;
 
-        var testRunner = this.getTestRunner();
-        var $container = testRunner
+        const testRunner = this.getTestRunner();
+        const $container = testRunner
             .getAreaBroker()
             .getContentArea()
             .parent();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
-        var pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
+        const testData = testRunner.getTestData() || {};
+        const testConfig = testData.config || {};
+        const config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
+        const pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
 
         function addMask() {
             maskComponent()

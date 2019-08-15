@@ -215,13 +215,13 @@ define([
                 responses: ['foo']
             }
         ])
-        .test('Moving is prevented ', function(data, assert) {
-            var ready = assert.async();
+        .test('Moving is prevented ', (data, assert) => {
+            const ready = assert.async();
 
-            var runner = runnerFactory(providerName, {}, {
+            const runner = runnerFactory(providerName, {}, {
                 options: data.options
             });
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+            const plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(2);
 

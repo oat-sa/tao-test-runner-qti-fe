@@ -178,6 +178,11 @@ export default pluginFactory({
             return navigatorConfig.enabled && categories.reviewScreen;
         }
 
+        /**
+         * Get the flagged value for the item at that position
+         * @param {Number} position - the item position
+         * @returns {Boolean}
+         */
         function isItemFlagged(position) {
             const map = testRunner.getTestMap();
             const item = mapHelper.getItemAt(map, position);

@@ -137,12 +137,12 @@ define([
                 responses: ['foo']
             }
         ])
-        .test('Moving is allowed ', function(data, assert) {
-            var ready = assert.async();
-            var runner = runnerFactory(providerName, {
+        .test('Moving is allowed ', (data, assert) => {
+            const ready = assert.async();
+            const runner = runnerFactory(providerName, {
                 options: data.options
             });
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+            const plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(1);
 
@@ -181,12 +181,12 @@ define([
             }
         ])
         .test('Moving is prevented ', function(data, assert) {
-            var ready = assert.async();
+            const ready = assert.async();
 
-            var runner = runnerFactory(providerName, {}, {
+            const runner = runnerFactory(providerName, {}, {
                 options : data.options
             });
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+            const plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(2);
 
@@ -240,12 +240,12 @@ define([
                 responses: ['foo']
             }
         ])
-        .test('Moving backwards is also allowed ', function(data, assert) {
-            var ready = assert.async();
-            var runner = runnerFactory(providerName, {}, {
+        .test('Moving backwards is also allowed ', (data, assert)  => {
+            const ready = assert.async();
+            const runner = runnerFactory(providerName, {}, {
                 options: data.options
             });
-            var plugin = pluginFactory(runner, runner.getAreaBroker(), data.pluginConfig);
+            const plugin = pluginFactory(runner, runner.getAreaBroker(), data.pluginConfig);
 
             assert.expect(1);
 

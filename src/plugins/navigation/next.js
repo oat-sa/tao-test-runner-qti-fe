@@ -101,6 +101,7 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init() {
+        const self = this;
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};

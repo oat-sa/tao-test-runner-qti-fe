@@ -63,11 +63,11 @@ var buttonData = {
 
 /**
  * Gets the definition of the flagItem button related to the context
- * @param {Object} context - the test context
+ * @param {Boolean} flag - the flag status
  * @returns {Object}
  */
-function getFlagItemButtonData(context) {
-    var dataType = context.itemFlagged ? 'unsetFlag' : 'setFlag';
+function getFlagItemButtonData(flag) {
+    const dataType = flag ? 'unsetFlag' : 'setFlag';
     return buttonData[dataType];
 }
 
@@ -208,15 +208,13 @@ export default pluginFactory({
                     flag: flag
                 })
                 .then(function() {
-                    const context = testRunner.getTestContext();
-                    const map     = testRunner.getTestMap();
-                    const item    = mapHelper.getItemAt(map, position);
+                    const item = mapHelper.getItemAt(testRunner.getTestMap(), position);
 
                     //update the value in the current testMap
                     item.flagged = flag;
 
                     // update the display of the flag button
-                    updateButton(self.flagItemButton, getFlagItemButtonData(context));
+                    updateButton(self.flagItemButton, getFlagItemButtonData(flag));
 
                     // update the item state
                     self.navigator.setItemFlag(position, flag);
@@ -292,7 +290,7 @@ export default pluginFactory({
 
         this.flagItemButton = this.getAreaBroker()
             .getToolbox()
-            .createEntry(getFlagItemButtonData(testContext));
+            .createEntry(getFlagItemButtonData(isItemFlagged(testContext.itemPosition)));
         this.flagItemButton.on('click', function(e) {
             e.preventDefault();
             testRunner.trigger('tool-flagitem');
@@ -349,7 +347,10 @@ export default pluginFactory({
                 const categories = getReviewCategories();
 
                 if (isPluginAllowed()) {
-                    updateButton(self.flagItemButton, getFlagItemButtonData(context));
+                    updateButton(
+                        self.flagItemButton,
+                        getFlagItemButtonData(isItemFlagged(context.itemPosition))
+                    );
                     self.navigator.update(map, context).updateConfig({
                         canFlag: !context.isLinear && categories.markReview
                     });

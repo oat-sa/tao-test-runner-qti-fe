@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Christophe Noël <christophe@taotesting.com>
@@ -32,6 +32,31 @@ define([
     var pluginApi;
     var providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
+
+    const sampleTestContext = {
+        itemIdentifier : 'item-1'
+    };
+    const sampleTestMap = {
+        parts: {
+            p1 : {
+                sections : {
+                    s1 : {
+                        items : {
+                            'item-1' : {
+                                categories: ['x-tao-option-answerMasking']
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        jumps : [{
+            identifier: 'item-1',
+            section: 's1',
+            part: 'p1',
+            position: 0
+        }]
+    };
 
     /**
      * The following tests applies to all plugins
@@ -215,11 +240,8 @@ define([
 
         assert.expect(3);
 
-        runner.setTestContext({
-            options: {
-                answerMasking: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         areaBroker.getContentArea().append(
             $('<div>', {
@@ -263,11 +285,8 @@ define([
 
         assert.expect(2);
 
-        runner.setTestContext({
-            options: {
-                answerMasking: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         areaBroker.getContentArea().append(
             $('<div>', {
@@ -305,24 +324,9 @@ define([
     QUnit.module('plugin UI');
 
     QUnit.test('Toggle on keyboard shortcut', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            plugin = pluginFactory(runner, runner.getAreaBroker()),
-            $contentContainer = areaBroker.getContentArea(),
-            toggleCounter = 0,
-            $button;
-
-        assert.expect(5);
-
-        runner.setTestContext({
-            options: {
-                answerMasking: true
-            }
-        });
-
-        runner.setTestData({
-            config: {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, {
+            options : {
                 allowShortcuts: true,
                 shortcuts: {
                     'answer-masking': {
@@ -331,6 +335,16 @@ define([
                 }
             }
         });
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $contentContainer = areaBroker.getContentArea();
+        let toggleCounter = 0;
+        let $button;
+
+        assert.expect(5);
+
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         areaBroker.getContentArea().append(
             $('<div>', {
@@ -403,11 +417,8 @@ define([
 
         assert.expect(5);
 
-        runner.setTestContext({
-            options: {
-                answerMasking: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         areaBroker.getContentArea().append(
             $('<div>', {

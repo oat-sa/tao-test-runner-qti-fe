@@ -40,21 +40,21 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
+        const self = this;
 
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
-        var stacker = stackerFactory('test-runner');
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const stacker = stackerFactory('test-runner');
 
         /**
          * Checks if the plugin is currently available
          * @returns {Boolean}
          */
         function isEnabled() {
-            var context = testRunner.getTestContext();
-            return !!context.options.allowComment;
+            const testContext = testRunner.getTestContext();
+            const contextOptions = testContext.options || {};
+            return !!contextOptions.allowComment;
         }
 
         /**
@@ -148,7 +148,7 @@ export default pluginFactory({
             testRunner.trigger('tool-comment');
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.toggle) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),

@@ -206,18 +206,22 @@ define([
                 title: 'when the item not answered',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableAllowSkipping: true,
                     allowSkipping: false
+                },
+                options : {
+                    enableAllowSkipping: true
                 },
                 answered: false,
                 responses: ['foo']
             }
         ])
-        .test('Moving is prevented ', function(data, assert) {
-            var ready = assert.async();
+        .test('Moving is prevented ', (data, assert) => {
+            const ready = assert.async();
 
-            var runner = runnerFactory(providerName);
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+            const runner = runnerFactory(providerName, {}, {
+                options: data.options
+            });
+            const plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(2);
 

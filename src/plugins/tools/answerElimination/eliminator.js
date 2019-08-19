@@ -35,6 +35,7 @@ import __ from 'i18n';
 import 'ui/hider';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 import pluginFactory from 'taoTests/runner/plugin';
 
 /**
@@ -69,17 +70,18 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
-        var self = this;
+    init() {
+        const self = this;
 
-        var testRunner = this.getTestRunner();
-        var $container = testRunner
+        const testRunner = this.getTestRunner();
+        const $container = testRunner
             .getAreaBroker()
             .getContentArea()
             .parent();
-        var testConfig = testRunner.getTestData().config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
-        var config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
+
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
+        const config = Object.assign({}, defaultConfig, this.getConfig());
 
         // register the button in the toolbox
         this.button = this.getAreaBroker()
@@ -96,10 +98,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isPluginEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-eliminator
-            return !!options.eliminator;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'eliminator',
+                true
+            );
         }
 
         /**
@@ -182,7 +187,7 @@ export default pluginFactory({
         });
 
         // handle the plugin's shortcuts
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             _.forEach(pluginShortcuts, function(command, key) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),

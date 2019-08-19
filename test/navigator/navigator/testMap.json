@@ -1,4 +1,10 @@
 {
+  "title": "Test 12",
+  "identifier": "Test-12",
+  "className": "assessmentTest",
+  "toolName": "tao",
+  "exclusivelyLinear": false,
+  "hasTimeLimits": false,
   "parts": {
     "testPart-1": {
       "id": "testPart-1",

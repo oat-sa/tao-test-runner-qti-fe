@@ -92,8 +92,10 @@ define([
                 title: 'when the option is not enabled',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: false,
                     validateResponses: true
+                },
+                options : {
+                    enableValidateResponses: false,
                 },
                 answered: false,
                 responses: ['foo']
@@ -102,8 +104,10 @@ define([
                 title: 'when the item has no interactions',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: true
+                },
+                options : {
+                    enableValidateResponses: true
                 },
                 answered: false,
                 responses: []
@@ -112,8 +116,10 @@ define([
                 title: 'when the item is configured without the validation',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: false
+                },
+                options : {
+                    enableValidateResponses: true
                 },
                 answered: false,
                 responses: ['foo']
@@ -122,17 +128,21 @@ define([
                 title: 'when the item is answered',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: true
+                },
+                options : {
+                    enableValidateResponses: true
                 },
                 answered: true,
                 responses: ['foo']
             }
         ])
-        .test('Moving is allowed ', function(data, assert) {
-            var ready = assert.async();
-            var runner = runnerFactory(providerName);
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+        .test('Moving is allowed ', (data, assert) => {
+            const ready = assert.async();
+            const runner = runnerFactory(providerName, {
+                options: data.options
+            });
+            const plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(1);
 
@@ -161,18 +171,22 @@ define([
                 title: 'when the item not answered',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: true
+                },
+                options : {
+                    enableValidateResponses: true
                 },
                 answered: false,
                 responses: ['foo']
             }
         ])
         .test('Moving is prevented ', function(data, assert) {
-            var ready = assert.async();
+            const ready = assert.async();
 
-            var runner = runnerFactory(providerName);
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+            const runner = runnerFactory(providerName, {}, {
+                options : data.options
+            });
+            const plugin = pluginFactory(runner, runner.getAreaBroker());
 
             assert.expect(2);
 
@@ -213,33 +227,30 @@ define([
                 title: 'when the item not answered, but the `validateOnPreviousMove` flag is set to `false`',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableValidateResponses: true,
                     validateResponses: true
                 },
-                testData: {
-                    config: {
-                        plugins: {
-                            validateResponses: {
-                                validateOnPreviousMove: false
-                            }
-                        }
-                    }
+                options :  {
+                    enableValidateResponses: true,
+                },
+                pluginConfig : {
+                    validateOnPreviousMove: false
                 },
                 answered: false,
                 responses: ['foo']
             }
         ])
-        .test('Moving backwards is also allowed ', function(data, assert) {
-            var ready = assert.async();
-            var runner = runnerFactory(providerName);
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+        .test('Moving backwards is also allowed ', (data, assert)  => {
+            const ready = assert.async();
+            const runner = runnerFactory(providerName, {}, {
+                options: data.options
+            });
+            const plugin = pluginFactory(runner, runner.getAreaBroker(), data.pluginConfig);
 
             assert.expect(1);
 
             plugin
                 .init()
                 .then(function() {
-                    runner.setTestData(_.assign(runner.getTestData(), data.testData));
                     runner.setTestContext(data.context);
                     runner.answered = data.answered;
                     runner.responses = data.responses;

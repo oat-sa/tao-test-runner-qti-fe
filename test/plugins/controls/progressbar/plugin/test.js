@@ -86,7 +86,7 @@ define([
         var ready = assert.async();
         var runner = runnerFactory(providerName),
             areaBroker = runner.getAreaBroker(),
-            plugin = pluginFactory(runner, areaBroker),
+            plugin = pluginFactory(runner, areaBroker, {}),
             $container = areaBroker.getControlArea();
 
         assert.expect(4);
@@ -95,10 +95,6 @@ define([
             itemPosition: 3,
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-1'
-        });
-
-        runner.setTestData({
-            config: {}
         });
 
         runner.setTestMap(testMap);
@@ -145,10 +141,6 @@ define([
             itemPosition: 3,
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-1'
-        });
-
-        runner.setTestData({
-            config: {}
         });
 
         runner.setTestMap(testMap);
@@ -199,7 +191,13 @@ define([
 
     QUnit.test('hide on informational', function(assert) {
         var ready = assert.async();
-        var runner = runnerFactory(providerName),
+        var runner = runnerFactory(providerName, {}, {
+                options : {
+                    progressIndicator: {
+                        type: 'questions'
+                    }
+                }
+            }),
             areaBroker = runner.getAreaBroker(),
             plugin = pluginFactory(runner, areaBroker),
             $container = areaBroker.getControlArea();
@@ -210,14 +208,6 @@ define([
             itemPosition: 1,
             testPartId: 'testPart-intro',
             sectionId: 'assessmentSection-intro'
-        });
-
-        runner.setTestData({
-            config: {
-                progressIndicator: {
-                    type: 'questions'
-                }
-            }
         });
 
         runner.setTestMap(testMap);

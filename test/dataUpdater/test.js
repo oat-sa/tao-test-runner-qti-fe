@@ -20,10 +20,9 @@
  */
 define([
     'taoQtiTest/runner/provider/dataUpdater',
-    'json!taoQtiTest/test/runner/dataUpdater/testData.json',
     'json!taoQtiTest/test/runner/dataUpdater/testMap.json',
     'json!taoQtiTest/test/runner/dataUpdater/testContext.json'
-], function(dataUpdaterFactory, testData, testMap, testContext) {
+], function(dataUpdaterFactory, testMap, testContext) {
     'use strict';
 
     QUnit.module('API');
@@ -87,9 +86,6 @@ define([
     QUnit.test('update from a single object', function(assert) {
         var holderMock = new Map();
         var dataSet = {
-            testData: {
-                foo: 'testData'
-            },
             testContext: {
                 foo: 'testContext'
             },
@@ -99,16 +95,14 @@ define([
         };
         var dataUpdater = dataUpdaterFactory(holderMock);
 
-        assert.expect(8);
+        assert.expect(6);
 
-        assert.equal(holderMock.get('testData'), null);
         assert.equal(holderMock.get('testContext'), null);
         assert.equal(holderMock.get('testMap'), null);
         assert.equal(holderMock.get('testBar'), null);
 
         dataUpdater.update(dataSet);
 
-        assert.deepEqual(holderMock.get('testData'), dataSet.testData);
         assert.deepEqual(holderMock.get('testContext'), dataSet.testContext);
         assert.equal(holderMock.get('testMap'), null);
         assert.equal(holderMock.get('testBar'), null);
@@ -168,13 +162,11 @@ define([
         };
 
         var holderMock = new Map();
-        holderMock.set('testData', testData);
 
-        assert.expect(9);
+        assert.expect(7);
 
         dataUpdater = dataUpdaterFactory(holderMock);
 
-        assert.deepEqual(holderMock.get('testData'), testData);
         assert.equal(holderMock.get('testContext'), null);
         assert.equal(holderMock.get('testMap'), null);
 
@@ -182,7 +174,6 @@ define([
 
         dataUpdater.update(dataSet);
 
-        assert.deepEqual(holderMock.get('testData'), testData);
         assert.deepEqual(holderMock.get('testContext'), testContext);
         assert.equal(typeof holderMock.get('testMap').jumps, 'object', 'The jump table does exists');
         assert.equal(holderMock.get('testMap').jumps.length, 10, 'The jump table is complete');

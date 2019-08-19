@@ -472,8 +472,13 @@ export default {
     computeStats: function computeStats(testMap, testContext, config) {
         var statsComputer = (config.scope && scopes[config.scope]) || scopes.test;
         var stats = statsComputer(testMap, testContext, config || defaultConfig);
-        stats.overallCompleted = testContext.numberCompleted;
-        stats.overall = testContext.numberItems;
+        stats.overall = testMap.stats.total;
+        if(testContext.isLinear){
+            stats.overallCompleted = testMap.stats.answered - 1;
+        } else {
+            stats.overallCompleted = testMap.stats.answered  ;
+        }
+
         return stats;
     },
 

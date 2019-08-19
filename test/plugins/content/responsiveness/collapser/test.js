@@ -101,18 +101,10 @@ define([
 
         runnerFactory.registerProvider(providerName, providerMock({areaBroker: areaBroker}));
         runner = runnerFactory(providerName);
-        plugin = pluginFactory(runner, areaBroker);
-
-        runner.setTestData({
-            config: {
-                plugins: {
-                    collapser: {
-                        collapseTools: false,
-                        collapseInOrder: true,
-                        collapseOrder: collapseOrder
-                    }
-                }
-            }
+        plugin = pluginFactory(runner, areaBroker, {
+            collapseTools: false,
+            collapseInOrder: true,
+            collapseOrder: collapseOrder
         });
 
         runner.after('collapseTools', function() {
@@ -312,19 +304,11 @@ define([
 
         runnerFactory.registerProvider(providerName, providerMock({areaBroker: areaBroker}));
         runner = runnerFactory(providerName);
-        plugin = pluginFactory(runner, areaBroker);
-
-        runner.setTestData({
-            config: {
-                plugins: {
-                    collapser: {
-                        collapseTools: true,
-                        collapseNavigation: true,
-                        collapseInOrder: true,
-                        collapseOrder: collapseOrder
-                    }
-                }
-            }
+        plugin = pluginFactory(runner, areaBroker, {
+            collapseTools: true,
+            collapseNavigation: true,
+            collapseInOrder: true,
+            collapseOrder: collapseOrder
         });
 
         runner.after('collapseTools', function() {
@@ -537,17 +521,9 @@ define([
 
             runnerFactory.registerProvider(providerName, providerMock({areaBroker: areaBroker}));
             runner = runnerFactory(providerName);
-            plugin = pluginFactory(runner, areaBroker);
-
-            runner.setTestData({
-                config: {
-                    plugins: {
-                        collapser: {
-                            collapseTools: data.collapseTools,
-                            collapseNavigation: data.collapseNavigation
-                        }
-                    }
-                }
+            plugin = pluginFactory(runner, areaBroker, {
+                collapseTools: data.collapseTools,
+                collapseNavigation: data.collapseNavigation
             });
 
             runner.after('collapseTools', function() {

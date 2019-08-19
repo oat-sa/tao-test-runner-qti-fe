@@ -21,7 +21,7 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import _ from 'lodash';
+
 import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import progressHelper from 'taoQtiTest/runner/plugins/controls/progressbar/progress';
@@ -47,10 +47,10 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var config = _.defaults(this.getConfig(), testData.config.progressIndicator || {});
-        var self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerConfig = testRunner.getOptions();
+        const config = Object.assign({}, testRunnerConfig.progressIndicator || {}, this.getConfig());
+        const self = this;
 
         var rendererFactory = renderers[config.renderer] || renderers.percentage;
         var progressConfig = {

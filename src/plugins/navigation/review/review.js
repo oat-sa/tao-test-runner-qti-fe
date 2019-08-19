@@ -63,12 +63,24 @@ var buttonData = {
 
 /**
  * Gets the definition of the flagItem button related to the context
- * @param {Object} context - the test context
+ * @param {Boolean} flag - the flag status
  * @returns {Object}
  */
-function getFlagItemButtonData(context) {
-    var dataType = context.itemFlagged ? 'unsetFlag' : 'setFlag';
+function getFlagItemButtonData(flag) {
+    const dataType = flag ? 'unsetFlag' : 'setFlag';
     return buttonData[dataType];
+}
+
+
+/**
+ * Get the flagged value for the item at that position
+ * @param {Object} testMap
+ * @param {Number} position - the item position
+ * @returns {Boolean}
+ */
+function isItemFlagged(testMap, position) {
+    const item = mapHelper.getItemAt(testMap, position);
+    return !!item.flagged;
 }
 
 /**
@@ -92,7 +104,7 @@ function updateButton(button, data) {
         if ($button.data('control') !== data.control) {
             $button.data('control', data.control).attr('title', data.title);
 
-            $button.find('.icon').attr('class', `icon icon-${  data.icon}`);
+            $button.find('.icon').attr('class', `icon icon-${data.icon}`);
             $button.find('.text').text(data.text);
 
             if (_.contains(data.control, 'flag')) {
@@ -112,10 +124,17 @@ function updateButton(button, data) {
  * @returns {Boolean}
  */
 function canFlag(testRunner) {
-    var context = testRunner.getTestContext();
-    var map = testRunner.getTestMap();
-    var item = mapHelper.getItemAt(map, context.itemPosition);
-    return !!(!context.isLinear && context.options.markReview && !(item && item.informational));
+    const testContext = testRunner.getTestContext();
+    const testMap = testRunner.getTestMap();
+    const item = mapHelper.getItemAt(testMap, testContext.itemPosition);
+    const markReviewCategory = mapHelper.hasItemCategory(
+        testMap,
+        testContext.itemIdentifier,
+        'markReview',
+        true
+    );
+
+    return !!(!testContext.isLinear && markReviewCategory && !(item && item.informational));
 }
 
 /**
@@ -128,23 +147,50 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var testContext = testRunner.getTestContext();
-        var testMap = testRunner.getTestMap();
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
-        var navigatorConfig = testConfig.review || {};
-        var previousItemPosition;
+        const self = this;
+        const testRunner = this.getTestRunner();
+
+        const testContext = testRunner.getTestContext();
+        const testMap = testRunner.getTestMap();
+
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const navigatorConfig = testRunnerOptions.review || {
+            defaultOpen : false
+        };
+        let previousItemPosition;
+
+        /**
+         * Retrieve the review categories of the current item
+         * @returns {Object} the calculator categories
+         */
+        function getReviewCategories(){
+            const currentContext = testRunner.getTestContext();
+            const currentMap = testRunner.getTestMap();
+
+            return {
+                reviewScreen : mapHelper.hasItemCategory(
+                    currentMap,
+                    currentContext.itemIdentifier,
+                    'reviewScreen',
+                    true
+                ),
+                markReview : mapHelper.hasItemCategory(
+                    currentMap,
+                    currentContext.itemIdentifier,
+                    'markReview',
+                    true
+                )
+            };
+        }
 
         /**
          * Tells if the component is enabled
          * @returns {Boolean}
          */
         function isPluginAllowed() {
-            var context = testRunner.getTestContext();
-            return navigatorConfig.enabled && context && context.options && context.options.reviewScreen;
+            const categories = getReviewCategories();
+            return navigatorConfig.enabled && categories.reviewScreen;
         }
 
         /**
@@ -159,19 +205,17 @@ export default pluginFactory({
             return testRunner
                 .getProxy()
                 .callTestAction('flagItem', {
-                    position: position,
-                    flag: flag
+                    position,
+                    flag
                 })
                 .then(function() {
-                    var context = testRunner.getTestContext();
+                    const item = mapHelper.getItemAt(testRunner.getTestMap(), position);
 
-                    // update the state in the context if the flagged item is the current one
-                    if (context.itemPosition === position) {
-                        context.itemFlagged = flag;
-                    }
+                    //update the value in the current testMap
+                    item.flagged = flag;
 
                     // update the display of the flag button
-                    updateButton(self.flagItemButton, getFlagItemButtonData(context));
+                    updateButton(self.flagItemButton, getFlagItemButtonData(flag));
 
                     // update the item state
                     self.navigator.setItemFlag(position, flag);
@@ -188,9 +232,10 @@ export default pluginFactory({
          * Mark the current item for review
          */
         function flagCurrentItem() {
-            var context = testRunner.getTestContext();
             if (self.getState('enabled') !== false) {
-                flagItem(context.itemPosition, !context.itemFlagged);
+                const itemPosition = testRunner.getTestContext().itemPosition;
+                const flagStatus = isItemFlagged(testRunner.getTestMap(), itemPosition);
+                flagItem(itemPosition, !flagStatus);
             }
         }
 
@@ -246,13 +291,13 @@ export default pluginFactory({
 
         this.flagItemButton = this.getAreaBroker()
             .getToolbox()
-            .createEntry(getFlagItemButtonData(testContext));
+            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition)));
         this.flagItemButton.on('click', function(e) {
             e.preventDefault();
             testRunner.trigger('tool-flagitem');
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.flag) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.flag, this.getName(), true),
@@ -285,7 +330,7 @@ export default pluginFactory({
         //disabled by default
         this.disable();
 
-        togglePanel(testConfig.review.defaultOpen);
+        togglePanel(navigatorConfig.defaultOpen);
 
         //change plugin state
         testRunner
@@ -298,13 +343,17 @@ export default pluginFactory({
                 }
             })
             .on('loaditem', function() {
-                var context = testRunner.getTestContext();
-                var map = testRunner.getTestMap();
+                const context = testRunner.getTestContext();
+                const map = testRunner.getTestMap();
+                const categories = getReviewCategories();
 
                 if (isPluginAllowed()) {
-                    updateButton(self.flagItemButton, getFlagItemButtonData(context));
+                    updateButton(
+                        self.flagItemButton,
+                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition))
+                    );
                     self.navigator.update(map, context).updateConfig({
-                        canFlag: !context.isLinear && context.options.markReview
+                        canFlag: !context.isLinear && categories.markReview
                     });
                     self.show();
                     updateButton(self.toggleButton, getToggleButtonData(self.navigator));
@@ -363,13 +412,14 @@ export default pluginFactory({
      * Enables the button
      */
     enable: function enable() {
-        var testRunner = this.getTestRunner();
-        var testContext = testRunner.getTestContext();
+        const testRunner = this.getTestRunner();
+        const testContext = testRunner.getTestContext();
+        const testMap = testRunner.getTestMap();
 
         this.flagItemButton.enable();
         this.toggleButton.enable();
         this.navigator.enable();
-        if (testContext.itemFlagged) {
+        if (isItemFlagged(testMap, testContext.itemPosition)) {
             this.flagItemButton.turnOn();
         } else {
             this.flagItemButton.turnOff();

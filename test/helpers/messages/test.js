@@ -56,7 +56,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
             getTestMap: function() {
                 return map;
             },
-            getTestData: function() {
+            getOptions() {
                 return data;
             },
             itemRunner: {
@@ -179,9 +179,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 itemAnswered: testData.currentItemAnswered
             };
             var data = {
-                config: {
-                    enableUnansweredItemsWarning: true
-                }
+                enableUnansweredItemsWarning: true
             };
             var map = {
                 jumps: [
@@ -263,7 +261,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 'message include the right stats for section scope'
             );
 
-            data.config.enableUnansweredItemsWarning = false;
+            data.enableUnansweredItemsWarning = false;
 
             assert.equal(
                 messagesHelper.getExitMessage(message, 'test', runner),

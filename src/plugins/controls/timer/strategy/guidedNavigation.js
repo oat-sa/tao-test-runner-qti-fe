@@ -35,15 +35,14 @@
  * @returns {strategy|Boolean} the strategy if applies or false
  */
 export default function guidedNavigationStrategy(testRunner, timer) {
-    var testData = testRunner.getTestData();
     var testContext = testRunner.getTestContext();
-    var config = testData && testData.config;
+    var testRunnerOptions = testRunner.getOptions();
 
     if (
         timer &&
         timer.type === 'locked' &&
         timer.scope === 'item' &&
-        config.guidedNavigation === true &&
+        testRunnerOptions.guidedNavigation === true &&
         testContext.isLinear === true
     ) {
         return {

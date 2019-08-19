@@ -54,24 +54,22 @@ export default pluginFactory({
         var self = this;
         var pluginName = this.getName();
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+        var testRunnerOptions = testRunner.getOptions();
+        var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
-        var pluginConfig = self.getConfig();
-        var oldNamespace = themeHandler.getActiveNamespace();
-        var themesConfig = {};
-        var state = {
+        const pluginConfig = this.getConfig();
+        const oldNamespace = themeHandler.getActiveNamespace();
+        const state = {
             availableThemes: [],
             defaultTheme: '',
             selectedTheme: ''
         };
-        var allMenuEntries = [];
+        const allMenuEntries = [];
 
         if (pluginConfig.activeNamespace) {
             themeHandler.setActiveNamespace(pluginConfig.activeNamespace);
         }
-        themesConfig = themeHandler.get('items') || {};
+        const themesConfig = themeHandler.get('items') || {};
         if (pluginConfig.activeNamespace !== oldNamespace && !_.isEmpty(themesConfig)) {
             reloadThemes();
         }
@@ -197,7 +195,7 @@ export default pluginFactory({
             allMenuEntries.push(themeEntry);
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.toggle) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),

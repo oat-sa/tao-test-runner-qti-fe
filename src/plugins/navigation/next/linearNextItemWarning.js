@@ -38,12 +38,35 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var testConfig = testData.config || {};
-        var testStore = testRunner.getTestStore(); // we'll store user's checkbox choice in here
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const testStore = testRunner.getTestStore(); // we'll store user's checkbox choice in here
         testStore.setVolatile(self.getName());
+
+        /**
+         * Retrieve the required categories of the current item
+         * @returns {Object} the calculator categories
+         */
+        function getNextItemCategories(){
+            const testContext = testRunner.getTestContext();
+            const testMap = testRunner.getTestMap();
+
+            return {
+                nextPartWarning : mapHelper.hasItemCategory(
+                    testMap,
+                    testContext.itemIdentifier,
+                    'nextPartWarning',
+                    true
+                ),
+                nextSectionWarning : mapHelper.hasItemCategory(
+                    testMap,
+                    testContext.itemIdentifier,
+                    'nextSectionWarning',
+                    true
+                )
+            };
+        }
 
         /**
          * Provides different variants of message text
@@ -94,7 +117,7 @@ export default pluginFactory({
                         // Show the warning unless user has turned it off:
                         if (checkboxValue !== true) {
                             // Define checkbox only if enabled by config:
-                            if (testConfig.enableLinearNextItemWarningCheckbox) {
+                            if (testRunnerOptions.enableLinearNextItemWarningCheckbox) {
                                 checkboxParams = {
                                     checked: checkboxValue,
                                     submitChecked: function() {
@@ -144,17 +167,18 @@ export default pluginFactory({
                 });
             })
             .before('move skip', function(e, type, scope) {
-                var context = testRunner.getTestContext();
-                var map = testRunner.getTestMap();
-                var item = mapHelper.getItemAt(map, context.itemPosition);
+                const context = testRunner.getTestContext();
+                const map = testRunner.getTestMap();
+                const item = mapHelper.getItemAt(map, context.itemPosition);
+                const categories = getNextItemCategories();
 
                 if (context.isLinear) {
                     // Do nothing if nextSection warning imminent:
-                    if (scope === 'section' && context.options.nextSectionWarning) {
+                    if (scope === 'section' && categories.nextSectionWarning) {
                         return;
                     }
                     // Do nothing if endOfPart warning imminent:
-                    else if (context.options.nextPartWarning) {
+                    else if (categories.nextPartWarning) {
                         return;
                     }
                     // Do nothing if 'informational item':
@@ -162,9 +186,9 @@ export default pluginFactory({
                         return;
                     }
                     // Show dialog if conditions met:
-                    else if (type === 'next' && !context.isLast && testConfig.forceEnableLinearNextItemWarning) {
+                    else if (type === 'next' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('next');
-                    } else if (e.name === 'skip' && !context.isLast && testConfig.forceEnableLinearNextItemWarning) {
+                    } else if (e.name === 'skip' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('skip');
                     }
                 }

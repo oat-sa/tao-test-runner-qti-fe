@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -29,6 +29,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import nextWarningHelper from 'taoQtiTest/runner/plugins/navigation/next/nextWarningHelper';
 import messages from 'taoQtiTest/runner/helpers/messages';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
+import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
@@ -54,21 +55,21 @@ var buttonData = {
 
 /**
  * Create the button based on the current context
- * @param {Object} context - the test context
+ * @param {Boolean} [isLast=false] - is the current item the last
  * @returns {jQueryElement} the button
  */
-var createElement = function createElement(context) {
-    var dataType = context.isLast ? 'end' : 'next';
+var createElement = function createElement(isLast = false) {
+    var dataType = isLast ? 'end' : 'next';
     return $(buttonTpl(buttonData[dataType]));
 };
 
 /**
  * Update the button based on the context
  * @param {jQueryElement} $element - the element to update
- * @param {Object} context - the test context
+ * @param {Boolean} [isLast=false] - is the current item the last
  */
-var updateElement = function updateElement($element, context) {
-    var dataType = context.isLast ? 'end' : 'next';
+const updateElement = function updateElement($element, isLast = false) {
+    const dataType = isLast ? 'end' : 'next';
     if ($element.attr('data-control') !== buttonData[dataType].control) {
         $element
             .attr('data-control', buttonData[dataType].control)
@@ -99,12 +100,22 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+    init() {
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+
+        /**
+         * Check if the currrent item is the last item
+         * @returns {Boolean} true if the last
+         */
+        function isLastItem(){
+            const testContext = testRunner.getTestContext();
+            const testMap = testRunner.getTestMap();
+            const itemIdentifier = testContext.itemIdentifier;
+            return navigationHelper.isLast(testMap, itemIdentifier);
+        }
 
         //plugin behavior
         /**
@@ -112,21 +123,24 @@ export default pluginFactory({
          * Note: the actual display of the warning depends on other conditions (see nextWarningHelper)
          */
         function doNext(nextItemWarning) {
-            var context = testRunner.getTestContext(),
-                testOptions = context.options || {};
-
-            var map = testRunner.getTestMap();
-            var nextItemPosition = context.itemPosition + 1;
+            const testContext = testRunner.getTestContext();
+            const testMap = testRunner.getTestMap();
+            const nextItemPosition = testContext.itemPosition + 1;
+            const itemIdentifier = testContext.itemIdentifier;
 
             // x-tao-option-unansweredWarning is a deprecated option whose behavior now matches the one of
-            // x-tao-option-nextPartWarning with the unansweredOnly option
-            var nextPartWarning = testOptions.nextPartWarning || testOptions.unansweredWarning;
-            var unansweredOnly =
-                !testOptions.endTestWarning && // this check to avoid an edge case where having both endTestWarning
-                // and unansweredWarning options would prevent endTestWarning to behave normally
-                testOptions.unansweredWarning;
+            const unansweredWarning = mapHelper.hasItemCategory(testMap, itemIdentifier, 'unansweredWarning', true);
 
-            var warningScope = nextPartWarning ? 'part' : 'test';
+            // x-tao-option-nextPartWarning with the unansweredOnly option
+            const nextPartWarning = mapHelper.hasItemCategory(testMap, itemIdentifier, 'nextPartWarning', true) || unansweredWarning;
+
+            const endTestWarning = mapHelper.hasItemCategory(testMap, itemIdentifier, 'endTestWarning', true);
+
+            // this check to avoid an edge case where having both endTestWarning
+            // and unansweredWarning options would prevent endTestWarning to behave normally
+            const unansweredOnly = !endTestWarning && unansweredWarning;
+
+            const warningScope = nextPartWarning ? 'part' : 'test';
 
             function enableNav() {
                 testRunner.trigger('enablenav');
@@ -136,15 +150,15 @@ export default pluginFactory({
 
             if (self.getState('enabled') !== false) {
                 const warningHelper = nextWarningHelper({
-                    endTestWarning: testOptions.endTestWarning,
-                    isLast: context.isLast,
-                    isLinear: context.isLinear,
+                    endTestWarning: endTestWarning,
+                    isLast: isLastItem(),
+                    isLinear: testContext.isLinear,
                     nextItemWarning: nextItemWarning,
                     nextPartWarning: nextPartWarning,
-                    nextPart: mapHelper.getItemPart(map, nextItemPosition),
-                    remainingAttempts: context.remainingAttempts,
-                    testPartId: context.testPartId,
-                    unansweredWarning: testOptions.unansweredWarning,
+                    nextPart: mapHelper.getItemPart(testMap, nextItemPosition),
+                    remainingAttempts: testContext.remainingAttempts,
+                    testPartId: testContext.testPartId,
+                    unansweredWarning: unansweredWarning,
                     stats: statsHelper.getInstantStats(warningScope, testRunner),
                     unansweredOnly: unansweredOnly
                 });
@@ -159,18 +173,18 @@ export default pluginFactory({
                             warningScope,
                             testRunner
                         ),
-                        _.partial(triggerNextAction, context), // if the test taker accept
+                        _.partial(triggerNextAction, testContext), // if the test taker accept
                         enableNav // if he refuse
                     );
                 } else if (warningHelper.shouldWarnBeforeNext()) {
                     testRunner.trigger(
                         'confirm.next',
                         __('You are about to go to the next item. Click OK to continue and go to the next item.'),
-                        _.partial(triggerNextAction, context), // if the test taker accept
+                        _.partial(triggerNextAction, testContext), // if the test taker accept
                         enableNav // if he refuse
                     );
                 } else {
-                    triggerNextAction(context);
+                    triggerNextAction(testContext);
                 }
             }
         }
@@ -183,7 +197,7 @@ export default pluginFactory({
         }
 
         //create the button (detached)
-        this.$element = createElement(testRunner.getTestContext());
+        this.$element = createElement(isLastItem());
 
         //attach behavior
         this.$element.on('click', function(e) {
@@ -191,7 +205,7 @@ export default pluginFactory({
             testRunner.trigger('nav-next');
         });
 
-        if (testConfig.allowShortcuts && pluginShortcuts.trigger) {
+        if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
             shortcut.add(
                 namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
                 function() {
@@ -211,8 +225,8 @@ export default pluginFactory({
 
         //change plugin state
         testRunner
-            .on('loaditem', function() {
-                updateElement(self.$element, testRunner.getTestContext());
+            .on('loaditem', () => {
+                updateElement(this.$element, isLastItem());
             })
             .on('enablenav', function() {
                 self.enable();

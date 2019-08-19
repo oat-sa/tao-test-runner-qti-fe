@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -53,21 +53,21 @@ export default pluginFactory({
      * Initialize plugin (called during runner's initialization)
      * @returns {this}
      */
-    init: function init() {
-        this.getTestRunner().before('move', function(e, direction) {
+    init() {
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginConfig = this.getConfig();
+
+        testRunner.before('move', function(e, direction) {
             var self = this;
             var testContext = this.getTestContext();
             var isInteracting = !this.getItemState(testContext.itemIdentifier, 'disabled');
-
-            var testData = this.getTestData() || {};
-            var testConfig = testData.config || {};
-            var pluginConfig = _.defaults((testConfig.plugins || {})[pluginName] || {});
 
             if (!pluginConfig.validateOnPreviousMove && direction === 'previous') {
                 return Promise.resolve();
             }
 
-            if (isInteracting && testContext.enableValidateResponses && testContext.validateResponses) {
+            if (isInteracting && testRunnerOptions.enableValidateResponses && testContext.validateResponses) {
                 return new Promise(function(resolve, reject) {
                     if (_.size(currentItemHelper.getDeclarations(self)) === 0) {
                         return resolve();

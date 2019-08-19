@@ -128,15 +128,18 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var testContext = testRunner.getTestContext();
-        var testMap = testRunner.getTestMap();
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
-        var navigatorConfig = testConfig.review || {};
-        var previousItemPosition;
+        const self = this;
+        const testRunner = this.getTestRunner();
+
+        const testContext = testRunner.getTestContext();
+        const testMap = testRunner.getTestMap();
+
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const navigatorConfig = testRunnerOptions.review || {
+            defaultOpen : false
+        };
+        let previousItemPosition;
 
         /**
          * Tells if the component is enabled
@@ -252,7 +255,7 @@ export default pluginFactory({
             testRunner.trigger('tool-flagitem');
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.flag) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.flag, this.getName(), true),
@@ -285,7 +288,7 @@ export default pluginFactory({
         //disabled by default
         this.disable();
 
-        togglePanel(testConfig.review.defaultOpen);
+        togglePanel(navigatorConfig.defaultOpen);
 
         //change plugin state
         testRunner

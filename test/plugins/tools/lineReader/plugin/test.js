@@ -377,7 +377,16 @@ define([
 
     QUnit.test('Toggle on keyboard shortcut', function(assert) {
         var ready = assert.async();
-        var runner = runnerFactory(providerName);
+        var runner = runnerFactory(providerName, {}, {
+            options: {
+                allowShortcuts: true,
+                shortcuts: {
+                    'line-reader': {
+                        toggle: 'c'
+                    }
+                }
+            }
+        });
         var areaBroker = runner.getAreaBroker();
         var plugin = pluginFactory(runner, runner.getAreaBroker());
 
@@ -386,17 +395,6 @@ define([
         runner.setTestContext({
             options: {
                 lineReader: true
-            }
-        });
-
-        runner.setTestData({
-            config: {
-                allowShortcuts: true,
-                shortcuts: {
-                    'line-reader': {
-                        toggle: 'c'
-                    }
-                }
             }
         });
 

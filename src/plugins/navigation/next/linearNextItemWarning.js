@@ -38,11 +38,10 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var testConfig = testData.config || {};
-        var testStore = testRunner.getTestStore(); // we'll store user's checkbox choice in here
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const testStore = testRunner.getTestStore(); // we'll store user's checkbox choice in here
         testStore.setVolatile(self.getName());
 
         /**
@@ -94,7 +93,7 @@ export default pluginFactory({
                         // Show the warning unless user has turned it off:
                         if (checkboxValue !== true) {
                             // Define checkbox only if enabled by config:
-                            if (testConfig.enableLinearNextItemWarningCheckbox) {
+                            if (testRunnerOptions.enableLinearNextItemWarningCheckbox) {
                                 checkboxParams = {
                                     checked: checkboxValue,
                                     submitChecked: function() {
@@ -162,9 +161,9 @@ export default pluginFactory({
                         return;
                     }
                     // Show dialog if conditions met:
-                    else if (type === 'next' && !context.isLast && testConfig.forceEnableLinearNextItemWarning) {
+                    else if (type === 'next' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('next');
-                    } else if (e.name === 'skip' && !context.isLast && testConfig.forceEnableLinearNextItemWarning) {
+                    } else if (e.name === 'skip' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('skip');
                     }
                 }

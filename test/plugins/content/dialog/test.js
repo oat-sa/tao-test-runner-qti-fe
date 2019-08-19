@@ -568,7 +568,8 @@ define([
         .init([
             {
                 title: 'Default',
-                focus: 'ok'
+                focus: 'ok',
+                config: 'ok'
             },
             {
                 title: 'OK button',
@@ -584,24 +585,14 @@ define([
         .test('focus on button', function(data, assert) {
             var ready = assert.async();
             var runner = runnerFactory(providerName);
-            var dialog = dialogFactory(runner, runner.getAreaBroker());
+            var dialog = dialogFactory(runner, runner.getAreaBroker(), {
+                confirm : {
+                    focus: data.config
+                }
+            });
             var expectedConfirmMessage = 'exit?';
 
             assert.expect(6);
-
-            if (data.config) {
-                runner.setTestData({
-                    config: {
-                        plugins: {
-                            dialog: {
-                                confirm: {
-                                    focus: data.config
-                                }
-                            }
-                        }
-                    }
-                });
-            }
 
             dialogConfirm
                 .on('create', function(message) {

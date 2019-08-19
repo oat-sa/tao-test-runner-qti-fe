@@ -305,30 +305,28 @@ define([
     QUnit.module('plugin UI');
 
     QUnit.test('Toggle on keyboard shortcut', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            plugin = pluginFactory(runner, runner.getAreaBroker()),
-            $contentContainer = areaBroker.getContentArea(),
-            toggleCounter = 0,
-            $button;
-
-        assert.expect(5);
-
-        runner.setTestContext({
-            options: {
-                answerMasking: true
-            }
-        });
-
-        runner.setTestData({
-            config: {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, {
+            options : {
                 allowShortcuts: true,
                 shortcuts: {
                     'answer-masking': {
                         toggle: 'c'
                     }
                 }
+            }
+        });
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $contentContainer = areaBroker.getContentArea();
+        let toggleCounter = 0;
+        let $button;
+
+        assert.expect(5);
+
+        runner.setTestContext({
+            options: {
+                answerMasking: true
             }
         });
 

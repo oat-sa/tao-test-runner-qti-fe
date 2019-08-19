@@ -102,9 +102,8 @@ export default pluginFactory({
     init: function init() {
         var self = this;
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+        var testRunnerOptions = testRunner.getOptions();
+        var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         //plugin behavior
         /**
@@ -191,7 +190,7 @@ export default pluginFactory({
             testRunner.trigger('nav-next');
         });
 
-        if (testConfig.allowShortcuts && pluginShortcuts.trigger) {
+        if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
             shortcut.add(
                 namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
                 function() {

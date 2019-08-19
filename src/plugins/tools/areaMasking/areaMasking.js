@@ -61,16 +61,16 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
+        const self = this;
 
-        var testRunner = this.getTestRunner();
-        var $container = testRunner
+        const testRunner = this.getTestRunner();
+        const $container = testRunner
             .getAreaBroker()
             .getContentArea()
             .parent();
-        var testConfig = testRunner.getTestData().config || {};
-        var config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
-        var pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
+        const testRunnerOptions = testRunner.getOptions();
+        const config = Object.assign({}, defaultConfig, this.getConfig());
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
 
         function addMask() {
             maskComponent()
@@ -121,7 +121,7 @@ export default pluginFactory({
         });
 
         // handle the plugin's shortcuts
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             _.forEach(pluginShortcuts, function(command, key) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),

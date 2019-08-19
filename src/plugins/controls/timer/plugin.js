@@ -95,14 +95,14 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
 
         /**
          * Plugin config,
          */
-        var config = _.merge({}, this.getConfig(), {
+        const config = Object.assign({
             /**
              * An option to control is the warnings are contextual or global
              */
@@ -111,18 +111,18 @@ export default pluginFactory({
             /**
              * The list of configured warnings
              */
-            warnings: (testData && testData.config && testData.config.timerWarning) || {},
+            warnings: (testRunnerOptions.timerWarning) || {},
 
             /**
              * The guided navigation option
              */
-            guidedNavigation: testData && testData.config && testData.config.guidedNavigation,
+            guidedNavigation: testRunnerOptions.guidedNavigation,
 
             /**
              * Restore timer from client.
              */
-            restoreTimerFromClient: testData && testData.config && testData.config.timer.restoreTimerFromClient
-        });
+            restoreTimerFromClient: testRunnerOptions.restoreTimerFromClient
+        }, this.getConfig());
 
         /**
          * Set up the strategy handler

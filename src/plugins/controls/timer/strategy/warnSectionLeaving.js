@@ -27,6 +27,8 @@ import _ from 'lodash';
 import __ from 'i18n';
 import messages from 'taoQtiTest/runner/helpers/messages';
 import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
+import states from 'taoQtiTest/runner/config/states';
+
 
 /**
  * The message to display when exiting
@@ -50,10 +52,9 @@ export default function warnSectionLeavingStrategy(testRunner, timer) {
     var leaveTimedSection = function leaveTimedSection(direction, scope, position) {
         var context = testRunner.getTestContext();
         var map = testRunner.getTestMap();
-        var testData = testRunner.getTestData();
         if (
             !context.isTimeout &&
-            context.itemSessionState !== testData.itemStates.closed &&
+            context.itemSessionState !== states.itemSession.closed &&
             context.sectionId === timer.source
         ) {
             return navigationHelper.isLeavingSection(context, map, direction, scope, position);
@@ -73,9 +74,8 @@ export default function warnSectionLeavingStrategy(testRunner, timer) {
                     .off('move.warntimedsection skip.warntimedsection')
                     .before('move.warntimedsection skip.warntimedsection', function(e, type, scope, position) {
                         var context = testRunner.getTestContext();
-                        var testDataBeforeMove = testRunner.getTestData();
-                        var config = testDataBeforeMove && testDataBeforeMove.config;
-                        var timerConfig = (config && config.timer) || {};
+                        var testRunnerOptions = testRunner.getOptions();
+                        var timerConfig = testRunnerOptions.timer || {};
                         var options = (context && context.options) || {};
                         var movePromise = new Promise(function(resolve, reject) {
                             // endTestWarning has already been displayed, so we don't repeat the warning

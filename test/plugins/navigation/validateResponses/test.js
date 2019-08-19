@@ -216,14 +216,8 @@ define([
                     enableValidateResponses: true,
                     validateResponses: true
                 },
-                testData: {
-                    config: {
-                        plugins: {
-                            validateResponses: {
-                                validateOnPreviousMove: false
-                            }
-                        }
-                    }
+                config : {
+                    validateOnPreviousMove: false
                 },
                 answered: false,
                 responses: ['foo']
@@ -232,14 +226,12 @@ define([
         .test('Moving backwards is also allowed ', function(data, assert) {
             var ready = assert.async();
             var runner = runnerFactory(providerName);
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
-
+            var plugin = pluginFactory(runner, runner.getAreaBroker(), data.config);
             assert.expect(1);
 
             plugin
                 .init()
                 .then(function() {
-                    runner.setTestData(_.assign(runner.getTestData(), data.testData));
                     runner.setTestContext(data.context);
                     runner.answered = data.answered;
                     runner.responses = data.responses;

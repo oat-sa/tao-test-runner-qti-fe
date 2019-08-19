@@ -54,14 +54,12 @@ export default pluginFactory({
      * @returns {void}
      */
     init: function init() {
-        var self = this;
-
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
-        var hasHighlights = false;
-        var logger = loggerFactory('highlighterPlugin');
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        let hasHighlights = false;
+        const logger = loggerFactory('highlighterPlugin');
 
         /**
          * @var {Object} highlighters - Highlighters collection
@@ -121,7 +119,7 @@ export default pluginFactory({
             }
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.toggle) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),

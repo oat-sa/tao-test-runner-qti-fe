@@ -29,19 +29,17 @@ import testContextBuilder from 'taoQtiTest/runner/helpers/testContextBuilder';
  * @returns {Object}
  */
 export default function offlineNavigatorFactory(itemStore, responseStore) {
-    var testData,
-        testContext,
+    var testContext,
         testMap,
         offlineJumpTableHelper = offlineJumpTableFactory(itemStore, responseStore);
 
     return {
         /**
+         * @deprecated
          * @param {Object} data
          * @returns {this}
          */
-        setTestData: function setTestData(data) {
-            testData = data;
-
+        setTestData: function setTestData() {
             return this;
         },
 
@@ -114,7 +112,7 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
                     .then(function() {
                         lastJump = offlineJumpTableHelper.getLastJump();
 
-                        resolve(testContextBuilder.buildTestContextFromJump(testData, testContext, testMap, lastJump));
+                        resolve(testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump));
                     })
                     .catch(function(err) {
                         reject(err);

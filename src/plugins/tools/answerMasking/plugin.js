@@ -20,7 +20,6 @@
  * @author Christophe Noël <christophe@taotesting.com>
  */
 
-import _ from 'lodash';
 import __ from 'i18n';
 import pluginFactory from 'taoTests/runner/plugin';
 import 'ui/hider';

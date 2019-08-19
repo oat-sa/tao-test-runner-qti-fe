@@ -21,7 +21,7 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import _ from 'lodash';
+
 import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import progressHelper from 'taoQtiTest/runner/plugins/controls/progressbar/progress';

@@ -223,7 +223,7 @@ var qtiProvider = {
 
             //if we have to display modal feedbacks, we submit the responses before the move
             var feedbackPromise = new Promise(function(resolve) {
-                if (mapHelper.getItem(testMap, context.itemIdentifier).hasFeedbacks) {
+                if (mapHelper.getItem(testMap, context.itemIdentifier).hasFeedbacks || context.hasFeedbacks) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
                     self.getProxy()

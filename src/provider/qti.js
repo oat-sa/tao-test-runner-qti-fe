@@ -204,7 +204,8 @@ var qtiProvider = {
          * @param {Promise} [loadPromise] - wait this Promise to resolve before loading the item.
          */
         function computeNext(action, params, loadPromise) {
-            var context = self.getTestContext();
+            const context = self.getTestContext();
+            const testMap = self.getTestMap();
 
             //catch server errors
             var submitError = function submitError(err) {
@@ -222,7 +223,7 @@ var qtiProvider = {
 
             //if we have to display modal feedbacks, we submit the responses before the move
             var feedbackPromise = new Promise(function(resolve) {
-                if (context.hasFeedbacks) {
+                if (mapHelper.getItem(testMap, context.itemIdentifier).hasFeedbacks) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
                     self.getProxy()

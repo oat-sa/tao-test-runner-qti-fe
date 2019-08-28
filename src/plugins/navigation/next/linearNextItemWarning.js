@@ -27,6 +27,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import currentItemHelper from 'taoQtiTest/runner/helpers/currentItem';
 import dialogConfirmNext from 'taoQtiTest/runner/plugins/navigation/next/dialogConfirmNext';
+import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
 
 /**
  * Returns the configured plugin
@@ -171,6 +172,7 @@ export default pluginFactory({
                 const map = testRunner.getTestMap();
                 const item = mapHelper.getItemAt(map, context.itemPosition);
                 const categories = getNextItemCategories();
+                const isLast = true;//navigationHelper.isLast(map, context.itemIdentifier);
 
                 if (context.isLinear) {
                     // Do nothing if nextSection warning imminent:

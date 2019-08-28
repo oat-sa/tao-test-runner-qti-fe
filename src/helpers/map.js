@@ -73,18 +73,9 @@ export default {
      * @returns {Object} the sections
      */
     getSections: function getSections(map) {
-        var parts = this.getParts(map),
-            result = {};
+        const parts = this.getParts(map) || {};
 
-        _.forEach(parts, function(part) {
-            var sections = part.sections;
-            if (sections) {
-                _.forEach(sections, function(section) {
-                    result[section.id] = section;
-                });
-            }
-        });
-        return result;
+        return Object.values(parts).reduce((result, part) => Object.assign(result, part.sections), {});
     },
 
     /**
@@ -93,25 +84,21 @@ export default {
      * @returns {Object} the active item
      */
     getActiveItem: function getActiveItem(map) {
-        var parts = this.getParts(map),
-            result = {};
+        const parts = this.getParts(map) || {};
 
-        _.forEach(parts, function(part) {
-            var sections = part.sections;
-            if (sections) {
-                _.forEach(sections, function(section) {
-                    if (section.active) {
-                        const items = section.items;
-                        _.forEach(items, function(item) {
-                            if (item.active) {
-                                result = item;
-                            }
-                        });
+        for (let part of Object.values(parts)) {
+            const sections = part.sections || {};
+            for (let section of Object.values(sections)) {
+                const items = section.items || {};
+                for (let item of Object.values(items)) {
+                    if (item.active) {
+                        return item;
                     }
-                });
+                }
             }
-        });
-        return result;
+        }
+
+        return {};
     },
 
     /**
@@ -121,20 +108,18 @@ export default {
      * @returns {Object} the next sections
      */
     getNextSections: function getNextSections(map, sectionId) {
-        var sections = this.getSections(map),
-            result = {},
-            canList = false;
+        const sections = this.getSections(map) || {};
+        const sectionIds = Object.keys(sections);
+        const sectionPosition = sectionIds.indexOf(sectionId);
 
-        _.forEach(sections, function(section) {
-            if (canList) {
-                result[section.id] = section;
-            }
-            if (section.id === sectionId) {
-                canList = true;
-            }
-        });
+        if (sectionPosition === -1) {
+            return {};
+        }
 
-        return result;
+        return sectionIds.splice(sectionPosition + 1).reduce((result, id) => {
+            result[id] = sections[id];
+            return result;
+        }, {});
     },
 
     /**
@@ -162,20 +147,21 @@ export default {
     /**
      * Gets a test section by its identifier
      * @param {Object} map - The assessment test map
-     * @param {String} sectionName - The identifier of the test section
+     * @param {String} sectionId - The identifier of the test section
      * @returns {Object}
      */
-    getSection: function getSection(map, sectionName) {
-        var parts = this.getParts(map);
-        var section = null;
-        _.forEach(parts, function(part) {
-            var sections = part.sections;
-            if (sections && sections[sectionName]) {
-                section = sections[sectionName];
-                return false;
+    getSection: function getSection(map, sectionId) {
+        const parts = this.getParts(map) || {};
+
+        for (let part of Object.values(parts)) {
+            const sections = part.sections;
+
+            if (sections && sections[sectionId]) {
+                return sections[sectionId];
             }
-        });
-        return section;
+        }
+
+        return null;
     },
 
     /**

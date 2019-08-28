@@ -30,7 +30,9 @@
               "viewed": true,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q02": {
               "id": "Q02",
@@ -43,7 +45,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q03-1": {
               "id": "Q03-1",
@@ -106,7 +110,9 @@
                     }
                   ]
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q03-2": {
               "id": "Q03-2",
@@ -119,7 +125,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q04-1": {
               "id": "Q04-1",
@@ -150,7 +158,9 @@
                     }
                   }
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q04-2": {
               "id": "Q04-2",
@@ -181,7 +191,9 @@
                     }
                   }
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q04-3": {
               "id": "Q04-3",
@@ -194,7 +206,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q05-1": {
               "id": "Q05-1",
@@ -355,7 +369,9 @@
                     }
                   ]
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q05-2": {
               "id": "Q05-2",
@@ -404,7 +420,9 @@
                     }
                   ]
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q05-3": {
               "id": "Q05-3",
@@ -417,7 +435,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q06-1": {
               "id": "Q06-1",
@@ -448,7 +468,9 @@
                     }
                   }
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q06-2": {
               "id": "Q06-2",
@@ -461,7 +483,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q07-1": {
               "id": "Q07-1",
@@ -510,7 +534,9 @@
                     }
                   ]
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q07-2": {
               "id": "Q07-2",
@@ -523,7 +549,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q08-1": {
               "id": "Q08-1",
@@ -572,7 +600,9 @@
                     }
                   ]
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q08-2": {
               "id": "Q08-2",
@@ -585,7 +615,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q09": {
               "id": "Q09",
@@ -598,7 +630,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q10": {
               "id": "Q10",
@@ -611,7 +645,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q11-1": {
               "id": "Q11-1",
@@ -642,7 +678,9 @@
                     }
                   }
                 }
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q11-2": {
               "id": "Q11-2",
@@ -655,7 +693,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "Q12": {
               "id": "Q12",
@@ -668,7 +708,9 @@
               "viewed": false,
               "categories": [],
               "informational": false,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -688,7 +730,9 @@
             "Q13": {
               "id": "Q13",
               "position": 21,
-              "branchRule": {}
+              "branchRule": {},
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           }
         }

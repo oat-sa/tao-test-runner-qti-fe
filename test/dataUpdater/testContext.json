@@ -23,9 +23,7 @@
   "isDeepestSectionVisible": true,
   "canMoveBackward": false,
   "preventEmptyResponses": false,
-  "hasFeedbacks": false,
   "options": {
-    "allowComment": false,
     "allowSkipping": true,
     "exitButton": false,
     "logoutButton": false

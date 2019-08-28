@@ -29,6 +29,7 @@ import stackerFactory from 'ui/stacker';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import commentTpl from 'taoQtiTest/runner/plugins/tools/comment/comment.tpl';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * Returns the configured plugin
@@ -53,8 +54,13 @@ export default pluginFactory({
          */
         function isEnabled() {
             const testContext = testRunner.getTestContext();
-            const contextOptions = testContext.options || {};
-            return !!contextOptions.allowComment;
+            const testMap = testRunner.getTestMap();
+            const item = mapHelper.getItem(testMap, testContext.itemIdentifier);
+
+            // should be deprecated
+            const {allowComment: deprecatedAllowComment} = testContext.options || {};
+
+            return Boolean(item.allowComment || deprecatedAllowComment);
         }
 
         /**

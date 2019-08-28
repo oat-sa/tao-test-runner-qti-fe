@@ -125,7 +125,6 @@ define([
                 markReview: true,
                 endTestWarning: true,
                 zoom: true,
-                allowComment: false,
                 allowSkipping: true,
                 exitButton: false,
                 logoutButton: false
@@ -174,7 +173,6 @@ define([
                 zoom: true,
                 fooBarBaz: true,
                 awesomeCategory: true,
-                allowComment: false,
                 allowSkipping: true,
                 exitButton: false,
                 logoutButton: false

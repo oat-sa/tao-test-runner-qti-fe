@@ -20,9 +20,7 @@
   "enableAllowSkipping": true,
   "allowSkipping": true,
   "validateResponses": true,
-  "hasFeedbacks": false,
   "options": {
-    "allowComment": false,
     "allowSkipping": true,
     "exitButton": false,
     "logoutButton": true,

@@ -20,7 +20,9 @@
               "informational": true,
               "answered": false,
               "flagged": false,
-              "viewed": true
+              "viewed": true,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-2": {
               "id": "item-2",
@@ -31,7 +33,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-3": {
               "id": "item-3",
@@ -42,7 +46,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -67,7 +73,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-5": {
               "id": "item-5",
@@ -78,7 +86,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-6": {
               "id": "item-6",
@@ -89,7 +99,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -129,7 +141,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-8": {
               "id": "item-8",
@@ -140,7 +154,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -165,7 +181,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-10": {
               "id": "item-10",
@@ -176,7 +194,9 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {

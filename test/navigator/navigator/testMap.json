@@ -30,7 +30,9 @@
               "flagged": false,
               "viewed": true,
               "categories" : ["x-tao-option-reviewScreen", "x-tao-option-markReview", "x-tao-option-endTestWarning", "x-tao-option-zoom"],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-2": {
               "id": "item-2",
@@ -45,7 +47,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : ["x-tao-option-reviewScreen", "x-tao-option-markReview", "x-tao-option-endTestWarning", "x-tao-option-zoom"],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-3": {
               "id": "item-3",
@@ -60,7 +64,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : ["x-tao-option-reviewScreen", "x-tao-option-markReview", "x-tao-option-endTestWarning", "x-tao-option-zoom"],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -97,7 +103,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : ["x-tao-option-calculator", "x-tao-option-zoom", "x-tao-option-foo-bar-baz", "awesome-category"],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-5": {
               "id": "item-5",
@@ -112,7 +120,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : ["x-tao-option-calculator", "x-tao-option-zoom", "x-tao-option-foo-bar-baz", "awesome-category"],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-6": {
               "id": "item-6",
@@ -135,7 +145,9 @@
                 "extraTime": 0,
                 "allowLateSubmission": false,
                 "qtiClassName": "assessmentItemRef"
-              }
+              },
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -172,7 +184,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : [],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-8": {
               "id": "item-8",
@@ -187,7 +201,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : [],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-9": {
               "id": "item-9",
@@ -202,7 +218,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : [],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -231,7 +249,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : [],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-11": {
               "id": "item-11",
@@ -246,7 +266,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : [],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -275,7 +297,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : [],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-13": {
               "id": "item-13",
@@ -290,7 +314,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : [],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-14": {
               "id": "item-14",
@@ -305,7 +331,9 @@
               "flagged": false,
               "viewed": false,
               "categories" : [],
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {
@@ -347,7 +375,9 @@
               "answered": false,
               "flagged": false,
               "viewed": false,
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-16": {
               "id": "item-16",
@@ -361,7 +391,9 @@
               "answered": false,
               "flagged": false,
               "viewed": false,
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             },
             "item-17": {
               "id": "item-17",
@@ -375,7 +407,9 @@
               "answered": false,
               "flagged": false,
               "viewed": false,
-              "informational": false
+              "informational": false,
+              "hasFeedbacks": false,
+              "allowComment": false
             }
           },
           "stats": {

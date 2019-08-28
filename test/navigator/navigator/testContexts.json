@@ -24,9 +24,7 @@
     "isDeepestSectionVisible": true,
     "canMoveBackward": false,
     "preventEmptyResponses": false,
-    "hasFeedbacks": false,
     "options": {
-      "allowComment": false,
       "allowSkipping": true,
       "exitButton": false,
       "logoutButton": false
@@ -57,9 +55,7 @@
     "isDeepestSectionVisible": true,
     "canMoveBackward": true,
     "preventEmptyResponses": false,
-    "hasFeedbacks": false,
     "options": {
-      "allowComment": false,
       "allowSkipping": true,
       "exitButton": false,
       "logoutButton": false
@@ -90,9 +86,7 @@
     "isDeepestSectionVisible": true,
     "canMoveBackward": true,
     "preventEmptyResponses": false,
-    "hasFeedbacks": false,
     "options": {
-      "allowComment": false,
       "allowSkipping": true,
       "exitButton": false,
       "logoutButton": false,
@@ -138,9 +132,7 @@
     "isDeepestSectionVisible": true,
     "canMoveBackward": true,
     "preventEmptyResponses": false,
-    "hasFeedbacks": false,
     "options": {
-      "allowComment": false,
       "allowSkipping": true,
       "exitButton": false,
       "logoutButton": false
@@ -171,9 +163,7 @@
     "isDeepestSectionVisible": true,
     "canMoveBackward": false,
     "preventEmptyResponses": false,
-    "hasFeedbacks": false,
     "options": {
-      "allowComment": false,
       "allowSkipping": true,
       "exitButton": false,
       "logoutButton": false

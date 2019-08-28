@@ -45,6 +45,7 @@ export default _.defaults(
          */
         install: function install(config) {
             var self = this;
+            const maxSyncAttempts = 3;
 
             // install the parent proxy
             qtiServiceProxy.install.call(this);
@@ -67,6 +68,8 @@ export default _.defaults(
 
             // scheduled action promises which supposed to be resolved after action synchronization.
             this.actionPromises = {};
+
+            this.syncInProgress = false; // is data synchronization in progress
 
             // let's you update test data (testContext and testMap)
             this.dataUpdater = dataUpdater(this.getDataHolder());
@@ -264,6 +267,29 @@ export default _.defaults(
             };
 
             /**
+             * Try to sync data until reached max attempts
+             *
+             * @param {Object} data - sync payload
+             * @param {Number} attempt - current attempt
+             * @returns {Promise} resolves with the action result
+             */
+            this.sendSyncData = function sendSyncData(data, attempt = 1) {
+                return new Promise((resolve, reject) => self.send('sync', data)
+                    .then(resolve)
+                    .catch((err) => {
+                        if (attempt < maxSyncAttempts) {
+                            return self.sendSyncData(data, attempt + 1)
+                                .then(resolve)
+                                .catch(reject);
+                        }
+
+                        return reject(err);
+                    })
+                );
+            };
+
+
+            /**
              * Flush and synchronize actions collected while offline
              *
              * @returns {Promise} resolves with the action result
@@ -271,14 +297,20 @@ export default _.defaults(
             this.syncData = function syncData() {
                 var actions;
 
+                this.syncInProgress = true;
+
                 return this.queue.serie(function() {
                     return self.actionStore
                         .flush()
                         .then(function(data) {
                             actions = data;
                             if (data && data.length) {
-                                return self.send('sync', data);
+                                return self.sendSyncData(data);
                             }
+                        }).finally((data) => {
+                            self.syncInProgress = false;
+
+                            return data;
                         })
                         .catch(function(err) {
                             if (self.isConnectivityError(err)) {
@@ -287,6 +319,8 @@ export default _.defaults(
                                     self.actionStore.push(action.action, action.parameters, action.timestamp);
                                 });
                             }
+
+                            self.trigger('error', err);
 
                             throw err;
                         });
@@ -358,6 +392,15 @@ export default _.defaults(
 
             // set up the action store for the current service call
             this.actionStore = actionStoreFactory(config.serviceCallId);
+
+            // stop error event propagation if sync is in progress
+            this.before('error', (e, error) => {
+                if (self.isConnectivityError(error) && self.syncInProgress) {
+                    return false;
+                }
+
+                return true;
+            });
 
             return InitCallPromise.then(function(response) {
                 var promises = [];

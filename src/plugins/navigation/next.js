@@ -173,24 +173,24 @@ export default pluginFactory({
                             warningScope,
                             testRunner
                         ),
-                        _.partial(triggerNextAction, testContext), // if the test taker accept
+                        triggerNextAction, // if the test taker accept
                         enableNav // if he refuse
                     );
                 } else if (warningHelper.shouldWarnBeforeNext()) {
                     testRunner.trigger(
                         'confirm.next',
                         __('You are about to go to the next item. Click OK to continue and go to the next item.'),
-                        _.partial(triggerNextAction, testContext), // if the test taker accept
+                        triggerNextAction, // if the test taker accept
                         enableNav // if he refuse
                     );
                 } else {
-                    triggerNextAction(testContext);
+                    triggerNextAction();
                 }
             }
         }
 
-        function triggerNextAction(context) {
-            if (context.isLast) {
+        function triggerNextAction() {
+            if (isLastItem()) {
                 self.trigger('end');
             }
             testRunner.next();

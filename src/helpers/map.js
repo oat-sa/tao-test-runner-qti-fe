@@ -84,15 +84,21 @@ export default {
      * @returns {Object} the active item
      */
     getActiveItem: function getActiveItem(map) {
-        const parts = this.getParts(map) || {};
+        const parts = this.getParts(map);
 
-        for (let part of Object.values(parts)) {
-            const sections = part.sections || {};
-            for (let section of Object.values(sections)) {
-                const items = section.items || {};
-                for (let item of Object.values(items)) {
-                    if (item.active) {
-                        return item;
+        if (parts) {
+            for (let part of Object.values(parts)) {
+                const sections = part.sections;
+                if (sections) {
+                    for (let section of Object.values(sections)) {
+                        const items = section.items;
+                        if (items) {
+                            for (let item of Object.values(items)) {
+                                if (item.active) {
+                                    return item;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -151,13 +157,15 @@ export default {
      * @returns {Object}
      */
     getSection: function getSection(map, sectionId) {
-        const parts = this.getParts(map) || {};
+        const parts = this.getParts(map);
 
-        for (let part of Object.values(parts)) {
-            const sections = part.sections;
+        if (parts) {
+            for (let part of Object.values(parts)) {
+                const sections = part.sections;
 
-            if (sections && sections[sectionId]) {
-                return sections[sectionId];
+                if (sections && sections[sectionId]) {
+                    return sections[sectionId];
+                }
             }
         }
 

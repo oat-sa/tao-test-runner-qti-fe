@@ -172,7 +172,7 @@ export default pluginFactory({
                 const map = testRunner.getTestMap();
                 const item = mapHelper.getItemAt(map, context.itemPosition);
                 const categories = getNextItemCategories();
-                const isLast = true;//navigationHelper.isLast(map, context.itemIdentifier);
+                const isLast = navigationHelper.isLast(map, context.itemIdentifier);
 
                 if (context.isLinear) {
                     // Do nothing if nextSection warning imminent:
@@ -188,9 +188,9 @@ export default pluginFactory({
                         return;
                     }
                     // Show dialog if conditions met:
-                    else if (type === 'next' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
+                    else if (type === 'next' && !isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('next');
-                    } else if (e.name === 'skip' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
+                    } else if (e.name === 'skip' && !isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('skip');
                     }
                 }

@@ -67,7 +67,7 @@ export default pluginFactory({
         var createOkButton = function createElement() {
             const testContext = testRunner.getTestContext();
             const testMap = testRunner.getTestMap();
-            const dataType = navigationHelper.isLast(testMap, testContext.itemIdentifier) ? 'end' : 'next';
+            const dataType = typeof testContext.itemIdentifier !== 'undefined' && navigationHelper.isLast(testMap, testContext.itemIdentifier) ? 'end' : 'next';
             const $btn = $(buttonTpl(buttonData[dataType]));
             $btn.addClass('modalFeedback-button');
 

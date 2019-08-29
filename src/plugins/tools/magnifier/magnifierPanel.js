@@ -266,6 +266,7 @@ function magnifierPanelFactory(config) {
                     controls.$clone.find('iframe').remove();
                     controls.$clone.find('[name],[id],[data-serial]').removeAttr('name id data-serial');
                     controls.$inner.empty().append(controls.$clone);
+                    controls.$clone.find('audio').prop('muted', true);
 
                     applySize();
                     applyZoomLevel();

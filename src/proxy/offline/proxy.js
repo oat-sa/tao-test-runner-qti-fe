@@ -277,7 +277,7 @@ export default _.defaults(
                 return new Promise((resolve, reject) => self.send('sync', data)
                     .then(resolve)
                     .catch((err) => {
-                        if (attempt < maxSyncAttempts) {
+                        if (self.isConnectivityError(err) && attempt < maxSyncAttempts) {
                             return self.sendSyncData(data, attempt + 1)
                                 .then(resolve)
                                 .catch(reject);

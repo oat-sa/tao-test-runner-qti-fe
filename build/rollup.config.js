@@ -69,6 +69,9 @@ export default inputs.map(input => {
             format: 'amd',
             name
         },
+        watch: {
+            clearScreen : false
+        },
         external: [
             ...localExternals,
             'handlebars',

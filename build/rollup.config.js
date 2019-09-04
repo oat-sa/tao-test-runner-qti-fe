@@ -29,6 +29,8 @@ import { copyFile, mkdirp } from 'fs-extra';
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
 
+const isDev = process.env.NODE_ENV === 'development';
+
 /**
  * Support of handlebars 1.3.0
  * TODO remove once migrated to hbs >= 3.0.0
@@ -67,6 +69,7 @@ export default inputs.map(input => {
         output: {
             dir: path.join(outputDir, dir),
             format: 'amd',
+            sourcemap: isDev,
             name
         },
         watch: {

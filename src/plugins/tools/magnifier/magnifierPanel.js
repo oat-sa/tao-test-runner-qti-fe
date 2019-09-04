@@ -44,6 +44,16 @@ var debounceDelay = 50;
 var scrollingDelay = 20;
 
 /**
+ * Information about scrooling offset in dom nodes
+ */
+let scrolling = [];
+
+/**
+ * Component scroll handler
+ */
+let componentScrollCallback;
+
+/**
  * The default base size
  * @type {Number}
  */
@@ -94,6 +104,39 @@ var dynamicComponentDefaultConfig = {
 };
 
 /**
+ * Identify scrolling dom nodes and store scrolling offsets
+ */
+const scrollingListenerCallback = _.throttle((event) => {
+    const $target = $(event.target);
+    const scrollingTop = event.target.scrollTop;
+    const scrollLeft = event.target.scrollLeft;
+    let scrollId = $target.data('magnifier-scroll');
+    let scrollData;
+
+    if (scrollId) {
+        //if the element is identified as a scrollable element, update it scrolling offset
+        scrollData = _.find(scrolling, {
+            id: scrollId
+        });
+        scrollData.scrollTop = scrollingTop;
+        scrollData.scrollLeft = scrollLeft;
+    } else {
+        //if the element is not yet identified as a scrollable element, tag it and register its id
+        scrollId = _.uniqueId('scrolling_');
+        $target.attr('data-magnifier-scroll', scrollId);
+        scrolling.push({
+            id: scrollId,
+            scrollTop: scrollingTop,
+            scrollLeft: scrollLeft
+        });
+    }
+
+    componentScrollCallback && componentScrollCallback(scrollData);
+}, scrollingDelay);
+
+window.addEventListener('scroll', scrollingListenerCallback, true);
+
+/**
  * Creates a magnifier panel component
  * @param {Object} config
  * @param {Number} [config.level] - The default zoom level
@@ -115,7 +158,6 @@ function magnifierPanelFactory(config) {
     var controls = null;
     var observer = null;
     var targetWidth, targetHeight, dx, dy;
-    var scrolling = [];
     var dynamicComponentInstance;
 
     var dynamicComponentConfig = _.defaults(config ? config.component || {} : {}, dynamicComponentDefaultConfig);
@@ -152,8 +194,6 @@ function magnifierPanelFactory(config) {
                 if (controls) {
                     controls.$target = $newTarget;
                     controls.$viewTarget = null;
-
-                    setScrollingListener();
 
                     /**
                      * @event magnifierPanel#targetchange
@@ -296,35 +336,19 @@ function magnifierPanelFactory(config) {
      * Will update the magnifier content with the scrolling position
      * @type {Function}
      */
-    var scrollingListenerCallback = _.throttle(function(event) {
-        var $target = $(event.target);
-        var scrollingTop = event.target.scrollTop;
-        var scrollLeft = event.target.scrollLeft;
-        var scrollId, scrollData;
-
-        //check if the element is already known as a scrollable element
-        if (controls && controls.$clone && $target.data('magnifier-scroll')) {
-            scrollId = $target.data('magnifier-scroll');
-            scrollData = _.find(scrolling, { id: scrollId });
-            scrollData.scrollTop = scrollingTop;
-            scrollData.scrollLeft = scrollLeft;
-
-            //if in clone, scroll it
+    componentScrollCallback = (scrollData) => {
+        if (
+            controls
+            && controls.$clone
+            && controls.$clone.find("[data-magnifier-scroll=".concat(scrollData.id, "]")).length
+        ) {
             scrollInClone(scrollData);
-        } else {
-            //if the element is not yet identified as a scrollable element, tag it and register its id
-            scrollId = _.uniqueId('scrolling_');
-            $target.attr('data-magnifier-scroll', scrollId);
-            scrolling.push({
-                id: scrollId,
-                scrollTop: scrollingTop,
-                scrollLeft: scrollLeft
-            });
 
-            //update all
-            magnifierPanel.update();
+            return;
         }
-    }, scrollingDelay);
+
+        magnifierPanel.update();
+    };
 
     /**
      * Scroll an element in the clone
@@ -347,20 +371,6 @@ function magnifierPanelFactory(config) {
                 }
             }
         }
-    }
-
-    /**
-     * Initializes the listener for scrolling event and transfer the scrolling
-     */
-    function setScrollingListener() {
-        window.addEventListener('scroll', scrollingListenerCallback, true);
-    }
-
-    /**
-     * Stops the listener for scrolling event
-     */
-    function removeScrollingListener() {
-        window.removeEventListener('scroll', scrollingListenerCallback, true);
     }
 
     /**
@@ -461,7 +471,6 @@ function magnifierPanelFactory(config) {
                 subtree: true // Set to true if mutations to target and target's descendants are to be observed.
             });
         }
-        setScrollingListener();
     }
 
     /**
@@ -469,7 +478,6 @@ function magnifierPanelFactory(config) {
      */
     function stopObserver() {
         observer.disconnect();
-        removeScrollingListener();
     }
 
     /**

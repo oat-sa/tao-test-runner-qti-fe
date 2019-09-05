@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -266,17 +266,17 @@ var navigatorApi = {
      * @returns {navigatorApi}
      * @fires navigator#update
      */
-    update: function update(map, context) {
-        var scopedMap = this.getScopedMap(map, context);
-        var progression = scopedMap.stats || {
+    update(map, context) {
+        const scopedMap = this.getScopedMap(map, context);
+        const testPart  = mapHelper.getPart(map, context.testPartId);
+        const progression = scopedMap.stats || {
             questions: 0,
             answered: 0,
             flagged: 0,
             viewed: 0,
             total: 0
         };
-        var totalQuestions = this.getProgressionTotal(progression, 'questions');
-        var activeItem, isSkipaheadEnabled;
+        const totalQuestions = this.getProgressionTotal(progression, 'questions');
 
         this.map = map;
         this.progression = progression;
@@ -289,17 +289,17 @@ var navigatorApi = {
         this.writeCount(this.controls.$infoAll, totalQuestions, null);
 
         // rebuild the tree
-        if (!context.isLinear) {
+        if (!testPart.isLinear) {
             this.controls.$filterBar.show();
             this.controls.$linearState.hide();
             this.controls.$tree.html(navigatorTreeTpl(scopedMap));
 
             this.autoScroll();
 
-            activeItem = mapHelper.getActiveItem(scopedMap);
+            let activeItem = mapHelper.getActiveItem(scopedMap);
             this.setState('prevents-unseen', this.config.preventsUnseen);
 
-            isSkipaheadEnabled =
+            let isSkipaheadEnabled =
                 activeItem &&
                 activeItem.categories &&
                 _.indexOf(activeItem.categories, 'x-tao-option-review-skipahead') >= 0;

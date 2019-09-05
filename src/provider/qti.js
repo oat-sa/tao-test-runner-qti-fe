@@ -172,7 +172,7 @@ var qtiProvider = {
 
         /**
          * Convenience function to load the current item from the testMap
-         * @returns {Object?} the current item if any
+         * @returns {Object?} the current item if any or falsy
          */
         this.getCurrentItem = function getCurrentItem() {
             const testContext = this.getTestContext();
@@ -180,12 +180,11 @@ var qtiProvider = {
             if (testContext && testMap && testContext.itemIdentifier) {
                 return mapHelper.getItem(testMap, testContext.itemIdentifier);
             }
-            return null;
         };
 
         /**
          * Convenience function to load the current section from the testMap
-         * @returns {Object?} the current section if any
+         * @returns {Object?} the current section if any or falsy
          */
         this.getCurrentSection = function getCurrentSection() {
             const testContext = this.getTestContext();
@@ -193,12 +192,11 @@ var qtiProvider = {
             if (testContext && testMap && testContext.sectionId) {
                 return mapHelper.getSection(testMap, testContext.sectionId);
             }
-            return null;
         };
 
         /**
          * Convenience function to load the current part from the testMap
-         * @returns {Object?} the current part if any
+         * @returns {Object?} the current part if any or falsy
          */
         this.getCurrentPart = function getCurrentPart() {
             const testContext = this.getTestContext();
@@ -206,7 +204,6 @@ var qtiProvider = {
             if (testContext && testMap && testContext.testPartId) {
                 return mapHelper.getPart(testMap, testContext.testPartId);
             }
-            return null;
         };
     },
 

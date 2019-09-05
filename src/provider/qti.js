@@ -157,14 +157,57 @@ var qtiProvider = {
      *
      * @this {runner} the runner context, not the provider
      */
-    install: function install() {
+    install() {
         /**
-         * Delegates the udpate of testMap, testContext and testData
+         * Delegates the update of testMap, testContext and testData
          * to a 3rd part component, the dataUpdater.
          */
         this.dataUpdater = dataUpdater(this.getDataHolder());
 
+        /**
+         * The tool state bridge manages the state of the tools (plugins)
+         * it updated directly the store of the plugins when configured to resume their values
+         */
         this.toolStateBridge = toolStateBridgeFactory(this.getTestStore(), _.keys(this.getPlugins()));
+
+        /**
+         * Convenience function to load the current item from the testMap
+         * @returns {Object?} the current item if any
+         */
+        this.getCurrentItem = function getCurrentItem() {
+            const testContext = this.getTestContext();
+            const testMap     = this.getTestMap();
+            if (testContext && testMap && testContext.itemIdentifier) {
+                return mapHelper.getItem(testMap, testContext.itemIdentifier);
+            }
+            return null;
+        };
+
+        /**
+         * Convenience function to load the current section from the testMap
+         * @returns {Object?} the current section if any
+         */
+        this.getCurrentSection = function getCurrentSection() {
+            const testContext = this.getTestContext();
+            const testMap     = this.getTestMap();
+            if (testContext && testMap && testContext.sectionId) {
+                return mapHelper.getSection(testMap, testContext.sectionId);
+            }
+            return null;
+        };
+
+        /**
+         * Convenience function to load the current part from the testMap
+         * @returns {Object?} the current part if any
+         */
+        this.getCurrentPart = function getCurrentPart() {
+            const testContext = this.getTestContext();
+            const testMap     = this.getTestMap();
+            if (testContext && testMap && testContext.testPartId) {
+                return mapHelper.getPart(testMap, testContext.testPartId);
+            }
+            return null;
+        };
     },
 
     /**
@@ -221,7 +264,7 @@ var qtiProvider = {
             };
 
             //if we have to display modal feedbacks, we submit the responses before the move
-            var feedbackPromise = new Promise(function(resolve) {
+            const feedbackPromise = new Promise(resolve => {
                 if (context.hasFeedbacks) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
@@ -232,7 +275,7 @@ var qtiProvider = {
                             self.itemRunner.getResponses(),
                             params
                         )
-                        .then(function(results) {
+                        .then( results => {
                             if (results.itemSession) {
                                 context.itemAnswered = results.itemSession.itemAnswered;
 
@@ -253,7 +296,9 @@ var qtiProvider = {
                         context.itemAnswered = false;
                     } else {
                         // when the test part is linear, the item is always answered as we cannot come back to it
-                        context.itemAnswered = currentItemHelper.isAnswered(self) || context.isLinear;
+                        const testPart = self.getCurrentPart();
+                        const isLinear = testPart && testPart.isLinear;
+                        context.itemAnswered = isLinear || currentItemHelper.isAnswered(self);
                     }
                     self.setTestContext(context);
                     resolve();
@@ -448,7 +493,7 @@ var qtiProvider = {
                  * @returns {String} the label (fallback to the item identifier);
                  */
                 var getItemLabel = function getItemLabel() {
-                    var item = mapHelper.getItem(self.getTestMap(), context.itemIdentifier);
+                    const item = self.getCurrentItem();
                     return item && item.label ? item.label : context.itemIdentifier;
                 };
 

@@ -186,7 +186,7 @@ define([
     QUnit.test('is moving to the next item over a testPart', function(assert) {
         var updatedContext;
 
-        assert.expect(6);
+        assert.expect(5);
 
         updatedContext = testNavigator(testContexts.context3, testMap).nextItem();
 
@@ -202,14 +202,13 @@ define([
             'The updated context contains the correct section id'
         );
         assert.equal(updatedContext.testPartId, 'testPart-2', 'The updated context contains the correct test part id');
-        assert.equal(updatedContext.isLinear, true, 'The updated context contains the correct isLinear option');
         assert.equal(updatedContext.itemAnswered, true, 'The item has been answered since the test part is linear');
     });
 
     QUnit.test('is moving to the next item over timed sections', function(assert) {
         var updatedContext;
 
-        assert.expect(6);
+        assert.expect(5);
 
         updatedContext = testNavigator(testContexts.context4, testMap).nextItem();
 
@@ -225,7 +224,6 @@ define([
             'The updated context contains the correct section id'
         );
         assert.equal(updatedContext.testPartId, 'testPart-1', 'The updated context contains the correct test part id');
-        assert.equal(updatedContext.isLinear, false, 'The updated context contains the correct isLinear option');
         assert.deepEqual(
             updatedContext.timeConstraints,
             [
@@ -280,7 +278,7 @@ define([
     QUnit.test('is moving to the next section', function(assert) {
         var updatedContext;
 
-        assert.expect(6);
+        assert.expect(5);
 
         updatedContext = testNavigator(testContexts.context4, testMap).nextSection();
 
@@ -296,7 +294,6 @@ define([
             'The updated context contains the correct section id'
         );
         assert.equal(updatedContext.testPartId, 'testPart-1', 'The updated context contains the correct test part id');
-        assert.equal(updatedContext.isLinear, false, 'The updated context contains the correct isLinear option');
         assert.deepEqual(
             updatedContext.timeConstraints,
             [

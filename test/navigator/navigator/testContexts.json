@@ -2,7 +2,6 @@
   "context1": {
     "state": 1,
     "remainingAttempts": -1,
-    "isLinear": false,
     "attempt": 1,
     "isTimeout": false,
     "itemIdentifier": "item-1",
@@ -35,7 +34,6 @@
   "context2": {
     "state": 1,
     "remainingAttempts": -1,
-    "isLinear": false,
     "attempt": 1,
     "isTimeout": false,
     "itemIdentifier": "item-3",
@@ -68,7 +66,6 @@
   "context3": {
     "state": 1,
     "remainingAttempts": -1,
-    "isLinear": false,
     "attempt": 1,
     "isTimeout": false,
     "itemIdentifier": "item-14",
@@ -102,7 +99,6 @@
   "context4": {
     "state": 1,
     "remainingAttempts": -1,
-    "isLinear": false,
     "attempt": 1,
     "isTimeout": false,
     "itemIdentifier": "item-6",
@@ -149,7 +145,6 @@
   "context5": {
     "state": 1,
     "remainingAttempts": -1,
-    "isLinear": true,
     "attempt": 1,
     "isTimeout": false,
     "itemIdentifier": "item-17",

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -126,7 +126,8 @@ function updateButton(button, data) {
 function canFlag(testRunner) {
     const testContext = testRunner.getTestContext();
     const testMap = testRunner.getTestMap();
-    const item = mapHelper.getItemAt(testMap, testContext.itemPosition);
+    const item = testRunner.getCurrentItem();
+    const testPart = testRunner.getCurrentPart();
     const markReviewCategory = mapHelper.hasItemCategory(
         testMap,
         testContext.itemIdentifier,
@@ -134,7 +135,7 @@ function canFlag(testRunner) {
         true
     );
 
-    return !!(!testContext.isLinear && markReviewCategory && !(item && item.informational));
+    return !!(!testPart.isLinear && markReviewCategory && !(item && item.informational));
 }
 
 /**
@@ -345,6 +346,7 @@ export default pluginFactory({
             .on('loaditem', function() {
                 const context = testRunner.getTestContext();
                 const map = testRunner.getTestMap();
+                const testPart = testRunner.getCurrentPart();
                 const categories = getReviewCategories();
 
                 if (isPluginAllowed()) {
@@ -353,7 +355,7 @@ export default pluginFactory({
                         getFlagItemButtonData(isItemFlagged(map, context.itemPosition))
                     );
                     self.navigator.update(map, context).updateConfig({
-                        canFlag: !context.isLinear && categories.markReview
+                        canFlag: !testPart.isLinear && categories.markReview
                     });
                     self.show();
                     updateButton(self.toggleButton, getToggleButtonData(self.navigator));

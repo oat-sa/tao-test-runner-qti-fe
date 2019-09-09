@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2018-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -35,15 +35,15 @@
  * @returns {strategy|Boolean} the strategy if applies or false
  */
 export default function guidedNavigationStrategy(testRunner, timer) {
-    var testContext = testRunner.getTestContext();
-    var testRunnerOptions = testRunner.getOptions();
+    const testRunnerOptions = testRunner.getOptions();
+    const testPart = testRunner.getCurrentPart();
 
     if (
         timer &&
         timer.type === 'locked' &&
         timer.scope === 'item' &&
         testRunnerOptions.guidedNavigation === true &&
-        testContext.isLinear === true
+        testPart && testPart.isLinear
     ) {
         return {
             name: 'guidedNavigation',

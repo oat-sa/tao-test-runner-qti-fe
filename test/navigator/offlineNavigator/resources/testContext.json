@@ -1,12 +1,10 @@
 {
   "state": 1,
   "remainingAttempts": 0,
-  "isLinear": true,
   "isTimeout": false,
   "itemIdentifier": "Q01",
   "attempt": 1,
   "itemSessionState": 1,
-  "isCatAdaptive": false,
   "needMapUpdate": false,
   "itemPosition": 0,
   "itemAnswered": true,

@@ -20,8 +20,7 @@ define([
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/navigation/next/linearNextItemWarning',
-    'taoQtiTest/runner/helpers/map'
-], function(runnerFactory, providerMock, pluginFactory, mapHelper) {
+], function(runnerFactory, providerMock, pluginFactory) {
     'use strict';
 
     var pluginApi;
@@ -45,68 +44,52 @@ define([
         );
     });
 
-    pluginApi = [
-        {
-            name: 'init',
-            title: 'init'
-        },
-        {
-            name: 'render',
-            title: 'render'
-        },
-        {
-            name: 'finish',
-            title: 'finish'
-        },
-        {
-            name: 'destroy',
-            title: 'destroy'
-        },
-        {
-            name: 'trigger',
-            title: 'trigger'
-        },
-        {
-            name: 'getTestRunner',
-            title: 'getTestRunner'
-        },
-        {
-            name: 'getAreaBroker',
-            title: 'getAreaBroker'
-        },
-        {
-            name: 'getConfig',
-            title: 'getConfig'
-        },
-        {
-            name: 'setConfig',
-            title: 'setConfig'
-        },
-        {
-            name: 'getState',
-            title: 'getState'
-        },
-        {
-            name: 'setState',
-            title: 'setState'
-        },
-        {
-            name: 'show',
-            title: 'show'
-        },
-        {
-            name: 'hide',
-            title: 'hide'
-        },
-        {
-            name: 'enable',
-            title: 'enable'
-        },
-        {
-            name: 'disable',
-            title: 'disable'
-        }
-    ];
+    pluginApi = [{
+        name: 'init',
+        title: 'init'
+    }, {
+        name: 'render',
+        title: 'render'
+    }, {
+        name: 'finish',
+        title: 'finish'
+    }, {
+        name: 'destroy',
+        title: 'destroy'
+    }, {
+        name: 'trigger',
+        title: 'trigger'
+    }, {
+        name: 'getTestRunner',
+        title: 'getTestRunner'
+    }, {
+        name: 'getAreaBroker',
+        title: 'getAreaBroker'
+    }, {
+        name: 'getConfig',
+        title: 'getConfig'
+    }, {
+        name: 'setConfig',
+        title: 'setConfig'
+    }, {
+        name: 'getState',
+        title: 'getState'
+    }, {
+        name: 'setState',
+        title: 'setState'
+    }, {
+        name: 'show',
+        title: 'show'
+    }, {
+        name: 'hide',
+        title: 'hide'
+    }, {
+        name: 'enable',
+        title: 'enable'
+    }, {
+        name: 'disable',
+        title: 'disable'
+    }];
 
     QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
         assert.expect(1);
@@ -130,6 +113,7 @@ define([
             'Part1': {
                 id: 'Part1',
                 position: 0,
+                isLinear: true,
                 sections: {
                     'Section1': {
                         id: 'Section1',
@@ -148,255 +132,249 @@ define([
                 }
             }
         },
-        jumps: [
-            {
-                identifier: "FirstItem",
-                section: "Section1",
-                part: "Part1",
-                position: 0
-            },
-            {
-                identifier: "LastItem",
-                section: "Section1",
-                part: "Part1",
-                position: 1
-            }
-        ]
+        jumps: [{
+            identifier: "FirstItem",
+            section: "Section1",
+            part: "Part1",
+            position: 0
+        }, {
+            identifier: "LastItem",
+            section: "Section1",
+            part: "Part1",
+            position: 1
+        }]
     };
 
     // No dialog expected
-    QUnit.cases
-        .init([
-            {
-                title: 'when the next part warning is set',
-                testContext: {
-                    enableAllowSkipping: false,
-                    allowSkipping: false,
-                    options: {
-                        nextPartWarning: true,
-                        nextSectionWarning: false
-                    },
-                    itemIdentifier: 'FirstItem',
-                    itemPosition: 0
-                },
-                item: {
-                    informational: false
-                }
+    QUnit.cases.init([{
+        title: 'when the next part warning is set',
+        testContext: {
+            enableAllowSkipping: false,
+            allowSkipping: false,
+            options: {
+                nextPartWarning: true,
+                nextSectionWarning: false
             },
-            {
-                title: 'when the next section warning is set',
-                testContext: {
-                    isLinear: true,
-                    options: {
-                        nextPartWarning: false,
-                        nextSectionWarning: true
-                    },
-                    itemIdentifier: 'FirstItem',
-                    itemPosition: 0
-                },
-                scope: 'section',
-                item: {
-                    informational: false
-                }
-            },
-            {
-                title: 'when the item is informational',
-                testContext: {
-                    isLinear: true,
-                    options: {
-                        nextPartWarning: false,
-                        nextSectionWarning: false
-                    },
-                    itemIdentifier: 'FirstItem',
-                    itemPosition: 0
-                },
-                item: {
-                    informational: true
-                }
-            },
-            {
-                title: 'when the item is the last item',
-                testContext: {
-                    isLinear: true,
-                    options: {
-                        nextPartWarning: false,
-                        nextSectionWarning: false
-                    },
-                    itemIdentifier: 'LastItem',
-                    itemPosition: 1
-                },
-                item: {
-                    informational: false
-                }
-            },
-            {
-                title: 'when the config setting is undefined',
-                testContext: {
-                    options: {
-                        nextPartWarning: false,
-                        nextSectionWarning: false
-                    },
-                    isLinear: true,
-                    itemIdentifier: 'FirstItem',
-                    itemPosition: 0
-                },
-                item: {
-                    informational: false
-                }
-            },
-            {
-                title: 'when the config setting is explicitly false',
-                testContext: {
-                    options: {
-                        nextPartWarning: false,
-                        nextSectionWarning: false
-                    },
-                    isLinear: true,
-                    itemIdentifier: 'FirstItem',
-                    itemPosition: 0
-                },
-                testConfig: {
-                    forceEnableLinearNextItemWarning: false
-                },
-                item: {
-                    informational: false
-                }
-            },
-            {
-                title: 'when the test is not linear',
-                testContext: {
-                    options: {
-                        nextPartWarning: false,
-                        nextSectionWarning: false
-                    },
-                    isLinear: false,
-                    itemIdentifier: 'FirstItem',
-                    itemPosition: 0
-                },
-                item: {
-                    informational: false
-                }
-            }
-        ])
-        .test('No dialog is triggered ', function(caseData, assert) {
-            var ready = assert.async();
-            var runner = runnerFactory(providerName, {}, {
-                options : caseData.testConfig
-            });
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
+        },
+        item: {
+            informational: false
+        },
+        isLinear : true,
 
-            // mock test store init
-            runner.getTestStore = function() {
-                return {
-                    setVolatile: function() {}
-                };
-            };
-            // mock the item we will get (informational or not)
-            mapHelper.getItemAt = function() {
-                return caseData.item;
-            };
-
-            assert.expect(1);
-
-            plugin
-                .init()
-                .then(function() {
-                    runner.setTestContext(caseData.testContext);
-                    runner.setTestMap(testMap);
-
-                    // dialog would be instantiated *before* move occurs
-                    runner.on('move', function() {
-                        assert.ok(true, 'The move took place without interruption');
-                        runner.destroy();
-                        ready();
-                        return Promise.reject();
-                    });
-                    runner.trigger('move', 'next', caseData.scope);
-                })
-                .catch(function(err) {
-                    assert.ok(false, err.message);
-                    ready();
-                });
+    }, {
+        title: 'when the next section warning is set',
+        testContext: {
+            isLinear: true,
+            options: {
+                nextPartWarning: false,
+                nextSectionWarning: true
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
+        },
+        scope: 'section',
+        item: {
+            informational: false
+        },
+        isLinear : true
+    }, {
+        title: 'when the item is informational',
+        testContext: {
+            isLinear: true,
+            options: {
+                nextPartWarning: false,
+                nextSectionWarning: false
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
+        },
+        item: {
+            informational: true
+        },
+        isLinear : true
+    }, {
+        title: 'when the item is the last item',
+        testContext: {
+            isLinear: true,
+            options: {
+                nextPartWarning: false,
+                nextSectionWarning: false
+            },
+            itemIdentifier: 'LastItem',
+            itemPosition: 1
+        },
+        item: {
+            informational: false
+        },
+        isLinear : true
+    }, {
+        title: 'when the config setting is undefined',
+        testContext: {
+            options: {
+                nextPartWarning: false,
+                nextSectionWarning: false
+            },
+            isLinear: true,
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
+        },
+        item: {
+            informational: false
+        },
+        isLinear : true
+    }, {
+        title: 'when the config setting is explicitly false',
+        testContext: {
+            options: {
+                nextPartWarning: false,
+                nextSectionWarning: false
+            },
+            isLinear: true,
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
+        },
+        testConfig: {
+            forceEnableLinearNextItemWarning: false
+        },
+        item: {
+            informational: false
+        },
+        isLinear : true
+    }, {
+        title: 'when the test is not linear',
+        testContext: {
+            options: {
+                nextPartWarning: false,
+                nextSectionWarning: false
+            },
+            isLinear: false,
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
+        },
+        item: {
+            informational: false
+        },
+        isLinear : false
+    }]).test('No dialog is triggered ', function(caseData, assert) {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, {
+            options : caseData.testConfig
         });
+        var plugin = pluginFactory(runner, runner.getAreaBroker());
+
+        // mock test store init
+        runner.getTestStore = function() {
+            return {
+                setVolatile: function() {}
+            };
+        };
+        runner.getCurrentItem = () => caseData.item;
+        runner.getCurrentPart = () => Object.assign({
+            isLinear : caseData.isLinear
+        }, testMap.part);
+
+        assert.expect(1);
+
+        plugin
+            .init()
+            .then(function() {
+                runner.setTestContext(caseData.testContext);
+                runner.setTestMap(testMap);
+
+                // dialog would be instantiated *before* move occurs
+                runner.on('move', function() {
+                    assert.ok(true, 'The move took place without interruption');
+                    runner.destroy();
+                    ready();
+                    return Promise.reject();
+                });
+                runner.trigger('move', 'next', caseData.scope);
+            })
+            .catch(function(err) {
+                assert.ok(false, err.message);
+                ready();
+            });
+    });
 
     // Dialog expected
-    QUnit.cases
-        .init([
-            {
-                title: 'when a next warning is needed',
-                event: 'next',
-                testContext: {
-                    isLinear: true,
-                    options: {
-                        nextPartWarning: false,
-                        nextSectionWarning: false
-                    },
-                    itemIdentifier: 'FirstItem',
-                    itemPosition: 0
-                },
-                testConfig: {
-                    forceEnableLinearNextItemWarning: true
-                },
-                item: {
-                    informational: false
-                }
+    QUnit.cases.init([{
+        title: 'when a next warning is needed',
+        event: 'next',
+        testContext: {
+            options: {
+                nextPartWarning: false,
+                nextSectionWarning: false
             },
-            {
-                title: 'when a skip warning is needed',
-                event: 'skip',
-                testContext: {
-                    isLinear: true,
-                    options: {
-                        nextPartWarning: false,
-                        nextSectionWarning: false
-                    },
-                    itemIdentifier: 'FirstItem',
-                    itemPosition: 0
-                },
-                testConfig: {
-                    forceEnableLinearNextItemWarning: true
-                },
-                item: {
-                    informational: false
-                }
-            }
-        ])
-        .test('Dialog will be triggered ', function(caseData, assert) {
-            var ready = assert.async();
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
+        },
+        testConfig: {
+            forceEnableLinearNextItemWarning: true
+        },
+        item: {
+            informational: false
+        },
+        isLinear : true
+    }, {
+        title: 'when a skip warning is needed',
+        event: 'skip',
+        testContext: {
+            options: {
+                nextPartWarning: false,
+                nextSectionWarning: false
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
+        },
+        testConfig: {
+            forceEnableLinearNextItemWarning: true
+        },
+        item: {
+            informational: false
+        },
+        isLinear : true
+    }]).test('Dialog will be triggered ', function(caseData, assert) {
+        const ready = assert.async();
 
-            var runner = runnerFactory(providerName, {}, {
-                options : caseData.testConfig
-            });
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+        const runner = runnerFactory(providerName, {}, {
+            options : caseData.testConfig
+        });
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-            // mock test store init
-            runner.getTestStore = function() {
-                return {
-                    getStore: function() {
-                        return Promise.reject();
-                    },
-                    setVolatile: function() {}
-                };
+        // mock test store init
+        runner.getTestStore = function() {
+            return {
+                getStore: function() {
+                    return Promise.reject();
+                },
+                setVolatile: function() {}
             };
+        };
+        runner.getCurrentItem = () => caseData.item;
+        runner.getCurrentPart = () => Object.assign({
+            isLinear : caseData.isLinear
+        }, testMap.part);
 
-            assert.expect(1);
+        assert.expect(1);
 
-            plugin
-                .init()
-                .then(function() {
-                    runner.setTestContext(caseData.testContext);
-                    runner.setTestMap(testMap);
+        plugin
+            .init()
+            .then(function() {
+                runner.setTestContext(caseData.testContext);
+                runner.setTestMap(testMap);
 
-                    runner.on('disablenav', function() {
-                        assert.ok(true, 'The dialog interrupted the move');
-                        runner.destroy();
-                        ready();
-                    });
-                    runner.trigger('move', caseData.event);
-                })
-                .catch(function(err) {
-                    assert.ok(false, err.message);
+                runner.on('disablenav', function() {
+                    assert.ok(true, 'The dialog interrupted the move');
+                    runner.destroy();
                     ready();
                 });
-        });
+                runner.trigger('move', caseData.event);
+            })
+            .catch(function(err) {
+                assert.ok(false, err.message);
+                ready();
+            });
+    });
 });

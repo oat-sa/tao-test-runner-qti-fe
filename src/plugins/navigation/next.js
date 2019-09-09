@@ -125,6 +125,7 @@ export default pluginFactory({
         function doNext(nextItemWarning) {
             const testContext = testRunner.getTestContext();
             const testMap = testRunner.getTestMap();
+            const testPart = testRunner.getCurrentPart();
             const nextItemPosition = testContext.itemPosition + 1;
             const itemIdentifier = testContext.itemIdentifier;
 
@@ -152,7 +153,7 @@ export default pluginFactory({
                 const warningHelper = nextWarningHelper({
                     endTestWarning: endTestWarning,
                     isLast: isLastItem(),
-                    isLinear: testContext.isLinear,
+                    isLinear: testPart.isLinear,
                     nextItemWarning: nextItemWarning,
                     nextPartWarning: nextPartWarning,
                     nextPart: mapHelper.getItemPart(testMap, nextItemPosition),

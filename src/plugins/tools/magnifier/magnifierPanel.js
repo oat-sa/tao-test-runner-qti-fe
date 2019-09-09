@@ -350,9 +350,54 @@ function magnifierPanelFactory(config) {
     }
 
     /**
+     * Capture all scroll positions of elements inside current target
+     */
+    function updateScrollPositions() {
+        if (!controls || !controls.$target) {
+            return;
+        }
+
+        const elements = [controls.$target];
+        let scrollOffsetsChanged = false;
+
+        while (elements.length) {
+            const $currentElement = $(elements.shift());
+            const scrollLeft = $currentElement.scrollLeft();
+            const scrollTop = $currentElement.scrollTop();
+
+            elements.push(...Array.from($currentElement.children()));
+
+            if (scrollLeft > 0 || scrollTop > 0) {
+                let scrollId = $currentElement.data('magnifier-scroll');
+                scrollOffsetsChanged = true;
+
+                if (scrollId) {
+                    const scrollData = _.find(scrolling, { id: scrollId });
+                    scrollData.scrollTop = scrollTop;
+                    scrollData.scrollLeft = scrollLeft;
+                } else {
+                    scrollId = _.uniqueId('scrolling_');
+                    $currentElement.attr('data-magnifier-scroll', scrollId);
+                    scrolling.push({
+                        id: scrollId,
+                        scrollTop,
+                        scrollLeft,
+                    });
+                }
+            }
+        }
+
+        // If there is any changes to scroll offset inside the target the magnifier should be updated
+        if (scrollOffsetsChanged) {
+            magnifierPanel.update();
+        }
+    }
+
+    /**
      * Initializes the listener for scrolling event and transfer the scrolling
      */
     function setScrollingListener() {
+        updateScrollPositions();
         window.addEventListener('scroll', scrollingListenerCallback, true);
     }
 

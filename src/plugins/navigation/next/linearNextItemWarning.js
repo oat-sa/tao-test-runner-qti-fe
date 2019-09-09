@@ -37,7 +37,7 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
+    init() {
         const self = this;
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
@@ -167,27 +167,28 @@ export default pluginFactory({
                 });
             })
             .before('move skip', function(e, type, scope) {
-                const context = testRunner.getTestContext();
-                const map = testRunner.getTestMap();
-                const item = mapHelper.getItemAt(map, context.itemPosition);
-                const categories = getNextItemCategories();
+                const context     = testRunner.getTestContext();
+                const item        = testRunner.getCurrentItem();
+                const currentPart = testRunner.getCurrentPart();
+                const categories  = getNextItemCategories();
 
-                if (context.isLinear) {
+                if (currentPart && currentPart.isLinear) {
                     // Do nothing if nextSection warning imminent:
                     if (scope === 'section' && categories.nextSectionWarning) {
                         return;
-                    }
+
                     // Do nothing if endOfPart warning imminent:
-                    else if (categories.nextPartWarning) {
+                    } else if (categories.nextPartWarning) {
                         return;
-                    }
+
                     // Do nothing if 'informational item':
-                    else if (item.informational) {
+                    } else if (item.informational) {
                         return;
-                    }
+
                     // Show dialog if conditions met:
-                    else if (type === 'next' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
+                    } else if (type === 'next' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('next');
+
                     } else if (e.name === 'skip' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('skip');
                     }

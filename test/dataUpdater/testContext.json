@@ -1,7 +1,6 @@
 {
   "state": 1,
   "remainingAttempts": -1,
-  "isLinear": false,
   "attempt": 1,
   "isTimeout": false,
   "itemIdentifier": "item-1",

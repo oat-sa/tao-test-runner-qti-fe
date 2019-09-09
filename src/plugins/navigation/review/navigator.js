@@ -296,10 +296,10 @@ var navigatorApi = {
 
             this.autoScroll();
 
-            let activeItem = mapHelper.getActiveItem(scopedMap);
+            const activeItem = mapHelper.getActiveItem(scopedMap);
             this.setState('prevents-unseen', this.config.preventsUnseen);
 
-            let isSkipaheadEnabled =
+            const isSkipaheadEnabled =
                 activeItem &&
                 activeItem.categories &&
                 _.indexOf(activeItem.categories, 'x-tao-option-review-skipahead') >= 0;

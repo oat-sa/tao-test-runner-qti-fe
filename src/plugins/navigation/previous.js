@@ -54,6 +54,7 @@ export default pluginFactory({
         var canDoPrevious = function canDoPrevious() {
             const testMap = testRunner.getTestMap();
             const context = testRunner.getTestContext();
+            const currentSection = testRunner.getCurrentSection();
             const noExitTimedSectionWarning = mapHelper.hasItemCategory(
                 testMap,
                 context.itemIdentifier,
@@ -78,7 +79,7 @@ export default pluginFactory({
             if (navigationHelper.isFirstOf(testMap, context.itemIdentifier, 'section')) {
                 //when entering an adaptive section,
                 //you can't leave the section from the beginning
-                if (context.isCatAdaptive) {
+                if (currentSection.isCatAdaptive) {
                     return false;
                 }
 

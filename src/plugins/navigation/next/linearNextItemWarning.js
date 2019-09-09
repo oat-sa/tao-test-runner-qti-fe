@@ -169,11 +169,11 @@ export default pluginFactory({
             })
             .before('move skip', function(e, type, scope) {
                 const context     = testRunner.getTestContext();
-		const map         = testRunner.getTestMap();
+                const map         = testRunner.getTestMap();
                 const item        = testRunner.getCurrentItem();
                 const currentPart = testRunner.getCurrentPart();
                 const categories  = getNextItemCategories();
-		const isLast      = navigationHelper.isLast(map, context.itemIdentifier);
+                const isLast      = navigationHelper.isLast(map, context.itemIdentifier);
 
                 if (currentPart && currentPart.isLinear) {
                     // Do nothing if nextSection warning imminent:

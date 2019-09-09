@@ -155,20 +155,17 @@ define([
                 }
             }
         },
-        jumps: [
-            {
-                identifier: "FirstItem",
-                section: "Section1",
-                part: "Part1",
-                position: 0
-            },
-            {
-                identifier: "LastItem",
-                section: "Section1",
-                part: "Part1",
-                position: 1
-            }
-        ]
+        jumps: [{
+            identifier: "FirstItem",
+            section: "Section1",
+            part: "Part1",
+            position: 0
+        }, {
+            identifier: "LastItem",
+            section: "Section1",
+            part: "Part1",
+            position: 1
+        }]
     };
 
     const testContext = {

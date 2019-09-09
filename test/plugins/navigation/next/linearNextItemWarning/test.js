@@ -166,7 +166,6 @@ define([
     }, {
         title: 'when the next section warning is set',
         testContext: {
-            isLinear: true,
             options: {
                 nextPartWarning: false,
                 nextSectionWarning: true
@@ -182,7 +181,6 @@ define([
     }, {
         title: 'when the item is informational',
         testContext: {
-            isLinear: true,
             options: {
                 nextPartWarning: false,
                 nextSectionWarning: false
@@ -197,7 +195,6 @@ define([
     }, {
         title: 'when the item is the last item',
         testContext: {
-            isLinear: true,
             options: {
                 nextPartWarning: false,
                 nextSectionWarning: false
@@ -216,7 +213,6 @@ define([
                 nextPartWarning: false,
                 nextSectionWarning: false
             },
-            isLinear: true,
             itemIdentifier: 'FirstItem',
             itemPosition: 0
         },
@@ -231,7 +227,6 @@ define([
                 nextPartWarning: false,
                 nextSectionWarning: false
             },
-            isLinear: true,
             itemIdentifier: 'FirstItem',
             itemPosition: 0
         },
@@ -249,7 +244,6 @@ define([
                 nextPartWarning: false,
                 nextSectionWarning: false
             },
-            isLinear: false,
             itemIdentifier: 'FirstItem',
             itemPosition: 0
         },

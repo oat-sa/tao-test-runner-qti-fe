@@ -26,6 +26,11 @@ define([
 ], function(_, progressHelper, mapSample) {
     'use strict';
 
+    const linearMapSample = _.cloneDeep(mapSample);
+    Object.values(linearMapSample.parts).forEach( part => {
+        part.isLinear = true;
+    });
+
     QUnit.module('helpers/progress');
 
     QUnit.test('module', function(assert) {
@@ -55,9 +60,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -110,9 +112,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -165,9 +164,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -224,9 +220,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -287,9 +280,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -350,9 +340,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -416,9 +403,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -479,9 +463,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -542,9 +523,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -608,9 +586,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -671,9 +646,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -734,9 +706,6 @@ define([
                 itemPosition: 3,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-1',
-                numberCompleted: 3,
-                numberItems: 12,
-                isLinear: false,
                 itemAnswered: true
             },
             expected: {
@@ -794,14 +763,11 @@ define([
                 scope: 'test',
                 categories: []
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -849,14 +815,11 @@ define([
                 scope: 'testPart',
                 categories: []
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -904,14 +867,11 @@ define([
                 scope: 'testSection',
                 categories: []
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -963,14 +923,11 @@ define([
                 indicator: 'categories',
                 categories: []
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1026,14 +983,11 @@ define([
                 indicator: 'categories',
                 categories: []
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1089,14 +1043,11 @@ define([
                 indicator: 'categories',
                 categories: []
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1155,14 +1106,11 @@ define([
                 indicator: 'categories',
                 categories: ['SCORED']
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1218,14 +1166,11 @@ define([
                 indicator: 'categories',
                 categories: ['SCORED']
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1281,14 +1226,11 @@ define([
                 indicator: 'categories',
                 categories: ['SCORED']
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1347,14 +1289,11 @@ define([
                 indicator: 'categories',
                 categories: ['SCORED', 'CAT2']
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1410,14 +1349,11 @@ define([
                 indicator: 'categories',
                 categories: ['SCORED', 'CAT2']
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1473,14 +1409,11 @@ define([
                 indicator: 'categories',
                 categories: ['SCORED', 'CAT2']
             },
-            testMap: mapSample,
+            testMap: linearMapSample,
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
                 sectionId: 'assessmentSection-2',
-                numberCompleted: 2,
-                numberItems: 12,
-                isLinear: true,
                 itemAnswered: true
             },
             expected: {
@@ -1821,7 +1754,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -1843,7 +1775,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -1865,7 +1796,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -1887,7 +1817,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -1910,7 +1839,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -1932,7 +1860,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -1954,7 +1881,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -1976,7 +1902,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -1998,7 +1923,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -2021,7 +1945,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -2043,7 +1966,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -2065,7 +1987,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -2087,7 +2008,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -2109,7 +2029,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {
@@ -2132,7 +2051,6 @@ define([
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
             numberItems: 12,
-            isLinear: false,
             itemAnswered: true
         },
         expected: {

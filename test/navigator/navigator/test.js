@@ -20,10 +20,9 @@
  */
 define([
     'taoQtiTest/runner/navigator/navigator',
-    'json!taoQtiTest/test/runner/navigator/navigator/testData.json',
     'json!taoQtiTest/test/runner/navigator/navigator/testMap.json',
     'json!taoQtiTest/test/runner/navigator/navigator/testContexts.json'
-], function(testNavigator, testData, testMap, testContexts) {
+], function(testNavigator, testMap, testContexts) {
     'use strict';
 
     QUnit.module('API');
@@ -47,7 +46,7 @@ define([
 
         assert.throws(
             function() {
-                testNavigator(testData);
+                testNavigator({});
             },
             TypeError,
             'factory called without all parameters'
@@ -55,16 +54,16 @@ define([
 
         assert.throws(
             function() {
-                testNavigator(testData, {});
+                testNavigator(testContexts.context1);
             },
             TypeError,
             'factory called without all parameters'
         );
 
-        assert.equal(typeof testNavigator(testData, {}, testMap), 'object', 'The factory creates an object');
+        assert.equal(typeof testNavigator({}, testMap), 'object', 'The factory creates an object');
         assert.notEqual(
-            testNavigator(testData, {}, testMap),
-            testNavigator(testData, {}, testMap),
+            testNavigator({}, testMap),
+            testNavigator({}, testMap),
             'The factory creates new objects'
         );
     });
@@ -91,7 +90,7 @@ define([
             assert.expect(1);
 
             assert.equal(
-                typeof testNavigator(testData, {}, testMap)[data.title],
+                typeof testNavigator({}, testMap)[data.title],
                 'function',
                 `The instance exposes a "${  data.title  }" method`
             );
@@ -104,7 +103,7 @@ define([
 
         assert.expect(6);
 
-        updatedContext = testNavigator(testData, testContexts.context1, testMap).nextItem();
+        updatedContext = testNavigator(testContexts.context1, testMap).nextItem();
 
         assert.equal(
             updatedContext.itemIdentifier,
@@ -140,7 +139,7 @@ define([
 
         assert.expect(6);
 
-        updatedContext = testNavigator(testData, testContexts.context2, testMap).nextItem();
+        updatedContext = testNavigator(testContexts.context2, testMap).nextItem();
 
         assert.equal(
             updatedContext.itemIdentifier,
@@ -187,9 +186,9 @@ define([
     QUnit.test('is moving to the next item over a testPart', function(assert) {
         var updatedContext;
 
-        assert.expect(6);
+        assert.expect(5);
 
-        updatedContext = testNavigator(testData, testContexts.context3, testMap).nextItem();
+        updatedContext = testNavigator(testContexts.context3, testMap).nextItem();
 
         assert.equal(
             updatedContext.itemIdentifier,
@@ -203,16 +202,15 @@ define([
             'The updated context contains the correct section id'
         );
         assert.equal(updatedContext.testPartId, 'testPart-2', 'The updated context contains the correct test part id');
-        assert.equal(updatedContext.isLinear, true, 'The updated context contains the correct isLinear option');
         assert.equal(updatedContext.itemAnswered, true, 'The item has been answered since the test part is linear');
     });
 
     QUnit.test('is moving to the next item over timed sections', function(assert) {
         var updatedContext;
 
-        assert.expect(6);
+        assert.expect(5);
 
-        updatedContext = testNavigator(testData, testContexts.context4, testMap).nextItem();
+        updatedContext = testNavigator(testContexts.context4, testMap).nextItem();
 
         assert.equal(
             updatedContext.itemIdentifier,
@@ -226,7 +224,6 @@ define([
             'The updated context contains the correct section id'
         );
         assert.equal(updatedContext.testPartId, 'testPart-1', 'The updated context contains the correct test part id');
-        assert.equal(updatedContext.isLinear, false, 'The updated context contains the correct isLinear option');
         assert.deepEqual(
             updatedContext.timeConstraints,
             [
@@ -248,7 +245,7 @@ define([
 
         assert.expect(1);
 
-        updatedContext = testNavigator(testData, testContexts.context5, testMap).nextItem();
+        updatedContext = testNavigator(testContexts.context5, testMap).nextItem();
         assert.equal(updatedContext, false, 'There is no next item');
     });
 
@@ -259,7 +256,7 @@ define([
 
         assert.expect(5);
 
-        updatedContext = testNavigator(testData, testContexts.context2, testMap).previousItem();
+        updatedContext = testNavigator(testContexts.context2, testMap).previousItem();
 
         assert.equal(
             updatedContext.itemIdentifier,
@@ -281,9 +278,9 @@ define([
     QUnit.test('is moving to the next section', function(assert) {
         var updatedContext;
 
-        assert.expect(6);
+        assert.expect(5);
 
-        updatedContext = testNavigator(testData, testContexts.context4, testMap).nextSection();
+        updatedContext = testNavigator(testContexts.context4, testMap).nextSection();
 
         assert.equal(
             updatedContext.itemIdentifier,
@@ -297,7 +294,6 @@ define([
             'The updated context contains the correct section id'
         );
         assert.equal(updatedContext.testPartId, 'testPart-1', 'The updated context contains the correct test part id');
-        assert.equal(updatedContext.isLinear, false, 'The updated context contains the correct isLinear option');
         assert.deepEqual(
             updatedContext.timeConstraints,
             [
@@ -321,7 +317,7 @@ define([
 
         assert.expect(5);
 
-        updatedContext = testNavigator(testData, testContexts.context4, testMap).jumpItem(3);
+        updatedContext = testNavigator(testContexts.context4, testMap).jumpItem(3);
 
         assert.equal(
             updatedContext.itemIdentifier,
@@ -354,7 +350,7 @@ define([
     QUnit.module('navigator.navigate');
 
     QUnit.test('executes the correct movement', function(assert) {
-        var aTestNaviagtor = testNavigator(testData, testContexts.context4, testMap);
+        var aTestNaviagtor = testNavigator(testContexts.context4, testMap);
 
         assert.expect(5);
 

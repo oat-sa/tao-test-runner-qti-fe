@@ -52,7 +52,7 @@ export default pluginFactory({
         var self = this;
         var testRunner = this.getTestRunner();
         var proxy = testRunner.getProxy();
-        var config = _.defaults(this.getConfig() || {}, defaultConfig);
+        var config = Object.assign({}, defaultConfig, this.getConfig());
 
         //Displays a connectivity indicator
         if (config && config.indicator) {

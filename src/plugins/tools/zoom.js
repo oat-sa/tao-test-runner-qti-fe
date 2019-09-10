@@ -26,6 +26,7 @@ import transformer from 'ui/transformer';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * The standard zoom level, in percentage
@@ -104,19 +105,21 @@ export default pluginFactory({
     init: function init() {
         var self = this;
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData() || {};
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+        var testRunnerOptions = testRunner.getOptions();
+        var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
          * Checks if the plugin is currently available
          * @returns {Boolean}
          */
         function isConfigured() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-zoom
-            return !!options.zoom;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'zoom',
+                true
+            );
         }
 
         /**
@@ -204,7 +207,7 @@ export default pluginFactory({
             testRunner.trigger('tool-zoomout');
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.in) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.in, this.getName(), true),

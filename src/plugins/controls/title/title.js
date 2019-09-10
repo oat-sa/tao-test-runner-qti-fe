@@ -24,26 +24,37 @@
 import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';
 import titleTpl from 'taoQtiTest/runner/plugins/controls/title/title.tpl';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 export default pluginFactory({
     name: 'title',
     init: function init() {
         var self = this;
         var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
+        var testMap = testRunner.getTestMap();
 
         var createElement = function() {
-            var context = testRunner.getTestContext();
-            var titles = [
+            const testContext = testRunner.getTestContext();
+
+            const titles = [
                 {
                     control: 'qti-test-title',
-                    text: testData.title
+                    text: testMap.title || ''
                 }
             ];
-            if (context.isDeepestSectionVisible) {
+
+            //@deprecated the following block seems to
+            //be very specific and need to be reworked
+            if (testContext.isDeepestSectionVisible) {
+                const section = mapHelper.getItemSection(
+                    testRunner.getTestMap(),
+                    testContext.itemPosition
+                );
                 titles.push({
-                    control: 'qti-test-position', //WTF !? isn't it the section title... ?
-                    text: context.sectionTitle
+                    //WTF !? isn't it the section title... ?
+                    control: 'qti-test-position',
+                    //testContext.sectionTitle is kept only for backward compat
+                    text: section.title || testContext.sectionTitle
                 });
             }
 

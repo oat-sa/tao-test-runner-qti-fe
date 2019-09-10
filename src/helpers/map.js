@@ -181,12 +181,59 @@ export default {
     /**
      * Gets a test item by its identifier
      * @param {Object} map - The assessment test map
-     * @param {String} itemName - The identifier of the test item
+     * @param {String} itemIdentifier - The identifier of the test item
      * @returns {Object}
      */
-    getItem: function getItem(map, itemName) {
-        var jump = _.find(this.getJumps(map), { identifier: itemName });
+    getItem(map, itemIdentifier) {
+        const jump = _.find(this.getJumps(map), { identifier: itemIdentifier });
         return this.getItemAt(map, jump && jump.position);
+    },
+
+    /**
+     * Gets a test item by its identifier
+     * @param {Object} map - The assessment test map
+     * @param {String} itemIdentifier - The identifier of the test item
+     * @returns {String[]} the raw list of categories
+     */
+    getItemCategories(map, itemIdentifier){
+        const item = this.getItem(map, itemIdentifier);
+        if (item && Array.isArray(item.categories)) {
+            return item.categories;
+        }
+
+        return [];
+    },
+
+    /**
+     * Check if an item has a category
+     * @param {Object} map - The assessment test map
+     * @param {String} itemIdentifier - The identifier of the test item
+     * @param {String} category - the category to check
+     * @param {Boolean} [fuzzyMatch=false] - if true the prefix or the case doesn't matter
+     * @returns {String[]} the raw list of categories
+     */
+    hasItemCategory(map, itemIdentifier, category, fuzzyMatch = false){
+        const taoPrefix = 'x-tao-option-';
+        const categories = this.getItemCategories(map, itemIdentifier);
+        if (!category || !category.length) {
+            return false;
+        }
+
+        const exactMatch = categories.includes(category);
+        if (exactMatch) {
+            return true;
+        }
+        if (fuzzyMatch) {
+            //check by adding the prefix first
+            if (!category.startsWith(taoPrefix) && category.includes(`${taoPrefix}${category}`)) {
+                return true;
+            }
+
+            //compare without the prefix and any case system
+            const normalize = elt => elt.replace(taoPrefix, '').replace(/[-_\s]/g, '').toLowerCase();
+            return categories.some( itemCategory => normalize(itemCategory) === normalize(category) );
+        }
+        return false;
     },
 
     /**

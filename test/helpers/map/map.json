@@ -80,7 +80,8 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "categories" : []
             },
             "item-5": {
               "id": "item-5",
@@ -108,7 +109,8 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "categories" : ["foo", "bar"]
             }
           },
           "stats": {
@@ -153,7 +155,8 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "categories":["x-tao-option-endTestWarning","x-tao-option-reviewScreen","x-tao-option-markReview","x-tao-option-calculator","x-tao-option-highlighter","x-tao-option-lineReader","x-tao-option-zoom","x-tao-option-noAlertTimeout","x-tao-option-nextSectionWarning","x-tao-option-nextPartWarning"]
             },
             "item-8": {
               "id": "item-8",
@@ -167,7 +170,8 @@
               "informational": false,
               "answered": false,
               "flagged": false,
-              "viewed": false
+              "viewed": false,
+              "categories":["end-test-warning","x-tao-option-review-screen","markReview","line_reader"]
             }
           },
           "stats": {

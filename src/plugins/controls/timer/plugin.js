@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2018-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -43,20 +43,22 @@ export default pluginFactory({
     /**
      * Install step, add behavior before the lifecycle
      */
-    install: function install() {
-        var testRunner = this.getTestRunner();
+    install() {
+        const testRunner = this.getTestRunner();
 
         /**
          * Load the timers, from the given timeConstraints and reading the current value in the store
          * @param {store} timeStore - where the values are read
          * @param {Object} config - the current config, especially for the warnings
-         * @return {Promise<Object[]>} the list of timers for the current context
+         * @returns {Promise<Object[]>} the list of timers for the current context
          */
         this.loadTimers = function loadTimers(timeStore, config) {
-            var testContext = testRunner.getTestContext();
-            var timeConstraints = testContext.timeConstraints;
-            var isLinear = !!testContext.isLinear;
-            var timers = timersFactory(timeConstraints, isLinear, config);
+            const testContext = testRunner.getTestContext();
+            const testPart = testRunner.getCurrentPart();
+            const isLinear = testPart && testPart.isLinear;
+            const timeConstraints = testContext.timeConstraints;
+            const timers = timersFactory(timeConstraints, isLinear, config);
+
             return Promise.all(
                 _.map(timers, function(timer) {
                     return timeStore.getItem(`consumed_${timer.id}`).then(function(savedConsumedTime) {
@@ -74,7 +76,7 @@ export default pluginFactory({
          * Save consumed time values into the store
          * @param {store} timeStore - where the values are saved
          * @param {Object[]} timers - the timers to save
-         * @return {Promise} resolves once saved
+         * @returns {Promise} resolves once saved
          */
         this.saveTimers = function saveTimers(timeStore, timers) {
             return Promise.all(
@@ -95,14 +97,14 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
 
         /**
          * Plugin config,
          */
-        var config = _.merge({}, this.getConfig(), {
+        const config = Object.assign({
             /**
              * An option to control is the warnings are contextual or global
              */
@@ -111,18 +113,18 @@ export default pluginFactory({
             /**
              * The list of configured warnings
              */
-            warnings: (testData && testData.config && testData.config.timerWarning) || {},
+            warnings: (testRunnerOptions.timerWarning) || {},
 
             /**
              * The guided navigation option
              */
-            guidedNavigation: testData && testData.config && testData.config.guidedNavigation,
+            guidedNavigation: testRunnerOptions.guidedNavigation,
 
             /**
              * Restore timer from client.
              */
-            restoreTimerFromClient: testData && testData.config && testData.config.timer.restoreTimerFromClient
-        });
+            restoreTimerFromClient: testRunnerOptions.restoreTimerFromClient
+        }, this.getConfig());
 
         /**
          * Set up the strategy handler

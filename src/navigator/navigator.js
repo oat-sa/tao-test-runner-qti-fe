@@ -17,7 +17,7 @@
  */
 
 /**
- * Navigate inside a test based on the information we have (testData, testMap and testContext),
+ * Navigate inside a test based on the information we have (testMap and testContext),
  * we can't guess some of the information, so we're back to the default values :
  *  - rubric blocks (we just leave it, except if we change the section)
  *  - timers (we remove them if we change the scope)
@@ -32,14 +32,13 @@ import testContextBuilder from 'taoQtiTest/runner/helpers/testContextBuilder';
 
 /**
  * Gives you a navigator
- * @param {Object} testData
  * @param {Object} testContext
  * @param {Object} testMap
  * @returns {Object} the navigator
  * @throws {TypeError} if the given parameters aren't objects
  */
-var navigatorFactory = function navigatorFactory(testData, testContext, testMap) {
-    if (!_.all([testData, testContext, testMap], _.isPlainObject)) {
+var navigatorFactory = function navigatorFactory(testContext, testMap) {
+    if (!_.all([testContext, testMap], _.isPlainObject)) {
         throw new TypeError('The navigator must be built with a testData, a testContext and a testMap');
     }
 
@@ -66,7 +65,6 @@ var navigatorFactory = function navigatorFactory(testData, testContext, testMap)
          */
         nextItem: function nextItem() {
             return testContextBuilder.buildTestContextFromPosition(
-                testData,
                 testContext,
                 testMap,
                 testContext.itemPosition + 1
@@ -79,7 +77,6 @@ var navigatorFactory = function navigatorFactory(testData, testContext, testMap)
          */
         previousItem: function previsousItem() {
             return testContextBuilder.buildTestContextFromPosition(
-                testData,
                 testContext,
                 testMap,
                 testContext.itemPosition - 1
@@ -95,7 +92,6 @@ var navigatorFactory = function navigatorFactory(testData, testContext, testMap)
             var section = mapHelper.getSection(testMap, testContext.sectionId);
 
             return testContextBuilder.buildTestContextFromPosition(
-                testData,
                 testContext,
                 testMap,
                 section.position + sectionStats.total
@@ -108,7 +104,7 @@ var navigatorFactory = function navigatorFactory(testData, testContext, testMap)
          * @returns {Object} the new test context
          */
         jumpItem: function jumpItem(position) {
-            return testContextBuilder.buildTestContextFromPosition(testData, testContext, testMap, position);
+            return testContextBuilder.buildTestContextFromPosition(testContext, testMap, position);
         }
     };
 };

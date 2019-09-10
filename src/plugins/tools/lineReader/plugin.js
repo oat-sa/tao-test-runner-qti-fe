@@ -28,6 +28,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import 'ui/hider';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 import compoundMaskFactory from 'taoQtiTest/runner/plugins/tools/lineReader/compoundMask';
 
 /**
@@ -109,12 +110,11 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this,
-            testRunner = this.getTestRunner(),
-            testData = testRunner.getTestData() || {},
-            testConfig = testData.config || {},
-            pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {},
-            $container = testRunner
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
+        const $container = testRunner
                 .getAreaBroker()
                 .getContentArea()
                 .parent();
@@ -132,10 +132,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-lineReader
-            return !!options.lineReader;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'lineReader',
+                true
+            );
         }
 
         function toggleButton() {
@@ -193,12 +196,12 @@ export default pluginFactory({
             testRunner.trigger(`${actionPrefix  }toggle`);
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.toggle) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),
                     function() {
-                        testRunner.trigger(`${actionPrefix  }toggle`);
+                        testRunner.trigger(`${actionPrefix}toggle`);
                     },
                     { avoidInput: true, prevent: true }
                 );

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Christophe Noël <christophe@taotesting.com>
@@ -42,6 +42,31 @@ define([
         sel.removeAllRanges(); //remove all ranges from selection
         sel.addRange(range); //add Range to a Selection.
     }
+
+    const sampleTestContext = {
+        itemIdentifier : 'item-1'
+    };
+    const sampleTestMap = {
+        parts: {
+            p1 : {
+                sections : {
+                    s1 : {
+                        items : {
+                            'item-1' : {
+                                categories: ['x-tao-option-highlighter']
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        jumps : [{
+            identifier: 'item-1',
+            section: 's1',
+            part: 'p1',
+            position: 0
+        }]
+    };
 
     /**
      * The following tests applies to all plugins
@@ -274,11 +299,8 @@ define([
 
         assert.expect(6);
 
-        runner.setTestContext({
-            options: {
-                highlighter: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         plugin
             .init()
@@ -357,15 +379,8 @@ define([
         var $container, $buttonMain, $buttonRemove;
         var cleanItemHtml = $('#qunit-item').html();
 
-        // mock context
-        runner.getTestContext = function() {
-            return {
-                itemIdentifier: 'item-1',
-                options: {
-                    highlighter: true
-                }
-            };
-        };
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         // mock stimulus helper
         itemHelper.getStimuliHrefs = function() {

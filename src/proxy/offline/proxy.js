@@ -29,6 +29,7 @@ import offlineErrorHelper from 'taoQtiTest/runner/helpers/offlineErrorHelper';
 import offlineSyncModal from 'taoQtiTest/runner/helpers/offlineSyncModal';
 import responseStoreFactory from 'taoQtiTest/runner/services/responseStore';
 import download from 'util/download';
+import states from 'taoQtiTest/runner/config/states';
 
 /**
  * Overrides the qtiServiceProxy with the offline behavior
@@ -44,6 +45,7 @@ export default _.defaults(
          */
         install: function install(config) {
             var self = this;
+            const maxSyncAttempts = 3;
 
             // install the parent proxy
             qtiServiceProxy.install.call(this);
@@ -67,7 +69,9 @@ export default _.defaults(
             // scheduled action promises which supposed to be resolved after action synchronization.
             this.actionPromises = {};
 
-            // let's you update test data (testData, testContext and testMap)
+            this.syncInProgress = false; // is data synchronization in progress
+
+            // let's you update test data (testContext and testMap)
             this.dataUpdater = dataUpdater(this.getDataHolder());
 
             /**
@@ -118,7 +122,6 @@ export default _.defaults(
                     var dataHolder = self.getDataHolder();
                     var testContext = dataHolder.get('testContext');
                     var testMap = dataHolder.get('testMap');
-                    var testData = dataHolder.get('testData');
                     var isLast =
                         testContext && testMap ? navigationHelper.isLast(testMap, testContext.itemIdentifier) : false;
                     var isOffline = self.isOffline();
@@ -132,7 +135,6 @@ export default _.defaults(
                      * doesent need active internet connection
                      * @param navigator - navigator helper used with this proxy
                      * @param {Object} options - options to manage the navigation
-                     * @param {Object} options.testData - current test testData dataset
                      * @param {Object} options.testContext - current test testContext dataset
                      * @param {Object} results - navigtion result output object
                      */
@@ -140,7 +142,6 @@ export default _.defaults(
                         var newTestContext;
 
                         navigator
-                            .setTestData(options.testData)
                             .setTestContext(options.testContext)
                             .setTestMap(options.testMap)
                             .init()
@@ -175,7 +176,7 @@ export default _.defaults(
                     if (isBlocked || (isNavigationAction && isLast)) {
                         // the last item of the test
                         result.testContext = {
-                            state: testData.states.closed
+                            state: states.testSession.closed
                         };
                         if (isOffline) {
                             return new Promise(function() {
@@ -214,8 +215,7 @@ export default _.defaults(
                                 self.offlineNavigator,
                                 {
                                     testContext: testContext,
-                                    testMap: testMap,
-                                    testData: testData
+                                    testMap: testMap
                                 },
                                 result
                             );
@@ -227,8 +227,7 @@ export default _.defaults(
                                         self.offlineNavigator,
                                         {
                                             testContext: testContext,
-                                            testMap: testMap,
-                                            testData: testData
+                                            testMap: testMap
                                         },
                                         result
                                     );
@@ -268,6 +267,29 @@ export default _.defaults(
             };
 
             /**
+             * Try to sync data until reached max attempts
+             *
+             * @param {Object} data - sync payload
+             * @param {Number} attempt - current attempt
+             * @returns {Promise} resolves with the action result
+             */
+            this.sendSyncData = function sendSyncData(data, attempt = 1) {
+                return new Promise((resolve, reject) => self.send('sync', data)
+                    .then(resolve)
+                    .catch((err) => {
+                        if (self.isConnectivityError(err) && attempt < maxSyncAttempts) {
+                            return self.sendSyncData(data, attempt + 1)
+                                .then(resolve)
+                                .catch(reject);
+                        }
+
+                        return reject(err);
+                    })
+                );
+            };
+
+
+            /**
              * Flush and synchronize actions collected while offline
              *
              * @returns {Promise} resolves with the action result
@@ -275,14 +297,20 @@ export default _.defaults(
             this.syncData = function syncData() {
                 var actions;
 
+                this.syncInProgress = true;
+
                 return this.queue.serie(function() {
                     return self.actionStore
                         .flush()
                         .then(function(data) {
                             actions = data;
                             if (data && data.length) {
-                                return self.send('sync', data);
+                                return self.sendSyncData(data);
                             }
+                        }).finally((data) => {
+                            self.syncInProgress = false;
+
+                            return data;
                         })
                         .catch(function(err) {
                             if (self.isConnectivityError(err)) {
@@ -292,17 +320,21 @@ export default _.defaults(
                                 });
                             }
 
+                            self.trigger('error', err);
+
                             throw err;
                         });
                 });
             };
 
             this.prepareDownload = function prepareDownload(actions) {
-                var timestamp = Date.now();
-                var dateTime = new Date(timestamp).toISOString();
-                var testData = self.getDataHolder().get('testData');
-                var testId = testData.title;
-                var niceFilename = `Download of ${testId} at ${dateTime}.json`;
+                const timestamp = Date.now();
+                const dateTime = new Date(timestamp).toISOString();
+
+                //@deprecated
+                const testData = self.getDataHolder().get('testData');
+                const testMap = self.getDataHolder().get('testMap');
+                const niceFilename = `Download of ${testMap.title} at ${dateTime}.json`;
 
                 return {
                     filename: niceFilename,
@@ -360,6 +392,15 @@ export default _.defaults(
 
             // set up the action store for the current service call
             this.actionStore = actionStoreFactory(config.serviceCallId);
+
+            // stop error event propagation if sync is in progress
+            this.before('error', (e, error) => {
+                if (self.isConnectivityError(error) && self.syncInProgress) {
+                    return false;
+                }
+
+                return true;
+            });
 
             return InitCallPromise.then(function(response) {
                 var promises = [];

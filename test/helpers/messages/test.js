@@ -56,8 +56,14 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
             getTestMap: function() {
                 return map;
             },
-            getTestData: function() {
+            getOptions() {
                 return data;
+            },
+            getCurrentItem(){
+                return map.parts[context.testPartId].sections[context.sectionId].items[context.itemIdentifier];
+            },
+            getCurrentPart(){
+                return map.parts[context.testPartId];
             },
             itemRunner: {
                 _item: {
@@ -176,12 +182,13 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
         .test('helpers/messages.getExitMessage (enabled)', function(testData, assert) {
             var context = {
                 itemPosition: 1,
-                itemAnswered: testData.currentItemAnswered
+                itemAnswered: testData.currentItemAnswered,
+                sectionId: 'section1',
+                testPartId: 'part1',
+                itemIdentifier: 'item1'
             };
             var data = {
-                config: {
-                    enableUnansweredItemsWarning: true
-                }
+                enableUnansweredItemsWarning: true
             };
             var map = {
                 jumps: [
@@ -263,7 +270,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 'message include the right stats for section scope'
             );
 
-            data.config.enableUnansweredItemsWarning = false;
+            data.enableUnansweredItemsWarning = false;
 
             assert.equal(
                 messagesHelper.getExitMessage(message, 'test', runner),

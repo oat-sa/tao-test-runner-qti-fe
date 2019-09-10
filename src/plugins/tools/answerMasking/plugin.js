@@ -20,12 +20,12 @@
  * @author Christophe Noël <christophe@taotesting.com>
  */
 
-import _ from 'lodash';
 import __ from 'i18n';
 import pluginFactory from 'taoTests/runner/plugin';
 import 'ui/hider';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 import answerMaskingFactory from 'taoQtiTest/runner/plugins/tools/answerMasking/answerMasking';
 
 /**
@@ -64,22 +64,25 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
+        const self = this;
 
-        var testRunner = this.getTestRunner(),
-            testData = testRunner.getTestData() || {},
-            testConfig = testData.config || {},
-            pluginConfig = _.defaults((testConfig.plugins || {})[pluginName] || {}, defaultConfig),
-            pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {},
-            $contentArea = this.getAreaBroker().getContentArea();
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
+        const $contentArea = this.getAreaBroker().getContentArea();
 
         var answerMasking = answerMaskingFactory($contentArea);
 
         function isPluginEnabled() {
-            var context = testRunner.getTestContext() || {},
-                options = context.options || {};
             //to be activated with the special category x-tao-option-answerMasking
-            return options.answerMasking && itemContainsChoiceInteraction();
+            const answerMaskingCategory = mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'answerMasking',
+                true
+            );
+            return answerMaskingCategory && itemContainsChoiceInteraction();
         }
 
         function itemContainsChoiceInteraction() {
@@ -147,7 +150,7 @@ export default pluginFactory({
             testRunner.trigger(`${actionPrefix}toggle`);
         });
 
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             if (pluginShortcuts.toggle) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.toggle, this.getName(), true),

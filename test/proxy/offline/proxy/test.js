@@ -68,7 +68,6 @@ define([
             {title: 'install'},
             {title: 'init'},
             {title: 'destroy'},
-            {title: 'getTestData'},
             {title: 'getTestContext'},
             {title: 'getTestMap'},
             {title: 'sendVariables'},
@@ -1610,6 +1609,8 @@ define([
                 }
             }
         };
+
+        var testMap = { title: 'testTitle' };
         var testData = { title: 'testTitle' };
         var actions = 'testActions';
 
@@ -1628,7 +1629,7 @@ define([
 
         proxy = proxyFactory('qtiServiceProxy', initConfig);
 
-        proxy.install(new Map([['testData', testData]]));
+        proxy.install(new Map([['testMap', testMap], ['testData', testData]]));
 
         proxy.init().then(function() {
             var downloadDataContent = JSON.parse(proxy.prepareDownload(actions).content);

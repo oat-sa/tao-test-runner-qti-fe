@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -28,17 +28,43 @@ import hider from 'ui/hider';
 import pluginFactory from 'taoTests/runner/plugin';
 import messages from 'taoQtiTest/runner/helpers/messages';
 import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 export default pluginFactory({
     name: 'nextsection',
-    init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testConfig = testRunner.getTestData().config;
+    init() {
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+
+        /**
+         * Retrieve the nexSection categories of the current item
+         * @returns {Object} the calculator categories
+         */
+        function getNextSectionCategories(){
+            const testContext = testRunner.getTestContext();
+            const testMap = testRunner.getTestMap();
+
+            return {
+                nextSection : mapHelper.hasItemCategory(
+                    testMap,
+                    testContext.itemIdentifier,
+                    'nextSection',
+                    true
+                ),
+                nextSectionWarning : mapHelper.hasItemCategory(
+                    testMap,
+                    testContext.itemIdentifier,
+                    'nextSectionWarning',
+                    true
+                )
+            };
+        }
 
         function toggle() {
-            var options = testRunner.getTestContext().options;
-            if (testConfig.nextSection && (options.nextSection || options.nextSectionWarning)) {
+            const categories = getNextSectionCategories();
+
+            if (testRunnerOptions.nextSection && (categories.nextSection || categories.nextSectionWarning)) {
                 self.show();
             } else {
                 self.hide();
@@ -59,13 +85,13 @@ export default pluginFactory({
         );
 
         this.$element.on('click', function(e) {
-            var context = testRunner.getTestContext();
-            var enable = _.bind(self.enable, self);
+            const enable = _.bind(self.enable, self);
+            const categories = getNextSectionCategories();
             e.preventDefault();
             if (self.getState('enabled') !== false) {
                 self.disable();
 
-                if (context.options.nextSectionWarning) {
+                if (categories.nextSectionWarning) {
                     testRunner.trigger(
                         'confirm.nextsection',
                         messages.getExitMessage(

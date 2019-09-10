@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -41,22 +41,29 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
-        var self = this;
+    init() {
+        const self = this;
 
-        var testRunner = this.getTestRunner();
-        var testData = testRunner.getTestData();
-        var testConfig = testData.config || {};
-        var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
          * Check if the "Previous" functionality should be available or not
          */
         var canDoPrevious = function canDoPrevious() {
-            var testMap = testRunner.getTestMap();
-            var context = testRunner.getTestContext();
-            var previousSection;
-            var previousPart;
+            const testMap = testRunner.getTestMap();
+            const context = testRunner.getTestContext();
+            const currentSection = testRunner.getCurrentSection();
+            const noExitTimedSectionWarning = mapHelper.hasItemCategory(
+                testMap,
+                context.itemIdentifier,
+                'noExitTimedSectionWarning',
+                true
+            );
+            const currentPart = testRunner.getCurrentPart();
+            let previousSection;
+            let previousPart;
 
             // check TestMap if empty
             if (_.isPlainObject(testMap) && _.size(testMap) === 0) {
@@ -72,7 +79,7 @@ export default pluginFactory({
             if (navigationHelper.isFirstOf(testMap, context.itemIdentifier, 'section')) {
                 //when entering an adaptive section,
                 //you can't leave the section from the beginning
-                if (context.isCatAdaptive) {
+                if (currentSection.isCatAdaptive) {
                     return false;
                 }
 
@@ -80,7 +87,7 @@ export default pluginFactory({
                 previousSection = mapHelper.getItemSection(testMap, context.itemPosition - 1);
                 if (
                     previousSection.isCatAdaptive ||
-                    (previousSection.timeConstraint && !context.options.noExitTimedSectionWarning)
+                    (previousSection.timeConstraint && !noExitTimedSectionWarning)
                 ) {
                     return false;
                 }
@@ -93,7 +100,7 @@ export default pluginFactory({
                     return false;
                 }
             }
-            return context.isLinear === false && context.canMoveBackward === true;
+            return currentPart.isLinear === false && context.canMoveBackward === true;
         };
 
         /**
@@ -148,7 +155,7 @@ export default pluginFactory({
             testRunner.trigger('nav-previous');
         });
 
-        if (testConfig.allowShortcuts && pluginShortcuts.trigger) {
+        if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
             shortcut.add(
                 namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
                 function() {

@@ -29,6 +29,7 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
 import maskComponent from 'taoQtiTest/runner/plugins/tools/areaMasking/mask';
+import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 /**
  * The public name of the plugin
@@ -60,17 +61,17 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
-        var self = this;
+    init() {
+        const self = this;
 
-        var testRunner = this.getTestRunner();
-        var $container = testRunner
+        const testRunner = this.getTestRunner();
+        const $container = testRunner
             .getAreaBroker()
             .getContentArea()
             .parent();
-        var testConfig = testRunner.getTestData().config || {};
-        var config = _.defaults(_.clone((testConfig.plugins || {})[pluginName]) || {}, defaultConfig);
-        var pluginShortcuts = (testConfig.shortcuts || {})[pluginName] || {};
+        const testRunnerOptions = testRunner.getOptions();
+        const config = Object.assign({}, defaultConfig, this.getConfig());
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
 
         function addMask() {
             maskComponent()
@@ -121,7 +122,7 @@ export default pluginFactory({
         });
 
         // handle the plugin's shortcuts
-        if (testConfig.allowShortcuts) {
+        if (testRunnerOptions.allowShortcuts) {
             _.forEach(pluginShortcuts, function(command, key) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),
@@ -144,10 +145,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isEnabled() {
-            var context = testRunner.getTestContext(),
-                options = context.options || {};
             //to be activated with the special category x-tao-option-areaMasking
-            return !!options.areaMasking;
+            return mapHelper.hasItemCategory(
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
+                'areaMasking',
+                true
+            );
         }
 
         /**

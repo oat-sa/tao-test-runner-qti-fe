@@ -82,7 +82,7 @@ export default _.defaults(
             //scheduled action promises which supposed to be resolved after action synchronization.
             this.actionPromises = {};
 
-            //let's you update test data (testData, testContext and testMap)
+            //let's you update test data (testContext and testMap)
             this.dataUpdater = dataUpdater(this.getDataHolder());
 
             /**
@@ -91,9 +91,8 @@ export default _.defaults(
              */
             this.getCacheAmount = function getCacheAmount() {
                 var cacheAmount = 1;
-                var testData = this.getDataHolder().get('testData');
-                if (testData && testData.config && testData.config.itemCaching) {
-                    cacheAmount = parseInt(testData.config.itemCaching.amount, 10) || cacheAmount;
+                if (config && config.options && config.options.itemCaching) {
+                    cacheAmount = parseInt(config.options.itemCaching.amount, 10) || cacheAmount;
                 }
                 return cacheAmount;
             };
@@ -141,7 +140,6 @@ export default _.defaults(
 
                 var blockingActions = ['exitTest', 'timeout'];
 
-                var testData = this.getDataHolder().get('testData');
                 var testContext = this.getDataHolder().get('testContext');
                 var testMap = this.getDataHolder().get('testMap');
 
@@ -161,7 +159,7 @@ export default _.defaults(
 
                 // try the navigation if the actionParams context meaningful data
                 if (actionParams.direction && actionParams.scope) {
-                    testNavigator = testNavigatorFactory(testData, testContext, testMap);
+                    testNavigator = testNavigatorFactory(testContext, testMap);
                     newTestContext = testNavigator.navigate(
                         actionParams.direction,
                         actionParams.scope,

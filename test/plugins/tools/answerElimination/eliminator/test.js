@@ -28,6 +28,31 @@ define([
     var providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
+    const sampleTestContext = {
+        itemIdentifier : 'item-1'
+    };
+    const sampleTestMap = {
+        parts: {
+            p1 : {
+                sections : {
+                    s1 : {
+                        items : {
+                            'item-1' : {
+                                categories: ['x-tao-option-eliminator']
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        jumps : [{
+            identifier: 'item-1',
+            section: 's1',
+            part: 'p1',
+            position: 0
+        }]
+    };
+
     QUnit.module('eliminatorFactory');
 
     QUnit.test('module', function(assert) {
@@ -43,11 +68,8 @@ define([
         var eliminator = eliminatorFactory(runner, areaBroker);
         var interaction = document.querySelector('.qti-choiceInteraction');
 
-        runner.setTestContext({
-            options: {
-                eliminator: true
-            }
-        });
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
 
         areaBroker.getContentArea().append(interaction);
         eliminator.init().then(function() {

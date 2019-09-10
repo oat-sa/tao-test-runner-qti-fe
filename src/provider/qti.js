@@ -244,7 +244,8 @@ var qtiProvider = {
          * @param {Promise} [loadPromise] - wait this Promise to resolve before loading the item.
          */
         function computeNext(action, params, loadPromise) {
-            var context = self.getTestContext();
+            const context = self.getTestContext();
+            const currentItem = self.getCurrentItem();
 
             //catch server errors
             var submitError = function submitError(err) {
@@ -262,7 +263,9 @@ var qtiProvider = {
 
             //if we have to display modal feedbacks, we submit the responses before the move
             const feedbackPromise = new Promise(resolve => {
-                if (context.hasFeedbacks) {
+
+                //@deprecated feedbacks from testContext
+                if (currentItem.hasFeedbacks || context.hasFeedbacks) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
                     self.getProxy()

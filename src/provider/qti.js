@@ -245,7 +245,6 @@ var qtiProvider = {
          */
         function computeNext(action, params, loadPromise) {
             const context = self.getTestContext();
-            const testMap = self.getTestMap();
             const currentItem = self.getCurrentItem();
 
             //catch server errors

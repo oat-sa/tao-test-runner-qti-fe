@@ -20,8 +20,7 @@ define([
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/navigation/next/linearNextItemWarning',
-    'taoQtiTest/runner/helpers/map'
-], function(runnerFactory, providerMock, pluginFactory, mapHelper) {
+], function(runnerFactory, providerMock, pluginFactory) {
     'use strict';
 
     var pluginApi;
@@ -108,6 +107,44 @@ define([
      */
     QUnit.module('Behavior');
 
+    const testMap = {
+        identifier: "Test",
+        parts: {
+            'Part1': {
+                id: 'Part1',
+                position: 0,
+                isLinear: true,
+                sections: {
+                    'Section1': {
+                        id: 'Section1',
+                        position: 0,
+                        items: {
+                            'FirstItem': {
+                                id: 'FirstItem',
+                                position: 0
+                            },
+                            'LastItem': {
+                                id: 'LastItem',
+                                position: 1
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        jumps: [{
+            identifier: "FirstItem",
+            section: "Section1",
+            part: "Part1",
+            position: 0
+        }, {
+            identifier: "LastItem",
+            section: "Section1",
+            part: "Part1",
+            position: 1
+        }]
+    };
+
     // No dialog expected
     QUnit.cases.init([{
         title: 'when the next part warning is set',
@@ -117,43 +154,44 @@ define([
             options: {
                 nextPartWarning: true,
                 nextSectionWarning: false
-            }
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
         },
         item: {
             informational: false
         },
-        part: {
-            isLinear: true
-        }
+        isLinear : true,
+
     }, {
         title: 'when the next section warning is set',
         testContext: {
             options: {
                 nextPartWarning: false,
                 nextSectionWarning: true
-            }
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
         },
         scope: 'section',
         item: {
             informational: false
         },
-        part: {
-            isLinear: true
-        }
+        isLinear : true
     }, {
         title: 'when the item is informational',
         testContext: {
             options: {
                 nextPartWarning: false,
                 nextSectionWarning: false
-            }
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
         },
         item: {
             informational: true
         },
-        part: {
-            isLinear: true
-        }
+        isLinear : true
     }, {
         title: 'when the item is the last item',
         testContext: {
@@ -161,35 +199,36 @@ define([
                 nextPartWarning: false,
                 nextSectionWarning: false
             },
-            isLast: true
+            itemIdentifier: 'LastItem',
+            itemPosition: 1
         },
         item: {
             informational: false
         },
-        part: {
-            isLinear: true
-        }
+        isLinear : true
     }, {
         title: 'when the config setting is undefined',
         testContext: {
             options: {
                 nextPartWarning: false,
                 nextSectionWarning: false
-            }
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
         },
         item: {
             informational: false
         },
-        part: {
-            isLinear: true
-        }
+        isLinear : true
     }, {
         title: 'when the config setting is explicitly false',
         testContext: {
             options: {
                 nextPartWarning: false,
                 nextSectionWarning: false
-            }
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
         },
         testConfig: {
             forceEnableLinearNextItemWarning: false
@@ -197,29 +236,27 @@ define([
         item: {
             informational: false
         },
-        part: {
-            isLinear: true
-        }
+        isLinear : true
     }, {
         title: 'when the test is not linear',
         testContext: {
             options: {
                 nextPartWarning: false,
                 nextSectionWarning: false
-            }
+            },
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
         },
         item: {
             informational: false
         },
-        part: {
-            isLinear: false
-        }
+        isLinear : false
     }]).test('No dialog is triggered ', function(caseData, assert) {
         const ready = assert.async();
         const runner = runnerFactory(providerName, {}, {
-            options: caseData.testConfig
+            options : caseData.testConfig
         });
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        var plugin = pluginFactory(runner, runner.getAreaBroker());
 
         // mock test store init
         runner.getTestStore = function() {
@@ -228,7 +265,9 @@ define([
             };
         };
         runner.getCurrentItem = () => caseData.item;
-        runner.getCurrentPart = () => caseData.part;
+        runner.getCurrentPart = () => Object.assign({
+            isLinear : caseData.isLinear
+        }, testMap.part);
 
         assert.expect(1);
 
@@ -236,6 +275,7 @@ define([
             .init()
             .then(function() {
                 runner.setTestContext(caseData.testContext);
+                runner.setTestMap(testMap);
 
                 // dialog would be instantiated *before* move occurs
                 runner.on('move', function() {
@@ -261,7 +301,8 @@ define([
                 nextPartWarning: false,
                 nextSectionWarning: false
             },
-            isLast: false
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
         },
         testConfig: {
             forceEnableLinearNextItemWarning: true
@@ -269,9 +310,7 @@ define([
         item: {
             informational: false
         },
-        part: {
-            isLinear: true
-        }
+        isLinear : true
     }, {
         title: 'when a skip warning is needed',
         event: 'skip',
@@ -280,7 +319,8 @@ define([
                 nextPartWarning: false,
                 nextSectionWarning: false
             },
-            isLast: false
+            itemIdentifier: 'FirstItem',
+            itemPosition: 0
         },
         testConfig: {
             forceEnableLinearNextItemWarning: true
@@ -288,14 +328,12 @@ define([
         item: {
             informational: false
         },
-        part: {
-            isLinear: true
-        }
+        isLinear : true
     }]).test('Dialog will be triggered ', function(caseData, assert) {
         const ready = assert.async();
 
         const runner = runnerFactory(providerName, {}, {
-            options: caseData.testConfig
+            options : caseData.testConfig
         });
         const plugin = pluginFactory(runner, runner.getAreaBroker());
 
@@ -309,7 +347,9 @@ define([
             };
         };
         runner.getCurrentItem = () => caseData.item;
-        runner.getCurrentPart = () => caseData.part;
+        runner.getCurrentPart = () => Object.assign({
+            isLinear : caseData.isLinear
+        }, testMap.part);
 
         assert.expect(1);
 
@@ -317,6 +357,7 @@ define([
             .init()
             .then(function() {
                 runner.setTestContext(caseData.testContext);
+                runner.setTestMap(testMap);
 
                 runner.on('disablenav', function() {
                     assert.ok(true, 'The dialog interrupted the move');
@@ -329,5 +370,5 @@ define([
                 assert.ok(false, err.message);
                 ready();
             });
-        });
+    });
 });

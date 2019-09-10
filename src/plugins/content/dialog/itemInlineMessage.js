@@ -27,6 +27,7 @@ import __ from 'i18n';
 import 'ui/hider';
 import pluginFactory from 'taoTests/runner/plugin';
 import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
+import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
 
 /**
  * The display of the next button
@@ -64,8 +65,10 @@ export default pluginFactory({
          * @returns {*|jQuery|HTMLElement} the button
          */
         var createOkButton = function createElement() {
-            var dataType = testRunner.getTestContext().isLast ? 'end' : 'next';
-            var $btn = $(buttonTpl(buttonData[dataType]));
+            const testContext = testRunner.getTestContext();
+            const testMap = testRunner.getTestMap();
+            const dataType = navigationHelper.isLast(testMap, testContext.itemIdentifier) ? 'end' : 'next';
+            const $btn = $(buttonTpl(buttonData[dataType]));
             $btn.addClass('modalFeedback-button');
 
             //plugin behavior

@@ -217,12 +217,14 @@ var indicators = {
  * @returns {Object} The fixed test map
  */
 function getFixedMap(testMap, testContext) {
-    var item;
-    const testPart = mapHelper.getPart(testMap, testContext.testPartId);
-    if (testContext.itemAnswered && testPart && testPart.isLinear) {
-        testMap = _.cloneDeep(testMap);
-        item = mapHelper.getItemAt(testMap, testContext.itemPosition);
-        item.answered = false;
+    const currentTestPart = mapHelper.getPart(testMap, testContext.testPartId);
+    const currentItem = mapHelper.getItemAt(testMap, testContext.itemPosition);
+
+    if (currentItem.answered && currentTestPart.isLinear) {
+        const fixedTestMap = _.cloneDeep(testMap);
+        const fixedCurrentItem = mapHelper.getItemAt(fixedTestMap, testContext.itemPosition);
+        fixedCurrentItem.answered = false;
+        return fixedTestMap;
     }
     return testMap;
 }

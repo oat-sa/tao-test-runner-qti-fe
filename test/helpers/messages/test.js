@@ -182,7 +182,6 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
         .test('helpers/messages.getExitMessage (enabled)', function(testData, assert) {
             var context = {
                 itemPosition: 1,
-                itemAnswered: testData.currentItemAnswered,
                 sectionId: 'section1',
                 testPartId: 'part1',
                 itemIdentifier: 'item1'
@@ -201,7 +200,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                         sections: {
                             section1: {
                                 items: {
-                                    item1: {},
+                                    item1: {
+                                        answered : testData.currentItemAnswered
+                                    },
                                     item2: {},
                                     item3: {}
                                 },

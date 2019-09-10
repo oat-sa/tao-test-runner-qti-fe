@@ -140,11 +140,6 @@ export default function dataUpdaterFactory(testDataHolder) {
                     //flag as viewed, always
                     item.viewed = true;
 
-                    //flag as answered only if a response has been set
-                    if (!_.isUndefined(testContext.itemAnswered)) {
-                        item.answered = testContext.itemAnswered;
-                    }
-
                     updatedTestMap = mapHelper.updateItemStats(testMap, testContext.itemPosition);
                 }
             }

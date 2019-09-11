@@ -247,9 +247,6 @@ var qtiProvider = {
             const context = self.getTestContext();
             const currentItem = self.getCurrentItem();
 
-
-            console.log('original testmap', self.getTestMap());
-
             //catch server errors
             var submitError = function submitError(err) {
                 //some server errors are valid, so we don't fail (prevent empty responses)
@@ -301,9 +298,7 @@ var qtiProvider = {
                         // when the test part is linear, the item is always answered as we cannot come back to it
                         const testPart = self.getCurrentPart();
                         const isLinear = testPart && testPart.isLinear;
-                        console.log('before', currentItem.position,  currentItem.answered);
                         currentItem.answered = isLinear || currentItemHelper.isAnswered(self);
-                        console.log('after', currentItem.position,  currentItem.answered);
                     }
                     resolve();
                 }
@@ -321,8 +316,6 @@ var qtiProvider = {
                     // ensure the answered state of the current item is correctly set and the stats are aligned
                     self.setTestMap(self.dataUpdater.updateStats());
 
-
-                    console.log('built testmap', self.getTestMap());
                     //to be sure load start after unload...
                     //we add an intermediate ns event on unload
                     self.on(`unloaditem.${action}`, function() {

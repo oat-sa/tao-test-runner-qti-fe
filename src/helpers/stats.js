@@ -42,11 +42,11 @@ export default {
 
         if (!item.informational) {
             const isItemCurrentlyAnswered = currentItemHelper.isAnswered(runner);
-            if (!isItemCurrentlyAnswered && context.itemAnswered) {
+            if (!isItemCurrentlyAnswered && item.answered) {
                 stats.answered--;
-            } else if ((isItemCurrentlyAnswered || sync) && !context.itemAnswered) {
+            } else if ((isItemCurrentlyAnswered || sync) && !item.answered) {
                 stats.answered++;
-            } else if (sync && !isItemCurrentlyAnswered && context.itemAnswered && testPart.isLinear) {
+            } else if (sync && !isItemCurrentlyAnswered && item.answered && testPart.isLinear) {
                 stats.answered++;
             }
         }

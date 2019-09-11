@@ -251,7 +251,6 @@
     "itemSessionState": 1,
     "needMapUpdate": false,
     "itemPosition": 0,
-    "itemAnswered": false,
     "timeConstraints": [{
       "label": "Section 1",
       "source": "assessmentSection-1",

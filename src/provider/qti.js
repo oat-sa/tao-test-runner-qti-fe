@@ -277,7 +277,7 @@ var qtiProvider = {
                         )
                         .then( results => {
                             if (results.itemSession) {
-                                context.itemAnswered = results.itemSession.itemAnswered;
+                                currentItem.answered = results.itemSession.itemAnswered;
 
                                 if (results.displayFeedbacks === true && results.feedbacks) {
                                     self.itemRunner.renderFeedbacks(results.feedbacks, results.itemSession, function(
@@ -293,14 +293,13 @@ var qtiProvider = {
                         .catch(submitError);
                 } else {
                     if (action === 'skip') {
-                        context.itemAnswered = false;
+                        currentItem.answered = false;
                     } else {
                         // when the test part is linear, the item is always answered as we cannot come back to it
                         const testPart = self.getCurrentPart();
                         const isLinear = testPart && testPart.isLinear;
-                        context.itemAnswered = isLinear || currentItemHelper.isAnswered(self);
+                        currentItem.answered = isLinear || currentItemHelper.isAnswered(self);
                     }
-                    self.setTestContext(context);
                     resolve();
                 }
             });
@@ -316,6 +315,7 @@ var qtiProvider = {
 
                     // ensure the answered state of the current item is correctly set and the stats are aligned
                     self.setTestMap(self.dataUpdater.updateStats());
+
                     //to be sure load start after unload...
                     //we add an intermediate ns event on unload
                     self.on(`unloaditem.${action}`, function() {

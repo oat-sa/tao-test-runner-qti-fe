@@ -66,7 +66,7 @@ export default pluginFactory({
                 return Promise.resolve();
             }
 
-            if (isInteracting && testRunnerOptions.enableValidateResponses && testContext.validateResponses) {
+            if (isInteracting && testRunnerOptions.enableValidateResponses) {
 
                 const currenItem = testRunner.getCurrentItem();
                 //@deprecated use validateResponses from testMap instead of the testContext
@@ -76,10 +76,10 @@ export default pluginFactory({
 
                 if (validateResponses) {
                     return new Promise((resolve, reject) => {
-                        if (_.size(currentItemHelper.getDeclarations(self)) === 0) {
+                        if (_.size(currentItemHelper.getDeclarations(testRunner)) === 0) {
                             return resolve();
                         }
-                        if (currentItemHelper.isAnswered(self, false)) {
+                        if (currentItemHelper.isAnswered(testRunner, false)) {
                             return resolve();
                         }
                         if (!testRunner.getState('alerted.notallowed')) {

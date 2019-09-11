@@ -83,10 +83,10 @@ export default pluginFactory({
 
                 if (!allowSkipping) {
                     return new Promise((resolve, reject) => {
-                        if (_.size(currentItemHelper.getDeclarations(self)) === 0) {
+                        if (_.size(currentItemHelper.getDeclarations(testRunner)) === 0) {
                             return resolve();
                         }
-                        if (currentItemHelper.isAnswered(self, pluginConfig.allowPartial)) {
+                        if (currentItemHelper.isAnswered(testRunner, pluginConfig.allowPartial)) {
                             return resolve();
                         }
 

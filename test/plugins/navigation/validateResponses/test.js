@@ -91,48 +91,48 @@ define([
             {
                 title: 'when the option is not enabled',
                 context: {
-                    itemIdentifier: 'item-1',
-                    validateResponses: true
+                    itemIdentifier: 'item-1'
                 },
                 options : {
                     enableValidateResponses: false,
                 },
+                validateResponses: true,
                 answered: false,
                 responses: ['foo']
             },
             {
                 title: 'when the item has no interactions',
                 context: {
-                    itemIdentifier: 'item-1',
-                    validateResponses: true
+                    itemIdentifier: 'item-1'
                 },
                 options : {
                     enableValidateResponses: true
                 },
+                validateResponses: true,
                 answered: false,
                 responses: []
             },
             {
                 title: 'when the item is configured without the validation',
                 context: {
-                    itemIdentifier: 'item-1',
-                    validateResponses: false
+                    itemIdentifier: 'item-1'
                 },
                 options : {
                     enableValidateResponses: true
                 },
                 answered: false,
+                validateResponses: false,
                 responses: ['foo']
             },
             {
                 title: 'when the item is answered',
                 context: {
-                    itemIdentifier: 'item-1',
-                    validateResponses: true
+                    itemIdentifier: 'item-1'
                 },
                 options : {
                     enableValidateResponses: true
                 },
+                validateResponses: true,
                 answered: true,
                 responses: ['foo']
             }
@@ -143,6 +143,8 @@ define([
                 options: data.options
             });
             const plugin = pluginFactory(runner, runner.getAreaBroker());
+
+            runner.getCurrentItem = () => ({ validateResponses : data.validateResponses });
 
             assert.expect(1);
 
@@ -170,12 +172,12 @@ define([
             {
                 title: 'when the item not answered',
                 context: {
-                    itemIdentifier: 'item-1',
-                    validateResponses: true
+                    itemIdentifier: 'item-1'
                 },
                 options : {
                     enableValidateResponses: true
                 },
+                validateResponses: true,
                 answered: false,
                 responses: ['foo']
             }
@@ -187,6 +189,11 @@ define([
                 options : data.options
             });
             const plugin = pluginFactory(runner, runner.getAreaBroker());
+
+            runner.getCurrentItem = () => ({
+                validateResponses : data.validateResponses,
+                answered : data.answered
+            });
 
             assert.expect(2);
 
@@ -226,8 +233,7 @@ define([
             {
                 title: 'when the item not answered, but the `validateOnPreviousMove` flag is set to `false`',
                 context: {
-                    itemIdentifier: 'item-1',
-                    validateResponses: true
+                    itemIdentifier: 'item-1'
                 },
                 options :  {
                     enableValidateResponses: true,
@@ -235,6 +241,7 @@ define([
                 pluginConfig : {
                     validateOnPreviousMove: false
                 },
+                validateResponses: true,
                 answered: false,
                 responses: ['foo']
             }
@@ -245,6 +252,8 @@ define([
                 options: data.options
             });
             const plugin = pluginFactory(runner, runner.getAreaBroker(), data.pluginConfig);
+
+            runner.getCurrentItem = () => ({ validateResponses : data.validateResponses });
 
             assert.expect(1);
 

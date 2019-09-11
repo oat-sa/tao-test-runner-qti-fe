@@ -58,33 +58,40 @@ export default pluginFactory({
         const testRunnerOptions = testRunner.getOptions();
         const pluginConfig = this.getConfig();
 
-        testRunner.before('move', function(e, direction) {
-            var self = this;
-            var testContext = this.getTestContext();
-            var isInteracting = !this.getItemState(testContext.itemIdentifier, 'disabled');
+        testRunner.before('move', (e, direction) => {
+            const testContext = testRunner.getTestContext();
+            const isInteracting = !testRunner.getItemState(testContext.itemIdentifier, 'disabled');
 
             if (!pluginConfig.validateOnPreviousMove && direction === 'previous') {
                 return Promise.resolve();
             }
 
             if (isInteracting && testRunnerOptions.enableValidateResponses && testContext.validateResponses) {
-                return new Promise(function(resolve, reject) {
-                    if (_.size(currentItemHelper.getDeclarations(self)) === 0) {
-                        return resolve();
-                    }
-                    if (currentItemHelper.isAnswered(self, false)) {
-                        return resolve();
-                    }
-                    if (!self.getState('alerted.notallowed')) {
-                        // Only show one alert for itemSessionControl
-                        self.setState('alerted.notallowed', true);
-                        self.trigger('alert.notallowed', __('A valid response to this item is required.'), function() {
-                            self.trigger('resumeitem');
-                            reject();
-                            self.setState('alerted.notallowed', false);
-                        });
-                    }
-                });
+
+                const currenItem = testRunner.getCurrentItem();
+                //@deprecated use validateResponses from testMap instead of the testContext
+                const validateResponses = typeof currenItem.validateResponses === 'boolean' ?
+                    currenItem.validateResponses :
+                    testContext.validateResponses;
+
+                if (validateResponses) {
+                    return new Promise((resolve, reject) => {
+                        if (_.size(currentItemHelper.getDeclarations(self)) === 0) {
+                            return resolve();
+                        }
+                        if (currentItemHelper.isAnswered(self, false)) {
+                            return resolve();
+                        }
+                        if (!testRunner.getState('alerted.notallowed')) {
+                            // Only show one alert for itemSessionControl
+                            testRunner.setState('alerted.notallowed', true);
+                            testRunner.trigger('alert.notallowed', __('A valid response to this item is required.'), () => {
+                                testRunner.trigger('resumeitem');
+                                reject();
+                                setestRunner.setState('alerted.notallowed', false);
+                            });
+                        }
+                    });
             }
         });
 

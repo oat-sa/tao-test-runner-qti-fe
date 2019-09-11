@@ -128,21 +128,20 @@ export default function dataUpdaterFactory(testDataHolder) {
          * @returns {Object} the updated testMap
          */
         updateStats: function updateStats() {
-            var testMap = testDataHolder.get('testMap');
-            var testContext = testDataHolder.get('testContext');
-            var updatedTestMap = null;
-            var item;
+            const testMap = testDataHolder.get('testMap');
+            const testContext = testDataHolder.get('testContext');
+            let updatedTestMap = null;
 
             if (testMap && testContext && _.isNumber(testContext.itemPosition)) {
-                item = mapHelper.getItemAt(testMap, testContext.itemPosition);
+                const item = mapHelper.getItemAt(testMap, testContext.itemPosition);
 
                 if (item && testContext.state === states.testSession.interacting) {
+                    const testPart = mapHelper.getPart(testMap, testContext.testPartId);
+
                     //flag as viewed, always
                     item.viewed = true;
-
-                    //flag as answered only if a response has been set
-                    if (!_.isUndefined(testContext.itemAnswered)) {
-                        item.answered = testContext.itemAnswered;
+                    if (testPart && testPart.isLinear) {
+                        item.answered = true;
                     }
 
                     updatedTestMap = mapHelper.updateItemStats(testMap, testContext.itemPosition);

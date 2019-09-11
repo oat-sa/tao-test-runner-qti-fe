@@ -61,39 +61,47 @@ export default pluginFactory({
      * Initialize plugin (called during runner's initialization)
      * @returns {this}
      */
-    init: function init() {
+    init() {
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
         const pluginConfig = Object.assign({}, defaults, this.getConfig());
 
-        testRunner.before('nav-next move', function() {
-            var self = this;
-            var testContext = this.getTestContext();
-            var isInteracting = !this.getItemState(testContext.itemIdentifier, 'disabled');
-            var warning = pluginConfig.allowPartial
+        testRunner.before('nav-next move', () => {
+            const testContext = testRunner.getTestContext();
+            const isInteracting = !testRunner.getItemState(testContext.itemIdentifier, 'disabled');
+            const warning = pluginConfig.allowPartial
                 ? __('A response to every question in this item is required.')
                 : __('A response to this item is required.');
 
-            if (isInteracting && testRunnerOptions.enableAllowSkipping && !testContext.allowSkipping) {
-                return new Promise(function(resolve, reject) {
-                    if (_.size(currentItemHelper.getDeclarations(self)) === 0) {
-                        return resolve();
-                    }
-                    if (currentItemHelper.isAnswered(self, pluginConfig.allowPartial)) {
-                        return resolve();
-                    }
 
-                    if (!self.getState('alerted.notallowed')) {
-                        // Only show one alert for itemSessionControl
+            if (isInteracting && testRunnerOptions.enableAllowSkipping) {
+                const currenItem = testRunner.getCurrentItem();
+                //@deprecated use allowSkipping from testMap instead of the testContext
+                const allowSkipping = typeof currenItem.allowSkipping === 'boolean' ?
+                    currenItem.allowSkipping :
+                    testContext.allowSkipping;
 
-                        self.setState('alerted.notallowed', true);
-                        self.trigger('alert.notallowed', warning, function() {
-                            self.trigger('resumeitem');
-                            reject();
-                            self.setState('alerted.notallowed', false);
-                        });
-                    }
-                });
+                if (!allowSkipping) {
+                    return new Promise((resolve, reject) => {
+                        if (_.size(currentItemHelper.getDeclarations(self)) === 0) {
+                            return resolve();
+                        }
+                        if (currentItemHelper.isAnswered(self, pluginConfig.allowPartial)) {
+                            return resolve();
+                        }
+
+                        if (!testRunner.getState('alerted.notallowed')) {
+                            // Only show one alert for itemSessionControl
+
+                            testRunner.setState('alerted.notallowed', true);
+                            testRunner.trigger('alert.notallowed', warning, () => {
+                                testRunner.trigger('resumeitem');
+                                reject();
+                                testRunner.setState('alerted.notallowed', false);
+                            });
+                        }
+                    });
+                }
             }
         });
     }

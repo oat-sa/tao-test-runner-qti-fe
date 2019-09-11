@@ -88,10 +88,11 @@ export default pluginFactory({
                             testRunner.trigger('alert.notallowed', __('A valid response to this item is required.'), () => {
                                 testRunner.trigger('resumeitem');
                                 reject();
-                                setestRunner.setState('alerted.notallowed', false);
+                                testRunner.setState('alerted.notallowed', false);
                             });
                         }
                     });
+                }
             }
         });
 

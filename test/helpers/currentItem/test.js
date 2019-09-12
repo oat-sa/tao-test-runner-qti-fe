@@ -149,7 +149,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
     });
 
     QUnit.test('helpers/currentItem.toResponse', function(assert) {
-        assert.expect(8);
+        assert.expect(9);
 
         assert.deepEqual(
             currentItemHelper.toResponse(null, 'string', 'single'),
@@ -179,6 +179,11 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         assert.deepEqual(
             currentItemHelper.toResponse(['choice_2 choice_3', 'choice_2 choice_4'], 'directedPair', 'multiple'),
             { list: { directedPair: [['choice_2', 'choice_3'], ['choice_2', 'choice_4']] } },
+            'The helper has built the right response'
+        );
+        assert.deepEqual(
+            currentItemHelper.toResponse(['choice_2 choice_3', 'choice_2 choice_4'], 'pair', 'multiple'),
+            { list: { pair: [['choice_2', 'choice_3'], ['choice_2', 'choice_4']] } },
             'The helper has built the right response'
         );
         assert.deepEqual(

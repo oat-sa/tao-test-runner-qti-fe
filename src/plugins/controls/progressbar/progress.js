@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2018-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -217,11 +217,14 @@ var indicators = {
  * @returns {Object} The fixed test map
  */
 function getFixedMap(testMap, testContext) {
-    var item;
-    if (testContext.itemAnswered && testContext.isLinear) {
-        testMap = _.cloneDeep(testMap);
-        item = mapHelper.getItemAt(testMap, testContext.itemPosition);
-        item.answered = false;
+    const currentTestPart = mapHelper.getPart(testMap, testContext.testPartId);
+    const currentItem = mapHelper.getItemAt(testMap, testContext.itemPosition);
+
+    if (currentItem.answered && currentTestPart.isLinear) {
+        const fixedTestMap = _.cloneDeep(testMap);
+        const fixedCurrentItem = mapHelper.getItemAt(fixedTestMap, testContext.itemPosition);
+        fixedCurrentItem.answered = false;
+        return fixedTestMap;
     }
     return testMap;
 }
@@ -469,11 +472,12 @@ export default {
      * @param {Array} config.categories - categories to count by them
      * @returns {progressData}
      */
-    computeStats: function computeStats(testMap, testContext, config) {
-        var statsComputer = (config.scope && scopes[config.scope]) || scopes.test;
-        var stats = statsComputer(testMap, testContext, config || defaultConfig);
+    computeStats(testMap, testContext, config) {
+        const testPart = mapHelper.getPart(testMap, testContext.testPartId);
+        const statsComputer = (config.scope && scopes[config.scope]) || scopes.test;
+        const stats = statsComputer(testMap, testContext, config || defaultConfig);
         stats.overall = testMap.stats.total;
-        if(testContext.isLinear){
+        if(testPart && testPart.isLinear){
             stats.overallCompleted = testMap.stats.answered - 1;
         } else {
             stats.overallCompleted = testMap.stats.answered  ;

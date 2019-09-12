@@ -59,6 +59,12 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
             getOptions() {
                 return data;
             },
+            getCurrentItem(){
+                return map.parts[context.testPartId].sections[context.sectionId].items[context.itemIdentifier];
+            },
+            getCurrentPart(){
+                return map.parts[context.testPartId];
+            },
             itemRunner: {
                 _item: {
                     responses: declarations
@@ -176,7 +182,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
         .test('helpers/messages.getExitMessage (enabled)', function(testData, assert) {
             var context = {
                 itemPosition: 1,
-                itemAnswered: testData.currentItemAnswered
+                sectionId: 'section1',
+                testPartId: 'part1',
+                itemIdentifier: 'item1'
             };
             var data = {
                 enableUnansweredItemsWarning: true
@@ -192,7 +200,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                         sections: {
                             section1: {
                                 items: {
-                                    item1: {},
+                                    item1: {
+                                        answered : testData.currentItemAnswered
+                                    },
                                     item2: {},
                                     item3: {}
                                 },

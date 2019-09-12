@@ -131,6 +131,49 @@ define([
         }
     });
 
+    const testMap = {
+        identifier: "Test",
+        parts: {
+            'Part1': {
+                id: 'Part1',
+                position: 0,
+                sections: {
+                    'Section1': {
+                        id: 'Section1',
+                        position: 0,
+                        items: {
+                            'FirstItem': {
+                                id: 'FirstItem',
+                                position: 0
+                            },
+                            'LastItem': {
+                                id: 'LastItem',
+                                position: 1
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        jumps: [{
+            identifier: "FirstItem",
+            section: "Section1",
+            part: "Part1",
+            position: 0
+        }, {
+            identifier: "LastItem",
+            section: "Section1",
+            part: "Part1",
+            position: 1
+        }]
+    };
+
+    const testContext = {
+        enableAllowSkipping: false,
+        itemIdentifier: 'FirstItem',
+        itemPosition: 0
+    };
+
     QUnit.test('init', function(assert) {
         var ready = assert.async();
 
@@ -168,6 +211,8 @@ define([
             .render(container);
 
         testRunner = testRunnerFactory(providerName);
+        testRunner.setTestMap(testMap);
+        testRunner.setTestContext(testContext);
         testRunner.itemRunner = { _item: runner };
     });
 
@@ -204,6 +249,8 @@ define([
             .render(container);
 
         testRunner = testRunnerFactory(providerName);
+        testRunner.setTestMap(testMap);
+        testRunner.setTestContext(testContext);
         testRunner.itemRunner = { _item: runner };
 
         testRunner

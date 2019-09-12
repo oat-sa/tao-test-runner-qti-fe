@@ -27,6 +27,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import currentItemHelper from 'taoQtiTest/runner/helpers/currentItem';
 import dialogConfirmNext from 'taoQtiTest/runner/plugins/navigation/next/dialogConfirmNext';
+import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
 
 /**
  * Returns the configured plugin
@@ -37,7 +38,7 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
+    init() {
         const self = this;
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
@@ -167,28 +168,27 @@ export default pluginFactory({
                 });
             })
             .before('move skip', function(e, type, scope) {
-                const context = testRunner.getTestContext();
-                const map = testRunner.getTestMap();
-                const item = mapHelper.getItemAt(map, context.itemPosition);
-                const categories = getNextItemCategories();
+                const context     = testRunner.getTestContext();
+                const map         = testRunner.getTestMap();
+                const item        = testRunner.getCurrentItem();
+                const currentPart = testRunner.getCurrentPart();
+                const categories  = getNextItemCategories();
+                const isLast      = navigationHelper.isLast(map, context.itemIdentifier);
 
-                if (context.isLinear) {
+                if (currentPart && currentPart.isLinear) {
                     // Do nothing if nextSection warning imminent:
                     if (scope === 'section' && categories.nextSectionWarning) {
                         return;
-                    }
                     // Do nothing if endOfPart warning imminent:
-                    else if (categories.nextPartWarning) {
+                    } else if (categories.nextPartWarning) {
                         return;
-                    }
                     // Do nothing if 'informational item':
-                    else if (item.informational) {
+                    } else if (item.informational) {
                         return;
-                    }
                     // Show dialog if conditions met:
-                    else if (type === 'next' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
+                    } else if (type === 'next' && !isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('next');
-                    } else if (e.name === 'skip' && !context.isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
+                    } else if (e.name === 'skip' && !isLast && testRunnerOptions.forceEnableLinearNextItemWarning) {
                         return doNextWarning('skip');
                     }
                 }

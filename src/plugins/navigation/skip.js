@@ -50,11 +50,14 @@ var buttonData = {
 
 /**
  * Create the button based on the current context
- * @param {Object} context - the test context
+ * @param {Object} testRunner - testRunner
  * @returns {jQueryElement} the button
  */
-var createElement = function createElement(context) {
-    var dataType = context.isLast ? 'end' : 'skip';
+var createElement = function createElement(testRunner) {
+    const testContext = testRunner.getTestContext();
+    const testMap = testRunner.getTestMap();
+    const isLast  = navigationHelper.isLast(testMap, testContext.itemIdentifier);
+    const dataType = isLast ? 'end' : 'skip';
     return $(buttonTpl(buttonData[dataType]));
 };
 
@@ -102,7 +105,7 @@ export default pluginFactory({
             testRunner.skip();
         }
 
-        this.$element = createElement(testRunner.getTestContext());
+        this.$element = createElement(testRunner);
 
         this.$element.on('click', e => {
             const enable = this.enable.bind(this);

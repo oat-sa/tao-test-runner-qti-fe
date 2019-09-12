@@ -94,14 +94,10 @@ function getTestContext(testContext, testMap, item, section, part, position) {
             {
                 itemIdentifier: item.id,
                 itemPosition: position,
-                itemAnswered: item.answered || part.isLinear,
-                hasFeedbacks: false,
                 remainingAttempts: Math.max(-1, item.remainingAttempts - 1),
                 sectionId: section.id,
                 sectionTitle: section.label,
                 testPartId: part.id,
-                isLinear: part.isLinear,
-                isLast: navigationHelper.isLast(testMap, item.id),
                 canMoveBackward: !part.isLinear && !navigationHelper.isFirst(testMap, item.id)
             },
             testContext

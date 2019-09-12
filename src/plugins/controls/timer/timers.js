@@ -168,9 +168,9 @@ export default function getTimers(timeConstraints, isLinear, config) {
         constraintData.scope = getScope(timeConstraint.scope || timeConstraint.qtiClassName);
 
         if (!constraintData.scope) {
-            logger.warning('Wrong data, a time constraint should apply to a valid scope, skipping');
+            logger.warn('Wrong data, a time constraint should apply to a valid scope, skipping');
         } else if (constraintData.minTime === false && constraintData.maxTime === false) {
-            logger.warning('Time constraint defined with no time, skipping');
+            logger.warn('Time constraint defined with no time, skipping');
 
             // minTime = maxTime -> one locked timer
         } else if (

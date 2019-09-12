@@ -170,7 +170,6 @@ define([
 
     const testContext = {
         enableAllowSkipping: false,
-        allowSkipping: false,
         itemIdentifier: 'FirstItem',
         itemPosition: 0
     };

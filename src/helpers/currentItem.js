@@ -99,7 +99,7 @@ var currentItemHelper = {
         let transform = v => v;
         if (baseType === 'boolean') {
             transform = v => v === true || v === 'true';
-        } else if (baseType === 'directedPair') {
+        } else if (baseType === 'directedPair' || baseType === 'pair') {
             transform = v => {
                 if (_.isString(v)) {
                     return v.split(' ');

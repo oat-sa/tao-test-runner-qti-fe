@@ -670,9 +670,8 @@ var qtiProvider = {
                         self.trigger('pause', {message : err.message});
                     } else {
                         self.trigger('enablenav');
-                        reject(err.message);
+                        reject(err);
                     }
-
                 })
                 .on('init', function() {
                     var itemContainer = self.getAreaBroker().getContentArea();

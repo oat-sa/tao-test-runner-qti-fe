@@ -59,8 +59,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 9,
@@ -111,8 +110,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 5,
@@ -163,8 +161,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 2,
@@ -219,8 +216,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 9,
@@ -279,8 +275,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 5,
@@ -339,8 +334,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 2,
@@ -402,8 +396,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 9,
@@ -462,8 +455,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 5,
@@ -522,8 +514,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 2,
@@ -585,8 +576,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 9,
@@ -645,8 +635,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 5,
@@ -705,8 +694,7 @@ define([
             testContext: {
                 itemPosition: 3,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-1',
-                itemAnswered: true
+                sectionId: 'assessmentSection-1'
             },
             expected: {
                 questions: 2,
@@ -767,8 +755,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 9,
@@ -819,8 +806,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 5,
@@ -871,8 +857,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 3,
@@ -927,8 +912,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 9,
@@ -987,8 +971,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 5,
@@ -1047,8 +1030,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 3,
@@ -1110,8 +1092,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 9,
@@ -1170,8 +1151,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 5,
@@ -1230,8 +1210,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 3,
@@ -1293,8 +1272,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 9,
@@ -1353,8 +1331,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 5,
@@ -1413,8 +1390,7 @@ define([
             testContext: {
                 itemPosition: 5,
                 testPartId: 'testPart-1',
-                sectionId: 'assessmentSection-2',
-                itemAnswered: true
+                sectionId: 'assessmentSection-2'
             },
             expected: {
                 questions: 3,
@@ -1753,8 +1729,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 3,
@@ -1774,8 +1749,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 6,
@@ -1795,8 +1769,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 3,
@@ -1816,8 +1789,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 2,
@@ -1838,8 +1810,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 3,
@@ -1859,8 +1830,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 3,
@@ -1880,8 +1850,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 4,
@@ -1901,8 +1870,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 3,
@@ -1922,8 +1890,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 2,
@@ -1944,8 +1911,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 3,
@@ -1965,8 +1931,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 1,
@@ -1986,8 +1951,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 1,
@@ -2007,8 +1971,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 1,
@@ -2028,8 +1991,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 1,
@@ -2050,8 +2012,7 @@ define([
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-2',
             numberCompleted: 6,
-            numberItems: 12,
-            itemAnswered: true
+            numberItems: 12
         },
         expected: {
             position: 1,

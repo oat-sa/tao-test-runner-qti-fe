@@ -8,7 +8,6 @@
     "itemSessionState": 1,
     "needMapUpdate": false,
     "itemPosition": 0,
-    "itemAnswered": false,
     "timeConstraints": [],
     "extraTime": {
       "total": 0,
@@ -39,7 +38,6 @@
     "itemSessionState": 1,
     "needMapUpdate": false,
     "itemPosition": 2,
-    "itemAnswered": false,
     "timeConstraints": [],
     "extraTime": {
       "total": 0,
@@ -70,7 +68,6 @@
     "itemSessionState": 1,
     "needMapUpdate": false,
     "itemPosition": 13,
-    "itemAnswered": false,
     "timeConstraints": [],
     "extraTime": {
       "total": 0,
@@ -102,7 +99,6 @@
     "itemSessionState": 1,
     "needMapUpdate": false,
     "itemPosition": 5,
-    "itemAnswered": false,
     "timeConstraints": [{
       "label": "Item 3",
       "source": "item-6",
@@ -147,7 +143,6 @@
     "itemSessionState": 1,
     "needMapUpdate": false,
     "itemPosition": 16,
-    "itemAnswered": false,
     "timeConstraints": [],
     "extraTime": {
       "total": 0,

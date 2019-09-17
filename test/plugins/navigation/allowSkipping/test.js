@@ -135,20 +135,24 @@ define([
             {
                 title: 'when the option is not enabled',
                 context: {
-                    itemIdentifier: 'item-1',
-                    enableAllowSkipping: false,
-                    allowSkipping: false
+                    itemIdentifier: 'item-1'
                 },
+                options : {
+                    enableAllowSkipping: false
+                },
+                allowSkipping: false,
                 answered: false,
                 responses: ['foo']
             },
             {
                 title: 'when the item has no interactions',
                 context: {
-                    itemIdentifier: 'item-1',
-                    enableAllowSkipping: true,
-                    allowSkipping: false
+                    itemIdentifier: 'item-1'
                 },
+                options : {
+                    enableAllowSkipping: true
+                },
+                allowSkipping: false,
                 answered: false,
                 responses: []
             },
@@ -156,9 +160,12 @@ define([
                 title: 'when the item is allowed to be skipped',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableAllowSkipping: true,
                     allowSkipping: true
                 },
+                options : {
+                    enableAllowSkipping: true
+                },
+                allowSkipping: true,
                 answered: false,
                 responses: ['foo']
             },
@@ -166,17 +173,23 @@ define([
                 title: 'when the item is answered',
                 context: {
                     itemIdentifier: 'item-1',
-                    enableAllowSkipping: true,
-                    allowSkipping: false
                 },
+                options : {
+                    enableAllowSkipping: true
+                },
+                allowSkipping: false,
                 answered: true,
                 responses: ['foo']
             }
         ])
         .test('Moving is allowed ', function(data, assert) {
-            var ready = assert.async();
-            var runner = runnerFactory(providerName);
-            var plugin = pluginFactory(runner, runner.getAreaBroker());
+            const ready = assert.async();
+            const runner = runnerFactory(providerName, {
+                options : data.options
+            });
+            const plugin = pluginFactory(runner, runner.getAreaBroker());
+
+            runner.getCurrentItem = () => ({ allowSkipping : data.allowSkipping });
 
             assert.expect(1);
 
@@ -206,11 +219,11 @@ define([
                 title: 'when the item not answered',
                 context: {
                     itemIdentifier: 'item-1',
-                    allowSkipping: false
                 },
                 options : {
                     enableAllowSkipping: true
                 },
+                allowSkipping: false,
                 answered: false,
                 responses: ['foo']
             }
@@ -222,6 +235,11 @@ define([
                 options: data.options
             });
             const plugin = pluginFactory(runner, runner.getAreaBroker());
+
+            runner.getCurrentItem = () => ({
+                allowSkipping : data.allowSkipping,
+                answered : data.answered
+            });
 
             assert.expect(2);
 

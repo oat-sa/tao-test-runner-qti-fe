@@ -39,7 +39,7 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
+    init() {
         const self = this;
 
         const testRunner = this.getTestRunner();
@@ -52,6 +52,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         function isEnabled() {
+
+            const currentItem = testRunner.getCurrentItem();
+            if (typeof currentItem.allowComment === 'boolean') {
+                return currentItem.allowComment;
+            }
+
+            //@deprecated use allowComment from the testMap
             const testContext = testRunner.getTestContext();
             const contextOptions = testContext.options || {};
             return !!contextOptions.allowComment;

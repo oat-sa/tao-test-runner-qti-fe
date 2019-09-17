@@ -150,7 +150,6 @@ define([
         title: 'when the next part warning is set',
         testContext: {
             enableAllowSkipping: false,
-            allowSkipping: false,
             options: {
                 nextPartWarning: true,
                 nextSectionWarning: false

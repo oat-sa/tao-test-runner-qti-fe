@@ -96,9 +96,18 @@ var currentItemHelper = {
             value = [value];
         }
 
-        value = _.map(value || [], function(v) {
-            return baseType === 'boolean' ? v === true || v === 'true' : v;
-        });
+        let transform = v => v;
+        if (baseType === 'boolean') {
+            transform = v => v === true || v === 'true';
+        } else if (baseType === 'directedPair' || baseType === 'pair') {
+            transform = v => {
+                if (_.isString(v)) {
+                    return v.split(' ');
+                }
+                return v;
+            };
+        }
+        value = _.map(value || [], transform);
 
         if (mappedCardinality) {
             if (mappedCardinality === 'base') {

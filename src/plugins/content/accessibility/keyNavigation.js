@@ -47,6 +47,12 @@ var defaultPluginConfig = {
 };
 
 /**
+ * initialized test runner navigator
+ * @type {Object}
+ */
+let testRunnerNavigatorItem;
+
+/**
  * Init the navigation in the toolbar
  *
  * @param {Object} testRunner
@@ -483,6 +489,56 @@ function initRubricNavigation() {
 }
 
 /**
+ * Init the navigation to select all item page
+ * make this element scrollable
+ *
+ * @param {Object} testRunner
+ * @returns {Array} of keyNavigator ids
+ */
+function initDefaultItemNavigation(testRunner) {
+    const itemNavigators = [];
+    const $container = $(testRunner.getAreaBroker().getContainer());
+    const $wrapper = $container.find('.content-wrapper');
+    let keyNavigatorItem;
+    const $group = $wrapper.closest('.test-runner-sections');
+    const navigables = navigableDomElement.createFromDoms($wrapper);
+
+    $wrapper.addClass('key-navigation-scrollable');
+    if (navigables.length) {
+        keyNavigatorItem = keyNavigator({
+            id: 'item-content-wrapper',
+            group: $group,
+            elements: navigables,
+            propagateTab: false, // inner item navigators will send tab to this element
+        });
+
+        keyNavigatorItem.on('tab', function (elem) {
+            if ($(elem).closest('.key-navigation-group').get(0) === $group.get(0) && allowedToNavigateFrom(elem)) {
+                runTestRunnerNextTab();
+            }
+        }).on('shift+tab', function (elem) {
+            if ($(elem).closest('.key-navigation-group').get(0) === $group.get(0) && allowedToNavigateFrom(elem)) {
+                runTestRunnerPrevTab();
+            }
+        });
+
+        itemNavigators.push(
+            keyNavigatorItem
+        );
+    }
+
+    return itemNavigators;
+}
+
+function runTestRunnerNextTab() {
+    testRunnerNavigatorItem.trigger('tab');
+}
+
+function runTestRunnerPrevTab() {
+    testRunnerNavigatorItem.trigger('shift+tab');
+}
+
+/**
  * Init test runner navigation
  * @param testRunner
  * @returns {*}
@@ -503,7 +559,8 @@ function initTestRunnerNavigation(testRunner, config) {
                 initAllContentButtonsNavigation(testRunner),
                 initToolbarNavigation(testRunner),
                 initNavigatorNavigation(testRunner),
-                initHeaderNavigation(testRunner)
+                initHeaderNavigation(testRunner),
+                initDefaultItemNavigation(testRunner)
             );
             break;
 
@@ -513,7 +570,8 @@ function initTestRunnerNavigation(testRunner, config) {
                 initDefaultContentNavigation(testRunner),
                 initToolbarNavigation(testRunner),
                 initNavigatorNavigation(testRunner),
-                initHeaderNavigation(testRunner)
+                initHeaderNavigation(testRunner),
+                initDefaultItemNavigation(testRunner)
             );
             break;
     }
@@ -599,6 +657,7 @@ export default pluginFactory({
         testRunner
             .after('renderitem', function() {
                 self.groupNavigator = initTestRunnerNavigation(testRunner, pluginConfig);
+                testRunnerNavigatorItem = self.groupNavigator;
 
                 shortcut.add('tab shift+tab', function(e) {
                     if (!allowedToNavigateFrom(e.target)) {

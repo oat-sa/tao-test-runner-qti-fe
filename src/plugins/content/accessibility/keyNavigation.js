@@ -455,7 +455,9 @@ function initInteractionNavigation($interaction, testRunner) {
  */
 function showElementsContent($el, $visibleContainer) {
     const $wrapper = $visibleContainer.closest('.content-wrapper');
-    $wrapper.scrollTop($el.offset().top + $wrapper.scrollTop() - $wrapper.offset().top);
+    if ($wrapper.length && $el.length) {
+        $wrapper.scrollTop($el.offset().top + $wrapper.scrollTop() - $wrapper.offset().top);
+    }
 }
 
 /**
@@ -500,26 +502,15 @@ function initDefaultItemNavigation(testRunner) {
     const $container = $(testRunner.getAreaBroker().getContainer());
     const $wrapper = $container.find('.content-wrapper');
     let keyNavigatorItem;
-    const $group = $wrapper.closest('.test-runner-sections');
     const navigables = navigableDomElement.createFromDoms($wrapper);
 
     $wrapper.addClass('key-navigation-scrollable');
     if (navigables.length) {
         keyNavigatorItem = keyNavigator({
-            id: 'item-content-wrapper',
-            group: $group,
+            id: 'item-content-wrapper_'.testRunner.getCurrentItem().id,
+            group: $wrapper,
             elements: navigables,
             propagateTab: false, // inner item navigators will send tab to this element
-        });
-
-        keyNavigatorItem.on('tab', function (elem) {
-            if ($(elem).closest('.key-navigation-group').get(0) === $group.get(0) && allowedToNavigateFrom(elem)) {
-                runTestRunnerNextTab();
-            }
-        }).on('shift+tab', function (elem) {
-            if ($(elem).closest('.key-navigation-group').get(0) === $group.get(0) && allowedToNavigateFrom(elem)) {
-                runTestRunnerPrevTab();
-            }
         });
 
         itemNavigators.push(
@@ -528,14 +519,6 @@ function initDefaultItemNavigation(testRunner) {
     }
 
     return itemNavigators;
-}
-
-function runTestRunnerNextTab() {
-    testRunnerNavigatorItem.trigger('tab');
-}
-
-function runTestRunnerPrevTab() {
-    testRunnerNavigatorItem.trigger('shift+tab');
 }
 
 /**
@@ -582,7 +565,10 @@ function initTestRunnerNavigation(testRunner, config) {
         id: 'test-runner',
         replace: true,
         loop: true,
-        elements: navigators
+        elements: navigators,
+        // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
+        // there is an issue with nested navigators
+        propagateTab: false,
     });
 
     keyNavigatorItem

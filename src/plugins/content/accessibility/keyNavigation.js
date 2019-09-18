@@ -506,8 +506,9 @@ function initDefaultItemNavigation(testRunner) {
 
     $wrapper.addClass('key-navigation-scrollable');
     if (navigables.length) {
+        const itemId = testRunner.getCurrentItem().id;
         keyNavigatorItem = keyNavigator({
-            id: 'item-content-wrapper_'.testRunner.getCurrentItem().id,
+            id: `item-content-wrapper_${itemId}`,
             group: $wrapper,
             elements: navigables,
             propagateTab: false, // inner item navigators will send tab to this element

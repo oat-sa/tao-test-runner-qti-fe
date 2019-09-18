@@ -512,6 +512,7 @@ function initDefaultItemNavigation(testRunner) {
             group: $wrapper,
             elements: navigables,
             propagateTab: false, // inner item navigators will send tab to this element
+            replace: true,
         });
 
         itemNavigators.push(

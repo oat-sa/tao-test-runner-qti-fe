@@ -149,44 +149,42 @@ export default pluginFactory({
 
             testRunner.trigger('disablenav');
 
-            if (self.getState('enabled') !== false) {
-                const warningHelper = nextWarningHelper({
-                    endTestWarning: endTestWarning,
-                    isLast: isLastItem(),
-                    isLinear: testPart.isLinear,
-                    nextItemWarning: nextItemWarning,
-                    nextPartWarning: nextPartWarning,
-                    nextPart: mapHelper.getItemPart(testMap, nextItemPosition),
-                    remainingAttempts: testContext.remainingAttempts,
-                    testPartId: testContext.testPartId,
-                    unansweredWarning: unansweredWarning,
-                    stats: statsHelper.getInstantStats(warningScope, testRunner),
-                    unansweredOnly: unansweredOnly
-                });
+            const warningHelper = nextWarningHelper({
+                endTestWarning: endTestWarning,
+                isLast: isLastItem(),
+                isLinear: testPart.isLinear,
+                nextItemWarning: nextItemWarning,
+                nextPartWarning: nextPartWarning,
+                nextPart: mapHelper.getItemPart(testMap, nextItemPosition),
+                remainingAttempts: testContext.remainingAttempts,
+                testPartId: testContext.testPartId,
+                unansweredWarning: unansweredWarning,
+                stats: statsHelper.getInstantStats(warningScope, testRunner),
+                unansweredOnly: unansweredOnly
+            });
 
-                if (warningHelper.shouldWarnBeforeEnd()) {
-                    testRunner.trigger(
-                        'confirm.endTest',
-                        messages.getExitMessage(
-                            __(
-                                'You are about to submit the test. You will not be able to access this test once submitted. Click OK to continue and submit the test.'
-                            ),
-                            warningScope,
-                            testRunner
+            if (warningHelper.shouldWarnBeforeEnd()) {
+                testRunner.trigger(
+                    'confirm.endTest',
+                    messages.getExitMessage(
+                        __(
+                            'You are about to submit the test. You will not be able to access this test once submitted. Click OK to continue and submit the test.'
                         ),
-                        triggerNextAction, // if the test taker accept
-                        enableNav // if he refuse
-                    );
-                } else if (warningHelper.shouldWarnBeforeNext()) {
-                    testRunner.trigger(
-                        'confirm.next',
-                        __('You are about to go to the next item. Click OK to continue and go to the next item.'),
-                        triggerNextAction, // if the test taker accept
-                        enableNav // if he refuse
-                    );
-                } else {
-                    triggerNextAction();
-                }
+                        warningScope,
+                        testRunner
+                    ),
+                    triggerNextAction, // if the test taker accept
+                    enableNav // if he refuse
+                );
+            } else if (warningHelper.shouldWarnBeforeNext()) {
+                testRunner.trigger(
+                    'confirm.next',
+                    __('You are about to go to the next item. Click OK to continue and go to the next item.'),
+                    triggerNextAction, // if the test taker accept
+                    enableNav // if he refuse
+                );
+            } else {
+                triggerNextAction();
             }
         }
 
@@ -203,7 +201,10 @@ export default pluginFactory({
         //attach behavior
         this.$element.on('click', function(e) {
             e.preventDefault();
-            testRunner.trigger('nav-next');
+            if (self.getState('enabled') === true) {
+                self.getState('enabled', false);
+                testRunner.trigger('nav-next');
+            }
         });
 
         if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
@@ -211,6 +212,7 @@ export default pluginFactory({
                 namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
                 function() {
                     if (self.getState('enabled') === true) {
+                        self.setState('enabled', false);
                         testRunner.trigger('nav-next', true);
                     }
                 },

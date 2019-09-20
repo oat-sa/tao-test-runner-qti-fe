@@ -202,7 +202,7 @@ export default pluginFactory({
         this.$element.on('click', function(e) {
             e.preventDefault();
             if (self.getState('enabled') === true) {
-                self.getState('enabled', false);
+                self.setState('enabled', false);
                 testRunner.trigger('nav-next');
             }
         });

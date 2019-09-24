@@ -339,17 +339,14 @@ export default function compoundMaskFactory(options, dimensions, position) {
                     $dragIcon = $('<div>', {
                         class: 'icon icon-move'
                     });
-
+                $element.css('touch-action', 'none');
                 $element.addClass('line-reader-inner-drag');
                 $element.css({ background: 'none' });
                 $element.append($dragIcon);
-                $element.on('mousedown touchstart', function(e) {
-                    e.stopPropagation();
-                    bringAllToFront();
-                });
             })
             .on('dragstart', function() {
                 closer.hide();
+                bringAllToFront();
                 invokeOnMasks('setState', ['resizing', true]);
             })
             .on('dragmove', function(xOffsetRelative, yOffsetRelative) {

@@ -212,10 +212,10 @@ export default _.defaults(
                                                         : null;
 
                                                 if (!actionResult.success && self.actionRejectPromises[actionId]) {
+                                                    var error = new Error(actionResult.message);
+                                                    error.unrecoverable = true;
+                                                    reject(error);
                                                 }
-                                                var error = new Error('sdfdasf');
-                                                unrecoverable = true;
-                                                reject(error);
 
                                                 if (actionId && self.actionPromises[actionId]) {
                                                     self.actionPromises[actionId](actionResult);

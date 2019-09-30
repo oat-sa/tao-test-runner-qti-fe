@@ -249,9 +249,10 @@ var qtiProvider = {
 
             //catch server errors
             var submitError = function submitError(err) {
-                console.log(123);
-                //some server errors are valid, so we don't fail (prevent empty responses)
-                if (err.code === 200) {
+                if (err && err.unrecoverable){
+                    self.trigger('pause', {message : err.message});
+                } else if (err.code === 200) {
+                    //some server errors are valid, so we don't fail (prevent empty responses)
                     self.trigger(
                         'alert.submitError',
                         err.message || __('An error occurred during results submission. Please retry.'),
@@ -667,8 +668,12 @@ var qtiProvider = {
                 assetManager: assetManager
             })
                 .on('error', function(err) {
-                    self.trigger('enablenav');
-                    reject(err);
+                    if(err && err.unrecoverable){
+                        self.trigger('pause', {message : err.message});
+                    } else {
+                        self.trigger('enablenav');
+                        reject(err);
+                    }
                 })
                 .on('init', function() {
                     var itemContainer = self.getAreaBroker().getContentArea();

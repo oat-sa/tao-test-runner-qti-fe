@@ -249,6 +249,7 @@ var qtiProvider = {
 
             //catch server errors
             var submitError = function submitError(err) {
+                console.log(123);
                 //some server errors are valid, so we don't fail (prevent empty responses)
                 if (err.code === 200) {
                     self.trigger(

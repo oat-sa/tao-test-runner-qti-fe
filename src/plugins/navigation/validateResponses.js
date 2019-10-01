@@ -66,6 +66,8 @@ export default pluginFactory({
                 return Promise.resolve();
             }
 
+            self.trigger('disableitem');
+
             if (isInteracting && testRunnerOptions.enableValidateResponses) {
 
                 const currenItem = testRunner.getCurrentItem();

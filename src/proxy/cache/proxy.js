@@ -212,9 +212,9 @@ export default _.defaults(
                                                         : null;
 
                                                 if (!actionResult.success && self.actionRejectPromises[actionId]) {
-                                                    var error = new Error(actionResult.message);
+                                                    const error = new Error(actionResult.message);
                                                     error.unrecoverable = true;
-                                                    reject(error);
+                                                    return reject(error);
                                                 }
 
                                                 if (actionId && self.actionPromises[actionId]) {

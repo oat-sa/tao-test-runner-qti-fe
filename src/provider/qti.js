@@ -666,8 +666,12 @@ var qtiProvider = {
                 assetManager: assetManager
             })
                 .on('error', function(err) {
-                    self.trigger('enablenav');
-                    reject(err);
+                    if(err && err.unrecoverable){
+                        self.trigger('pause', {message : err.message});
+                    } else {
+                        self.trigger('enablenav');
+                        reject(err);
+                    }
                 })
                 .on('init', function() {
                     var itemContainer = self.getAreaBroker().getContentArea();

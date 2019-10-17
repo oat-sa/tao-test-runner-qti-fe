@@ -364,11 +364,11 @@ function magnifierPanelFactory(config) {
             const $currentElement = $(elements.shift());
             const scrollLeft = $currentElement.scrollLeft();
             const scrollTop = $currentElement.scrollTop();
+            let scrollId = $currentElement.data('magnifier-scroll');
 
             elements.push(...Array.from($currentElement.children()));
 
-            if (scrollLeft > 0 || scrollTop > 0) {
-                let scrollId = $currentElement.data('magnifier-scroll');
+            if (scrollLeft > 0 || scrollTop > 0 || scrollId) {
                 scrollOffsetsChanged = true;
 
                 if (scrollId) {

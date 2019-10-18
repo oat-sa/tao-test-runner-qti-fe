@@ -123,7 +123,7 @@ export default pluginFactory({
             /**
              * Restore timer from client.
              */
-            restoreTimerFromClient: testRunnerOptions.restoreTimerFromClient
+            restoreTimerFromClient: testRunnerOptions.timer.restoreTimerFromClient
         }, this.getConfig());
 
         /**

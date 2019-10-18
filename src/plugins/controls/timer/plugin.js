@@ -62,7 +62,6 @@ export default pluginFactory({
             return Promise.all(
                 _.map(timers, function(timer) {
                     return timeStore.getItem(`consumed_${timer.id}`).then(function(savedConsumedTime) {
-                        debugger;
                         if (_.isNumber(savedConsumedTime) && savedConsumedTime >= 0 && config.restoreTimerFromClient) {
                             timer.remainingTime = timer.originalTime + timer.extraTime.total - savedConsumedTime;
                         }
@@ -82,8 +81,6 @@ export default pluginFactory({
         this.saveTimers = function saveTimers(timeStore, timers) {
             return Promise.all(
                 _.map(timers, function(timer) {
-                    console.log(`consumed_${timer.id}`);
-                    console.log(timer.originalTime + timer.extraTime.total - timer.remainingTime);
                     return timeStore.setItem(
                         `consumed_${timer.id}`,
                         timer.originalTime + timer.extraTime.total - timer.remainingTime

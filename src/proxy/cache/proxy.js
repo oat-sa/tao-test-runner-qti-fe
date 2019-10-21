@@ -82,6 +82,9 @@ export default _.defaults(
             //scheduled action promises which supposed to be resolved after action synchronization.
             this.actionPromises = {};
 
+            //scheduled action reject promises which supposed to be rejected in case of failed synchronization.
+            this.actionRejectPromises = {};
+
             //let's you update test data (testContext and testMap)
             this.dataUpdater = dataUpdater(this.getDataHolder());
 
@@ -196,6 +199,7 @@ export default _.defaults(
                     self.scheduleAction(action, actionParams)
                         .then(function(actionData) {
                             self.actionPromises[actionData.params.actionId] = resolve;
+                            self.actionRejectPromises[actionData.params.actionId] = reject;
                             if (!deferred) {
                                 self.syncData()
                                     .then(function(result) {
@@ -206,6 +210,12 @@ export default _.defaults(
                                                     actionResult.requestParameters.actionId
                                                         ? actionResult.requestParameters.actionId
                                                         : null;
+
+                                                if (!actionResult.success && self.actionRejectPromises[actionId]) {
+                                                    const error = new Error(actionResult.message);
+                                                    error.unrecoverable = true;
+                                                    return reject(error);
+                                                }
 
                                                 if (actionId && self.actionPromises[actionId]) {
                                                     self.actionPromises[actionId](actionResult);

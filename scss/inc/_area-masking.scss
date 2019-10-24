@@ -1,5 +1,5 @@
 
-.mask-container {
+.mask-container.mask-container {
     background-color: transparent;
 
     .dynamic-component-title-bar {
@@ -50,6 +50,7 @@
                 background-color: $uiGeneralContentBg;
                 opacity: 1;
                 box-sizing: content-box;
+                padding-bottom: 30px;
             }
 
             .controls {

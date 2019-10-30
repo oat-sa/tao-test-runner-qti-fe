@@ -250,8 +250,8 @@ function magnifierPanelFactory(config) {
              */
             translate: function translate(x, y) {
                 return {
-                    top: translateMagnifier(y, targetHeight, dynamicComponentInstance.config.height),
-                    left: translateMagnifier(x, targetWidth, dynamicComponentInstance.config.width)
+                    top: translateMagnifier(y, targetHeight, dynamicComponentInstance.position.height),
+                    left: translateMagnifier(x, targetWidth, dynamicComponentInstance.position.width)
                 };
             },
 

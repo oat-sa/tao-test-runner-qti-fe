@@ -473,7 +473,7 @@ var qtiProvider = {
                     .callTestAction('pause', {
                         reason: {
                             reasons: data && data.reasons,
-                            comment: data && data.originalMessage || data.message
+                            comment: data && (data.originalMessage || data.message)
                         }
                     })
                     .then(function() {

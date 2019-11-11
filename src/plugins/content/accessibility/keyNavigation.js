@@ -526,7 +526,7 @@ function initDefaultItemNavigation(testRunner) {
 function initTTSNavigation(testRunner) {
     const pluginName = 'apiptts';
     const actionPrefix = `tool-${pluginName}-`;
-    const $itemElement = $(`[data-control="${pluginName}"]`);
+    const $itemElement = $(`.${pluginName}-plugin`);
     const id = `${pluginName}_navigation_group`;
 
     const test1Navigator = keyNavigator({
@@ -693,14 +693,14 @@ export default pluginFactory({
                 pluginConfig.contentNavigatorType = type;
             })
             .on('plugin-open.apiptts', () => {
-                const $itemElement = $('[data-control="apiptts"]');
+                const $itemElement = $('.apiptts-plugin');
 
                 $itemElement.addClass(ignoredClass);
 
                 this.groupNavigator.goto('apiptts_navigation_group');
             })
             .on('plugin-close.apiptts', () => {
-                const $itemElement = $('[data-control="apiptts"]');
+                const $itemElement = $('.apiptts-plugin');
 
                 $itemElement.removeClass(ignoredClass);
             });

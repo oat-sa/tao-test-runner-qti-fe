@@ -39,7 +39,7 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
+    init() {
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
@@ -77,7 +77,7 @@ export default pluginFactory({
             this.button.turnOn();
             this.setState('active', true);
 
-            testRunner.trigger(`plugin-open.${pluginName}`);
+            this.trigger('open');
         };
 
         /**
@@ -89,7 +89,7 @@ export default pluginFactory({
             this.setState('active', false);
 
             this.button.turnOff();
-            testRunner.trigger(`plugin-close.${pluginName}`);
+            this.trigger('close');
         };
 
         /**
@@ -109,7 +109,8 @@ export default pluginFactory({
         this.button = this.getAreaBroker()
             .getToolbox()
             .createEntry({
-                control: 'apiptts',
+                className: `${this.getName()}-plugin`,
+                control: this.getName(),
                 icon: 'headphones',
                 text: __('Text To Speech'),
                 title: __('Enable text to speech'),
@@ -179,31 +180,31 @@ export default pluginFactory({
     /**
      * Called during the runner's destroy phase
      */
-    destroy: function destroy() {
+    destroy() {
         shortcut.remove(`.${this.getName()}`);
     },
     /**
      * Enable the button
      */
-    enable: function enable() {
+    enable() {
         this.button.enable();
     },
     /**
      * Disable the button
      */
-    disable: function disable() {
+    disable() {
         this.button.disable();
     },
     /**
      * Show the button
      */
-    show: function show() {
+    show() {
         this.button.show();
     },
     /**
      * Hide the button
      */
-    hide: function hide() {
+    hide() {
         this.button.hide();
     }
 });

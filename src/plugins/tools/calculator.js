@@ -178,6 +178,7 @@ export default pluginFactory({
                 .after('render', function() {
                     this.show();
                 });
+            self.trigger('open');
         }
 
         /**

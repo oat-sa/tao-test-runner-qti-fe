@@ -19,6 +19,7 @@
  * @author Péter Halász <peter@taotesting.com>
  */
 import _ from 'lodash';
+import __ from 'i18n';
 import offlineNavigatorFactory from 'taoQtiTest/runner/navigator/offlineNavigator';
 import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
 import dataUpdater from 'taoQtiTest/runner/provider/dataUpdater';
@@ -318,6 +319,7 @@ export default _.defaults(
                                 _.forEach(actions, function(action) {
                                     self.actionStore.push(action.action, action.parameters, action.timestamp);
                                 });
+                                err.message = __("You are currently working offline. Error with connection to the server.")
                             }
 
                             self.trigger('error', err);

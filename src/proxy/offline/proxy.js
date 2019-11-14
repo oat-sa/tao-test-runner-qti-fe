@@ -318,7 +318,6 @@ export default _.defaults(
                             }
 
                             self.trigger('error', err);
-
                             throw err;
                         });
                 });

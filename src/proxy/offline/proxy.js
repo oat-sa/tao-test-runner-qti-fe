@@ -307,10 +307,6 @@ export default _.defaults(
                             if (data && data.length) {
                                 return self.sendSyncData(data);
                             }
-                        }).finally((data) => {
-                            self.syncInProgress = false;
-
-                            return data;
                         })
                         .catch(function(err) {
                             if (self.isConnectivityError(err)) {
@@ -318,11 +314,16 @@ export default _.defaults(
                                 _.forEach(actions, function(action) {
                                     self.actionStore.push(action.action, action.parameters, action.timestamp);
                                 });
+                                return;
                             }
 
+                            self.syncInProgress = false;
                             self.trigger('error', err);
-
+                            
                             throw err;
+                        }).then(data => {
+                            self.syncInProgress = false;
+                            return data;
                         });
                 });
             };

@@ -304,13 +304,11 @@ export default _.defaults(
                         .flush()
                         .then(function(data) {
                             actions = data;
-                            self.syncInProgress = false;
                             if (data && data.length) {
                                 return self.sendSyncData(data);
                             }
                         })
                         .catch(function(err) {
-                            self.syncInProgress = false;
                             if (self.isConnectivityError(err)) {
                                 self.setOffline('communicator');
                                 _.forEach(actions, function(action) {
@@ -319,8 +317,13 @@ export default _.defaults(
                                 return;
                             }
 
+                            self.syncInProgress = false;
                             self.trigger('error', err);
+                            
                             throw err;
+                        }).then(data => {
+                            self.syncInProgress = false;
+                            return data;
                         });
                 });
             };

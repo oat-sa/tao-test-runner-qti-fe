@@ -27,14 +27,16 @@ import hider from 'ui/hider';
 import waitingDialogFactory from 'ui/waitingDialog/waitingDialog';
 import offlineSyncModalCountdownTpl from 'taoQtiTest/runner/helpers/templates/offlineSyncModalCountdown';
 import offlineSyncModalWaitContentTpl from 'taoQtiTest/runner/helpers/templates/offlineSyncModalWaitContent';
+import shortcutRegistry from 'util/shortcut/registry';
+import globalShortcut from 'util/shortcut';
 
 /**
  * Display the waiting dialog, while waiting the connection to be back
  * @param {Object} [proxy] - test runner proxy
  * @returns {waitingDialog} resolves once the wait is over and the user click on 'proceed'
  */
-var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
-    var waitingConfig = {
+function offlineSyncModalFactory(proxy) {
+    const waitingConfig = {
         message: __('You are encountering a prolonged connectivity loss.'),
         waitContent: offlineSyncModalWaitContentTpl(),
         proceedContent: __('The connection seems to be back, please proceed.'),
@@ -45,40 +47,54 @@ var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
         buttonSeparatorText: __('or'),
         width: '600px'
     };
-    var $secondaryButton;
-    var secondaryButtonWait = 60; // seconds to wait until it enables
-    var $countdown = $(offlineSyncModalCountdownTpl());
-    var countdownPolling;
+    let $secondaryButton;
+    const secondaryButtonWait = 60; // seconds to wait until it enables
+    const $countdown = $(offlineSyncModalCountdownTpl());
+    let countdownPolling;
+
+    const dialogShortcut = shortcutRegistry($('body'), {
+        propagate: false,
+        prevent: true
+    });
+
+    // starts with shortcuts disabled, prevents the TAB key to be used to move outside the dialog box
+    dialogShortcut.disable().set('Tab Shift+Tab');
 
     //creates the waiting modal dialog
-    var waitingDialog = waitingDialogFactory(waitingConfig)
-        .on('render', function() {
+    const waitingDialog = waitingDialogFactory(waitingConfig)
+        .on('render', () => {
             $secondaryButton = $('div.preview-modal-feedback.modal').find('button[data-control="secondary"]');
 
             $countdown.insertAfter($secondaryButton);
 
-            proxy.off('reconnect.waiting').after('reconnect.waiting', function() {
-                waitingDialog.endWait();
-            });
+            proxy.off('reconnect.waiting').after('reconnect.waiting', () => waitingDialog.endWait());
 
             // if render comes before beginWait:
             if (waitingDialog.is('waiting')) {
                 waitingDialog.trigger('begincountdown');
             }
+
+            globalShortcut.disable();
+            dialogShortcut.enable();
         })
-        .on('wait', function() {
+        .on('destroy', () => {
+            globalShortcut.enable();
+            dialogShortcut.disable();
+            dialogShortcut.clear();
+        })
+        .on('wait', () => {
             // if beginWait comes before render:
             if (waitingDialog.is('rendered')) {
                 waitingDialog.trigger('begincountdown');
             }
         })
-        .on('begincountdown', function() {
-            var delaySec = secondaryButtonWait;
+        .on('begincountdown', () => {
+            let delaySec = secondaryButtonWait;
             // Set up secondary button time delay:
             // it can only be clicked after 60 seconds have passed
             $secondaryButton.prop('disabled', true);
             countdownPolling = polling({
-                action: function() {
+                action: function countdownAction() {
                     delaySec--;
                     $countdown.html(__('The download will be available in <strong>%d</strong> seconds', delaySec));
                     if (delaySec < 1) {
@@ -91,7 +107,7 @@ var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
                 autoStart: true
             });
         })
-        .on('unwait', function() {
+        .on('unwait', () => {
             countdownPolling.stop();
             $secondaryButton.prop('disabled', true);
             $countdown.remove();

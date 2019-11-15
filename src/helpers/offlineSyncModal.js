@@ -77,11 +77,9 @@ function offlineSyncModalFactory(proxy) {
             globalShortcut.disable();
             dialogShortcut.enable();
         })
-        .on('proceed secondaryaction', () => {
+        .on('destroy', () => {
             globalShortcut.enable();
             dialogShortcut.disable();
-        })
-        .on('destroy', () => {
             dialogShortcut.clear();
         })
         .on('wait', () => {

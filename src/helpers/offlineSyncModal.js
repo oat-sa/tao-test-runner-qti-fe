@@ -27,14 +27,16 @@ import hider from 'ui/hider';
 import waitingDialogFactory from 'ui/waitingDialog/waitingDialog';
 import offlineSyncModalCountdownTpl from 'taoQtiTest/runner/helpers/templates/offlineSyncModalCountdown';
 import offlineSyncModalWaitContentTpl from 'taoQtiTest/runner/helpers/templates/offlineSyncModalWaitContent';
+import shortcutRegistry from 'util/shortcut/registry';
+import globalShortcut from 'util/shortcut';
 
 /**
  * Display the waiting dialog, while waiting the connection to be back
  * @param {Object} [proxy] - test runner proxy
  * @returns {waitingDialog} resolves once the wait is over and the user click on 'proceed'
  */
-var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
-    var waitingConfig = {
+function offlineSyncModalFactory(proxy) {
+    const waitingConfig = {
         message: __('You are encountering a prolonged connectivity loss.'),
         waitContent: offlineSyncModalWaitContentTpl(),
         proceedContent: __('The connection seems to be back, please proceed.'),
@@ -77,8 +79,17 @@ var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
             if (waitingDialog.is('waiting')) {
                 waitingDialog.trigger('begincountdown');
             }
+
+            globalShortcut.disable();
+            dialogShortcut.enable();
+        })
+        .on('destroy', () => {
+            globalShortcut.enable();
+            dialogShortcut.disable();
+            dialogShortcut.clear();
         })
         .on('wait', () => {
+
             hider.show('.between-buttons-text');
             // if beginWait comes before render:
             if (waitingDialog.is('rendered')) {
@@ -91,7 +102,7 @@ var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
             // if disconnect-reconnect delay will be left seconds
             $secondaryButton.prop('disabled', true);
             countdownPolling = polling({
-                action: function() {
+                action: function countdownAction() {
                     delaySec--;
                     $countdown.html(__('The download will be available in <strong>%d</strong> seconds', delaySec));
                     if (delaySec < 1) {
@@ -104,7 +115,7 @@ var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
                 autoStart: true
             });
         })
-        .on('unwait', function() {
+        .on('unwait', () => {
             countdownPolling.stop();
             $secondaryButton.prop('disabled', true);
             $countdown.html('');

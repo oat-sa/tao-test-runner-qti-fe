@@ -178,30 +178,43 @@ export default _.defaults(
                         result.testContext = {
                             state: states.testSession.closed
                         };
-                        if (isOffline) {
-                            return new Promise(function() {
-                                offlineSyncModal(self)
-                                    .on('proceed', function() {
-                                        self.syncData()
-                                            .then(function() {
+                        const offlineSync = function() {
+                            offlineSyncModal(self)
+                                .on('proceed', function() {
+                                    self.syncData()
+                                        .then(function() {
+                                            // if is online resolve promise 
+                                            if (self.isOnline()) {
                                                 return resolve(result);
-                                            })
-                                            .catch(function() {
-                                                return resolve({ success: false });
-                                            });
-                                    })
-                                    .on('secondaryaction', function() {
-                                        self.initiateDownload().catch(function() {
+                                            }
+                                        })
+                                        .catch(function() {
                                             return resolve({ success: false });
                                         });
+                                    })
+                                .on('secondaryaction', function() {
+                                    self.initiateDownload().catch(function() {
+                                        return resolve({ success: false });
                                     });
-                            }).catch(function() {
-                                return resolve({ success: false });
-                            });
+                                });
+                            };
+                        if (isOffline) {
+                            return new Promise(offlineSync)
+                                .catch(function() {
+                                    return resolve({ success: false });
+                                });
                         } else {
                             return self
                                 .syncData()
                                 .then(function() {
+                                    if (self.isOffline()) {
+                                        // in case last request was failed and connection lost
+                                        // show offlineWaitingDialog
+                                        return new Promise(offlineSync)
+                                            .catch(function() {
+                                                return resolve({ success: false });
+                                            });
+                                    }
                                     return resolve(result);
                                 })
                                 .catch(function() {

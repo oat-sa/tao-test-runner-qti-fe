@@ -69,10 +69,7 @@ var offlineSyncModalFactory = function offlineSyncModalFactory(proxy) {
             proxy.after('reconnect', () => waitingDialog.endWait());
             proxy.before('disconnect', () => {
                 // need to open dialog again if it is closed
-                const waitingDialogModal = $('.preview-modal-feedback');
-                if (!waitingDialogModal.hasClass('opened')){
-                    waitingDialogModal('open');
-                }
+                waitingDialog.dialog.show();
                 waitingDialog.beginWait();
             });
 

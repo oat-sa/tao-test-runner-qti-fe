@@ -48,7 +48,9 @@ function offlineSyncModalFactory(proxy) {
         width: '600px'
     };
     let $secondaryButton;
+    const betweenButtonTextSelector = '.between-buttons-text';
     const secondaryButtonWait = 60; // seconds to wait until it enables
+    let delaySec;
     const $countdown = $(offlineSyncModalCountdownTpl());
     let countdownPolling;
 
@@ -61,13 +63,22 @@ function offlineSyncModalFactory(proxy) {
     dialogShortcut.disable().set('Tab Shift+Tab');
 
     //creates the waiting modal dialog
-    const waitingDialog = waitingDialogFactory(waitingConfig)
-        .on('render', () => {
-            $secondaryButton = $('div.preview-modal-feedback.modal').find('button[data-control="secondary"]');
+    const waitingDialog = waitingDialogFactory(waitingConfig);
 
+    const getDialogEl = selector => waitingDialog.dialog.getDom().find(selector);
+
+    waitingDialog
+        .on('render', () => {
+            delaySec = secondaryButtonWait;
+            $secondaryButton = getDialogEl('button[data-control="secondary"]');
             $countdown.insertAfter($secondaryButton);
 
-            proxy.off('reconnect.waiting').after('reconnect.waiting', () => waitingDialog.endWait());
+            proxy.after('reconnect.waiting', () => waitingDialog.endWait());
+            proxy.before('disconnect.waiting', () => {
+                // need to open dialog again if it is closed
+                waitingDialog.dialog.show();
+                waitingDialog.beginWait();
+            });
 
             // if render comes before beginWait:
             if (waitingDialog.is('waiting')) {
@@ -78,20 +89,22 @@ function offlineSyncModalFactory(proxy) {
             dialogShortcut.enable();
         })
         .on('destroy', () => {
+            proxy.off('.waiting');
             globalShortcut.enable();
             dialogShortcut.disable();
             dialogShortcut.clear();
         })
         .on('wait', () => {
+            hider.show(getDialogEl(betweenButtonTextSelector));
             // if beginWait comes before render:
             if (waitingDialog.is('rendered')) {
                 waitingDialog.trigger('begincountdown');
             }
         })
         .on('begincountdown', () => {
-            let delaySec = secondaryButtonWait;
             // Set up secondary button time delay:
             // it can only be clicked after 60 seconds have passed
+            // if disconnect-reconnect delay will be left seconds
             $secondaryButton.prop('disabled', true);
             countdownPolling = polling({
                 action: function countdownAction() {
@@ -110,8 +123,8 @@ function offlineSyncModalFactory(proxy) {
         .on('unwait', () => {
             countdownPolling.stop();
             $secondaryButton.prop('disabled', true);
-            $countdown.remove();
-            hider.hide('.between-buttons-text');
+            $countdown.html('');
+            hider.hide(getDialogEl(betweenButtonTextSelector));
         });
 
     return waitingDialog;

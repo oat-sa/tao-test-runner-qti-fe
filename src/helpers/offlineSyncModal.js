@@ -68,8 +68,8 @@ function offlineSyncModalFactory(proxy) {
             $secondaryButton = $('div.preview-modal-feedback.modal').find('button[data-control="secondary"]');
             $countdown.insertAfter($secondaryButton);
 
-            proxy.after('reconnect', () => waitingDialog.endWait());
-            proxy.before('disconnect', () => {
+            proxy.after('reconnect.waiting', () => waitingDialog.endWait());
+            proxy.before('disconnect.waiting', () => {
                 // need to open dialog again if it is closed
                 waitingDialog.dialog.show();
                 waitingDialog.beginWait();
@@ -84,6 +84,8 @@ function offlineSyncModalFactory(proxy) {
             dialogShortcut.enable();
         })
         .on('destroy', () => {
+            proxy.off('reconnect.waiting');
+            proxy.off('disconnect.waiting');
             globalShortcut.enable();
             dialogShortcut.disable();
             dialogShortcut.clear();

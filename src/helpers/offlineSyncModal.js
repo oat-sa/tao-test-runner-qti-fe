@@ -48,7 +48,7 @@ function offlineSyncModalFactory(proxy) {
         width: '600px'
     };
     let $secondaryButton;
-    const betweenButtonTextSelector = 'div.preview-modal-feedback.modal .between-buttons-text';
+    const betweenButtonTextSelector = '.between-buttons-text';
     const secondaryButtonWait = 60; // seconds to wait until it enables
     let delaySec;
     const $countdown = $(offlineSyncModalCountdownTpl());
@@ -63,10 +63,14 @@ function offlineSyncModalFactory(proxy) {
     dialogShortcut.disable().set('Tab Shift+Tab');
 
     //creates the waiting modal dialog
-    const waitingDialog = waitingDialogFactory(waitingConfig)
+    const waitingDialog = waitingDialogFactory(waitingConfig);
+
+    const getDialogEl = selector => waitingDialog.dialog.getDom().find(selector);
+
+    waitingDialog
         .on('render', () => {
             delaySec = secondaryButtonWait;
-            $secondaryButton = $('div.preview-modal-feedback.modal').find('button[data-control="secondary"]');
+            $secondaryButton = getDialogEl('button[data-control="secondary"]');
             $countdown.insertAfter($secondaryButton);
 
             proxy.after('reconnect.waiting', () => waitingDialog.endWait());
@@ -85,14 +89,13 @@ function offlineSyncModalFactory(proxy) {
             dialogShortcut.enable();
         })
         .on('destroy', () => {
-            proxy.off('reconnect.waiting');
-            proxy.off('disconnect.waiting');
+            proxy.off('.waiting');
             globalShortcut.enable();
             dialogShortcut.disable();
             dialogShortcut.clear();
         })
         .on('wait', () => {
-            hider.show(betweenButtonTextSelector);
+            hider.show(getDialogEl(betweenButtonTextSelector));
             // if beginWait comes before render:
             if (waitingDialog.is('rendered')) {
                 waitingDialog.trigger('begincountdown');
@@ -121,7 +124,7 @@ function offlineSyncModalFactory(proxy) {
             countdownPolling.stop();
             $secondaryButton.prop('disabled', true);
             $countdown.html('');
-            hider.hide(betweenButtonTextSelector);
+            hider.hide(getDialogEl(betweenButtonTextSelector));
         });
 
     return waitingDialog;

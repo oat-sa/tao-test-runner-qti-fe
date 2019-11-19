@@ -49,6 +49,7 @@ function offlineSyncModalFactory(proxy) {
     };
     let $secondaryButton;
     const secondaryButtonWait = 60; // seconds to wait until it enables
+    let delaySec;
     const $countdown = $(offlineSyncModalCountdownTpl());
     let countdownPolling;
 
@@ -63,11 +64,16 @@ function offlineSyncModalFactory(proxy) {
     //creates the waiting modal dialog
     const waitingDialog = waitingDialogFactory(waitingConfig)
         .on('render', () => {
+            delaySec = secondaryButtonWait;
             $secondaryButton = $('div.preview-modal-feedback.modal').find('button[data-control="secondary"]');
-
             $countdown.insertAfter($secondaryButton);
 
-            proxy.off('reconnect.waiting').after('reconnect.waiting', () => waitingDialog.endWait());
+            proxy.after('reconnect', () => waitingDialog.endWait());
+            proxy.before('disconnect', () => {
+                // need to open dialog again!!!
+                // waitingDialog.getElement().modal('open'); - not working 
+                waitingDialog.beginWait()
+            });
 
             // if render comes before beginWait:
             if (waitingDialog.is('waiting')) {
@@ -83,15 +89,17 @@ function offlineSyncModalFactory(proxy) {
             dialogShortcut.clear();
         })
         .on('wait', () => {
+
+            hider.show('.between-buttons-text');
             // if beginWait comes before render:
             if (waitingDialog.is('rendered')) {
                 waitingDialog.trigger('begincountdown');
             }
         })
         .on('begincountdown', () => {
-            let delaySec = secondaryButtonWait;
             // Set up secondary button time delay:
             // it can only be clicked after 60 seconds have passed
+            // if disconnect-reconnect delay will be left seconds
             $secondaryButton.prop('disabled', true);
             countdownPolling = polling({
                 action: function countdownAction() {
@@ -110,7 +118,7 @@ function offlineSyncModalFactory(proxy) {
         .on('unwait', () => {
             countdownPolling.stop();
             $secondaryButton.prop('disabled', true);
-            $countdown.remove();
+            $countdown.html('');
             hider.hide('.between-buttons-text');
         });
 

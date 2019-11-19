@@ -48,6 +48,7 @@ function offlineSyncModalFactory(proxy) {
         width: '600px'
     };
     let $secondaryButton;
+    const betweenButtonTextSelector = 'div.preview-modal-feedback.modal .between-buttons-text';
     const secondaryButtonWait = 60; // seconds to wait until it enables
     let delaySec;
     const $countdown = $(offlineSyncModalCountdownTpl());
@@ -91,8 +92,7 @@ function offlineSyncModalFactory(proxy) {
             dialogShortcut.clear();
         })
         .on('wait', () => {
-
-            hider.show('.between-buttons-text');
+            hider.show(betweenButtonTextSelector);
             // if beginWait comes before render:
             if (waitingDialog.is('rendered')) {
                 waitingDialog.trigger('begincountdown');
@@ -121,7 +121,7 @@ function offlineSyncModalFactory(proxy) {
             countdownPolling.stop();
             $secondaryButton.prop('disabled', true);
             $countdown.html('');
-            hider.hide('.between-buttons-text');
+            hider.hide(betweenButtonTextSelector);
         });
 
     return waitingDialog;

@@ -199,10 +199,7 @@ export default _.defaults(
                                 });
                             };
                         if (isOffline) {
-                            return new Promise(offlineSync)
-                                .catch(function() {
-                                    return resolve({ success: false });
-                                });
+                            return offlineSync();
                         } else {
                             return self
                                 .syncData()
@@ -210,10 +207,7 @@ export default _.defaults(
                                     if (self.isOffline()) {
                                         // in case last request was failed and connection lost
                                         // show offlineWaitingDialog
-                                        return new Promise(offlineSync)
-                                            .catch(function() {
-                                                return resolve({ success: false });
-                                            });
+                                        return offlineSync();
                                     }
                                     return resolve(result);
                                 })

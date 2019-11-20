@@ -76,7 +76,7 @@ export default pluginFactory({
          * @fires plugin-open.apiptts
          */
         const enablePlugin = () => {
-            this.navigationGroup.focus();
+            this.navigationGroup && this.navigationGroup.focus();
 
             this.button.turnOn();
             this.setState('active', true);
@@ -90,7 +90,7 @@ export default pluginFactory({
          * @fires plugin-close.apiptts
          */
         const disablePlugin = () => {
-            this.navigationGroup.blur();
+            this.navigationGroup && this.navigationGroup.blur();
 
             this.setState('active', false);
 

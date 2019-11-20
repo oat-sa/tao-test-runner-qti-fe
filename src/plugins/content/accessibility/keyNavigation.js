@@ -47,12 +47,6 @@ var defaultPluginConfig = {
 };
 
 /**
- * initialized test runner navigator
- * @type {Object}
- */
-let testRunnerNavigatorItem;
-
-/**
  * Init the navigation in the toolbar
  *
  * @param {Object} testRunner
@@ -523,30 +517,6 @@ function initDefaultItemNavigation(testRunner) {
     return itemNavigators;
 }
 
-function initTTSNavigation(testRunner) {
-    const pluginName = 'apiptts';
-    const actionPrefix = `tool-${pluginName}-`;
-    const $itemElement = $(`.${pluginName}-plugin`);
-    const id = `${pluginName}_navigation_group`;
-
-    const test1Navigator = keyNavigator({
-        id: id,
-        elements: navigableDomElement.createFromDoms($itemElement),
-        group: $itemElement,
-        replace: true,
-    });
-
-    test1Navigator
-        .on('tab', () => {
-            testRunner.trigger(`${actionPrefix}next`);
-        })
-        .on('shift+tab', () => {
-            testRunner.trigger(`${actionPrefix}previous`);
-        });
-
-    return [test1Navigator];
-}
-
 /**
  * Init test runner navigation
  * @param testRunner
@@ -569,8 +539,7 @@ function initTestRunnerNavigation(testRunner, config) {
                 initToolbarNavigation(testRunner),
                 initNavigatorNavigation(testRunner),
                 initHeaderNavigation(testRunner),
-                initDefaultItemNavigation(testRunner),
-                initTTSNavigation(testRunner)
+                initDefaultItemNavigation(testRunner)
             );
             break;
 
@@ -581,8 +550,7 @@ function initTestRunnerNavigation(testRunner, config) {
                 initToolbarNavigation(testRunner),
                 initNavigatorNavigation(testRunner),
                 initHeaderNavigation(testRunner),
-                initDefaultItemNavigation(testRunner),
-                initTTSNavigation(testRunner)
+                initDefaultItemNavigation(testRunner)
             );
             break;
     }
@@ -671,7 +639,6 @@ export default pluginFactory({
         testRunner
             .after('renderitem', function() {
                 self.groupNavigator = initTestRunnerNavigation(testRunner, pluginConfig);
-                testRunnerNavigatorItem = self.groupNavigator;
 
                 shortcut.add('tab shift+tab', function(e) {
                     if (!allowedToNavigateFrom(e.target)) {
@@ -691,18 +658,6 @@ export default pluginFactory({
              */
             .on('setcontenttabtype', function(type) {
                 pluginConfig.contentNavigatorType = type;
-            })
-            .on('plugin-open.apiptts', () => {
-                const $itemElement = $('.apiptts-plugin');
-
-                $itemElement.addClass(ignoredClass);
-
-                this.groupNavigator.goto('apiptts_navigation_group');
-            })
-            .on('plugin-close.apiptts', () => {
-                const $itemElement = $('.apiptts-plugin');
-
-                $itemElement.removeClass(ignoredClass);
             });
     },
 

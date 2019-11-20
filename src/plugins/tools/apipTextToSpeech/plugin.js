@@ -25,6 +25,8 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
+import keyNavigator from 'ui/keyNavigation/navigator';
+import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 
 const pluginName = 'apiptts';
 
@@ -74,6 +76,8 @@ export default pluginFactory({
          * @fires plugin-open.apiptts
          */
         const enablePlugin = () => {
+            this.navigationGroup.focus();
+
             this.button.turnOn();
             this.setState('active', true);
 
@@ -86,6 +90,8 @@ export default pluginFactory({
          * @fires plugin-close.apiptts
          */
         const disablePlugin = () => {
+            this.navigationGroup.blur();
+
             this.setState('active', false);
 
             this.button.turnOff();
@@ -175,6 +181,28 @@ export default pluginFactory({
                         // handling goes here
                     }
                 }
+            })
+            .on('renderitem', () => {
+                const $navigationGroupElement = this.button.getElement();
+                const groupNavigationId = `${pluginName}_navigation_group`;
+
+                if (!$navigationGroupElement) {
+                    return;
+                }
+
+                this.navigationGroup = keyNavigator({
+                    id: groupNavigationId,
+                    elements: navigableDomElement.createFromDoms($navigationGroupElement),
+                    group: $navigationGroupElement,
+                    replace: true,
+                    propagateTab: false,
+                })
+                    .on('tab', () => {
+                        testRunner.trigger(`${actionPrefix}next`);
+                    })
+                    .on('shift+tab', () => {
+                        testRunner.trigger(`${actionPrefix}previous`);
+                    });
             });
     },
     /**

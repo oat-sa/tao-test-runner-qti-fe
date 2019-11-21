@@ -306,21 +306,21 @@ export default pluginFactory({
                     }
                 })
                 .after('renderitem', function() {
-                    // Attach start/end listeners to all highlighter instances:
-                    _.forEach(highlighters.getAllHighlighters(), function(instance) {
-                        if (instance.isEnabled()) {
-                            instance
-                                .on('start', function() {
-                                    self.buttonMain.turnOn();
-                                    self.trigger('start');
-                                    hasHighlights = true;
-                                })
-                                .on('end', function() {
-                                    self.buttonMain.turnOff();
-                                    self.trigger('end');
-                                });
-                        }
-                    });
+                    // Attach start/end listeners only to item level highlighter
+                    const instance = highlighters.getItemHighlighter();
+
+                    if (instance.isEnabled()) {
+                        instance
+                            .on('start', function() {
+                                self.buttonMain.turnOn();
+                                self.trigger('start');
+                                hasHighlights = true;
+                            })
+                            .on('end', function() {
+                                self.buttonMain.turnOff();
+                                self.trigger('end');
+                            });
+                    }
                 })
                 .after('clear.highlighter', function() {
                     saveAll();
@@ -334,7 +334,7 @@ export default pluginFactory({
                         _.forEach(highlighters.getAllHighlighters(), function(instance) {
                             if (instance.isEnabled()) {
                                 instance
-                                    .off('end.save')
+                                    .off('end.save end start')
                                     .toggleHighlighting(false)
                                     .disable();
                             }

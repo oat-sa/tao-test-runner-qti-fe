@@ -24,8 +24,9 @@ define([
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/tools/apipTextToSpeech/plugin',
+    'ui/keyNavigation/navigator',
     'lib/simulator/jquery.simulate'
-], function (_, hider, runnerFactory, providerMock, pluginFactory) {
+], function (_, hider, runnerFactory, providerMock, pluginFactory, keyNavigatorFactory) {
     'use strict';
 
     const providerName = 'mock';
@@ -332,6 +333,66 @@ define([
                     assert.equal(plugin.getState('active'), false, 'If the plugin is active, the button should toggle the plugin to non active state');
 
                     ready();
+                });
+            })
+            .catch(function (err) {
+                assert.ok(false, `Unexpected error: ${err}`);
+                ready();
+            });
+    });
+
+    QUnit.test('Add navigation group', (assert) => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const pluginName = plugin.getName();
+        const groupNavigationId = `${pluginName}_navigation_group`;
+        const actionPrefix = `tool-${pluginName}-`;
+
+        assert.expect(6);
+
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+
+        plugin
+            .init()
+            .then(function () {
+                const $container = areaBroker.getToolboxArea();
+                areaBroker.getToolbox().render($container);
+
+                runner.trigger('renderitem');
+
+                const navigationGroup = keyNavigatorFactory.get(groupNavigationId);
+
+                assert.equal(typeof navigationGroup, 'object', 'The plugin create navigation group after render');
+
+                return plugin.enable().then(() => {
+                    const $button = $container.find('[data-control="apiptts"]');
+
+                    assert.equal($button.is(document.activeElement), false, 'The focus group is not focused by default');
+
+                    $button.click();
+
+                    assert.equal($button.is(document.activeElement), true, 'The focus group is not focused after plugin activation');
+
+                    $button.click();
+
+                    assert.equal($button.is(document.activeElement), false, 'The focus group lose focus after plugin disabling');
+
+                    runner.on(`${actionPrefix}next`, () => {
+                        assert.ok(true, `The next event triggered after tab navigation`);
+
+                        runner.on(`${actionPrefix}previous`, () => {
+                            assert.ok(true, `The previous event triggered after tab+shift navigation`);
+
+                            ready();
+                        });
+
+                        navigationGroup.trigger('shift+tab');
+                    });
+
+                    navigationGroup.trigger('tab');
                 });
             })
             .catch(function (err) {

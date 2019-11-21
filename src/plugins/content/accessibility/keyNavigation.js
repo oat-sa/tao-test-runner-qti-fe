@@ -47,12 +47,6 @@ var defaultPluginConfig = {
 };
 
 /**
- * initialized test runner navigator
- * @type {Object}
- */
-let testRunnerNavigatorItem;
-
-/**
  * Init the navigation in the toolbar
  *
  * @param {Object} testRunner
@@ -645,7 +639,6 @@ export default pluginFactory({
         testRunner
             .after('renderitem', function() {
                 self.groupNavigator = initTestRunnerNavigation(testRunner, pluginConfig);
-                testRunnerNavigatorItem = self.groupNavigator;
 
                 shortcut.add('tab shift+tab', function(e) {
                     if (!allowedToNavigateFrom(e.target)) {

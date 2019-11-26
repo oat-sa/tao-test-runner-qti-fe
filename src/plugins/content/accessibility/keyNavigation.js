@@ -46,16 +46,47 @@ var defaultPluginConfig = {
     contentNavigatorType: 'default'
 };
 
+var keysForTypesMap = {
+    default: {
+        contentNavigatorType: 'default',
+        nextInGroup: 'right down',
+        prevInGroup: 'left up',
+        nextInFilters: 'right',
+        prevInFilters: 'left',
+        nextInList: 'down',
+        prevInList: 'up'
+    },
+    liner: {
+        contentNavigatorType: 'default',
+        nextInGroup: 'right down',
+        prevInGroup: 'left up',
+        nextInFilters: 'right',
+        prevInFilters: 'left',
+        nextInList: 'down',
+        prevInList: 'up' 
+    },
+    native: {
+        nextLinear: 'tab',
+        prevLinear: 'shift+tab',
+        nextInGroup: 'tab',
+        prevInGroup: 'shift+tab',
+        nextInFilters: 'tab',
+        prevInFilters: 'shift+tab',
+        nextInList: 'tab',
+        prevInList: 'shift+tab'
+    }
+}
 /**
  * Init the navigation in the toolbar
  *
  * @param {Object} testRunner
  * @returns {Array}
  */
-function initToolbarNavigation() {
+function initToolbarNavigation(config) {
     var $navigationBar = $('.bottom-action-bar');
     var $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
     var navigables = navigableDomElement.createFromDoms($focusables);
+    var isNativeNavigation = config.contentNavigatorType === 'native';
     if (navigables.length) {
         return [
             keyNavigator({
@@ -64,16 +95,16 @@ function initToolbarNavigation() {
                 group: $navigationBar,
                 elements: navigables,
                 //start from the last button "goto next"
-                defaultPosition: navigables.length - 1
+                defaultPosition:  !isNativeNavigation ? navigables.length - 1 : 0
             })
-                .on('right down', function(elem) {
+                .on(config.nextInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on('left up', function(elem) {
+                .on(config.prevInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
@@ -97,21 +128,36 @@ function initToolbarNavigation() {
  * @param {Object} testRunner
  * @returns {Array}
  */
-function initHeaderNavigation() {
+function initHeaderNavigation(config) {
     //need global selector as currently no way to access delivery frame from test runner
-    var $headerElements = $('[data-control="exit"]:visible a');
+    var $header = $('header');
+    var $headerElements = $header.find('a:visible');
     var navigables = navigableDomElement.createFromDoms($headerElements);
     if (navigables.length) {
         return [
             keyNavigator({
                 id: 'header-toolbar',
-                group: $headerElements.closest('.infoControl'),
+                group: $header,
                 elements: navigables,
-                loop: true,
                 replace: true
-            }).on('activate', function(cursor) {
-                cursor.navigable.getElement().click();
             })
+                .on(config.nextInGroup, function(elem) {
+                    if (!allowedToNavigateFrom(elem)) {
+                        return false;
+                    } else {
+                        this.next();
+                    }
+                })
+                .on(config.prevInGroup, function(elem) {
+                    if (!allowedToNavigateFrom(elem)) {
+                        return false;
+                    } else {
+                        this.previous();
+                    }
+                })
+                .on('activate', function(cursor) {
+                    cursor.navigable.getElement().click();
+                })
         ];
     }
     return [];
@@ -123,9 +169,10 @@ function initHeaderNavigation() {
  * @param {Object} testRunner
  * @returns {Array} the keyNavigator of the main navigation group
  */
-function initNavigatorNavigation(testRunner) {
+function initNavigatorNavigation(testRunner, config) {
     var $panel = testRunner.getAreaBroker().getPanelArea();
     var $navigator = $panel.find('.qti-navigator');
+    var isNativeNavigation = config.contentNavigatorType === 'native';
     var navigators = [];
     var filtersNavigator;
     var itemsNavigator;
@@ -141,62 +188,72 @@ function initNavigatorNavigation(testRunner) {
         navigableFilters = navigableDomElement.createFromDoms($filters);
         if (navigableFilters.length) {
             filtersNavigator = keyNavigator({
-                keepState: true,
+                keepState: isNativeNavigation ? false : true,
                 id: 'navigator-filters',
                 replace: true,
                 elements: navigableFilters,
-                group: $navigator
+                group: $navigator.find('.qti-navigator-filters')
             })
-                .on('right', function(elem) {
+                .on(config.nextInFilters, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on('left', function(elem) {
+                .on(config.prevInFilters, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.previous();
                     }
                 })
-                .on('down', function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else if (itemsNavigator) {
-                        _.defer(function() {
-                            if (itemListingVisited) {
-                                itemsNavigator.focus().first();
-                            } else {
-                                itemsNavigator.focus();
-                            }
-                        });
-                    }
-                })
-                .on('up', function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else if (itemsNavigator) {
-                        _.defer(function() {
-                            itemsNavigator.last();
-                        });
-                    }
+                .on('activate', function(cursor) {
+                    cursor.navigable.getElement().click();
                 })
                 .on('focus', function(cursor, origin) {
-                    //activate the tab in the navigators
-                    cursor.navigable.getElement().click();
+                    if (!isNativeNavigation) {
+                        //activate the tab in the navigators
+                        cursor.navigable.getElement().click();
 
-                    //reset the item listing browsed tag whenever the focus on the filter happens after a focus on another element
-                    if ((filterCursor && filterCursor.position !== cursor.position) || origin) {
-                        itemListingVisited = false;
+                        //reset the item listing browsed tag whenever the focus on the filter happens after a focus on another element
+                        if ((filterCursor && filterCursor.position !== cursor.position) || origin) {
+                            itemListingVisited = false;
+                        }
+                        //set the filter cursor in memory
+                        filterCursor = cursor;
                     }
-                    //set the filter cursor in memory
-                    filterCursor = cursor;
+
                 });
+            if (!isNativeNavigation) {
+                filtersNavigator
+                    .on(config.nextInList, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else if (itemsNavigator) {
+                            _.defer(function() {
+                                if (itemListingVisited) {
+                                    itemsNavigator.focus().first();
+                                } else {
+                                    itemsNavigator.focus();
+                                }
+                            });
+                        }
+                    })
+                    .on(config.prevInList, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else if (itemsNavigator) {
+                            _.defer(function() {
+                                itemsNavigator.last();
+                            });
+                        }
+                    })
+            }
             navigators.push(filtersNavigator);
         }
 
+        var $navigatorTree = $panel.find('.qti-navigator-tree');
         $trees = $navigator.find('.qti-navigator-tree .qti-navigator-item:not(.unseen) .qti-navigator-label');
         navigableTrees = navigableDomElement.createFromDoms($trees);
         if (navigableTrees.length) {
@@ -205,6 +262,7 @@ function initNavigatorNavigation(testRunner) {
                 id: 'navigator-items',
                 replace: true,
                 elements: navigableTrees,
+                group: $navigatorTree,
                 defaultPosition: function defaultPosition(navigables) {
                     var pos = 0;
                     if (filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
@@ -220,39 +278,25 @@ function initNavigatorNavigation(testRunner) {
                     return pos;
                 }
             })
-                .on('down', function(elem) {
+                .on(config.nextInList, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on('up', function(elem) {
+                .on(config.prevInList, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.previous();
                     }
                 })
-                .on('right', function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else if (filtersNavigator) {
-                        filtersNavigator.focus().next();
-                    }
-                })
-                .on('left', function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else if (filtersNavigator) {
-                        filtersNavigator.focus().previous();
-                    }
-                })
                 .on('activate', function(cursor) {
                     cursor.navigable.getElement().click();
                 })
                 .on('lowerbound upperbound', function() {
-                    if (filtersNavigator) {
+                    if (!isNativeNavigation && filtersNavigator) {
                         filtersNavigator.focus();
                     }
                 })
@@ -269,6 +313,26 @@ function initNavigatorNavigation(testRunner) {
                         .parent()
                         .removeClass('key-navigation-highlight');
                 });
+            if (!isNativeNavigation) {
+                itemsNavigator
+                    .on(config.nextInFilters, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else if (filtersNavigator) {
+                            filtersNavigator.focus().next();
+                        }
+                    })
+                    .on(config.prevInFilters, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else if (filtersNavigator) {
+                            filtersNavigator.focus().previous();
+                        }
+                    });
+            }
+            if (isNativeNavigation) {
+                navigators.push(itemsNavigator);
+            }
         }
     }
     return navigators;
@@ -282,7 +346,7 @@ function initNavigatorNavigation(testRunner) {
  * @param {Object} testRunner
  * @returns {Array} of keyNavigator ids
  */
-function initDefaultContentNavigation(testRunner) {
+function initDefaultContentNavigation(testRunner, config) {
     var itemNavigators = [];
     var $content = testRunner.getAreaBroker().getContentArea();
 
@@ -297,7 +361,7 @@ function initDefaultContentNavigation(testRunner) {
         .each(function() {
             var $itemElement = $(this);
             if ($itemElement.hasClass('qti-interaction')) {
-                itemNavigators = _.union(itemNavigators, initInteractionNavigation($itemElement, testRunner));
+                itemNavigators = _.union(itemNavigators, initInteractionNavigation($itemElement, testRunner, config));
             } else {
                 itemNavigators.push(
                     keyNavigator({
@@ -365,7 +429,7 @@ function initAllContentButtonsNavigation(testRunner) {
  * @param {JQuery} $interaction - the interaction container
  * @returns {Array} array of navigators created from interaction container
  */
-function initInteractionNavigation($interaction, testRunner) {
+function initInteractionNavigation($interaction, testRunner, config) {
     var $inputs;
     var interactionNavigables;
     var interactionNavigators = [];
@@ -399,14 +463,14 @@ function initInteractionNavigation($interaction, testRunner) {
         });
 
         keyNavigatorItem
-            .on('right down', function(elem) {
+            .on(config.nextInGroup, function(elem) {
                 if (!allowedToNavigateFrom(elem)) {
                     return false;
                 } else {
                     this.next();
                 }
             })
-            .on('left up', function(elem) {
+            .on(config.prevInGroup, function(elem) {
                 if (!allowedToNavigateFrom(elem)) {
                     return false;
                 } else {
@@ -530,29 +594,54 @@ function initTestRunnerNavigation(testRunner, config) {
     if (document.activeElement) {
         document.activeElement.blur();
     }
-
+    var configWithKeys = Object.assign({}, config, keysForTypesMap[config.contentNavigatorType]);
     switch (config.contentNavigatorType) {
         case 'linear':
             navigators = _.union(
                 initRubricNavigation(testRunner),
                 initAllContentButtonsNavigation(testRunner),
-                initToolbarNavigation(testRunner),
-                initNavigatorNavigation(testRunner),
-                initHeaderNavigation(testRunner),
+                initToolbarNavigation(configWithKeys),
+                initHeaderNavigation(configWithKeys),
+                initNavigatorNavigation(testRunner, configWithKeys),
                 initDefaultItemNavigation(testRunner)
             );
             break;
-
+        case 'native':
+                navigators = _.union(
+                    initHeaderNavigation(configWithKeys),
+                    initNavigatorNavigation(testRunner, configWithKeys),
+                    initRubricNavigation(testRunner),
+                    initDefaultContentNavigation(testRunner, configWithKeys),
+                    initToolbarNavigation(configWithKeys),
+                );
+                break;
         default:
             navigators = _.union(
                 initRubricNavigation(testRunner),
-                initDefaultContentNavigation(testRunner),
-                initToolbarNavigation(testRunner),
-                initNavigatorNavigation(testRunner),
-                initHeaderNavigation(testRunner),
+                initDefaultContentNavigation(testRunner, configWithKeys),
+                initToolbarNavigation(configWithKeys),
+                initHeaderNavigation(configWithKeys),
+                initNavigatorNavigation(testRunner, configWithKeys),
                 initDefaultItemNavigation(testRunner)
             );
             break;
+    }
+    var isNativeNavigation = config.contentNavigatorType === 'native';
+    if (isNativeNavigation) {
+        _.forEach(navigators, function addListeners(navigator){
+            navigator
+                .on('upperbound', function moveToNextGroup() {
+                    if (allowedToNavigateFrom(navigator)) {
+                        keyNavigatorItem.next();
+                    }
+                })
+                .on('lowerbound', function moveToPrevGroup() {
+                    if (allowedToNavigateFrom(navigator)) {
+                        keyNavigatorItem.previous();
+                        keyNavigatorItem.getCursor().navigable.getKeyNavigator().last();
+                    }
+                });
+        });
     }
 
     navigators = navigableGroupElement.createFromNavigators(navigators);
@@ -564,20 +653,22 @@ function initTestRunnerNavigation(testRunner, config) {
         elements: navigators,
         // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
         // there is an issue with nested navigators
-        propagateTab: false,
+        propagateTab: isNativeNavigation ? true : false,
     });
 
-    keyNavigatorItem
-        .on('tab', function(elem) {
-            if (allowedToNavigateFrom(elem)) {
-                this.next();
-            }
-        })
-        .on('shift+tab', function(elem) {
-            if (allowedToNavigateFrom(elem)) {
-                this.previous();
-            }
-        });
+    if (!isNativeNavigation) {
+        keyNavigatorItem
+            .on('tab', function(elem) {
+                if (allowedToNavigateFrom(elem)) {
+                    this.next();
+                }
+            })
+            .on('shift+tab', function(elem) {
+                if (allowedToNavigateFrom(elem)) {
+                    this.previous();
+                }
+            });
+    }
 
     if (config.contentNavigatorType === 'linear') {
         keyNavigatorItem

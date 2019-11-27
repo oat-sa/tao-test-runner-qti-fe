@@ -108,8 +108,25 @@ function initToolbarNavigation(config) {
                 replace: true,
                 group: $navigationBar,
                 elements: navigables,
-                //start from the last button "goto next"
-                defaultPosition:  !isNativeNavigation ? navigables.length - 1 : 0
+                defaultPosition: function defaultPosition(navigables) {
+                    if (isNativeNavigation) {
+                        return 0;
+                    }
+                    let pos = navigables.length - 1;
+                    // start from the button "Next" or the button "End test"
+                    _.forIn(navigables, function(navigable, i) {
+                        const $element = navigable.getElement();
+                        // find button "Next"
+                        if ($element.data('control') &&
+                            ($element.data('control') === 'move-forward' ||
+                            $element.data('control') === 'move-end')) {
+                            pos = i;
+                            return;
+                        }
+                    });
+                    // else the last button
+                    return pos;
+                }
             })
                 .on(config.nextInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {

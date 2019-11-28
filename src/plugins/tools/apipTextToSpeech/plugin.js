@@ -27,6 +27,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
+import ttsComponentFactory from 'taoQtiTest/runner/plugins/tools/apipTextToSpeech/textToSpeech';
 
 const pluginName = 'apiptts';
 
@@ -45,6 +46,26 @@ export default pluginFactory({
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        let ttsComponent = null;
+
+        /**
+         * Creates the tts component on demand
+         * @returns {textToSpeech}
+         */
+        const getTTSComponent = () => {
+            if (!ttsComponent) {
+                const $container = testRunner.getAreaBroker().getContainer();
+
+                ttsComponent = ttsComponentFactory({
+                    renderTo: $container.parent(),
+                })
+                    .on('close', () => {
+                        testRunner.trigger(`${actionPrefix}toggle`);
+                    });
+            }
+
+            return ttsComponent;
+        };
 
         /**
          * Checks if the plugin is currently available.
@@ -76,12 +97,18 @@ export default pluginFactory({
          * @fires plugin-open.apiptts
          */
         const enablePlugin = () => {
+            getTTSComponent();
+
             this.navigationGroup && this.navigationGroup.focus();
 
             this.button.turnOn();
             this.setState('active', true);
 
             this.trigger('open');
+
+            if (ttsComponent.is('hidden')) {
+                ttsComponent.show();
+            }
         };
 
         /**
@@ -96,6 +123,10 @@ export default pluginFactory({
 
             this.button.turnOff();
             this.trigger('close');
+
+            if (ttsComponent && !ttsComponent.is('hidden')) {
+                ttsComponent.hide();
+            }
         };
 
         /**

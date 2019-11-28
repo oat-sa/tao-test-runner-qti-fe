@@ -22,7 +22,6 @@
  * @author Anton Tsymuk <anton@taotesting.com>
  */
 import $ from 'jquery';
-import _ from 'lodash';
 import ttsTemplate from 'taoQtiTest/runner/plugins/tools/apipTextToSpeech/textToSpeech.tpl';
 import component from 'ui/component';
 import interact from 'interact';
@@ -45,13 +44,12 @@ const stackingOptions = {
 /**
  * Creates an instance of Text to Speech component
  *
+ * @param {Element} container
  * @param {Object} config - component configurations
  * @param {Number} config.playbackRate - playback rate. Default value 1
  * @returns {ttsComponent} the textToSpeech component (uninitialized)
  */
-function maskingComponentFactory(config) {
-    const initConfig = _.defaults(config || {}, defaultConfig);
-
+function maskingComponentFactory(container, config) {
     // component API
     const spec = {
         close() {
@@ -79,12 +77,15 @@ function maskingComponentFactory(config) {
         }
     };
 
-    const ttsComponent = component(spec);
+    const ttsComponent = component(spec, defaultConfig);
     makePlaceable(ttsComponent);
     makeStackable(ttsComponent, stackingOptions);
 
     ttsComponent
         .setTemplate(ttsTemplate)
+        .on('init', function () {
+            this.render(container);
+        })
         .on('render', function () {
             const {
                 left,
@@ -121,7 +122,7 @@ function maskingComponentFactory(config) {
                 });
 
             interact($dragElement[0]).on('down', (event) => {
-                var interaction = event.interaction;
+                const interaction = event.interaction;
 
                 interaction.start(
                     {
@@ -143,7 +144,7 @@ function maskingComponentFactory(config) {
                 start: playbackRate,
                 step: 0.1
             })
-                .on('change', () => {});
+                .on('change', () => { });
 
             // handle controls
             $closeElement.on('click', this.close);
@@ -155,7 +156,7 @@ function maskingComponentFactory(config) {
             this.moveTo(left, top);
         });
 
-    ttsComponent.init(initConfig);
+    ttsComponent.init(config);
 
     return ttsComponent;
 }

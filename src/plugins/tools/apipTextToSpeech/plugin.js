@@ -56,9 +56,7 @@ export default pluginFactory({
             if (!ttsComponent) {
                 const $container = testRunner.getAreaBroker().getContainer();
 
-                ttsComponent = ttsComponentFactory({
-                    renderTo: $container.parent(),
-                })
+                ttsComponent = ttsComponentFactory($container.parent(), {})
                     .on('close', () => {
                         testRunner.trigger(`${actionPrefix}toggle`);
                     });

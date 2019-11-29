@@ -28,6 +28,10 @@
             .icon-pause {
                 display: none;
             }
+
+            &.tts-control-drag {
+              cursor: move;
+            }
         }
 
         .tts-control-container {

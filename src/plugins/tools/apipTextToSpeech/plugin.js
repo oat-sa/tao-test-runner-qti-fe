@@ -56,7 +56,7 @@ export default pluginFactory({
             if (!ttsComponent) {
                 const $container = testRunner.getAreaBroker().getContainer();
 
-                ttsComponent = ttsComponentFactory($container.parent(), {})
+                ttsComponent = ttsComponentFactory($container, {})
                     .on('close', () => {
                         testRunner.trigger(`${actionPrefix}toggle`);
                     });
@@ -188,6 +188,7 @@ export default pluginFactory({
                 this.enable();
             })
             .on('disabletools unloaditem', () => {
+                disablePlugin();
                 this.disable();
             })
             .on(`${actionPrefix}toggle`, () => {

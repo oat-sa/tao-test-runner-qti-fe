@@ -1,0 +1,93 @@
+.tts-container {
+    .tts-controls {
+        @include flex-container();
+
+        background-color: $uiClickableDefaultBg;
+        @include box-shadow(0, 2px, 3px, 1px, rgba(0,0,0,0.20));
+
+        .tts-control {
+            @include flex-container();
+            @include vendor-prefix(justify-content, center, property);
+            @include vendor-prefix(align-items, center, property);
+
+            color: $textColor;
+            height: 100%;
+            padding: 6px 8.5px;
+            text-decoration: none;
+
+            .tts-control-label {
+                padding-left: 7.5px;
+            }
+
+            .tts-icon {
+                font-size: 18px;
+                text-align: center;
+                width: 18px;
+            }
+
+            .icon-pause {
+                display: none;
+            }
+
+            &.tts-control-drag {
+              cursor: move;
+            }
+        }
+
+        .tts-control-container {
+            @include flex-container();
+
+            .tts-slider-container {
+                display: none;
+
+                .tts-slider {
+                    margin: 0 8.5px;
+                    width: 80px;
+                }
+            }
+        }
+    }
+
+    &.playing {
+        .tts-controls {
+            .tts-control {
+                .icon-pause {
+                    display: block;
+                }
+                .icon-play {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    &.sfhMode {
+        .tts-controls {
+            .tts-control.tts-control-mode {
+                @include vendor-prefix(box-shadow, inset 2px 2px 4px rgba(0,0,0,0.20), property);
+
+                background-color: darken($uiClickableDefaultBg, 10);
+            }
+        }
+    }
+    &.settings {
+      .tts-controls {
+          .tts-control-container {
+              .tts-slider-container {
+                  @include flex-container();
+                  @include vendor-prefix(align-items, center, property);
+              }
+
+              &:last-child {
+                  @include vendor-prefix(box-shadow, inset 2px 2px 4px rgba(0,0,0,0.20), property);
+
+                  background-color: darken($uiClickableDefaultBg, 10);
+
+                  &:hover {
+                      background-color: darken($uiClickableDefaultBg, 10);
+                  }
+              }
+          }
+      }
+  }
+}

@@ -30,6 +30,8 @@ import makePlaceable from 'ui/component/placeable';
 import 'nouislider';
 
 const defaultConfig = {
+    activeElementClass: 'tts-active-content-node',
+    elementClass: 'tts-content-node',
     left: 50,
     maxPlaybackRate: 2,
     minPlaybackRate: 0.5,
@@ -46,35 +48,237 @@ const stackingOptions = {
  *
  * @param {Element} container
  * @param {Object} config - component configurations
+ * @param {String} config.activeElementClass - class applied to active content element. Default value 'tts-active-content-node'
+ * @param {String} config.elementClass - class applied to content element. Default value 'tts-content-node'
+ * @param {Number} config.left - initial left position of component. Default value 50
+ * @param {Number} config.maxPlaybackRate - max playback rate. Default value 2
+ * @param {Number} config.minPlaybackRate - min playback rate. Default value 0.5
  * @param {Number} config.playbackRate - playback rate. Default value 1
+ * @param {Number} config.top - initial top position of component. Default value 50
  * @returns {ttsComponent} the textToSpeech component (uninitialized)
  */
 function maskingComponentFactory(container, config) {
+    const audio = new Audio();
+    let currentPlayback = [];
+    let currentItem;
+    let mediaContentData = [];
+    // Browser does not support selection Api If getSelection is not defined
+    const selection = window.getSelection && window.getSelection();
+
     // component API
     const spec = {
+        /**
+         * Update componet state and stop playback
+         *
+         * @fires close
+         */
         close() {
-            this.setState('playing', false);
-            this.setState('sfhMode', false);
+            this.setTTSStateOnPage('playing', false);
+            this.setTTSStateOnPage('sfhMode', false);
             this.setState('settings', false);
+            this.stop();
 
             this.trigger('close');
         },
-        togglePlayback() {
+        /**
+         * Get current active APIP item
+         *
+         * @returns {Object} active APIP item
+         */
+        getCurrentItem() {
+            return currentItem;
+        },
+        /**
+         * When component in start from here mode, switch to clicked content element
+         *
+         * @param {Object} e - event object
+         */
+        handleContentNodeClick(e) {
+            if (!this.is('sfhMode')) {
+                return;
+            }
+
+            const $target = $(e.target);
+
+            // Allow default behaviour for inputs
+            if (
+                $target.hasClass('icon-checkbox')
+                || $target.hasClass('icon-radio')
+                || $target.is('input')
+            ) {
+                return;
+            }
+
+            const $currentTarget = $(e.currentTarget);
+            // Find APIP item associated with clicked element
+            const selectedItem = mediaContentData.find(({ selector: itemSelector }) => $currentTarget.is(itemSelector));
+            currentPlayback = [selectedItem];
+
+            // Prevent default behaviour for lables and links
+            e.stopPropagation();
+            e.preventDefault();
+
+            this.stop();
+            this.initNextItem();
+            this.togglePlayback();
+        },
+        /**
+         * Select APIP item for default mode
+         */
+        initDefaultModeItem() {
+            this.initItemWithTextSelection();
+
+            if (!currentItem) {
+                this.initDefaultModePlayback();
+            }
+        },
+        /**
+         * Check if there is some selected content inside APIP elelemts on the page
+         */
+        initItemWithTextSelection() {
+            // Check if there is selected content
+            if (!selection || !selection.toString()) {
+                return;
+            }
+
+            // Get APIP item by current selection
+            const currentSelection = selection.getRangeAt(0);
+            const { commonAncestorContainer } = currentSelection;
+            const selectedItem = mediaContentData.find(({ selector }) => $(selector).is(commonAncestorContainer)
+                || $.contains($(selector)[0], commonAncestorContainer));
+
+            if (selectedItem && selectedItem !== currentItem) {
+                currentPlayback = [selectedItem];
+                this.initNextItem();
+            }
+        },
+        /**
+         * Check if there is next APIP item to play and start playback if component in playing state.
+         * If there is no APIP item to play stop playback
+         */
+        initNextItem() {
+            const { activeElementClass } = this.config;
+
+            currentItem && $(currentItem.selector).removeClass(activeElementClass);
+            currentItem = currentPlayback.shift();
+
+            if (currentItem) {
+                const { selector, url } = currentItem;
+                $(selector).addClass(activeElementClass);
+
+                audio.setAttribute('src', url);
+                audio.load();
+
+                if (this.is('playing')) {
+                    audio.play();
+                }
+
+                return;
+            }
+
+            this.stop();
+        },
+        /**
+         * Init default mode playback
+         */
+        initDefaultModePlayback() {
+            currentPlayback = [...mediaContentData];
+
+            this.initNextItem();
+        },
+        /**
+         * Set APIP data. Apply handlers to APIP elements. Stop current playback
+         *
+         * @param {Array} data - APIP data items
+         */
+        setMediaContentData(data) {
+            const { elementClass } = this.config;
+            mediaContentData = data;
+            const $contentNodes = $(
+                mediaContentData
+                    .map(({ selector }) => selector)
+                    .join(', ')
+            );
+
+            $contentNodes.addClass(elementClass);
+            $contentNodes.on('click', this.handleContentNodeClick);
+
+            this.stop();
+        },
+        /**
+         * Set playback rate
+         *
+         * @param {Object} e - event object
+         * @param {Number} value - playback rate
+         */
+        setPlaybackRate(e, value) {
+            audio.playbackRate = value;
+        },
+        /**
+         * Update component state. Toggle state class on page body
+         *
+         * @param {String} name
+         * @param {Boolean} value
+         */
+        setTTSStateOnPage(name, value) {
+            this.setState(name, value);
+
+            $(document.body).toggleClass(`tts-${name}`, value);
+        },
+        /**
+         * Pause playback and update component state. Set current item to null
+         */
+        stop() {
+            const { activeElementClass } = this.config;
+
+            audio.pause();
+            audio.currentTime = 0;
+            currentItem && $(currentItem.selector).removeClass(activeElementClass);
+            currentItem = null;
+
+            this.setTTSStateOnPage('playing', false);
+        },
+        /**
+         * Toggle playback
+         *
+         * @param {Object} e - event object
+         */
+        togglePlayback(e) {
+            e && e.preventDefault();
+
             const isPlaying = this.is('playing');
 
-            this.setState('playing', !isPlaying);
+            if (!this.is('sfhMode')) {
+                this.initDefaultModeItem();
+            }
+
+            if (!isPlaying && currentItem) {
+                audio.play();
+
+                this.setTTSStateOnPage('playing', true);
+            } else {
+                audio.pause();
+
+                this.setTTSStateOnPage('playing', false);
+            }
         },
-        // toggle start from here mode
+        /**
+         * Toggle start from here mode
+         */
         toggleSFHMode() {
             const isSFHMode = this.is('sfhMode');
 
-            this.setState('sfhMode', !isSFHMode);
+            this.setTTSStateOnPage('sfhMode', !isSFHMode);
+            this.stop();
         },
+        /**
+         * Toggle settings element
+         */
         toggleSettings() {
             const isSettings = this.is('settings');
 
             this.setState('settings', !isSettings);
-        }
+        },
     };
 
     const ttsComponent = component(spec, defaultConfig);
@@ -110,7 +314,7 @@ function maskingComponentFactory(container, config) {
                     autoScroll: true,
                     manualStart: true,
                     restrict: {
-                        restriction: this.getContainer()[0],
+                        restriction: container,
                         elementRect: { left: 0, right: 1, top: 0, bottom: 1 }
                     },
                     onmove: (event) => {
@@ -144,16 +348,21 @@ function maskingComponentFactory(container, config) {
                 start: playbackRate,
                 step: 0.1
             })
-                .on('change', () => { });
+                .on('change', this.setPlaybackRate);
 
             // handle controls
             $closeElement.on('click', this.close);
-            $playbackElement.on('click', this.togglePlayback);
+            // handle mousedown instead of click to prevent selection lose
+            $playbackElement.on('mousedown', this.togglePlayback);
             $sfhModeElement.on('click', this.toggleSFHMode);
             $settingsElement.on('click', this.toggleSettings);
+            audio.addEventListener('ended', this.initNextItem);
 
             // move to initial position
             this.moveTo(left, top);
+        })
+        .on('destory', function () {
+            this.stop();
         });
 
     ttsComponent.init(config);

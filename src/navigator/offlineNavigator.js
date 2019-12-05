@@ -67,12 +67,11 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
          * Initialization method for the offline navigator component
          * It get called before every navigation action
          *
-         * @returns {this}
+         * @returns {Promise}
          */
         init: function init() {
             offlineJumpTableHelper.setTestMap(testMap);
-            offlineJumpTableHelper.init(testContext);
-            return this;
+            return offlineJumpTableHelper.init(testContext);
         },
 
         /**

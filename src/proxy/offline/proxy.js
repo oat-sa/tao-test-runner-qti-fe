@@ -134,17 +134,13 @@ export default _.defaults(
                      * performs navigation trough items of given test parameters according to action parameters
                      * doesent need active internet connection
                      * @param navigator - navigator helper used with this proxy
-                     * @param {Object} options - options to manage the navigation
                      * @param {Object} options.testContext - current test testContext dataset
                      * @param {Object} results - navigtion result output object
                      */
-                    var navigate = function(navigator, options, results) {
+                    var navigate = function(navigator, results) {
                         var newTestContext;
 
                         navigator
-                            .setTestContext(options.testContext)
-                            .setTestMap(options.testMap)
-                            .init()
                             .navigate(actionParams.direction, actionParams.scope, actionParams.ref, actionParams)
                             .then(function(res) {
                                 newTestContext = res;
@@ -220,10 +216,6 @@ export default _.defaults(
                         if (isOffline) {
                             navigate(
                                 self.offlineNavigator,
-                                {
-                                    testContext: testContext,
-                                    testMap: testMap
-                                },
                                 result
                             );
                         } else {
@@ -232,10 +224,6 @@ export default _.defaults(
                                 .then(function() {
                                     navigate(
                                         self.offlineNavigator,
-                                        {
-                                            testContext: testContext,
-                                            testMap: testMap
-                                        },
                                         result
                                     );
                                 })
@@ -423,11 +411,18 @@ export default _.defaults(
                     promises.push(self.itemStore.set(itemIdentifier, item));
                 });
 
-                return Promise.all(promises).then(function() {
-                    return new Promise(function(resolve) {
-                        resolve(response);
+                return Promise.all(promises)
+                    .then(() => {
+                        return self.offlineNavigator
+                            .setTestContext(response.testContext)
+                            .setTestMap(response.testMap)
+                            .init()
+                    })
+                    .then(function() {
+                        return new Promise(function(resolve) {
+                            resolve(response);
+                        });
                     });
-                });
             });
         },
 

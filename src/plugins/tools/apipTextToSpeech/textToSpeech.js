@@ -353,7 +353,7 @@ function maskingComponentFactory(container, config) {
             // handle controls
             $closeElement.on('click', this.close);
             // handle mousedown instead of click to prevent selection lose
-            $playbackElement.on('mousedown', this.togglePlayback);
+            $playbackElement.on('mousedown touchstart', this.togglePlayback);
             $sfhModeElement.on('click', this.toggleSFHMode);
             $settingsElement.on('click', this.toggleSettings);
             audio.addEventListener('ended', this.initNextItem);

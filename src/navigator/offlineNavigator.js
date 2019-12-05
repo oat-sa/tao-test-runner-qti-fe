@@ -65,7 +65,7 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
 
         /**
          * Initialization method for the offline navigator component
-         * It get called before every navigation action
+         * It get called in proxy init function 
          *
          * @returns {Promise}
          */

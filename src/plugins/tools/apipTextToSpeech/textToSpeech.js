@@ -94,10 +94,6 @@ function maskingComponentFactory(container, config) {
          * @param {Object} e - event object
          */
         handleContentNodeClick(e) {
-            if (!this.is('sfhMode')) {
-                return;
-            }
-
             const $target = $(e.target);
 
             // Allow default behaviour for inputs
@@ -109,14 +105,18 @@ function maskingComponentFactory(container, config) {
                 return;
             }
 
+            // Prevent default behaviour for lables and links
+            e.stopPropagation();
+            e.preventDefault();
+
+            if (!this.is('sfhMode')) {
+                return;
+            }
+
             const $currentTarget = $(e.currentTarget);
             // Find APIP item associated with clicked element
             const selectedItem = mediaContentData.find(({ selector: itemSelector }) => $currentTarget.is(itemSelector));
             currentPlayback = [selectedItem];
-
-            // Prevent default behaviour for lables and links
-            e.stopPropagation();
-            e.preventDefault();
 
             this.stop();
             this.initNextItem();
@@ -314,7 +314,7 @@ function maskingComponentFactory(container, config) {
                     autoScroll: true,
                     manualStart: true,
                     restrict: {
-                        restriction: container,
+                        restriction: container[0],
                         elementRect: { left: 0, right: 1, top: 0, bottom: 1 }
                     },
                     onmove: (event) => {
@@ -360,6 +360,12 @@ function maskingComponentFactory(container, config) {
 
             // move to initial position
             this.moveTo(left, top);
+        })
+        .on('hide', function () {
+            this.setTTSStateOnPage('visible', false);
+        })
+        .on('show', function () {
+            this.setTTSStateOnPage('visible', true);
         })
         .on('destory', function () {
             this.stop();

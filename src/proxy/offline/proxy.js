@@ -134,6 +134,7 @@ export default _.defaults(
                      * performs navigation trough items of given test parameters according to action parameters
                      * doesent need active internet connection
                      * @param navigator - navigator helper used with this proxy
+                     * @param {Object} options - options to manage the navigation
                      * @param {Object} options.testContext - current test testContext dataset
                      * @param {Object} results - navigtion result output object
                      */

@@ -142,9 +142,8 @@ export default _.defaults(
                         var newTestContext;
 
                         navigator
-                            .setTestContext(options.testContext)
+                            .setTestContext(options.testContext)	
                             .setTestMap(options.testMap)
-                            .init()
                             .navigate(actionParams.direction, actionParams.scope, actionParams.ref, actionParams)
                             .then(function(res) {
                                 newTestContext = res;
@@ -220,9 +219,9 @@ export default _.defaults(
                         if (isOffline) {
                             navigate(
                                 self.offlineNavigator,
-                                {
-                                    testContext: testContext,
-                                    testMap: testMap
+                                {	
+                                    testContext: testContext,	
+                                    testMap: testMap	
                                 },
                                 result
                             );
@@ -232,9 +231,9 @@ export default _.defaults(
                                 .then(function() {
                                     navigate(
                                         self.offlineNavigator,
-                                        {
-                                            testContext: testContext,
-                                            testMap: testMap
+                                        {	
+                                            testContext: testContext,	
+                                            testMap: testMap	
                                         },
                                         result
                                     );
@@ -423,11 +422,14 @@ export default _.defaults(
                     promises.push(self.itemStore.set(itemIdentifier, item));
                 });
 
-                return Promise.all(promises).then(function() {
-                    return new Promise(function(resolve) {
-                        resolve(response);
-                    });
-                });
+                return Promise.all(promises)
+                    .then(() => {
+                        return self.offlineNavigator
+                            .setTestContext(response.testContext)
+                            .setTestMap(response.testMap)
+                            .init()
+                    })
+                    .then(() => response);
             });
         },
 

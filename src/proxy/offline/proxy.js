@@ -418,11 +418,7 @@ export default _.defaults(
                             .setTestMap(response.testMap)
                             .init()
                     })
-                    .then(function() {
-                        return new Promise(function(resolve) {
-                            resolve(response);
-                        });
-                    });
+                    .then(() => response);
             });
         },
 

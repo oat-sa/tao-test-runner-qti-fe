@@ -26,7 +26,6 @@ define([
 ], function ($, _, componentFactory) {
     'use strict';
 
-    const $container = $('#tts-container');
     const apipData = [
         {
             selector: '#apip-element-1',
@@ -52,14 +51,9 @@ define([
 
     const apipElements = apipData.map(({ selector }) => $(`<div id="${selector.replace('#', '')}"><span>${selector}</span></div>`));
 
-    QUnit.module('componentFactory', {
-        afterEach: () => {
-            $container.empty();
-        },
-    });
-
-
     QUnit.test('module', (assert) => {
+        const $container = $('#qunit-fixture');
+
         assert.equal(typeof componentFactory, 'function', 'The component factory module exposes a function');
         assert.equal(typeof componentFactory($container, {}), 'object', 'The component factory produces an instance');
         assert.notStrictEqual(
@@ -91,7 +85,7 @@ define([
         { name: 'initDefaultModePlayback', title: 'initDefaultModePlayback' },
         { name: 'setMediaContentData', title: 'setMediaContentData' },
         { name: 'setPlaybackRate', title: 'setPlaybackRate' },
-        { name: 'setTTSStateOnPage', title: 'setTTSStateOnPage' },
+        { name: 'setTTSStateOnContainer', title: 'setTTSStateOnContainer' },
         { name: 'stop', title: 'stop' },
         { name: 'togglePlayback', title: 'togglePlayback' },
         { name: 'toggleSFHMode', title: 'toggleSFHMode' },
@@ -99,6 +93,8 @@ define([
     ];
 
     QUnit.cases.init(componentApi).test('component API ', (data, assert) => {
+        const $container = $('#qunit-fixture');
+
         const ttsComponent = componentFactory($container, {});
 
         assert.equal(
@@ -113,9 +109,6 @@ define([
             // eslint-disable-next-line no-global-assign
             Audio = originalAudio;
         },
-        afterEach: () => {
-            $container.empty();
-        },
         before: () => {
             // eslint-disable-next-line no-global-assign
             Audio = function () {
@@ -125,6 +118,7 @@ define([
     });
 
     QUnit.test('componentInstance.close', (assert) => {
+        const $container = $('#qunit-fixture');
         const ready = assert.async();
         const ttsComponent = componentFactory($container, {});
 
@@ -148,6 +142,7 @@ define([
     });
 
     QUnit.test('componentInstance.handleContentNodeClick', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
         $container.append(...apipElements);
@@ -163,6 +158,7 @@ define([
 
         apipElements.forEach(($element) => {
             $element.click();
+
             const { selector } = ttsComponent.getCurrentItem();
 
 
@@ -172,6 +168,7 @@ define([
     });
 
     QUnit.test('componentInstance.initItemWithTextSelection', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
         $container.append(...apipElements);
@@ -200,6 +197,7 @@ define([
     });
 
     QUnit.test('componentInstance.initDefaultModePlayback', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
         $container.append(...apipElements);
@@ -215,6 +213,7 @@ define([
     });
 
     QUnit.test('componentInstance.initNextItem', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
         $container.append(...apipElements);
@@ -245,6 +244,7 @@ define([
     });
 
     QUnit.test('componentInstance.setMediaContentData', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
         const { elementClass } = ttsComponent.getConfig();
 
@@ -258,22 +258,23 @@ define([
         assert.equal($(`.${elementClass}`).length, 3, 'The component adds css class to apip content elements');
     });
 
-    QUnit.test('componentInstance.setTTSStateOnPage', (assert) => {
+    QUnit.test('componentInstance.setTTSStateOnContainer', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
-        const $body = $(document.body);
 
         assert.expect(2);
 
-        ttsComponent.setTTSStateOnPage('playing', true);
+        ttsComponent.setTTSStateOnContainer('playing', true);
 
-        assert.equal($body.hasClass('tts-playing'), true, 'The component adds state class to the page');
+        assert.equal($container.hasClass('tts-playing'), true, 'The component adds state class to the container');
 
-        ttsComponent.setTTSStateOnPage('playing', false);
+        ttsComponent.setTTSStateOnContainer('playing', false);
 
-        assert.equal($body.hasClass('tts-playing'), false, 'The component removes state class from the page');
+        assert.equal($container.hasClass('tts-playing'), false, 'The component removes state class from the page');
     });
 
     QUnit.test('componentInstance.stop', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
         $container.append(...apipElements);
@@ -282,7 +283,7 @@ define([
         assert.expect(2);
 
         ttsComponent.initDefaultModePlayback();
-        ttsComponent.setTTSStateOnPage('playing', true);
+        ttsComponent.setTTSStateOnContainer('playing', true);
         ttsComponent.stop();
 
         assert.ok(!ttsComponent.getCurrentItem(), 'The component sets current item to null');
@@ -290,6 +291,7 @@ define([
     });
 
     QUnit.test('componentInstance.togglePlayback', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
         $container.append(...apipElements);
@@ -313,6 +315,7 @@ define([
     });
 
     QUnit.test('componentInstance.toggleSFHMode', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
         assert.expect(3);
@@ -329,6 +332,7 @@ define([
     });
 
     QUnit.test('componentInstance.toggleSettings', (assert) => {
+        const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
         assert.expect(2);

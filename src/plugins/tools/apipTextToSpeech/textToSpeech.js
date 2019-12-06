@@ -73,8 +73,8 @@ function maskingComponentFactory(container, config) {
          * @fires close
          */
         close() {
-            this.setTTSStateOnPage('playing', false);
-            this.setTTSStateOnPage('sfhMode', false);
+            this.setTTSStateOnContainer('playing', false);
+            this.setTTSStateOnContainer('sfhMode', false);
             this.setState('settings', false);
             this.stop();
 
@@ -115,7 +115,7 @@ function maskingComponentFactory(container, config) {
 
             const $currentTarget = $(e.currentTarget);
             // Find APIP item associated with clicked element
-            const selectedItem = mediaContentData.find(({ selector: itemSelector }) => $currentTarget.is(itemSelector));
+            const selectedItem = mediaContentData.find(({ selector }) => $currentTarget.is(selector));
             currentPlayback = [selectedItem];
 
             this.stop();
@@ -144,8 +144,12 @@ function maskingComponentFactory(container, config) {
             // Get APIP item by current selection
             const currentSelection = selection.getRangeAt(0);
             const { commonAncestorContainer } = currentSelection;
-            const selectedItem = mediaContentData.find(({ selector }) => $(selector).is(commonAncestorContainer)
-                || $.contains($(selector)[0], commonAncestorContainer));
+            const selectedItem = mediaContentData.find(({ selector }) => {
+                const $item = $(selector);
+
+                return $item.is(commonAncestorContainer)
+                    || $.contains($item[0], commonAncestorContainer);
+            });
 
             if (selectedItem && selectedItem !== currentItem) {
                 currentPlayback = [selectedItem];
@@ -220,10 +224,10 @@ function maskingComponentFactory(container, config) {
          * @param {String} name
          * @param {Boolean} value
          */
-        setTTSStateOnPage(name, value) {
+        setTTSStateOnContainer(name, value) {
             this.setState(name, value);
 
-            $(document.body).toggleClass(`tts-${name}`, value);
+            $(container).toggleClass(`tts-${name}`, value);
         },
         /**
          * Pause playback and update component state. Set current item to null
@@ -236,7 +240,7 @@ function maskingComponentFactory(container, config) {
             currentItem && $(currentItem.selector).removeClass(activeElementClass);
             currentItem = null;
 
-            this.setTTSStateOnPage('playing', false);
+            this.setTTSStateOnContainer('playing', false);
         },
         /**
          * Toggle playback
@@ -255,11 +259,11 @@ function maskingComponentFactory(container, config) {
             if (!isPlaying && currentItem) {
                 audio.play();
 
-                this.setTTSStateOnPage('playing', true);
+                this.setTTSStateOnContainer('playing', true);
             } else {
                 audio.pause();
 
-                this.setTTSStateOnPage('playing', false);
+                this.setTTSStateOnContainer('playing', false);
             }
         },
         /**
@@ -268,7 +272,7 @@ function maskingComponentFactory(container, config) {
         toggleSFHMode() {
             const isSFHMode = this.is('sfhMode');
 
-            this.setTTSStateOnPage('sfhMode', !isSFHMode);
+            this.setTTSStateOnContainer('sfhMode', !isSFHMode);
             this.stop();
         },
         /**
@@ -362,10 +366,10 @@ function maskingComponentFactory(container, config) {
             this.moveTo(left, top);
         })
         .on('hide', function () {
-            this.setTTSStateOnPage('visible', false);
+            this.setTTSStateOnContainer('visible', false);
         })
         .on('show', function () {
-            this.setTTSStateOnPage('visible', true);
+            this.setTTSStateOnContainer('visible', true);
         })
         .on('destory', function () {
             this.stop();

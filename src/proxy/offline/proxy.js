@@ -137,10 +137,12 @@ export default _.defaults(
                      * @param {Object} options.testContext - current test testContext dataset
                      * @param {Object} results - navigtion result output object
                      */
-                    var navigate = function(navigator, results) {
+                    var navigate = function(navigator, options, results) {
                         var newTestContext;
 
                         navigator
+                            .setTestContext(options.testContext)	
+                            .setTestMap(options.testMap)
                             .navigate(actionParams.direction, actionParams.scope, actionParams.ref, actionParams)
                             .then(function(res) {
                                 newTestContext = res;
@@ -216,6 +218,10 @@ export default _.defaults(
                         if (isOffline) {
                             navigate(
                                 self.offlineNavigator,
+                                {	
+                                    testContext: testContext,	
+                                    testMap: testMap	
+                                },
                                 result
                             );
                         } else {
@@ -224,6 +230,10 @@ export default _.defaults(
                                 .then(function() {
                                     navigate(
                                         self.offlineNavigator,
+                                        {	
+                                            testContext: testContext,	
+                                            testMap: testMap	
+                                        },
                                         result
                                     );
                                 })

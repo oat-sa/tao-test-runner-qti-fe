@@ -68,6 +68,21 @@ function maskingComponentFactory(container, config) {
     // component API
     const spec = {
         /**
+         * Remove APIP element class and click handlers from APIP elements
+         */
+        clearAPIPElements() {
+            const { elementClass } = this.config;
+            const $contentNodes = $(
+                mediaContentData
+                    .map(({ selector }) => selector)
+                    .join(', '),
+                container
+            );
+
+            $contentNodes.removeClass(elementClass);
+            $contentNodes.off('click', this.handleContentNodeClick);
+        },
+        /**
          * Update componet state and stop playback
          *
          * @fires close
@@ -145,7 +160,7 @@ function maskingComponentFactory(container, config) {
             const currentSelection = selection.getRangeAt(0);
             const { commonAncestorContainer } = currentSelection;
             const selectedItem = mediaContentData.find(({ selector }) => {
-                const $item = $(selector);
+                const $item = $(selector, container);
 
                 return $item.is(commonAncestorContainer)
                     || $.contains($item[0], commonAncestorContainer);
@@ -163,12 +178,12 @@ function maskingComponentFactory(container, config) {
         initNextItem() {
             const { activeElementClass } = this.config;
 
-            currentItem && $(currentItem.selector).removeClass(activeElementClass);
+            currentItem && $(currentItem.selector, container).removeClass(activeElementClass);
             currentItem = currentPlayback.shift();
 
             if (currentItem) {
                 const { selector, url } = currentItem;
-                $(selector).addClass(activeElementClass);
+                $(selector, container).addClass(activeElementClass);
 
                 audio.setAttribute('src', url);
                 audio.load();
@@ -196,12 +211,15 @@ function maskingComponentFactory(container, config) {
          * @param {Array} data - APIP data items
          */
         setMediaContentData(data) {
+            this.clearAPIPElements();
+
             const { elementClass } = this.config;
             mediaContentData = data;
             const $contentNodes = $(
                 mediaContentData
                     .map(({ selector }) => selector)
-                    .join(', ')
+                    .join(', '),
+                container
             );
 
             $contentNodes.addClass(elementClass);
@@ -237,7 +255,7 @@ function maskingComponentFactory(container, config) {
 
             audio.pause();
             audio.currentTime = 0;
-            currentItem && $(currentItem.selector).removeClass(activeElementClass);
+            currentItem && $(currentItem.selector, container).removeClass(activeElementClass);
             currentItem = null;
 
             this.setTTSStateOnContainer('playing', false);
@@ -292,6 +310,11 @@ function maskingComponentFactory(container, config) {
     ttsComponent
         .setTemplate(ttsTemplate)
         .on('init', function () {
+            if (container.hasClass('tts-component-container')) {
+                throw new Error('Container already has assigned text to speech component');
+            }
+
+            container.addClass('tts-component-container');
             this.render(container);
         })
         .on('render', function () {
@@ -371,7 +394,9 @@ function maskingComponentFactory(container, config) {
         .on('show', function () {
             this.setTTSStateOnContainer('visible', true);
         })
-        .on('destory', function () {
+        .on('destroy', function () {
+            container.removeClass('tts-component-container');
+            this.clearAPIPElements();
             this.stop();
         });
 

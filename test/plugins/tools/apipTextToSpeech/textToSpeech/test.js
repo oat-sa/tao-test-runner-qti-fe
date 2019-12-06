@@ -55,11 +55,18 @@ define([
         const $container = $('#qunit-fixture');
 
         assert.equal(typeof componentFactory, 'function', 'The component factory module exposes a function');
-        assert.equal(typeof componentFactory($container, {}), 'object', 'The component factory produces an instance');
+        assert.equal(typeof componentFactory($('<div></div>'), {}), 'object', 'The component factory produces an instance');
         assert.notStrictEqual(
-            componentFactory($container, {}),
-            componentFactory($container, {}),
+            componentFactory($('<div></div>'), {}),
+            componentFactory($('<div></div>'), {}),
             'The component factory provides a different instance on each call'
+        );
+        assert.throws(
+            () => {
+                componentFactory($container, {});
+                componentFactory($container, {});
+            },
+            'The component throws an error when the container already have assigned tts component'
         );
     });
 
@@ -115,6 +122,20 @@ define([
                 return audioInstance;
             };
         }
+    });
+
+    QUnit.test('componentInstance.clearAPIPElements', (assert) => {
+        const $container = $('#qunit-fixture');
+        const ttsComponent = componentFactory($container, {});
+        const { elementClass } = ttsComponent.getConfig();
+
+        assert.expect(1);
+
+        $container.append(...apipElements);
+        ttsComponent.setMediaContentData(apipData);
+        ttsComponent.clearAPIPElements();
+
+        assert.equal($(`.${elementClass}`).length, 0, 'The component cleans up apip lements');
     });
 
     QUnit.test('componentInstance.close', (assert) => {
@@ -346,15 +367,38 @@ define([
         assert.equal(ttsComponent.is('settings'), false, 'The component sets settings state to false');
     });
 
+    QUnit.test('componentInstance.on("destroy")', (assert) => {
+        const $container = $('#qunit-fixture');
+        const ttsComponent = componentFactory($container, {});
+        const { elementClass } = ttsComponent.getConfig();
+
+        assert.expect(3);
+
+        $container.append(...apipElements);
+        ttsComponent.setMediaContentData(apipData);
+        ttsComponent.setState('playing', true);
+        ttsComponent.destroy();
+
+        assert.equal($container.hasClass('tts-component-container'), false, 'The component cleans up container');
+        assert.equal(ttsComponent.is('playing'), false, 'The component stops playback');
+        assert.equal($(`.${elementClass}`).length, 0, 'The component cleans up apip lements');
+    });
+
     QUnit.module('Visual');
 
     QUnit.test('visual test', (assert) => {
-        var $playgroundContainer = $('#tts-playground-container');
+        var $firstPlaygroundContainer = $('#tts-first-playground-container');
+        var $secondPlaygroundContainer = $('#tts-second-playground-container');
 
-        const ttsComponent = componentFactory($playgroundContainer, {});
+        const firstTtsComponent = componentFactory($firstPlaygroundContainer, {});
+        $firstPlaygroundContainer.append(...apipElements);
+        firstTtsComponent.setMediaContentData(apipData);
 
-        $playgroundContainer.append(...apipElements);
-        ttsComponent.setMediaContentData(apipData);
+        const secondTtsComponent = componentFactory($secondPlaygroundContainer, { top: 85 });
+        $secondPlaygroundContainer.append(
+            ...apipData.map(({ selector }) => $(`<div id="${selector.replace('#', '')}"><span>${selector}</span></div>`))
+        );
+        secondTtsComponent.setMediaContentData(apipData);
 
         assert.ok(true);
     });

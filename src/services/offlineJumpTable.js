@@ -131,49 +131,54 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
         },
 
         /**
-         * Initialization method for the offline jump table, which is responsible to add the first item as the first
-         * jump and collect the correct responses for the branching rules.
-         * @param {Object} [testContext] - current test context is needed in order to continue test after interruption
+         * Build jumpTable
+         *
+         * @param {Object} testContext
+         * @returns {Promise}
          */
-        init: function init(testContext) {
-            var firstItem;
-            var simplifiedTestMap = getSimplifiedTestMap(testMap);
-            var self = this;
-            var contextItemId = testContext ? testContext.itemIdentifier : null;
-            var contextItemPosition = contextItemId ? testContext.itemPosition : null;
-            var reducedTestMap = [];
-            var isTestMapResuced = false;
+        buildJumpTable: function buildJumpTable(testContext) {
+            const self = this;
+            const simplifiedTestMap = getSimplifiedTestMap(testMap);
+            const contextItemId = testContext ? testContext.itemIdentifier : null;
+            const contextItemPosition = contextItemId ? testContext.itemPosition : null;
 
-            // reducer to filter out all test items before current
-            var testMapReducer = function testMapReducer(accumulator, current) {
-                if (!isTestMapResuced) {
-                    accumulator.push(current);
-                    if (current.item === contextItemId) {
-                        isTestMapResuced = true;
-                    }
-                }
-                return accumulator;
-            };
-
-            /**
-             * if the jump table is empty, it adds the first item as the first jump
-             * or put previous from current to jump table. Current item id is taken from test context
-             */
-            if (simplifiedTestMap.length > 0 && jumpTable.length === 0) {
-                if (contextItemId && contextItemPosition) {
-                    reducedTestMap = simplifiedTestMap.reduce(testMapReducer, []);
-                    _.forEach(reducedTestMap, function(item) {
-                        self.addJump(item.part, item.section, item.item);
-                    });
-                } else {
-                    firstItem = simplifiedTestMap[0];
-                    this.addJump(firstItem.part, firstItem.section, firstItem.item);
-                }
+            const firstJumpItem = simplifiedTestMap[0];
+            if (firstJumpItem) {
+                this.addJump(firstJumpItem.part, firstJumpItem.section, firstJumpItem.item);
+            }
+            
+            if (!contextItemPosition) {
+                return Promise.resolve();
             }
 
-            // Put all correct responses to the responseStore
+            function calculateNextJump() {
+                var lastJumpItem = self.getLastJump().item || null;
+                if (contextItemId !== lastJumpItem ) {
+                    return itemStore.get(lastJumpItem).then(function (item) {
+                        const itemResponse = {};
+                        _.forEach(item.itemState, function(state, itemStateIdentifier) {
+                            itemResponse[itemStateIdentifier] = state.response;
+                        });
+                        return self.jumpToNextItem(Object.assign({}, item, {itemResponse, itemDefinition: item.itemIdentifier }))
+                            .then(calculateNextJump);
+                    });
+                }
+                return Promise.resolve();
+            }
+            
+            return calculateNextJump();
+        },
+        /**
+         * Put all correct responses to the responseStore
+         *
+         * @param {Object} testContext
+         * @returns {Promise}
+         */
+        putCorrectResponsesInStore: function putCorrectResponsesInStore() {
+            const simplifiedTestMap = getSimplifiedTestMap(testMap);
+            const promises = [];
             simplifiedTestMap.forEach(function(row) {
-                itemStore
+                promises.push(itemStore
                     .get(row.item)
                     .then(function(item) {
                         if (item) {
@@ -186,8 +191,20 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
                     })
                     .catch(function(err) {
                         return Promise.reject(err);
-                    });
+                    }));
             });
+            return Promise.all(promises);
+        },
+
+        /**
+         * Initialization method for the offline jump table, which is responsible to add the first item as the first
+         * jump and collect the correct responses for the branching rules.
+         * @param {Object} [testContext] - current test context is needed in order to continue test after interruption
+         * @returns {Promise}
+         */
+        init: function init(testContext) {
+            return this.putCorrectResponsesInStore()
+                .then(() => this.buildJumpTable(testContext));
         },
 
         /**

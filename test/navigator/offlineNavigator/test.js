@@ -69,12 +69,19 @@ define([
         assert.equal(typeof offlineNavigator['navigate'], 'function');
     });
 
-    QUnit.test('it returns itself after calling the setters or init method', function(assert) {
+    QUnit.test('it returns itself after calling the setters', function(assert) {
         var mockTestMap = { parts: {} };
 
         assert.equal(offlineNavigator['setTestContext'](), offlineNavigator);
         assert.equal(offlineNavigator['setTestMap'](mockTestMap), offlineNavigator);
-        assert.equal(offlineNavigator['init'](), offlineNavigator);
+    });
+
+    QUnit.test('it returns Promise after calling init method', function(assert) {
+        offlineNavigator
+            .setTestMap(mapHelper.createJumpTable(testMapJson))
+            .setTestContext(testContextJson)
+        var promise = offlineNavigator['init']();
+        assert.equal(typeof promise, 'object');
     });
 
     QUnit.cases
@@ -90,17 +97,18 @@ define([
                 .setTestMap(mapHelper.createJumpTable(testMapJson))
                 .setTestContext(testContextJson)
                 .clearJumpTable()
-                .init();
-
-            offlineNavigator.navigate(data.direction, data.scope, null, { itemResponse: {} }).then(function(result) {
-                assert.expect(4);
-
-                assert.equal(typeof result, 'object');
-                assert.equal(result.itemIdentifier, data.expectedItem);
-                assert.equal(result.sectionId, data.expectedSection);
-                assert.equal(result.testPartId, data.expectedPart);
-                done();
-            });
+                .init()
+                .then(() => {
+                    offlineNavigator.navigate(data.direction, data.scope, null, { itemResponse: {} }).then(function(result) {
+                        assert.expect(4);
+        
+                        assert.equal(typeof result, 'object');
+                        assert.equal(result.itemIdentifier, data.expectedItem);
+                        assert.equal(result.sectionId, data.expectedSection);
+                        assert.equal(result.testPartId, data.expectedPart);
+                        done();
+                    });
+                })
         });
 
     QUnit.test('it supports previousItem navigation action', function(assert) {
@@ -110,22 +118,23 @@ define([
             .setTestMap(mapHelper.createJumpTable(testMapJson))
             .setTestContext(testContextJson)
             .clearJumpTable()
-            .init();
-
-        Promise.all([
-            offlineNavigator.navigate('next', 'item', null, { itemResponse: {} }),
-            offlineNavigator.navigate('next', 'item', null, { itemResponse: {} }),
-            offlineNavigator.navigate('previous', 'item', null, { itemResponse: {} })
-        ]).then(function(result) {
-            result = result[2];
-            assert.expect(4);
-
-            assert.equal(typeof result, 'object');
-            assert.equal(result.itemIdentifier, 'Q02');
-            assert.equal(result.sectionId, 'S01');
-            assert.equal(result.testPartId, 'P01');
-            done();
-        });
+            .init()
+            .then(() => {
+                Promise.all([
+                    offlineNavigator.navigate('next', 'item', null, { itemResponse: {} }),
+                    offlineNavigator.navigate('next', 'item', null, { itemResponse: {} }),
+                    offlineNavigator.navigate('previous', 'item', null, { itemResponse: {} })
+                ]).then(function(result) {
+                    result = result[2];
+                    assert.expect(4);
+        
+                    assert.equal(typeof result, 'object');
+                    assert.equal(result.itemIdentifier, 'Q02');
+                    assert.equal(result.sectionId, 'S01');
+                    assert.equal(result.testPartId, 'P01');
+                    done();
+                });
+            });
     });
 
     QUnit.cases

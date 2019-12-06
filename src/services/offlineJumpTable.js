@@ -143,8 +143,10 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
             const contextItemPosition = contextItemId ? testContext.itemPosition : null;
 
             const firstJumpItem = simplifiedTestMap[0];
-            this.addJump(firstJumpItem.part, firstJumpItem.section, firstJumpItem.item);
-
+            if (firstJumpItem) {
+                this.addJump(firstJumpItem.part, firstJumpItem.section, firstJumpItem.item);
+            }
+            
             if (!contextItemPosition) {
                 return Promise.resolve();
             }

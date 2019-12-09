@@ -14,7 +14,7 @@
                 outline: none;
             }
             &.qti-interaction {
-                .qti-choice.key-navigation-highlight {
+                .qti-choice.key-navigation-highlight:not(.tts-content-node) {
                     background: whiten($info, .9) !important;
                 }
             }

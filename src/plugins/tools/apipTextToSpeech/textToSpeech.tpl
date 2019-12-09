@@ -21,7 +21,7 @@
         </div>
         <div class="tts-control-container">
             <a class="tts-control tts-control-mode" title="{{__ 'Toggle start from here mode'}}">
-                <span class="icon-increase-indent tts-icon"></span>
+                <span class="icon-play-from-here tts-icon"></span>
             </a>
         </div>
         <div class="tts-control-container">

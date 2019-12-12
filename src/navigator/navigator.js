@@ -57,7 +57,8 @@ var navigatorFactory = function navigatorFactory(testContext, testMap, itemStore
 
                 if (_.isFunction(this[methodName])) {
                     this[methodName](position, attempt)
-                        then(newTestContext => resolve(newTestContext));
+                        then(newTestContext => resolve(newTestContext))
+                        .catch(() => reject);
                 }
                 
                 reject();
@@ -98,17 +99,16 @@ var navigatorFactory = function navigatorFactory(testContext, testMap, itemStore
          * @returns {Promise} the new test context
          */
         jumpItem: function jumpItem(position) {
-            var updatedMap = mapHelper.updateItemStats(testMap, position);
-            item = mapHelper.getItemAt(updatedMap, position);
-            if (itemStore.has(item.id)) {
+            var item = mapHelper.getItemAt(updatedMap, position);
+            if (item && itemStore.has(item.id)) {
                 return itemStore.get(item.id)
                     .then(itemFromStore => {
                         const newTestContext = testContextBuilder.buildTestContextFromPosition(testContext, testMap, position, itemFromStore.attempt)
                         return itemStore.update(newTestContext.itemIdentifier, 'attempt', newTestContext.attempt)
                             .then(() => newTestContext);
-                    });
+                    })
             }
-            return Promise.resolve(testContextBuilder.buildTestContextFromPosition(testContext, testMap, newPosition));
+            return Promise.resolve(testContextBuilder.buildTestContextFromPosition(testContext, testMap, position));
         }
     };
 };

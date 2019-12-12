@@ -31,7 +31,8 @@ import testContextBuilder from 'taoQtiTest/runner/helpers/testContextBuilder';
 export default function offlineNavigatorFactory(itemStore, responseStore) {
     var testContext,
         testMap,
-        offlineJumpTableHelper = offlineJumpTableFactory(itemStore, responseStore);
+        offlineJumpTableHelper = offlineJumpTableFactory(itemStore, responseStore),
+        itemStore = itemStore;
 
     return {
         /**
@@ -110,8 +111,24 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
                 offlineJumpTableHelper[navigationActionName](params)
                     .then(function() {
                         lastJump = offlineJumpTableHelper.getLastJump();
-
-                        resolve(testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump));
+                        // new textContext doesn't know about item attempt
+                        // attempt is stored in itemStore
+                        // 1. get attempt from itemStore and increase it
+                        // 2. set it in new textContext
+                        // 3. store new attempt in itemStore
+                        // 4. return new textContext with right attempt
+                        Promise.all([
+                            testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump),
+                            itemStore.get(lastJump.item)
+                        ])
+                            .then(res => {
+                                const newTestContext = res[0];
+                                const itemFromStore = res[1];
+                                const newAttempt = itemFromStore.attempt ? itemFromStore.attempt + 1 : 1;
+                                newTestContext.attempt = newAttempt;
+                                itemStore.update(newTestContext.itemIdentifier, 'attempt', newAttempt)
+                                    .then(() => resolve(newTestContext));
+                            });
                     })
                     .catch(function(err) {
                         reject(err);

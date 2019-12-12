@@ -31,8 +31,7 @@ import testContextBuilder from 'taoQtiTest/runner/helpers/testContextBuilder';
 export default function offlineNavigatorFactory(itemStore, responseStore) {
     var testContext,
         testMap,
-        offlineJumpTableHelper = offlineJumpTableFactory(itemStore, responseStore),
-        itemStore = itemStore;
+        offlineJumpTableHelper = offlineJumpTableFactory(itemStore, responseStore);
 
     return {
         /**

@@ -31,7 +31,7 @@ import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
  * @param {Integer} position
  * @returns {Object}
  */
-function buildTestContextFromPosition(testContext, testMap, position) {
+function buildTestContextFromPosition(testContext, testMap, position, attempt) {
     var updatedMap = mapHelper.updateItemStats(testMap, position),
         item = mapHelper.getItemAt(updatedMap, position),
         section = mapHelper.getItemSection(updatedMap, position),
@@ -41,7 +41,7 @@ function buildTestContextFromPosition(testContext, testMap, position) {
         return false;
     }
 
-    return getTestContext(testContext, testMap, item, section, part, position);
+    return getTestContext(testContext, testMap, item, section, part, position, attempt);
 }
 
 /**
@@ -56,12 +56,12 @@ function buildTestContextFromPosition(testContext, testMap, position) {
  * @param {Integer} jump.position
  * @returns {Object}
  */
-function buildTestContextFromJump(testContext, testMap, jump) {
+function buildTestContextFromJump(testContext, testMap, jump, attempt) {
     var part = testMap.parts[jump.part],
         section = part.sections[jump.section],
         item = section.items[jump.item];
 
-    return getTestContext(testContext, testMap, item, section, part, jump.position);
+    return getTestContext(testContext, testMap, item, section, part, jump.position, attempt);
 }
 
 /**
@@ -87,7 +87,7 @@ function buildTestContextFromJump(testContext, testMap, jump) {
  * @returns {Object} the new test context
  * @private
  */
-function getTestContext(testContext, testMap, item, section, part, position) {
+function getTestContext(testContext, testMap, item, section, part, position, attempt) {
     var isLeavingSection = section.id !== testContext.sectionId,
         isLeavingPart = part.id !== testContext.testPartId,
         newTestContext = _.defaults(
@@ -95,6 +95,7 @@ function getTestContext(testContext, testMap, item, section, part, position) {
                 itemIdentifier: item.id,
                 itemPosition: position,
                 remainingAttempts: Math.max(-1, item.remainingAttempts - 1),
+                attempt: attempt ? attempt + 1 : 1,
                 sectionId: section.id,
                 sectionTitle: section.label,
                 testPartId: part.id,

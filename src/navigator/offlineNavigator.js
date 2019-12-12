@@ -94,7 +94,7 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
          * @param {String} scope
          * @param {Integer} position
          * @param {Object} params
-         * @returns {Object} the new test context
+         * @returns {Promise} the new test context
          */
         navigate: function navigate(direction, scope, position, params) {
             return new Promise(function(resolve, reject) {
@@ -117,16 +117,10 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
                         // 2. set it in new textContext
                         // 3. store new attempt in itemStore
                         // 4. return new textContext with right attempt
-                        Promise.all([
-                            testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump),
-                            itemStore.get(lastJump.item)
-                        ])
-                            .then(res => {
-                                const newTestContext = res[0];
-                                const itemFromStore = res[1];
-                                const newAttempt = itemFromStore.attempt ? itemFromStore.attempt + 1 : 1;
-                                newTestContext.attempt = newAttempt;
-                                itemStore.update(newTestContext.itemIdentifier, 'attempt', newAttempt)
+                        itemStore.get(lastJump.item)
+                            .then(itemFromStore => {
+                                const newTestContext = testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump, itemFromStore.attempt)
+                                itemStore.update(newTestContext.itemIdentifier, 'attempt', newTestContext.attempt)
                                     .then(() => resolve(newTestContext));
                             });
                     })

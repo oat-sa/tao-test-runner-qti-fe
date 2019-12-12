@@ -37,7 +37,7 @@ import testContextBuilder from 'taoQtiTest/runner/helpers/testContextBuilder';
  * @returns {Object} the navigator
  * @throws {TypeError} if the given parameters aren't objects
  */
-var navigatorFactory = function navigatorFactory(testContext, testMap) {
+var navigatorFactory = function navigatorFactory(testContext, testMap, itemStore) {
     if (!_.all([testContext, testMap], _.isPlainObject)) {
         throw new TypeError('The navigator must be built with a testData, a testContext and a testMap');
     }
@@ -49,62 +49,66 @@ var navigatorFactory = function navigatorFactory(testContext, testMap) {
          * @param {String} direction - the move direction (next, previous or jump)
          * @param {String} scope - the move scope (item, section, testPart)
          * @param {Number} [position] - the position in case of jump
-         * @returns {Object|Boolean} - false if we can't navigate, otherwise the result of the nav
+         * @returns {Promise} - the result of the nav
          */
         navigate: function navigate(direction, scope, position) {
-            var methodName = direction.toLowerCase() + scope.substr(0, 1).toUpperCase() + scope.substr(1).toLowerCase();
+            return new Promise(function(resolve, reject) {
+                var methodName = direction.toLowerCase() + scope.substr(0, 1).toUpperCase() + scope.substr(1).toLowerCase();
 
-            if (_.isFunction(this[methodName])) {
-                return this[methodName](position);
-            }
+                if (_.isFunction(this[methodName])) {
+                    this[methodName](position, attempt)
+                        then(newTestContext => resolve(newTestContext));
+                }
+                
+                reject();
+            });
+
         },
 
         /**
          * Navigate to the next item
-         * @returns {Object} the new test context
+         * @returns {Promise} the new test context
          */
         nextItem: function nextItem() {
-            return testContextBuilder.buildTestContextFromPosition(
-                testContext,
-                testMap,
-                testContext.itemPosition + 1
-            );
+            return this.jumpItem(testContext.itemPosition + 1);
         },
 
         /**
          * Navigate to the next item
-         * @returns {Object} the new test context
+         * @returns {Promise} the new test context
          */
         previousItem: function previsousItem() {
-            return testContextBuilder.buildTestContextFromPosition(
-                testContext,
-                testMap,
-                testContext.itemPosition - 1
-            );
+            return this.jumpItem(testContext.itemPosition - 1);
         },
 
         /**
          * Navigate to the next item
-         * @returns {Object} the new test context
+         * @returns {Promise} the new test context
          */
         nextSection: function nextSection() {
             var sectionStats = mapHelper.getSectionStats(testMap, testContext.sectionId);
             var section = mapHelper.getSection(testMap, testContext.sectionId);
 
-            return testContextBuilder.buildTestContextFromPosition(
-                testContext,
-                testMap,
-                section.position + sectionStats.total
-            );
+            return this.jumpItem(section.position + sectionStats.total);
         },
 
         /**
          * Navigate to the given position
          * @param {Number} position - the position
-         * @returns {Object} the new test context
+         * @returns {Promise} the new test context
          */
         jumpItem: function jumpItem(position) {
-            return testContextBuilder.buildTestContextFromPosition(testContext, testMap, position);
+            var updatedMap = mapHelper.updateItemStats(testMap, position);
+            item = mapHelper.getItemAt(updatedMap, position);
+            if (itemStore.has(item.id)) {
+                return itemStore.get(item.id)
+                    .then(itemFromStore => {
+                        const newTestContext = testContextBuilder.buildTestContextFromPosition(testContext, testMap, position, itemFromStore.attempt)
+                        return itemStore.update(newTestContext.itemIdentifier, 'attempt', newTestContext.attempt)
+                            .then(() => newTestContext);
+                    });
+            }
+            return Promise.resolve(testContextBuilder.buildTestContextFromPosition(testContext, testMap, newPosition));
         }
     };
 };

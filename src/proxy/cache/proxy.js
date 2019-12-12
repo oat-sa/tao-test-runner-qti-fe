@@ -134,56 +134,62 @@ export default _.defaults(
              *
              * @param {String} action - the action name (ie. move, skip, timeout)
              * @param {Object} actionParams - the parameters sent along the action
-             * @returns {Object} action result
+             * @returns {Promise} action result
              */
             this.offlineAction = function offlineAction(action, actionParams) {
-                var testNavigator;
-                var newTestContext;
-                var result = { success: true };
+                return new Promise(function(resolve, reject) {
+                    var testNavigator;
+                    var newTestContext;
+                    var result = { success: true };
 
-                var blockingActions = ['exitTest', 'timeout'];
+                    var blockingActions = ['exitTest', 'timeout'];
 
-                var testContext = this.getDataHolder().get('testContext');
-                var testMap = this.getDataHolder().get('testMap');
+                    var testContext = this.getDataHolder().get('testContext');
+                    var testMap = this.getDataHolder().get('testMap');
 
-                if (action === 'pause') {
-                    throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflinePauseError(), {
-                        reason: actionParams.reason
-                    });
-                }
-
-                //we just block those actions and the end of the test
-                if (
-                    _.contains(blockingActions, action) ||
-                    (actionParams.direction === 'next' && navigationHelper.isLast(testMap, testContext.itemIdentifier))
-                ) {
-                    throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineExitError());
-                }
-
-                // try the navigation if the actionParams context meaningful data
-                if (actionParams.direction && actionParams.scope) {
-                    testNavigator = testNavigatorFactory(testContext, testMap);
-                    newTestContext = testNavigator.navigate(
-                        actionParams.direction,
-                        actionParams.scope,
-                        actionParams.ref
-                    );
-
-                    //we are really not able to navigate
-                    if (
-                        !newTestContext ||
-                        !newTestContext.itemIdentifier ||
-                        !self.hasItem(newTestContext.itemIdentifier)
-                    ) {
-                        throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineNavError());
+                    if (action === 'pause') {
+                        reject(offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflinePauseError(), {
+                            reason: actionParams.reason
+                        }));
                     }
 
-                    result.testContext = newTestContext;
-                }
+                    //we just block those actions and the end of the test
+                    if (
+                        _.contains(blockingActions, action) ||
+                        (actionParams.direction === 'next' && navigationHelper.isLast(testMap, testContext.itemIdentifier))
+                    ) {
+                        reject(offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineExitError()));
+                    }
 
-                self.markActionAsOffline(actionParams);
+                    self.markActionAsOffline(actionParams);
 
-                return result;
+                    // try the navigation if the actionParams context meaningful data
+                    if (actionParams.direction && actionParams.scope) {
+                        testNavigator = testNavigatorFactory(testContext, testMap, itemStore);
+                        testNavigator.navigate(
+                            actionParams.direction,
+                            actionParams.scope,
+                            actionParams.ref
+                        )
+                            .then(newTestContext => {
+                                //we are really not able to navigate
+                                if (
+                                    !newTestContext ||
+                                    !newTestContext.itemIdentifier ||
+                                    !self.hasItem(newTestContext.itemIdentifier)
+                                ) {
+                                    reject(offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineNavError()));
+                                }
+
+                                result.testContext = newTestContext;
+                                resolve(result);
+                            })
+                            .catch(() => reject(offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineNavError())))
+                    } else {
+                        resolve(result);
+                    }
+                });
+                
             };
 
             /**

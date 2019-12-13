@@ -95,7 +95,6 @@ function getTestContext(testContext, testMap, item, section, part, position, att
                 itemIdentifier: item.id,
                 itemPosition: position,
                 remainingAttempts: Math.max(-1, item.remainingAttempts - 1),
-                attempt: attempt ? attempt + 1 : 1,
                 sectionId: section.id,
                 sectionTitle: section.label,
                 testPartId: part.id,
@@ -104,6 +103,10 @@ function getTestContext(testContext, testMap, item, section, part, position, att
             testContext
         );
 
+    if (attempt) {
+        newTestContext.attempt = attempt + 1;
+    }
+    
     if (isLeavingSection) {
         newTestContext.numberRubrics = 0;
         newTestContext.rubrics = '';

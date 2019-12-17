@@ -1,0 +1,169 @@
+{
+  "companionMaterialsInfo": [],
+  "inclusionOrder": {
+    "textGraphicsDefaultOrder": {
+      "elementOrder": [
+        {
+          "@attributes": {
+            "identifierRef": "ae001"
+          },
+          "order": "1"
+        },
+        {
+          "@attributes": {
+            "identifierRef": "ae002"
+          },
+          "order": "3"
+        },
+        {
+          "@attributes": {
+            "identifierRef": "ae003"
+          },
+          "order": "2"
+        }
+      ]
+    }
+  },
+  "accessibilityInfo": {
+    "accessElement": [
+      {
+        "@attributes": {
+          "identifier": "ae001"
+        },
+        "contentLinkInfo": {
+          "@attributes": {
+            "qtiLinkIdentifierRef": "cde_i289548_20"
+          },
+          "objectLink": []
+        },
+        "relatedElementInfo": {
+          "spoken": {
+            "audioFileInfo": [
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534500_mp3",
+                  "mimeType": "audio/mpeg"
+                },
+                "fileHref": "assets/ae001_534500.mp3",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              },
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534500_ogg",
+                  "mimeType": "audio/ogg"
+                },
+                "fileHref": "assets/ae001_534500.ogg",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              },
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534500_xml",
+                  "mimeType": "application/xml"
+                },
+                "fileHref": "assets/ae001_534500.xml",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              }
+            ],
+            "spokenText": "45 minutes, 75 questions",
+            "textToSpeechPronunciation": "45 minutes, 75 questions"
+          }
+        }
+      },
+      {
+        "@attributes": {
+          "identifier": "ae002"
+        },
+        "contentLinkInfo": {
+          "@attributes": {
+            "qtiLinkIdentifierRef": "cde_i289548_21"
+          },
+          "objectLink": []
+        },
+        "relatedElementInfo": {
+          "spoken": {
+            "audioFileInfo": [
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534501_mp3",
+                  "mimeType": "audio/mpeg"
+                },
+                "fileHref": "assets/ae002_534501.mp3",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              },
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534501_ogg",
+                  "mimeType": "audio/ogg"
+                },
+                "fileHref": "assets/ae002_534501.ogg",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              },
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534501_xml",
+                  "mimeType": "application/xml"
+                },
+                "fileHref": "assets/ae002_534501.xml",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              }
+            ],
+            "spokenText": "In the five passages that follow, certain words and phrases are underlined and highlighted.",
+            "textToSpeechPronunciation": "In the five passages that follow, certain words and phrases are underlined and highlighted."
+          }
+        }
+      },
+      {
+        "@attributes": {
+          "identifier": "ae003"
+        },
+        "contentLinkInfo": {
+          "@attributes": {
+            "qtiLinkIdentifierRef": "cde_i289548_22"
+          },
+          "objectLink": []
+        },
+        "relatedElementInfo": {
+          "spoken": {
+            "audioFileInfo": [
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534502_mp3",
+                  "mimeType": "audio/mpeg"
+                },
+                "fileHref": "assets/ae003_534502.mp3",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              },
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534502_ogg",
+                  "mimeType": "audio/ogg"
+                },
+                "fileHref": "assets/ae003_534502.ogg",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              },
+              {
+                "@attributes": {
+                  "contentLinkIdentifier": "audioFileInfo534502_xml",
+                  "mimeType": "application/xml"
+                },
+                "fileHref": "assets/ae003_534502.xml",
+                "voiceType": "Synthetic",
+                "voiceSpeed": "Standard"
+              }
+            ],
+            "spokenText": "On the right-hand side of the screen, you will find alternatives for the underlined and highlighted text.",
+            "textToSpeechPronunciation": "On the right-hand side of the screen, you will find alternatives for the underlined and highlighted text."
+          }
+        }
+      }
+    ]
+  }
+}

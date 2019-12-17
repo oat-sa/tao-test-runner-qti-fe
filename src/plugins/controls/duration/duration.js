@@ -108,7 +108,7 @@ export default pluginFactory({
                     self.enable();
                 })
 
-                .before('move skip exit timeout', function() {
+                .before('move skip exit timeout pause', function() {
                     var context = testRunner.getTestContext();
                     var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 

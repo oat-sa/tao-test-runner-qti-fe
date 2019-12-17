@@ -69,7 +69,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         if (flaggedCount) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
         }
-    } else if (scope === 'test') {
+    } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
         if (unansweredCount === 0) {
             itemsCountMessage = __('You answered all %s question(s) in this test', stats.questions.toString());
         } else {

@@ -62,6 +62,8 @@ function maskingComponentFactory(container, config) {
     let currentPlayback = [];
     let currentItem;
     let mediaContentData = [];
+    let playbackRate;
+
     // Browser does not support selection Api If getSelection is not defined
     const selection = window.getSelection && window.getSelection();
 
@@ -187,6 +189,7 @@ function maskingComponentFactory(container, config) {
 
                 audio.setAttribute('src', url);
                 audio.load();
+                audio.playbackRate = playbackRate;
 
                 if (this.is('playing')) {
                     audio.play();
@@ -234,6 +237,7 @@ function maskingComponentFactory(container, config) {
          * @param {Number} value - playback rate
          */
         setPlaybackRate(e, value) {
+            playbackRate = value;
             audio.playbackRate = value;
         },
         /**
@@ -322,7 +326,7 @@ function maskingComponentFactory(container, config) {
                 left,
                 maxPlaybackRate,
                 minPlaybackRate,
-                playbackRate,
+                playbackRate: defaultPlaybackRate,
                 top
             } = this.getConfig();
             const $element = this.getElement();
@@ -332,6 +336,7 @@ function maskingComponentFactory(container, config) {
             const $sfhModeElement = $('.tts-control-mode', $element);
             const $sliderElement = $('.tts-slider', $element);
             const $settingsElement = $('.tts-control-settings', $element);
+            playbackRate = defaultPlaybackRate;
 
             $element.css('touch-action', 'none');
 
@@ -372,7 +377,7 @@ function maskingComponentFactory(container, config) {
                     min: minPlaybackRate,
                     max: maxPlaybackRate,
                 },
-                start: playbackRate,
+                start: defaultPlaybackRate,
                 step: 0.1
             })
                 .on('change', this.setPlaybackRate);

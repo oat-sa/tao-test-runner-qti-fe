@@ -28,6 +28,7 @@ import mapHelper from 'taoQtiTest/runner/helpers/map';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import ttsComponentFactory from 'taoQtiTest/runner/plugins/tools/apipTextToSpeech/textToSpeech';
+import ttsApipDataProvider from 'taoQtiTest/runner/plugins/tools/apipTextToSpeech/ttsApipDataProvider';
 
 const pluginName = 'apiptts';
 
@@ -46,7 +47,52 @@ export default pluginFactory({
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
-        let ttsComponent = null;
+        let ttsComponent;
+        let ttsApipData;
+
+        const createNavigationGroup = () => {
+            const $container = testRunner.getAreaBroker().getContainer();
+            const $navigationGroupElement = this.button.getElement();
+            const groupNavigationId = `${pluginName}_navigation_group`;
+
+            const $navigationElements = $container
+                .find(
+                    ttsApipData
+                        .map(({ selector }) => selector)
+                        .join(', ')
+                );
+
+            this.navigationGroup = keyNavigator({
+                id: groupNavigationId,
+                group: $navigationGroupElement,
+                elements: navigableDomElement.createFromDoms($navigationElements.add($navigationGroupElement)),
+                replace: true,
+                propagateTab: false,
+                loop: true,
+                keepState: true,
+            })
+                .on('tab', () => {
+                    this.navigationGroup.next();
+
+                    testRunner.trigger(`${actionPrefix}next`);
+                })
+                .on('shift+tab', () => {
+                    this.navigationGroup.previous();
+
+                    testRunner.trigger(`${actionPrefix}previous`);
+                })
+                .on('blur', () => {
+                    setTimeout(
+                        () => {
+                            if (!this.navigationGroup.isFocused()) {
+                                this.navigationGroup.focus();
+                            }
+                        },
+                        0
+                    );
+                })
+                .focusPosition($navigationElements.length);
+        };
 
         /**
          * Creates the tts component on demand
@@ -58,8 +104,11 @@ export default pluginFactory({
 
                 ttsComponent = ttsComponentFactory($container, {})
                     .on('close', () => {
-                        testRunner.trigger(`${actionPrefix}toggle`);
-                    });
+                        if (this.getState('active')) {
+                            testRunner.trigger(`${actionPrefix}toggle`);
+                        }
+                    })
+                    .hide();
             }
 
             return ttsComponent;
@@ -95,9 +144,7 @@ export default pluginFactory({
          * @fires plugin-open.apiptts
          */
         const enablePlugin = () => {
-            getTTSComponent();
-
-            this.navigationGroup && this.navigationGroup.focus();
+            createNavigationGroup();
 
             this.button.turnOn();
             this.setState('active', true);
@@ -115,15 +162,19 @@ export default pluginFactory({
          * @fires plugin-close.apiptts
          */
         const disablePlugin = () => {
-            this.navigationGroup && this.navigationGroup.blur();
+            if (this.getState('active')) {
+                this.navigationGroup.blur();
+                this.navigationGroup.destroy();
 
-            this.setState('active', false);
+                this.setState('active', false);
 
-            this.button.turnOff();
-            this.trigger('close');
+                this.button.turnOff();
+                this.trigger('close');
 
-            if (ttsComponent && !ttsComponent.is('hidden')) {
-                ttsComponent.hide();
+                if (ttsComponent && !ttsComponent.is('hidden')) {
+                    ttsComponent.close();
+                    ttsComponent.hide();
+                }
             }
         };
 
@@ -174,9 +225,10 @@ export default pluginFactory({
             });
         }
 
-        //start disabled
+        // Hide plugin by default
         togglePlugin();
         this.disable();
+        this.hide();
 
         //update plugin state based on changes
         testRunner
@@ -197,42 +249,37 @@ export default pluginFactory({
                 }
             })
             .on(`${actionPrefix}togglePlayback`, () => {
-            })
-            .on(`${actionPrefix}next`, () => {
                 if (this.getState('enabled')) {
                     if (this.getState('active')) {
-                        // handling goes here
-                    }
-                }
-            })
-            .on(`${actionPrefix}previous`, () => {
-                if (this.getState('enabled')) {
-                    if (this.getState('active')) {
-                        // handling goes here
+                        if (ttsComponent.is('sfhMode')) {
+                            const $currentElement = this.navigationGroup.getCursor().navigable.getElement();
+                            const { selector } = ttsComponent.getCurrentItem() || {};
+
+                            if (!$currentElement.is(selector)) {
+                                if (this.button.getElement()[0] !== $currentElement[0]) {
+                                    $currentElement.trigger('click');
+                                }
+
+                                return;
+                            }
+                        }
+
+                        ttsComponent.togglePlayback();
                     }
                 }
             })
             .on('renderitem', () => {
-                const $navigationGroupElement = this.button.getElement();
-                const groupNavigationId = `${pluginName}_navigation_group`;
+                ttsApipData = ttsApipDataProvider(testRunner.itemRunner.getApipData() || {});
 
-                if (!$navigationGroupElement) {
+                if (!ttsApipData.length) {
+                    disablePlugin();
+                    this.hide();
+
                     return;
                 }
 
-                this.navigationGroup = keyNavigator({
-                    id: groupNavigationId,
-                    elements: navigableDomElement.createFromDoms($navigationGroupElement),
-                    group: $navigationGroupElement,
-                    replace: true,
-                    propagateTab: false,
-                })
-                    .on('tab', () => {
-                        testRunner.trigger(`${actionPrefix}next`);
-                    })
-                    .on('shift+tab', () => {
-                        testRunner.trigger(`${actionPrefix}previous`);
-                    });
+                getTTSComponent().setMediaContentData(ttsApipData);
+                this.show();
             });
     },
     /**

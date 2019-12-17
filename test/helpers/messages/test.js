@@ -253,7 +253,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
             var runner = runnerMock(map, context, data, responses, declarations);
             var message = 'This is a test.';
 
-            assert.expect(6);
+            assert.expect(7);
 
             assert.equal(
                 messagesHelper.getExitMessage(message, 'test', runner),
@@ -269,6 +269,11 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 messagesHelper.getExitMessage(message, 'section', runner),
                 `${testData.sectionMessage} ${message}`,
                 'message include the right stats for section scope'
+            );
+            assert.equal(
+                messagesHelper.getExitMessage(message, 'testWithoutInaccessibleItems', runner),
+                `${testData.testMessage} ${message}`,
+                'message include the right stats for testWithoutInaccessibleItems scope'
             );
 
             data.enableUnansweredItemsWarning = false;

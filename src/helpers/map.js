@@ -285,6 +285,36 @@ export default {
             case 'testPart':
                 return this.getPartStats(map, jump && jump.part);
 
+            // During calculation stats for this case,
+            // we are considiring all unanswered inaccessible items as answered
+            case 'testWithoutInaccessibleItems': {
+                const testStats = this.getTestStats(map);
+                const { position: currentPartPosition, isLinear: isCurrentPartLinear } = this.getPart(map, jump && jump.part);
+                const parts = Object.values(this.getParts(map))
+                    .filter(({ position: partPosition }) => partPosition < currentPartPosition)
+                    .sort((a, b) => b - a);
+
+                // Find the neirest part to which test taker can not navigate
+                const linearPartIndex = isCurrentPartLinear
+                    ? 0
+                    : parts.findIndex(({ isLinear }) => isLinear);
+
+                if (linearPartIndex === -1) {
+                    return testStats;
+                }
+
+                // Calculate all unanswered questions in inaccessible parts
+                const countOfInaccessibleUnasweredQestions = parts
+                    .slice(linearPartIndex)
+                    .reduce((acc, {stats: { questions, answered }}) => acc + (questions - answered), 0);
+
+                return Object.assign(
+                    {},
+                    testStats,
+                    { answered: testStats.answered + countOfInaccessibleUnasweredQestions }
+                );
+            }
+
             default:
             case 'test':
                 return this.getTestStats(map);

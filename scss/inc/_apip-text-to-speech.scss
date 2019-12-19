@@ -156,6 +156,13 @@ $activeApipElementBackgroundColor: yellow;
                 cursor: $stfCursor 0 32, auto !important;
             }
         }
+
+        img.tts-content-node {
+            &:hover,
+            &:focus {
+                padding: 5px;
+            }
+        }
     }
 }
 
@@ -170,6 +177,12 @@ $activeApipElementBackgroundColor: yellow;
                     color: $textColor !important;
                     background-color: $activeApipElementBackgroundColor !important;
                 }
+            }
+        }
+
+        img.tts-content-node {
+            &.tts-active-content-node {
+                padding: 5px;
             }
         }
     }

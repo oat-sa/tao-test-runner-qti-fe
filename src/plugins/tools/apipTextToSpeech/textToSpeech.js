@@ -22,11 +22,13 @@
  * @author Anton Tsymuk <anton@taotesting.com>
  */
 import $ from 'jquery';
+import __ from 'i18n';
 import ttsTemplate from 'taoQtiTest/runner/plugins/tools/apipTextToSpeech/textToSpeech.tpl';
 import component from 'ui/component';
 import interact from 'interact';
 import makeStackable from 'ui/component/stackable';
 import makePlaceable from 'ui/component/placeable';
+import feedback from 'ui/feedback';
 import 'nouislider';
 
 const defaultConfig = {
@@ -62,6 +64,8 @@ function maskingComponentFactory(container, config) {
     let currentPlayback = [];
     let currentItem;
     let mediaContentData = [];
+    let playbackRate;
+
     // Browser does not support selection Api If getSelection is not defined
     const selection = window.getSelection && window.getSelection();
 
@@ -187,6 +191,7 @@ function maskingComponentFactory(container, config) {
 
                 audio.setAttribute('src', url);
                 audio.load();
+                audio.playbackRate = playbackRate;
 
                 if (this.is('playing')) {
                     audio.play();
@@ -234,6 +239,7 @@ function maskingComponentFactory(container, config) {
          * @param {Number} value - playback rate
          */
         setPlaybackRate(e, value) {
+            playbackRate = value;
             audio.playbackRate = value;
         },
         /**
@@ -322,7 +328,7 @@ function maskingComponentFactory(container, config) {
                 left,
                 maxPlaybackRate,
                 minPlaybackRate,
-                playbackRate,
+                playbackRate: defaultPlaybackRate,
                 top
             } = this.getConfig();
             const $element = this.getElement();
@@ -332,6 +338,7 @@ function maskingComponentFactory(container, config) {
             const $sfhModeElement = $('.tts-control-mode', $element);
             const $sliderElement = $('.tts-slider', $element);
             const $settingsElement = $('.tts-control-settings', $element);
+            playbackRate = defaultPlaybackRate;
 
             $element.css('touch-action', 'none');
 
@@ -372,7 +379,7 @@ function maskingComponentFactory(container, config) {
                     min: minPlaybackRate,
                     max: maxPlaybackRate,
                 },
-                start: playbackRate,
+                start: defaultPlaybackRate,
                 step: 0.1
             })
                 .on('change', this.setPlaybackRate);
@@ -384,6 +391,10 @@ function maskingComponentFactory(container, config) {
             $sfhModeElement.on('click', this.toggleSFHMode);
             $settingsElement.on('click', this.toggleSettings);
             audio.addEventListener('ended', this.initNextItem);
+            audio.addEventListener('error', () => {
+                feedback().error(__('Can not playback media file!'));
+                this.initNextItem();
+            });
 
             // move to initial position
             this.moveTo(left, top);

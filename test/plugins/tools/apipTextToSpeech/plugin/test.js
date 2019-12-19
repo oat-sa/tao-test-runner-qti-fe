@@ -56,6 +56,42 @@ define([
             position: 0
         }]
     };
+    const apipData = {
+        companionMaterialsInfo: [],
+        inclusionOrder: {
+            textGraphicsDefaultOrder: {
+                elementOrder: [
+                    {
+                        '@attributes': {
+                            identifierRef: 'ae001',
+                        },
+                        order: '1',
+                    },
+                ]
+            },
+        },
+        accessibilityInfo: {
+            accessElement: [
+                {
+                    '@attributes': {
+                        identifier: 'ae001',
+                    },
+                    relatedElementInfo: {
+                        spoken: {
+                            audioFileInfo: [
+                                {
+                                    '@attributes': {
+                                        mimeType: 'audio/mpeg',
+                                    },
+                                    fileHref: 'assets/ae001_534500.mp3',
+                                },
+                            ],
+                        }
+                    }
+                }
+            ]
+        }
+    };
 
     /**
      * The following tests applies to all plugins
@@ -201,6 +237,10 @@ define([
 
         assert.expect(3);
 
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
+
         plugin
             .init()
             .then(() => {
@@ -240,6 +280,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
@@ -273,6 +314,8 @@ define([
         const runner = runnerFactory(providerName);
         const areaBroker = runner.getAreaBroker();
         const plugin = pluginFactory(runner, runner.getAreaBroker());
+
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         assert.expect(2);
 
@@ -309,6 +352,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
@@ -354,6 +398,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
@@ -363,16 +408,16 @@ define([
 
                 runner.trigger('renderitem');
 
-                const navigationGroup = keyNavigatorFactory.get(groupNavigationId);
-
-                assert.equal(typeof navigationGroup, 'object', 'The plugin create navigation group after render');
-
                 return plugin.enable().then(() => {
                     const $button = $container.find('[data-control="apiptts"]');
 
                     assert.equal($button.is(document.activeElement), false, 'The focus group is not focused by default');
 
                     $button.click();
+
+                    const navigationGroup = keyNavigatorFactory.get(groupNavigationId);
+
+                    assert.equal(typeof navigationGroup, 'object', 'The plugin create navigation group after render');
 
                     assert.equal($button.is(document.activeElement), true, 'The focus group is not focused after plugin activation');
 

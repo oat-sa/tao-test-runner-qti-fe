@@ -22,11 +22,13 @@
  * @author Anton Tsymuk <anton@taotesting.com>
  */
 import $ from 'jquery';
+import __ from 'i18n';
 import ttsTemplate from 'taoQtiTest/runner/plugins/tools/apipTextToSpeech/textToSpeech.tpl';
 import component from 'ui/component';
 import interact from 'interact';
 import makeStackable from 'ui/component/stackable';
 import makePlaceable from 'ui/component/placeable';
+import feedback from 'ui/feedback';
 import 'nouislider';
 
 const defaultConfig = {
@@ -389,6 +391,10 @@ function maskingComponentFactory(container, config) {
             $sfhModeElement.on('click', this.toggleSFHMode);
             $settingsElement.on('click', this.toggleSettings);
             audio.addEventListener('ended', this.initNextItem);
+            audio.addEventListener('error', () => {
+                feedback().error(__('Can not playback media file!'));
+                this.initNextItem();
+            });
 
             // move to initial position
             this.moveTo(left, top);

@@ -34,13 +34,13 @@ const getTTSItemData = (apipElement) => {
             } = {},
         } = {},
     } = apipElement;
-    const { fileHref } = audioFileInfo.find((audioFile) => audioFile['@attributes'].mimeType === 'audio/mpeg') || {};
+    const { fileHref = '' } = audioFileInfo.find((audioFile) => audioFile['@attributes'].mimeType === 'audio/mpeg') || {};
     const elementId = contentLinkInfo['@attributes'].qtiLinkIdentifierRef;
 
     return {
         identifier,
         selector: elementId && `#${elementId}`,
-        url: fileHref,
+        url: fileHref.replace('assets/', ''),
     };
 };
 

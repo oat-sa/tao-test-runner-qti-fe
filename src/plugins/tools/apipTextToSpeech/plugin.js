@@ -269,7 +269,12 @@ export default pluginFactory({
                 }
             })
             .on('renderitem', () => {
-                ttsApipData = ttsApipDataProvider(testRunner.itemRunner.getApipData() || {});
+                ttsApipData = ttsApipDataProvider(testRunner.itemRunner.getApipData() || {})
+                    .map((apipItemData) => Object.assign(
+                        {},
+                        apipItemData,
+                        { url: testRunner.itemRunner.assetManager.resolve(apipItemData.url) }
+                    ));
 
                 if (!ttsApipData.length) {
                     disablePlugin();

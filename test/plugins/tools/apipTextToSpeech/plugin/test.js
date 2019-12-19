@@ -239,7 +239,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
-        runner.itemRunner = { assetManager: { resolve: () => {} }, getApipData: () => apipData };
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
@@ -280,7 +280,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
-        runner.itemRunner = { assetManager: { resolve: () => {} }, getApipData: () => apipData };
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
@@ -315,7 +315,7 @@ define([
         const areaBroker = runner.getAreaBroker();
         const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        runner.itemRunner = { assetManager: { resolve: () => {} }, getApipData: () => apipData };
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         assert.expect(2);
 
@@ -352,7 +352,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
-        runner.itemRunner = { assetManager: { resolve: () => {} }, getApipData: () => apipData };
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
@@ -398,7 +398,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
-        runner.itemRunner = { assetManager: { resolve: () => {} }, getApipData: () => apipData };
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()

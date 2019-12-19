@@ -28,17 +28,17 @@ define([
         {
             identifier: 'ae001',
             selector: '#cde_i289548_20',
-            url: 'assets/ae001_534500.mp3',
+            url: 'ae001_534500.mp3',
         },
         {
             identifier: 'ae003',
             selector: '#cde_i289548_22',
-            url: 'assets/ae003_534502.mp3',
+            url: 'ae003_534502.mp3',
         },
         {
             identifier: 'ae002',
             selector: '#cde_i289548_21',
-            url: 'assets/ae002_534501.mp3',
+            url: 'ae002_534501.mp3',
         },
     ];
     const apipItemWithoutQtiLinkIdentifierRef = {

@@ -70,30 +70,37 @@ export default pluginFactory({
                 return durationStore.getItem(attemptId);
             }
 
+            /**
+             * Updates the duration of a particular item
+             *
+             * @returns {Promise}
+             */
+            function updateDuration() {
+                //how many time elapsed from the last tick ?
+
+                var context = testRunner.getTestContext();
+
+                //store by attempt
+                var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
+
+                return durationStore.getItem(itemAttemptId).then(function(duration) {
+                    var elapsed = self.stopwatch.tick();
+                    duration = _.isNumber(duration) ? duration : 0;
+                    elapsed = _.isNumber(elapsed) && elapsed > 0 ? elapsed / 1000 : 0;
+
+                    //store the last duration
+                    return durationStore.setItem(itemAttemptId, duration + elapsed);
+                });
+            }
+
             //one stopwatch to count the time
             self.stopwatch = timerFactory({
-                autoStart: false
+                autoStart: false,
             });
 
             //update the duration on a regular basis
             self.polling = pollingFactory({
-                action: function updateDuration() {
-                    //how many time elapsed from the last tick ?
-
-                    var context = testRunner.getTestContext();
-
-                    //store by attempt
-                    var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
-
-                    durationStore.getItem(itemAttemptId).then(function(duration) {
-                        var elapsed = self.stopwatch.tick();
-                        duration = _.isNumber(duration) ? duration : 0;
-                        elapsed = _.isNumber(elapsed) && elapsed > 0 ? elapsed / 1000 : 0;
-
-                        //store the last duration
-                        durationStore.setItem(itemAttemptId, duration + elapsed);
-                    });
-                },
+                action: updateDuration,
                 interval: refresh,
                 autoStart: false
             });
@@ -112,18 +119,20 @@ export default pluginFactory({
                     var context = testRunner.getTestContext();
                     var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
-                    return getItemDuration(itemAttemptId).then(function(duration) {
-                        var params = {
-                            itemDuration: 0
-                        };
-                        if (_.isNumber(duration) && duration > 0) {
-                            params.itemDuration = duration;
-                        }
+                    return updateDuration()
+                        .then(() => getItemDuration(itemAttemptId))
+                        .then(function(duration) {
+                            var params = {
+                                itemDuration: 0
+                            };
+                            if (_.isNumber(duration) && duration > 0) {
+                                params.itemDuration = duration;
+                            }
 
-                        // the duration will be sent to the server with the next request,
-                        // usually submitItem() or callItemAction()
-                        testRunner.getProxy().addCallActionParams(params);
-                    });
+                            // the duration will be sent to the server with the next request,
+                            // usually submitItem() or callItemAction()
+                            testRunner.getProxy().addCallActionParams(params);
+                        });
                 })
 
                 .on('move skip exit timeout error disableitem', function() {

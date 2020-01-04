@@ -73,7 +73,10 @@ function offlineSyncModalFactory(proxy) {
             $secondaryButton = getDialogEl('button[data-control="secondary"]');
             $countdown.insertAfter($secondaryButton);
 
-            proxy.after('reconnect.waiting', () => waitingDialog.endWait());
+            proxy.after('reconnect.waiting', () => {
+                waitingDialog.endWait();
+                hider.hide(getDialogEl('p.message'));
+            });
             proxy.before('disconnect.waiting', () => {
                 // need to open dialog again if it is closed
                 waitingDialog.dialog.show();
@@ -96,6 +99,7 @@ function offlineSyncModalFactory(proxy) {
         })
         .on('wait', () => {
             hider.show(getDialogEl(betweenButtonTextSelector));
+            hider.show(getDialogEl('p.message'));
             // if beginWait comes before render:
             if (waitingDialog.is('rendered')) {
                 waitingDialog.trigger('begincountdown');

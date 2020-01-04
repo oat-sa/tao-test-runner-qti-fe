@@ -57,6 +57,26 @@ export default pluginFactory({
 
         //where the duration of attempts are stored
         return testRunner.getPluginStore(this.getName()).then(function(durationStore) {
+            let currentLock = Promise.resolve();
+
+            /**
+             * Return new lock promise based on current lock
+             *
+             * @returns {Promise}
+             */
+            function mutex() {
+                let resolveLock;
+
+                const nextLock = new Promise(resolve => {
+                    resolveLock = () => resolve();
+                });
+
+                const prevLock = currentLock;
+                currentLock = nextLock;
+
+                return prevLock.then(() => resolveLock);
+            }
+
             /**
              * Gets the duration of a particular item from the store
              * @param {String} attemptId - the attempt id to get the duration for
@@ -77,20 +97,27 @@ export default pluginFactory({
              */
             function updateDuration() {
                 //how many time elapsed from the last tick ?
-
-                var context = testRunner.getTestContext();
+                const context = testRunner.getTestContext();
 
                 //store by attempt
-                var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
+                const itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
-                return durationStore.getItem(itemAttemptId).then(function(duration) {
-                    var elapsed = self.stopwatch.tick();
-                    duration = _.isNumber(duration) ? duration : 0;
-                    elapsed = _.isNumber(elapsed) && elapsed > 0 ? elapsed / 1000 : 0;
+                //Time elapsed from last update
+                let elapsed = self.stopwatch.tick();
 
-                    //store the last duration
-                    return durationStore.setItem(itemAttemptId, duration + elapsed);
-                });
+                return mutex()
+                    .then(
+                        (unlock) => durationStore.getItem(itemAttemptId)
+                            .then((duration) => ({ duration, unlock }))
+                            .catch(unlock)
+                    )
+                    .then(function({ duration, unlock }) {
+                        duration = _.isNumber(duration) ? duration : 0;
+                        elapsed = _.isNumber(elapsed) && elapsed > 0 ? elapsed / 1000 : 0;
+                        //store the last duration
+                        return durationStore.setItem(itemAttemptId, duration + elapsed)
+                            .finally(unlock);
+                    });
             }
 
             //one stopwatch to count the time
@@ -115,16 +142,24 @@ export default pluginFactory({
                     self.enable();
                 })
 
+                .before('move skip exit timeout pause error disableitem', function() {
+                    updateDuration()
+                      .then(() => {
+                          self.disable();
+                      });
+                })
+
                 .before('move skip exit timeout pause', function() {
                     var context = testRunner.getTestContext();
                     var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
-                    return updateDuration()
+                    return mutex().then((unlock) => unlock())
                         .then(() => getItemDuration(itemAttemptId))
                         .then(function(duration) {
                             var params = {
                                 itemDuration: 0
                             };
+
                             if (_.isNumber(duration) && duration > 0) {
                                 params.itemDuration = duration;
                             }
@@ -132,11 +167,9 @@ export default pluginFactory({
                             // the duration will be sent to the server with the next request,
                             // usually submitItem() or callItemAction()
                             testRunner.getProxy().addCallActionParams(params);
-                        });
-                })
 
-                .on('move skip exit timeout error disableitem', function() {
-                    self.disable();
+                            self.disable();
+                        });
                 })
 
                 /**

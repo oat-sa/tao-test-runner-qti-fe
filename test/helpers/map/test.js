@@ -455,7 +455,7 @@ define([
     });
 
     QUnit.test('helpers/map.getScopeStats', function(assert) {
-        assert.expect(9);
+        assert.expect(11);
 
         assert.equal(
             mapHelper.getScopeStats(mapSample, 6),
@@ -501,6 +501,35 @@ define([
             mapHelper.getScopeStats(),
             void 0,
             'The map helper getScopeStats does not provide any stats when the map does not exist'
+        );
+        assert.equal(
+            mapHelper.getScopeStats(mapSample, 6, 'testWithoutInaccessibleItems'),
+            mapSample.stats,
+            'The map helper getScopeStats return test stats for "testWithoutInaccessibleItems" scope when all parts has non-linear navigation'
+        );
+        assert.equal(
+            mapHelper.getScopeStats(
+                Object.assign(
+                    {},
+                    mapSample,
+                    {
+                        parts: {
+                            'testPart-1': Object.assign(
+                                {},
+                                mapSample.parts['testPart-1'],
+                                {
+                                    isLinear: true
+                                }
+                            ),
+                            'testPart-2': mapSample.parts['testPart-2']
+                        }
+                    }
+                ),
+                6,
+                'testWithoutInaccessibleItems'
+            ).answered,
+            mapSample.parts['testPart-1'].stats.questions,
+            'The map helper getScopeStats considers all unanswered inaccessible items as answered for "testWithoutInaccessibleItems" scope'
         );
     });
 

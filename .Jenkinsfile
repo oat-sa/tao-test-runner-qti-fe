@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh(
                     label: 'Setup frontend toolchain',
-                    script: 'npm install'
+                    script: 'npm i'
                 )
                 sh (
                     label : 'Run frontend tests',

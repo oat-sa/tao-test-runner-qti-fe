@@ -214,7 +214,7 @@ export default pluginFactory({
      * Enable the button
      */
     enable: function enable() {
-        this.$element.removeProp('disabled').removeClass('disabled');
+        this.$element.prop('disabled', false).removeClass('disabled');
     },
 
     /**

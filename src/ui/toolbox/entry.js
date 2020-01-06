@@ -118,7 +118,7 @@ export default function itemComponentFactory(specs, defaults) {
         .setTemplate(entryTpl)
         .on('enable', function() {
             if (this.is('rendered')) {
-                this.$component.removeProp('disabled');
+                this.$component.prop('disabled', false);
             }
         })
         .on('disable', function() {

@@ -167,8 +167,6 @@ export default pluginFactory({
                             // the duration will be sent to the server with the next request,
                             // usually submitItem() or callItemAction()
                             testRunner.getProxy().addCallActionParams(params);
-
-                            self.disable();
                         });
                 })
 

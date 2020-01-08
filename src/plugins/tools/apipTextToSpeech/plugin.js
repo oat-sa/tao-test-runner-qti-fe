@@ -281,6 +281,10 @@ export default pluginFactory({
                 }
             })
             .on('renderitem', () => {
+                if (!isConfigured()) {
+                    return;
+                }
+
                 ttsApipData = ttsApipDataProvider(testRunner.itemRunner.getData().apipAccessibility || {})
                     .map((apipItemData) => Object.assign(
                         {},

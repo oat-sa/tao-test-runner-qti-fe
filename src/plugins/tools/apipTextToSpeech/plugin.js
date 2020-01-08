@@ -72,14 +72,18 @@ export default pluginFactory({
                 keepState: true,
             })
                 .on('tab', () => {
-                    this.navigationGroup.next();
+                    if (ttsComponent.is('sfhMode')) {
+                        this.navigationGroup.next();
 
-                    testRunner.trigger(`${actionPrefix}next`);
+                        testRunner.trigger(`${actionPrefix}next`);
+                    }
                 })
                 .on('shift+tab', () => {
-                    this.navigationGroup.previous();
+                    if (ttsComponent.is('sfhMode')) {
+                        this.navigationGroup.previous();
 
-                    testRunner.trigger(`${actionPrefix}previous`);
+                        testRunner.trigger(`${actionPrefix}previous`);
+                    }
                 })
                 .on('blur', () => {
                     setTimeout(
@@ -214,6 +218,14 @@ export default pluginFactory({
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),
                     () => {
+                        if (
+                            key === 'spaceTogglePlayback'
+                            && ttsComponent
+                            && ttsComponent.is('sfhMode')
+                        ) {
+                            return;
+                        }
+
                         const eventKey = key.endsWith('TogglePlayback') ? 'togglePlayback' : key;
 
                         testRunner.trigger(actionPrefix + eventKey);

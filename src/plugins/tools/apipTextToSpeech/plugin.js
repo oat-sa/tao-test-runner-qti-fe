@@ -85,6 +85,11 @@ export default pluginFactory({
                         testRunner.trigger(`${actionPrefix}previous`);
                     }
                 })
+                .on('activate', () => {
+                    if (ttsComponent.is('sfhMode')) {
+                        testRunner.trigger(`${actionPrefix}togglePlayback`);
+                    }
+                })
                 .on('blur', () => {
                     setTimeout(
                         () => {

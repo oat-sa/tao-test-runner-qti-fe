@@ -25,6 +25,7 @@ import _ from 'lodash';
 import pollingFactory from 'core/polling';
 import timerFactory from 'core/timer';
 import pluginFactory from 'taoTests/runner/plugin';
+import promiseQueue from 'core/promiseQueue';
 
 /**
  * Time interval between duration capture in ms
@@ -55,6 +56,12 @@ export default pluginFactory({
         var self = this;
         var testRunner = this.getTestRunner();
 
+        /**
+         * A promise queue to ensure requests run sequentially
+         */
+        const queue = promiseQueue();
+        let currentUpdatePromise = Promise.resolve();
+
         //where the duration of attempts are stored
         return testRunner.getPluginStore(this.getName()).then(function(durationStore) {
             /**
@@ -83,14 +90,18 @@ export default pluginFactory({
                 //store by attempt
                 var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
-                return durationStore.getItem(itemAttemptId).then(function(duration) {
-                    var elapsed = self.stopwatch.tick();
-                    duration = _.isNumber(duration) ? duration : 0;
-                    elapsed = _.isNumber(elapsed) && elapsed > 0 ? elapsed / 1000 : 0;
+                currentUpdatePromise = queue.serie(() => durationStore.getItem(itemAttemptId)
+                    .then(function(duration) {
+                        var elapsed = self.stopwatch.tick();
+                        duration = _.isNumber(duration) ? duration : 0;
+                        elapsed = _.isNumber(elapsed) && elapsed > 0 ? elapsed / 1000 : 0;
 
-                    //store the last duration
-                    return durationStore.setItem(itemAttemptId, duration + elapsed);
-                });
+                        //store the last duration
+                        return durationStore.setItem(itemAttemptId, duration + elapsed);
+                    })
+                );
+
+                return currentUpdatePromise;
             }
 
             //one stopwatch to count the time
@@ -107,24 +118,26 @@ export default pluginFactory({
 
             //change plugin state
             testRunner
-
                 .after('renderitem', function() {
                     self.enable();
                 })
                 .on('enableitem', function() {
                     self.enable();
                 })
-
+                .on('move skip exit timeout error disableitem', function() {
+                    updateDuration().then(() => self.disable());
+                })
                 .before('move skip exit timeout pause', function() {
                     var context = testRunner.getTestContext();
                     var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
-                    return updateDuration()
+                    return currentUpdatePromise
                         .then(() => getItemDuration(itemAttemptId))
-                        .then(function(duration) {
-                            var params = {
+                        .then((duration) => {
+                            const params = {
                                 itemDuration: 0
                             };
+
                             if (_.isNumber(duration) && duration > 0) {
                                 params.itemDuration = duration;
                             }
@@ -134,11 +147,6 @@ export default pluginFactory({
                             testRunner.getProxy().addCallActionParams(params);
                         });
                 })
-
-                .on('move skip exit timeout error disableitem', function() {
-                    self.disable();
-                })
-
                 /**
                  * @event duration.get
                  * @param {String} attemptId - the attempt id to get the duration for

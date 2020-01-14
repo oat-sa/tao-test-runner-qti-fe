@@ -124,7 +124,7 @@ export default pluginFactory({
                 .on('enableitem', function() {
                     self.enable();
                 })
-                .on('move skip exit timeout error disableitem', function() {
+                .before('move skip exit timeout error disableitem', function() {
                     updateDuration().then(() => self.disable());
                 })
                 .before('move skip exit timeout pause', function() {

@@ -393,7 +393,7 @@ export default function menuComponentFactory(specs, defaults) {
         .setTemplate(menuTpl)
         .on('enable', function enable() {
             if (this.is('rendered')) {
-                this.$component.removeProp('disabled');
+                this.$component.prop('disabled', false);
             }
         })
         .on('disable', function disable() {

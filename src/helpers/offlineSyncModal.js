@@ -112,7 +112,7 @@ function offlineSyncModalFactory(proxy) {
                     $countdown.html(__('The download will be available in <strong>%d</strong> seconds', delaySec));
                     if (delaySec < 1) {
                         this.stop();
-                        $secondaryButton.removeProp('disabled');
+                        $secondaryButton.prop('disabled', false);
                         $countdown.html('');
                     }
                 },

@@ -118,7 +118,7 @@ export default pluginFactory({
      * Enable the container
      */
     enable: function enable() {
-        this.$element.removeProp('disabled').removeClass('disabled');
+        this.$element.prop('disabled', false).removeClass('disabled');
     },
 
     /**

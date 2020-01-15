@@ -342,10 +342,12 @@ export default _.defaults(
                 const testData = self.getDataHolder().get('testData');
                 const testMap = self.getDataHolder().get('testMap');
                 const niceFilename = `Download of ${testMap.title} at ${dateTime}.json`;
+                const isExitTest = actions.some(elem => elem.action === 'exitTest');
 
                 return {
                     filename: niceFilename,
                     content: JSON.stringify({
+                        isExitTest: isExitTest,
                         timestamp: timestamp,
                         testData: testData,
                         actionQueue: actions,

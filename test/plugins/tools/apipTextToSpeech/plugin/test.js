@@ -315,6 +315,8 @@ define([
         const areaBroker = runner.getAreaBroker();
         const plugin = pluginFactory(runner, runner.getAreaBroker());
 
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
         runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         assert.expect(2);
@@ -333,6 +335,56 @@ define([
                 assert.equal(hider.isHidden($button), false, 'The trigger button is visible');
 
                 assert.equal($button.hasClass('disabled'), false, 'The trigger button is not disabled');
+
+                ready();
+            })
+            .catch((err) => {
+                assert.ok(false, `Error in init method: ${err}`);
+                ready();
+            });
+    });
+
+    QUnit.test('runner events: renderitem with disabled plugin', (assert) => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const testPartWithApipCategory = {
+            parts: {
+                p1: {
+                    sections: {
+                        s1: {
+                            items: {
+                                'item-1': {
+                                    categories: []
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(Object.assign({}, sampleTestMap, testPartWithApipCategory));
+
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
+
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
+
+        assert.expect(1);
+
+        plugin
+            .init()
+            .then(() => {
+                const $container = runner.getAreaBroker().getToolboxArea();
+
+                areaBroker.getToolbox().render($container);
+
+                const $button = $container.find('[data-control="apiptts"]');
+
+                plugin.hide();
+                runner.trigger('renderitem');
+
+                assert.equal(hider.isHidden($button), true, 'the button is not visible');
 
                 ready();
             })
@@ -394,7 +446,7 @@ define([
         const groupNavigationId = `${pluginName}_navigation_group`;
         const actionPrefix = `tool-${pluginName}-`;
 
-        assert.expect(6);
+        assert.expect(7);
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
@@ -404,12 +456,14 @@ define([
             .init()
             .then(function () {
                 const $container = areaBroker.getToolboxArea();
+                const $testContainer = areaBroker.getContainer();
                 areaBroker.getToolbox().render($container);
 
                 runner.trigger('renderitem');
 
                 return plugin.enable().then(() => {
                     const $button = $container.find('[data-control="apiptts"]');
+                    const $sfhButton = $testContainer.find('.tts-control-mode');
 
                     assert.equal($button.is(document.activeElement), false, 'The focus group is not focused by default');
 
@@ -422,14 +476,15 @@ define([
                     assert.equal($button.is(document.activeElement), true, 'The focus group is not focused after plugin activation');
 
                     $button.click();
+                    $sfhButton.click();
 
                     assert.equal($button.is(document.activeElement), false, 'The focus group lose focus after plugin disabling');
 
                     runner.on(`${actionPrefix}next`, () => {
-                        assert.ok(true, `The next event triggered after tab navigation`);
+                        assert.ok(true, 'The next event triggered after tab navigation');
 
                         runner.on(`${actionPrefix}previous`, () => {
-                            assert.ok(true, `The previous event triggered after tab+shift navigation`);
+                            assert.ok(true, 'The previous event triggered after tab+shift navigation');
 
                             ready();
                         });
@@ -437,7 +492,12 @@ define([
                         navigationGroup.trigger('shift+tab');
                     });
 
+                    runner.on(`${actionPrefix}togglePlayback`, () => {
+                        assert.ok(true, 'The togglePlayback event triggered on activate navigation event');
+                    });
+
                     navigationGroup.trigger('tab');
+                    navigationGroup.trigger('activate');
                 });
             })
             .catch(function (err) {

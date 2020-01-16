@@ -31,7 +31,7 @@ import promiseQueue from 'core/promiseQueue';
  * Time interval between duration capture in ms
  * @type {Number}
  */
-var refresh = 1000;
+const refresh = 1000;
 
 /**
  * Creates the timer plugin
@@ -53,8 +53,8 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
+        const self = this;
+        const testRunner = this.getTestRunner();
 
         /**
          * A promise queue to ensure requests run sequentially
@@ -63,36 +63,36 @@ export default pluginFactory({
         let currentUpdatePromise = Promise.resolve();
 
         //where the duration of attempts are stored
-        return testRunner.getPluginStore(this.getName()).then(function(durationStore) {
+        return testRunner.getPluginStore(this.getName()).then((durationStore) => {
             /**
              * Gets the duration of a particular item from the store
              * @param {String} attemptId - the attempt id to get the duration for
              * @returns {Promise}
              */
-            function getItemDuration(attemptId) {
+            const getItemDuration = (attemptId) => {
                 if (!/^(.*)+#+\d+$/.test(attemptId)) {
                     return Promise.reject(new Error('Is it really an attempt id, like "itemid#attempt"'));
                 }
 
                 return durationStore.getItem(attemptId);
-            }
+            };
 
             /**
              * Updates the duration of a particular item
              *
              * @returns {Promise}
              */
-            function updateDuration() {
+            const updateDuration = () => {
                 //how many time elapsed from the last tick ?
 
-                var context = testRunner.getTestContext();
+                const context = testRunner.getTestContext();
 
                 //store by attempt
-                var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
+                const itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
                 currentUpdatePromise = queue.serie(() => durationStore.getItem(itemAttemptId)
                     .then(function(duration) {
-                        var elapsed = self.stopwatch.tick();
+                        let elapsed = self.stopwatch.tick();
                         duration = _.isNumber(duration) ? duration : 0;
                         elapsed = _.isNumber(elapsed) && elapsed > 0 ? elapsed / 1000 : 0;
 
@@ -102,7 +102,28 @@ export default pluginFactory({
                 );
 
                 return currentUpdatePromise;
-            }
+            };
+
+            const addDuractionToCallActionParams = () => {
+                const context = testRunner.getTestContext();
+                const itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
+
+                return getItemDuration(itemAttemptId)
+                    .then((duration) => {
+                        const params = {
+                            itemDuration: 0,
+                        };
+
+                        if (_.isNumber(duration) && duration > 0) {
+                            params.itemDuration = duration;
+                        }
+
+                        // the duration will be sent to the server with the next request,
+                        // usually submitItem() or callItemAction()
+                        testRunner.getProxy().addCallActionParams(params);
+                    })
+                    .catch(_.noop);
+            };
 
             //one stopwatch to count the time
             self.stopwatch = timerFactory({
@@ -113,46 +134,32 @@ export default pluginFactory({
             self.polling = pollingFactory({
                 action: updateDuration,
                 interval: refresh,
-                autoStart: false
+                autoStart: false,
             });
 
             //change plugin state
             testRunner
-                .after('renderitem', function() {
+                .after('renderitem', () => {
                     self.enable();
                 })
-                .on('enableitem', function() {
+                .on('enableitem', () => {
                     self.enable();
                 })
-                .before('move skip exit timeout error disableitem', function() {
-                    updateDuration().then(() => self.disable());
+                .before('move skip exit timeout error disableitem', () => {
+                    updateDuration()
+                      .then(() => self.disable())
+                      .catch(() => self.disable());
                 })
-                .before('move skip exit timeout pause', function() {
-                    var context = testRunner.getTestContext();
-                    var itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
-
-                    return currentUpdatePromise
-                        .then(() => getItemDuration(itemAttemptId))
-                        .then((duration) => {
-                            const params = {
-                                itemDuration: 0
-                            };
-
-                            if (_.isNumber(duration) && duration > 0) {
-                                params.itemDuration = duration;
-                            }
-
-                            // the duration will be sent to the server with the next request,
-                            // usually submitItem() or callItemAction()
-                            testRunner.getProxy().addCallActionParams(params);
-                        });
-                })
+                .before('move skip exit timeout pause', () => currentUpdatePromise
+                    .then(addDuractionToCallActionParams)
+                    .catch(addDuractionToCallActionParams)
+                )
                 /**
                  * @event duration.get
                  * @param {String} attemptId - the attempt id to get the duration for
                  * @param {getDuration} getDuration - a receiver callback
                  */
-                .on('plugin-get.duration', function(e, attemptId, getDuration) {
+                .on('plugin-get.duration', (e, attemptId, getDuration) => {
                     if (_.isFunction(getDuration)) {
                         getDuration(getItemDuration(attemptId));
                     }

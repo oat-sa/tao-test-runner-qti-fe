@@ -150,7 +150,8 @@ export default pluginFactory({
                 control: 'color-contrast',
                 title: __('Change the current color preset'),
                 icon: 'contrast',
-                text: __('Contrast')
+                text: __('Contrast'),
+                navType: pluginConfig.navType
             })
             .on('click', function(e) {
                 e.preventDefault();

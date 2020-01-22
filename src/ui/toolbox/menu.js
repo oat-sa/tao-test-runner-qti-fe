@@ -55,7 +55,7 @@ var menuComponentApi = {
      */
     initMenu: function initMenu() {
         this.id = this.config.control;
-        this.type = this.config.navType ? this.config.navType : 'fromLast';
+        this.typeNav = this.config.navType ? this.config.navType : 'fromLast';
         this.menuItems = [];
     },
 
@@ -126,15 +126,16 @@ var menuComponentApi = {
         this.enableShortcuts();
         this.hoverOffAll();
         const activeItemIndex = _.findIndex(this.menuItems, item => item.is('active'));
-        if (activeItemIndex) {
+        if (activeItemIndex !== undefined) {
             this.hoverIndex = activeItemIndex;
+            this.hoverItem(this.menuItems[activeItemIndex].id);
         }
-        else if (this.type === 'fromLast') {
+        else if (this.typeNav === 'fromLast') {
             // fromLast (default) navigation: focus on button and then using UP go to last item
             this.hoverIndex = this.menuItems.length; // we start on the button, not at the max array index
             // which would be menuItems.length-1
         }
-        else if (this.type === 'fromFirst') {
+        else if (this.typeNav === 'fromFirst') {
             // fromFirst navigation: focus on button and then using DOWN go to first item
             this.hoverIndex = -1; // we start on the button, not the first element
             // which would be 0
@@ -302,12 +303,12 @@ var menuComponentApi = {
                 self.hoverItem(self.menuItems[self.hoverIndex].id);
             }
 
-            if (currentKeyCode === keyCodes.UP && this.type === 'fromLast') {
+            if (currentKeyCode === keyCodes.UP && this.typeNav === 'fromLast') {
                 e.stopPropagation();
                 setFocusToItem(self.menuItems.length - 1);
             }
 
-            if (currentKeyCode === keyCodes.DOWN && this.type === 'fromFirst') {
+            if (currentKeyCode === keyCodes.DOWN && this.typeNav === 'fromFirst') {
                 e.stopPropagation();
                 setFocusToItem(0);
             }
@@ -330,7 +331,7 @@ var menuComponentApi = {
             this.hoverIndex--;
             this.hoverItem(this.menuItems[this.hoverIndex].id);
             // move to the menu button
-        } else if (this.hoverIndex === 0  && this.type === 'fromFirst') {
+        } else if (this.hoverIndex === 0  && this.typeNav === 'fromFirst') {
             this.hoverIndex--;
             this.hoverOffAll();
             this.$menuButton.closest('.action').focus();
@@ -348,7 +349,7 @@ var menuComponentApi = {
             this.hoverItem(this.menuItems[this.hoverIndex].id);
 
             // move to the menu button
-        } else if (this.hoverIndex === this.menuItems.length - 1 && this.type === 'fromLast') {
+        } else if (this.hoverIndex === this.menuItems.length - 1 && this.typeNav === 'fromLast') {
             this.hoverIndex++;
             this.hoverOffAll();
             this.$menuButton.closest('.action').focus();
@@ -394,6 +395,16 @@ var menuComponentApi = {
             if (document.activeElement) {
                 document.activeElement.blur();
             }
+        }
+    },
+
+    /**
+     * Set navigation type
+     * @param {String} type - 'fromLast', 'fromFirst'
+     */
+    setNavigationType: function setItemNavigation(type) {
+        if (_.contains(['fromLast', 'fromFirst'], type)) {
+            this.typeNav = type;
         }
     }
 };

@@ -150,8 +150,7 @@ export default pluginFactory({
                 control: 'color-contrast',
                 title: __('Change the current color preset'),
                 icon: 'contrast',
-                text: __('Contrast'),
-                navType: pluginConfig.navType
+                text: __('Contrast')
             })
             .on('click', function(e) {
                 e.preventDefault();
@@ -240,7 +239,10 @@ export default pluginFactory({
                 if (self.getState('enabled') !== false) {
                     self.menuButton.toggleMenu();
                 }
-            });
+            })
+            .on('set-themeswitcher-navtype', function(type) {
+                self.menuButton.setNavigationType(type);
+            })
 
         return testRunner.getPluginStore(this.getName()).then(function(itemThemesStore) {
             self.storage = itemThemesStore;

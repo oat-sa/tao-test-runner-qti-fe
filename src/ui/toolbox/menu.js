@@ -125,12 +125,16 @@ var menuComponentApi = {
         // setup keyboard navigation & highlighting
         this.enableShortcuts();
         this.hoverOffAll();
-        if (this.type === 'fromLast') {
+        const activeItemIndex = _.findIndex(this.menuItems, item => item.is('active'));
+        if (activeItemIndex) {
+            this.hoverIndex = activeItemIndex;
+        }
+        else if (this.type === 'fromLast') {
             // fromLast (default) navigation: focus on button and then using UP go to last item
             this.hoverIndex = this.menuItems.length; // we start on the button, not at the max array index
             // which would be menuItems.length-1
         }
-        if (this.type === 'fromFirst') {
+        else if (this.type === 'fromFirst') {
             // fromFirst navigation: focus on button and then using DOWN go to first item
             this.hoverIndex = -1; // we start on the button, not the first element
             // which would be 0

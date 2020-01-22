@@ -125,28 +125,31 @@ var menuComponentApi = {
         // setup keyboard navigation & highlighting
         this.enableShortcuts();
         this.hoverOffAll();
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
         const activeItemIndex = _.findIndex(this.menuItems, item => item.is('active'));
         if (activeItemIndex >= 0) {
             this.hoverIndex = activeItemIndex;
+            this.$menuContainer.focus();
             this.hoverItem(this.menuItems[activeItemIndex].id);
         }
         else if (this.typeNav === 'fromLast') {
             // fromLast (default) navigation: focus on button and then using UP go to last item
             this.hoverIndex = this.menuItems.length; // we start on the button, not at the max array index
             // which would be menuItems.length-1
+            this.$menuButton.focus();
         }
         else if (this.typeNav === 'fromFirst') {
             // fromFirst navigation: focus on button and then using DOWN go to first item
             this.hoverIndex = -1; // we start on the button, not the first element
             // which would be 0
+            this.$menuButton.focus();
         }
        
 
-        // focus the button, for keyboard navigation
-        if (document.activeElement) {
-            document.activeElement.blur();
-        }
-        this.$menuContainer.focus();
+
+        
 
         // component inner state
         this.setState('opened', true);
@@ -303,12 +306,12 @@ var menuComponentApi = {
                 self.hoverItem(self.menuItems[self.hoverIndex].id);
             }
 
-            if (currentKeyCode === keyCodes.UP && this.typeNav === 'fromLast') {
+            if (currentKeyCode === keyCodes.UP && self.typeNav === 'fromLast') {
                 e.stopPropagation();
                 setFocusToItem(self.menuItems.length - 1);
             }
 
-            if (currentKeyCode === keyCodes.DOWN && this.typeNav === 'fromFirst') {
+            if (currentKeyCode === keyCodes.DOWN && self.typeNav === 'fromFirst') {
                 e.stopPropagation();
                 setFocusToItem(0);
             }

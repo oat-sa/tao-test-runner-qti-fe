@@ -126,7 +126,7 @@ var menuComponentApi = {
         this.enableShortcuts();
         this.hoverOffAll();
         const activeItemIndex = _.findIndex(this.menuItems, item => item.is('active'));
-        if (activeItemIndex !== undefined) {
+        if (activeItemIndex >= 0) {
             this.hoverIndex = activeItemIndex;
             this.hoverItem(this.menuItems[activeItemIndex].id);
         }

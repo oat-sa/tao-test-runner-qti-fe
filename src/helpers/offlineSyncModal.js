@@ -39,8 +39,8 @@ function offlineSyncModalFactory(proxy) {
     const waitingConfig = {
         message: __('You are encountering a prolonged connectivity loss.'),
         waitContent: offlineSyncModalWaitContentTpl(),
-        proceedContent: __('The connection seems to be back, please proceed.'),
-        proceedButtonText: __('Proceed & End Test'),
+        proceedContent: __('Your connection seems to be back, please proceed.'),
+        proceedButtonText: __('PROCEED & END ASSESSMENT'),
         showSecondary: true,
         secondaryButtonText: __('Download'),
         secondaryButtonIcon: 'download',

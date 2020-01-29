@@ -101,6 +101,17 @@ export default pluginFactory({
                     );
                 })
                 .focusPosition($navigationElements.length);
+
+            ttsComponent.on('next finish', () => {
+                if (ttsComponent.is('sfhMode')) {
+                    const $currentElement = this.navigationGroup.getCursor().navigable.getElement();
+                    const { selector } = ttsComponent.getCurrentItem() || {};
+
+                    if (!selector || !$currentElement.is(selector)) {
+                        this.navigationGroup.next();
+                    }
+                }
+            });
         };
 
         /**

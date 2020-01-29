@@ -134,8 +134,8 @@ function maskingComponentFactory(container, config) {
 
             const $currentTarget = $(e.currentTarget);
             // Find APIP item associated with clicked element
-            const selectedItem = mediaContentData.find(({ selector }) => $currentTarget.is(selector));
-            currentPlayback = [selectedItem];
+            const selectedItemIndex = mediaContentData.findIndex(({ selector }) => $currentTarget.is(selector));
+            currentPlayback = mediaContentData.slice(selectedItemIndex);
 
             this.stop();
             this.initNextItem();
@@ -156,7 +156,7 @@ function maskingComponentFactory(container, config) {
          */
         initItemWithTextSelection() {
             // Check if there is selected content
-            if (!selection || !selection.toString()) {
+            if (this.is('sfhMode') || !selection || !selection.toString()) {
                 return;
             }
 
@@ -178,6 +178,9 @@ function maskingComponentFactory(container, config) {
         /**
          * Check if there is next APIP item to play and start playback if component in playing state.
          * If there is no APIP item to play stop playback
+         *
+         * @fires finish
+         * @fires next
          */
         initNextItem() {
             const { activeElementClass } = this.config;
@@ -197,9 +200,12 @@ function maskingComponentFactory(container, config) {
                     audio.play();
                 }
 
+                this.trigger('next');
+
                 return;
             }
 
+            this.trigger('finish');
             this.stop();
         },
         /**
@@ -276,9 +282,7 @@ function maskingComponentFactory(container, config) {
 
             const isPlaying = this.is('playing');
 
-            if (!this.is('sfhMode')) {
-                this.initDefaultModeItem();
-            }
+            this.initDefaultModeItem();
 
             if (!isPlaying && currentItem) {
                 audio.play();

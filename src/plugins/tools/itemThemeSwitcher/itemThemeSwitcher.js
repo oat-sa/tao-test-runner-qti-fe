@@ -240,7 +240,7 @@ export default pluginFactory({
                     self.menuButton.toggleMenu();
                 }
             })
-            .on('set-themeswitcher-navtype', function(type) {
+            .on('tool-themeswitcher-setnavtype', function(type) {
                 self.menuButton.setNavigationType(type);
             })
 

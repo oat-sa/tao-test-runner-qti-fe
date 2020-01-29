@@ -37,7 +37,7 @@ import globalShortcut from 'util/shortcut';
  */
 function offlineSyncModalFactory(proxy) {
     const waitingConfig = {
-        message: __('You are encountering a prolonged connectivity loss.'),
+        message: __('You are currently working offline.'),
         waitContent: offlineSyncModalWaitContentTpl(),
         proceedContent: __('Your connection seems to be back, please proceed.'),
         proceedButtonText: __('PROCEED & END ASSESSMENT'),

@@ -27,7 +27,7 @@
  *      icon: 'icon',
  *      text: __('Displayed label')
  * });
- * Optional config navType - navigation type 
+ * Optional setting: navType - navigation type 
  * navType: 'fromLast' (default behavior) - focus on button (if no active item) and then using UP go to last item, when press DOWN at last item menu will be closed,
  * navType: 'fromFirst' - focus on button (if no active item) and then using DOWN go to first item, when press UP at first item menu will be closed
  * toolbox.createMenu({
@@ -416,7 +416,7 @@ var menuComponentApi = {
      * @param {String} type - 'fromLast', 'fromFirst'
      */
     setNavigationType: function setNavigationType(type) {
-        if (_.contains(['fromLast', 'fromFirst'], type)) {
+        if (['fromLast', 'fromFirst'].includes(type)) {
             this.navType = type;
         }
     }

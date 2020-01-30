@@ -237,12 +237,20 @@ define([
         const $container = $('#qunit-fixture');
         const ttsComponent = componentFactory($container, {});
 
+        ttsComponent.on('next', () => {
+            assert.ok('The component triggers next event after each next navigation');
+        });
+        ttsComponent.on('finish', () => {
+            assert.ok('The component triggers finish event');
+        });
+
         $container.append(...apipElements);
         ttsComponent.setMediaContentData(apipData);
 
-        assert.expect(6);
+        assert.expect(10);
 
         ttsComponent.initDefaultModePlayback();
+
         ttsComponent.initNextItem();
 
         let selector = ttsComponent.getCurrentItem().selector;
@@ -323,12 +331,8 @@ define([
         ttsComponent.setState('sfhMode', true);
         ttsComponent.togglePlayback();
 
-        assert.equal(ttsComponent.is('playing'), false, 'The component does not start playback if there is no current item');
-
-        ttsComponent.setState('sfhMode', false);
-        ttsComponent.togglePlayback();
-
-        assert.equal(ttsComponent.is('playing'), true, 'The component starts playback');
+        assert.equal(ttsComponent.is('playing'), true, 'The component start playback');
+        assert.equal(ttsComponent.getCurrentItem().selector, apipData[0].selector, true, 'The component start playback from the beggining if there is active items');
 
         ttsComponent.togglePlayback();
 

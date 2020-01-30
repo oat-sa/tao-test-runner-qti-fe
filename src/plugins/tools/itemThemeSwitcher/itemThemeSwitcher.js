@@ -239,7 +239,10 @@ export default pluginFactory({
                 if (self.getState('enabled') !== false) {
                     self.menuButton.toggleMenu();
                 }
-            });
+            })
+            .on('tool-themeswitcher-setnavtype', function(type) {
+                self.menuButton.setNavigationType(type);
+            })
 
         return testRunner.getPluginStore(this.getName()).then(function(itemThemesStore) {
             self.storage = itemThemesStore;

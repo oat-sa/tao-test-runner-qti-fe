@@ -35,7 +35,8 @@ import connectivityTpl from 'taoQtiTest/runner/plugins/controls/connectivity/con
  */
 var defaultConfig = {
     checkInterval: 30 * 1000,
-    indicator: true
+    indicator: true,
+    message: false
 };
 
 /**
@@ -59,7 +60,8 @@ export default pluginFactory({
             //create the indicator
             this.$element = $(
                 connectivityTpl({
-                    state: proxy.isOnline() ? 'connected' : 'disconnected'
+                    state: proxy.isOnline() ? 'connected' : 'disconnected',
+                    message: config.message
                 })
             );
 

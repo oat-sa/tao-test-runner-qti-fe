@@ -2,6 +2,9 @@
     display: none;
     width: 40px;
     margin-left: 40px;
+    &.with-message {
+        width: 60px; 
+    }
     .icon-connect, .icon-disconnect {
         display: none;
         line-height: 2;
@@ -10,8 +13,9 @@
     }
     .message-connect, .message-disconnected {
         display: none;
-        @include font-size(16);
+        @include font-size(14);
         text-shadow: none;
+        margin-right: 3px;
     }
     &.connected, &.disconnected {
         display: inline-block;

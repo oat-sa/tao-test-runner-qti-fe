@@ -1,15 +1,15 @@
 <div class="wait-content">
     <p>{{__ 'It is not possible to save your responses while working offline.'}}</p>
     <p class="wait-content_text"><strong>{{__ 'Option A'}}</strong></p>
-    <ol class="wait-content_actions-list">
+    <ul class="wait-content_actions-list">
         <li>{{__ 'Wait for your connection to come back online.'}}</li>
         <li>{{__ 'Try connecting the machine to the internet via cable, or move to an area with a better wifi signal.'}}</li>
         <li>{{__ 'If the connection cannot be restored, see option B.'}}</li>
-    </ol>
+    </ul>
     <p class="wait-content_text"><strong>{{__ 'Option B'}}</strong></p>
-    <ol class="wait-content_actions-list">
+    <ul class="wait-content_actions-list">
         <li>{{__ 'Download the pupil responses and submit manually.'}}</li>
-    </ol>
+    </ul>
     <p>{{__ 'Step 1: Download the file (see below when available).'}} <strong>{{__ 'Do not rename it.'}}</strong></p>
     <p>{{__ 'Step 2: When you are online again, please send the downloaded file to receptionbaseline@nfer.ac.uk together with the '}}
         <strong>{{__ 'name of the pupil'}}</strong> {{__ 'and'}} <strong>{{__ 'the assessment (LCL or Mathematics)'}}</strong> {{__ 'that was being taken.'}}

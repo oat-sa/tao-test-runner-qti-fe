@@ -32,6 +32,7 @@ import connectivityTpl from 'taoQtiTest/runner/plugins/controls/connectivity/con
  * @type {Object}
  * @property {Number} checkInterval - when offline, interval to check if we're back online
  * @property {Boolean} indicator - do we display the indicator in the test UI
+ * @property {Boolean} message - do we display the message in the test UI
  */
 var defaultConfig = {
     checkInterval: 30 * 1000,

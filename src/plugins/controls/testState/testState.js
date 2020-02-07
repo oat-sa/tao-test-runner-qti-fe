@@ -75,9 +75,12 @@ export default pluginFactory({
             ) {
                 isLeaving = true;
 
-                testRunner.setState('closedOrSuspended', true);
-
-                testRunner.trigger('leave', data);
+                if ('pause' === data.type) {
+                    testRunner.trigger('pause', data);
+                } else {
+                    testRunner.setState('closedOrSuspended', true);
+                    testRunner.trigger('leave', data);
+                }
             }
         });
     }

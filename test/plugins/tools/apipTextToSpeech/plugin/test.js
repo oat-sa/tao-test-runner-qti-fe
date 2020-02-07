@@ -56,6 +56,42 @@ define([
             position: 0
         }]
     };
+    const apipData = {
+        companionMaterialsInfo: [],
+        inclusionOrder: {
+            textGraphicsDefaultOrder: {
+                elementOrder: [
+                    {
+                        '@attributes': {
+                            identifierRef: 'ae001',
+                        },
+                        order: '1',
+                    },
+                ]
+            },
+        },
+        accessibilityInfo: {
+            accessElement: [
+                {
+                    '@attributes': {
+                        identifier: 'ae001',
+                    },
+                    relatedElementInfo: {
+                        spoken: {
+                            audioFileInfo: [
+                                {
+                                    '@attributes': {
+                                        mimeType: 'audio/mpeg',
+                                    },
+                                    fileHref: 'assets/ae001_534500.mp3',
+                                },
+                            ],
+                        }
+                    }
+                }
+            ]
+        }
+    };
 
     /**
      * The following tests applies to all plugins
@@ -201,6 +237,10 @@ define([
 
         assert.expect(3);
 
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
+
         plugin
             .init()
             .then(() => {
@@ -240,6 +280,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
@@ -274,6 +315,10 @@ define([
         const areaBroker = runner.getAreaBroker();
         const plugin = pluginFactory(runner, runner.getAreaBroker());
 
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
+
         assert.expect(2);
 
         plugin
@@ -299,6 +344,56 @@ define([
             });
     });
 
+    QUnit.test('runner events: renderitem with disabled plugin', (assert) => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const testPartWithApipCategory = {
+            parts: {
+                p1: {
+                    sections: {
+                        s1: {
+                            items: {
+                                'item-1': {
+                                    categories: []
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(Object.assign({}, sampleTestMap, testPartWithApipCategory));
+
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
+
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
+
+        assert.expect(1);
+
+        plugin
+            .init()
+            .then(() => {
+                const $container = runner.getAreaBroker().getToolboxArea();
+
+                areaBroker.getToolbox().render($container);
+
+                const $button = $container.find('[data-control="apiptts"]');
+
+                plugin.hide();
+                runner.trigger('renderitem');
+
+                assert.equal(hider.isHidden($button), true, 'the button is not visible');
+
+                ready();
+            })
+            .catch((err) => {
+                assert.ok(false, `Error in init method: ${err}`);
+                ready();
+            });
+    });
+
     QUnit.test('Toggle on click', (assert) => {
         const ready = assert.async();
         const runner = runnerFactory(providerName);
@@ -309,6 +404,7 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
@@ -350,41 +446,45 @@ define([
         const groupNavigationId = `${pluginName}_navigation_group`;
         const actionPrefix = `tool-${pluginName}-`;
 
-        assert.expect(6);
+        assert.expect(7);
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
+        runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
             .init()
             .then(function () {
                 const $container = areaBroker.getToolboxArea();
+                const $testContainer = areaBroker.getContainer();
                 areaBroker.getToolbox().render($container);
 
                 runner.trigger('renderitem');
 
-                const navigationGroup = keyNavigatorFactory.get(groupNavigationId);
-
-                assert.equal(typeof navigationGroup, 'object', 'The plugin create navigation group after render');
-
                 return plugin.enable().then(() => {
                     const $button = $container.find('[data-control="apiptts"]');
+                    const $sfhButton = $testContainer.find('.tts-control-mode');
 
                     assert.equal($button.is(document.activeElement), false, 'The focus group is not focused by default');
 
                     $button.click();
 
+                    const navigationGroup = keyNavigatorFactory.get(groupNavigationId);
+
+                    assert.equal(typeof navigationGroup, 'object', 'The plugin create navigation group after render');
+
                     assert.equal($button.is(document.activeElement), true, 'The focus group is not focused after plugin activation');
 
                     $button.click();
+                    $sfhButton.click();
 
                     assert.equal($button.is(document.activeElement), false, 'The focus group lose focus after plugin disabling');
 
                     runner.on(`${actionPrefix}next`, () => {
-                        assert.ok(true, `The next event triggered after tab navigation`);
+                        assert.ok(true, 'The next event triggered after tab navigation');
 
                         runner.on(`${actionPrefix}previous`, () => {
-                            assert.ok(true, `The previous event triggered after tab+shift navigation`);
+                            assert.ok(true, 'The previous event triggered after tab+shift navigation');
 
                             ready();
                         });
@@ -392,7 +492,12 @@ define([
                         navigationGroup.trigger('shift+tab');
                     });
 
+                    runner.on(`${actionPrefix}togglePlayback`, () => {
+                        assert.ok(true, 'The togglePlayback event triggered on activate navigation event');
+                    });
+
                     navigationGroup.trigger('tab');
+                    navigationGroup.trigger('activate');
                 });
             })
             .catch(function (err) {

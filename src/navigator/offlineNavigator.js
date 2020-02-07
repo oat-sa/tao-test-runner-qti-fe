@@ -65,14 +65,13 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
 
         /**
          * Initialization method for the offline navigator component
-         * It get called before every navigation action
+         * It get called in proxy init function 
          *
-         * @returns {this}
+         * @returns {Promise}
          */
         init: function init() {
             offlineJumpTableHelper.setTestMap(testMap);
-            offlineJumpTableHelper.init(testContext);
-            return this;
+            return offlineJumpTableHelper.init(testContext);
         },
 
         /**
@@ -94,7 +93,7 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
          * @param {String} scope
          * @param {Integer} position
          * @param {Object} params
-         * @returns {Object} the new test context
+         * @returns {Promise} the new test context
          */
         navigate: function navigate(direction, scope, position, params) {
             return new Promise(function(resolve, reject) {
@@ -111,8 +110,18 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
                 offlineJumpTableHelper[navigationActionName](params)
                     .then(function() {
                         lastJump = offlineJumpTableHelper.getLastJump();
-
-                        resolve(testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump));
+                        // new textContext doesn't know about item attempt
+                        // attempt is stored in itemStore
+                        // 1. get attempt from itemStore and increase it
+                        // 2. set it in new textContext
+                        // 3. store new attempt in itemStore
+                        // 4. return new textContext with right attempt
+                        itemStore.get(lastJump.item)
+                            .then(itemFromStore => {
+                                const newTestContext = testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump, itemFromStore.attempt)
+                                itemStore.update(newTestContext.itemIdentifier, 'attempt', newTestContext.attempt)
+                                    .then(() => resolve(newTestContext));
+                            });
                     })
                     .catch(function(err) {
                         reject(err);

@@ -70,8 +70,8 @@ export default pluginFactory({
             const testContext = testRunner.getTestContext();
             const isInteracting = !testRunner.getItemState(testContext.itemIdentifier, 'disabled');
             const warning = pluginConfig.allowPartial
-                ? __('A response to every question in this item is required.')
-                : __('A response to this item is required.');
+                ? __('A response to this item is required.')
+                : __('A response to every question in this item is required.');
 
 
             if (isInteracting && testRunnerOptions.enableAllowSkipping) {

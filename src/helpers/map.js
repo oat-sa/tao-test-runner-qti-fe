@@ -304,10 +304,10 @@ export default {
                 }
 
                 // Calculate all unanswered and flagged questions in inaccessible parts
-                const actualParts = parts.slice(linearPartIndex);
-                const countOfInaccessibleUnasweredQestions = actualParts
+                const inaccessibleParts = parts.slice(linearPartIndex);
+                const countOfInaccessibleUnasweredQestions = inaccessibleParts
                     .reduce((acc, {stats: { questions, answered }}) => acc + (questions - answered), 0);
-                const countOfInaccessibleFlaggedQestions = actualParts
+                const countOfInaccessibleFlaggedQestions = inaccessibleParts
                     .reduce((acc, {stats: { flagged }}) => acc + flagged, 0);
                 return Object.assign(
                     {},

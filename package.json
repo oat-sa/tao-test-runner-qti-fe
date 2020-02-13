@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-test-runner-qti",
-    "version": "0.17.1",
+    "version": "0.17.2",
     "description": "TAO Test Runner QTI implementation",
     "files": [
         "dist",

@@ -303,15 +303,19 @@ export default {
                     return testStats;
                 }
 
-                // Calculate all unanswered questions in inaccessible parts
-                const countOfInaccessibleUnasweredQestions = parts
-                    .slice(linearPartIndex)
+                // Calculate all unanswered and flagged questions in inaccessible parts
+                const inaccessibleParts = parts.slice(linearPartIndex);
+                const countOfInaccessibleUnasweredQestions = inaccessibleParts
                     .reduce((acc, {stats: { questions, answered }}) => acc + (questions - answered), 0);
-
+                const countOfInaccessibleFlaggedQestions = inaccessibleParts
+                    .reduce((acc, {stats: { flagged }}) => acc + flagged, 0);
                 return Object.assign(
                     {},
                     testStats,
-                    { answered: testStats.answered + countOfInaccessibleUnasweredQestions }
+                    {
+                        answered: testStats.answered + countOfInaccessibleUnasweredQestions,
+                        flagged: testStats.flagged - countOfInaccessibleFlaggedQestions
+                    }
                 );
             }
 

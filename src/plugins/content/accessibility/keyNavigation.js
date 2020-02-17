@@ -83,39 +83,39 @@ const keysForTypesMap = {
         nextLinearFromFirst: '',
         prevLinearFromLast: ''
     }
-}
+};
+
 /**
  * Init the navigation in the toolbar
  *
- * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array}
  */
 function initToolbarNavigation(config) {
     const $navigationBar = $('.bottom-action-bar');
     const $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
-    const navigables = navigableDomElement.createFromDoms($focusables);
+    const elements = navigableDomElement.createFromDoms($focusables);
     const isNativeNavigation = config.contentNavigatorType === 'native';
-    if (navigables.length) {
+    if (elements.length) {
         return [
             keyNavigator({
                 id: 'bottom-toolbar',
                 replace: true,
                 group: $navigationBar,
-                elements: navigables,
-                defaultPosition: function defaultPosition(navigables) {
+                elements: elements,
+                defaultPosition(navigables) {
                     if (isNativeNavigation) {
                         return 0;
                     }
                     let pos = navigables.length - 1;
                     // start from the button "Next" or the button "End test"
-                    _.forIn(navigables, function(navigable, i) {
+                    _.forEach(navigables, (navigable, i) => {
                         const $element = navigable.getElement();
                         // find button "Next"
                         if ($element.data('control') &&
                             ($element.data('control') === 'move-forward' ||
                             $element.data('control') === 'move-end')) {
                             pos = i;
-                            return;
                         }
                     });
                     // else the last button
@@ -150,7 +150,7 @@ function initToolbarNavigation(config) {
 /**
  * Init the navigation in the header block
  *
- * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array}
  */
 function initHeaderNavigation(config) {
@@ -192,6 +192,7 @@ function initHeaderNavigation(config) {
  * Init the navigation in the review panel
  *
  * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array} the keyNavigator of the main navigation group
  */
 function initNavigatorNavigation(testRunner, config) {
@@ -213,7 +214,7 @@ function initNavigatorNavigation(testRunner, config) {
         navigableFilters = navigableDomElement.createFromDoms($filters);
         if (navigableFilters.length) {
             filtersNavigator = keyNavigator({
-                keepState: isNativeNavigation ? false : true,
+                keepState: !isNativeNavigation,
                 id: 'navigator-filters',
                 replace: true,
                 elements: navigableFilters,
@@ -273,7 +274,7 @@ function initNavigatorNavigation(testRunner, config) {
                                 itemsNavigator.last();
                             });
                         }
-                    })
+                    });
             }
             navigators.push(filtersNavigator);
         }
@@ -288,10 +289,10 @@ function initNavigatorNavigation(testRunner, config) {
                 replace: true,
                 elements: navigableTrees,
                 group: $navigatorTree,
-                defaultPosition: function defaultPosition(navigables) {
-                    const pos = 0;
+                defaultPosition(navigables) {
+                    let pos = 0;
                     if (filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
-                        _.forIn(navigables, function(navigable, i) {
+                        _.forEach(navigables, function(navigable, i) {
                             const $parent = navigable.getElement().parent('.qti-navigator-item');
                             //find the first active and visible item
                             if ($parent.hasClass('active') && $parent.is(':visible')) {
@@ -369,6 +370,7 @@ function initNavigatorNavigation(testRunner, config) {
  * It returns an array of keyNavigators as the content is dynamically determined
  *
  * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array} of keyNavigator ids
  */
 function initDefaultContentNavigation(testRunner, config) {
@@ -451,7 +453,9 @@ function initAllContentButtonsNavigation(testRunner) {
 /**
  * Init interaction key navigation from the interaction navigator
  *
- * @param {JQuery} $interaction - the interaction container
+ * @param {jQuery} $interaction - the interaction container
+ * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array} array of navigators created from interaction container
  */
 function initInteractionNavigation($interaction, testRunner, config) {
@@ -516,7 +520,7 @@ function initInteractionNavigation($interaction, testRunner, config) {
                 }
             })
             .on('focus', function(cursor) {
-		        const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
+                const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
                 $qtiChoice.addClass('key-navigation-highlight');
                 showElementsContent($qtiChoice, testRunner.getAreaBroker().getContentArea());
             })
@@ -535,6 +539,8 @@ function initInteractionNavigation($interaction, testRunner, config) {
 
 /**
  * Scrolling to the top of the required element
+ * @param {jQuery} $el
+ * @param {jQuery} $visibleContainer
  */
 function showElementsContent($el, $visibleContainer) {
     const $wrapper = $visibleContainer.closest('.content-wrapper');
@@ -547,7 +553,6 @@ function showElementsContent($el, $visibleContainer) {
  * Init the navigation of test rubric blocks
  * It returns an array of keyNavigator ids as the content is dynamically determined
  *
- * @param {Object} testRunner
  * @returns {Array} of keyNavigator ids
  */
 function initRubricNavigation() {
@@ -608,7 +613,8 @@ function initDefaultItemNavigation(testRunner) {
 
 /**
  * Init test runner navigation
- * @param testRunner
+ * @param {Object} testRunner
+ * @param {Object} pluginConfig
  * @returns {*}
  */
 function initTestRunnerNavigation(testRunner, pluginConfig) {
@@ -623,7 +629,7 @@ function initTestRunnerNavigation(testRunner, pluginConfig) {
     switch (config.contentNavigatorType) {
         case 'linear':
             navigators = _.union(
-                initRubricNavigation(testRunner),
+                initRubricNavigation(),
                 initAllContentButtonsNavigation(testRunner),
                 initToolbarNavigation(config),
                 initHeaderNavigation(config),
@@ -632,17 +638,17 @@ function initTestRunnerNavigation(testRunner, pluginConfig) {
             );
             break;
         case 'native':
-                navigators = _.union(
-                    initHeaderNavigation(config),
-                    initNavigatorNavigation(testRunner, config),
-                    initRubricNavigation(testRunner),
-                    initDefaultContentNavigation(testRunner, config),
-                    initToolbarNavigation(config),
-                );
-                break;
+            navigators = _.union(
+                initHeaderNavigation(config),
+                initNavigatorNavigation(testRunner, config),
+                initRubricNavigation(),
+                initDefaultContentNavigation(testRunner, config),
+                initToolbarNavigation(config)
+            );
+            break;
         default:
             navigators = _.union(
-                initRubricNavigation(testRunner),
+                initRubricNavigation(),
                 initDefaultContentNavigation(testRunner, config),
                 initToolbarNavigation(config),
                 initHeaderNavigation(config),
@@ -678,7 +684,7 @@ function initTestRunnerNavigation(testRunner, pluginConfig) {
         elements: navigators,
         // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
         // there is an issue with nested navigators
-        propagateTab: isNativeNavigation ? true : false,
+        propagateTab: isNativeNavigation,
     });
 
     if (!isNativeNavigation) {

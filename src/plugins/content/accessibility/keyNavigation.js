@@ -34,7 +34,7 @@ import 'taoQtiTest/runner/plugins/content/accessibility/css/key-navigation.css';
  *
  * @type {String}
  */
-var ignoredClass = 'no-key-navigation';
+const ignoredClass = 'no-key-navigation';
 
 /**
  * If we have now config from backend side - we set this default dataset
@@ -42,38 +42,94 @@ var ignoredClass = 'no-key-navigation';
  * @typedef {object}
  * @properties {string} contentNavigatorType - ('default' | 'linear') - type of content navigation
  */
-var defaultPluginConfig = {
+const defaultPluginConfig = {
     contentNavigatorType: 'default'
+};
+
+const keysForTypesMap = {
+    default: {
+        nextGroup: 'tab',
+        prevGroup: 'shift+tab',
+        nextInGroup: 'right down',
+        prevInGroup: 'left up',
+        nextInFilters: 'right',
+        prevInFilters: 'left',
+        nextInList: 'down',
+        prevInList: 'up',
+        nextLinearFromFirst: '',
+        prevLinearFromLast: ''
+    },
+    linear: {
+        nextGroup: 'tab',
+        prevGroup: 'shift+tab',
+        nextInGroup: 'right down',
+        prevInGroup: 'left up',
+        nextInFilters: 'right',
+        prevInFilters: 'left',
+        nextInList: 'down',
+        prevInList: 'up',
+        nextLinearFromFirst: 'right',
+        prevLinearFromLast: 'left'
+    },
+    native: {
+        nextGroup: '',
+        prevGroup: '',
+        nextInGroup: 'tab',
+        prevInGroup: 'shift+tab',
+        nextInFilters: 'tab',
+        prevInFilters: 'shift+tab',
+        nextInList: 'tab',
+        prevInList: 'shift+tab',
+        nextLinearFromFirst: '',
+        prevLinearFromLast: ''
+    }
 };
 
 /**
  * Init the navigation in the toolbar
  *
- * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array}
  */
-function initToolbarNavigation() {
-    var $navigationBar = $('.bottom-action-bar');
-    var $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
-    var navigables = navigableDomElement.createFromDoms($focusables);
-    if (navigables.length) {
+function initToolbarNavigation(config) {
+    const $navigationBar = $('.bottom-action-bar');
+    const $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
+    const elements = navigableDomElement.createFromDoms($focusables);
+    const isNativeNavigation = config.contentNavigatorType === 'native';
+    if (elements.length) {
         return [
             keyNavigator({
                 id: 'bottom-toolbar',
                 replace: true,
                 group: $navigationBar,
-                elements: navigables,
-                //start from the last button "goto next"
-                defaultPosition: navigables.length - 1
+                elements: elements,
+                defaultPosition(navigables) {
+                    if (isNativeNavigation) {
+                        return 0;
+                    }
+                    let pos = navigables.length - 1;
+                    // start from the button "Next" or the button "End test"
+                    _.forEach(navigables, (navigable, i) => {
+                        const $element = navigable.getElement();
+                        // find button "Next"
+                        if ($element.data('control') &&
+                            ($element.data('control') === 'move-forward' ||
+                            $element.data('control') === 'move-end')) {
+                            pos = i;
+                        }
+                    });
+                    // else the last button
+                    return pos;
+                }
             })
-                .on('right down', function(elem) {
+                .on(config.nextInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on('left up', function(elem) {
+                .on(config.prevInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
@@ -94,24 +150,39 @@ function initToolbarNavigation() {
 /**
  * Init the navigation in the header block
  *
- * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array}
  */
-function initHeaderNavigation() {
+function initHeaderNavigation(config) {
     //need global selector as currently no way to access delivery frame from test runner
-    var $headerElements = $('[data-control="exit"]:visible a');
-    var navigables = navigableDomElement.createFromDoms($headerElements);
+    const $header = $('header');
+    const $headerElements = $header.find('a:visible');
+    const navigables = navigableDomElement.createFromDoms($headerElements);
     if (navigables.length) {
         return [
             keyNavigator({
                 id: 'header-toolbar',
-                group: $headerElements.closest('.infoControl'),
+                group: $header,
                 elements: navigables,
-                loop: true,
                 replace: true
-            }).on('activate', function(cursor) {
-                cursor.navigable.getElement().click();
             })
+                .on(config.nextInGroup, function(elem) {
+                    if (!allowedToNavigateFrom(elem)) {
+                        return false;
+                    } else {
+                        this.next();
+                    }
+                })
+                .on(config.prevInGroup, function(elem) {
+                    if (!allowedToNavigateFrom(elem)) {
+                        return false;
+                    } else {
+                        this.previous();
+                    }
+                })
+                .on('activate', function(cursor) {
+                    cursor.navigable.getElement().click();
+                })
         ];
     }
     return [];
@@ -121,82 +192,94 @@ function initHeaderNavigation() {
  * Init the navigation in the review panel
  *
  * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array} the keyNavigator of the main navigation group
  */
-function initNavigatorNavigation(testRunner) {
-    var $panel = testRunner.getAreaBroker().getPanelArea();
-    var $navigator = $panel.find('.qti-navigator');
-    var navigators = [];
-    var filtersNavigator;
-    var itemsNavigator;
-    var $filters, $trees, navigableFilters, navigableTrees;
+function initNavigatorNavigation(testRunner, config) {
+    const $panel = testRunner.getAreaBroker().getPanelArea();
+    const $navigator = $panel.find('.qti-navigator');
+    const isNativeNavigation = config.contentNavigatorType === 'native';
+    const navigators = [];
+    let filtersNavigator;
+    let itemsNavigator;
+    let $filters, $trees, navigableFilters, navigableTrees;
 
     //the tag to identify if the item listing has been browsed, to only "smart jump" to active item only on the first visit
-    var itemListingVisited = false;
+    let itemListingVisited = false;
     //the position of the filter in memory, to only "smart jump" to active item only on the first visit
-    var filterCursor;
+    let filterCursor;
 
     if ($navigator.length && !$navigator.hasClass('disabled')) {
         $filters = $navigator.find('.qti-navigator-filters .qti-navigator-filter');
         navigableFilters = navigableDomElement.createFromDoms($filters);
         if (navigableFilters.length) {
             filtersNavigator = keyNavigator({
-                keepState: true,
+                keepState: !isNativeNavigation,
                 id: 'navigator-filters',
                 replace: true,
                 elements: navigableFilters,
-                group: $navigator
+                group: $navigator.find('.qti-navigator-filters')
             })
-                .on('right', function(elem) {
+                .on(config.nextInFilters, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on('left', function(elem) {
+                .on(config.prevInFilters, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.previous();
                     }
                 })
-                .on('down', function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else if (itemsNavigator) {
-                        _.defer(function() {
-                            if (itemListingVisited) {
-                                itemsNavigator.focus().first();
-                            } else {
-                                itemsNavigator.focus();
-                            }
-                        });
-                    }
-                })
-                .on('up', function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else if (itemsNavigator) {
-                        _.defer(function() {
-                            itemsNavigator.last();
-                        });
-                    }
+                .on('activate', function(cursor) {
+                    cursor.navigable.getElement().click();
                 })
                 .on('focus', function(cursor, origin) {
-                    //activate the tab in the navigators
-                    cursor.navigable.getElement().click();
+                    if (!isNativeNavigation) {
+                        //activate the tab in the navigators
+                        cursor.navigable.getElement().click();
 
-                    //reset the item listing browsed tag whenever the focus on the filter happens after a focus on another element
-                    if ((filterCursor && filterCursor.position !== cursor.position) || origin) {
-                        itemListingVisited = false;
+                        //reset the item listing browsed tag whenever the focus on the filter happens after a focus on another element
+                        if ((filterCursor && filterCursor.position !== cursor.position) || origin) {
+                            itemListingVisited = false;
+                        }
+                        //set the filter cursor in memory
+                        filterCursor = cursor;
                     }
-                    //set the filter cursor in memory
-                    filterCursor = cursor;
+
                 });
+            if (!isNativeNavigation) {
+                filtersNavigator
+                    .on(config.nextInList, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else if (itemsNavigator) {
+                            _.defer(function() {
+                                if (itemListingVisited) {
+                                    itemsNavigator.focus().first();
+                                } else {
+                                    itemsNavigator.focus();
+                                }
+                            });
+                        }
+                    })
+                    .on(config.prevInList, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else if (itemsNavigator) {
+                            _.defer(function() {
+                                itemsNavigator.last();
+                            });
+                        }
+                    });
+            }
             navigators.push(filtersNavigator);
         }
 
+        const $navigatorTree = $panel.find('.qti-navigator-tree');
         $trees = $navigator.find('.qti-navigator-tree .qti-navigator-item:not(.unseen) .qti-navigator-label');
         navigableTrees = navigableDomElement.createFromDoms($trees);
         if (navigableTrees.length) {
@@ -205,11 +288,12 @@ function initNavigatorNavigation(testRunner) {
                 id: 'navigator-items',
                 replace: true,
                 elements: navigableTrees,
-                defaultPosition: function defaultPosition(navigables) {
-                    var pos = 0;
+                group: $navigatorTree,
+                defaultPosition(navigables) {
+                    let pos = 0;
                     if (filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
-                        _.forIn(navigables, function(navigable, i) {
-                            var $parent = navigable.getElement().parent('.qti-navigator-item');
+                        _.forEach(navigables, function(navigable, i) {
+                            const $parent = navigable.getElement().parent('.qti-navigator-item');
                             //find the first active and visible item
                             if ($parent.hasClass('active') && $parent.is(':visible')) {
                                 pos = i;
@@ -220,39 +304,25 @@ function initNavigatorNavigation(testRunner) {
                     return pos;
                 }
             })
-                .on('down', function(elem) {
+                .on(config.nextInList, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on('up', function(elem) {
+                .on(config.prevInList, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.previous();
                     }
                 })
-                .on('right', function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else if (filtersNavigator) {
-                        filtersNavigator.focus().next();
-                    }
-                })
-                .on('left', function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else if (filtersNavigator) {
-                        filtersNavigator.focus().previous();
-                    }
-                })
                 .on('activate', function(cursor) {
                     cursor.navigable.getElement().click();
                 })
                 .on('lowerbound upperbound', function() {
-                    if (filtersNavigator) {
+                    if (!isNativeNavigation && filtersNavigator) {
                         filtersNavigator.focus();
                     }
                 })
@@ -269,6 +339,26 @@ function initNavigatorNavigation(testRunner) {
                         .parent()
                         .removeClass('key-navigation-highlight');
                 });
+            if (!isNativeNavigation) {
+                itemsNavigator
+                    .on(config.nextInFilters, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else if (filtersNavigator) {
+                            filtersNavigator.focus().next();
+                        }
+                    })
+                    .on(config.prevInFilters, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else if (filtersNavigator) {
+                            filtersNavigator.focus().previous();
+                        }
+                    });
+            }
+            if (isNativeNavigation) {
+                navigators.push(itemsNavigator);
+            }
         }
     }
     return navigators;
@@ -280,11 +370,12 @@ function initNavigatorNavigation(testRunner) {
  * It returns an array of keyNavigators as the content is dynamically determined
  *
  * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array} of keyNavigator ids
  */
-function initDefaultContentNavigation(testRunner) {
-    var itemNavigators = [];
-    var $content = testRunner.getAreaBroker().getContentArea();
+function initDefaultContentNavigation(testRunner, config) {
+    let itemNavigators = [];
+    const $content = testRunner.getAreaBroker().getContentArea();
 
     //the item focusable body elements are considered scrollable
     $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
@@ -295,9 +386,9 @@ function initDefaultContentNavigation(testRunner) {
             return !$(this).parents('.qti-interaction').length;
         })
         .each(function() {
-            var $itemElement = $(this);
+            const $itemElement = $(this);
             if ($itemElement.hasClass('qti-interaction')) {
-                itemNavigators = _.union(itemNavigators, initInteractionNavigation($itemElement, testRunner));
+                itemNavigators = _.union(itemNavigators, initInteractionNavigation($itemElement, testRunner, config));
             } else {
                 itemNavigators.push(
                     keyNavigator({
@@ -321,27 +412,27 @@ function initDefaultContentNavigation(testRunner) {
  * @returns {Array} of keyNavigator ids
  */
 function initAllContentButtonsNavigation(testRunner) {
-    var navigableElements = [];
-    var $content = testRunner.getAreaBroker().getContentArea();
-    var $qtiIteractionsNodeList = $content.find('.key-navigation-focusable,.qti-interaction').filter(function() {
+    const navigableElements = [];
+    const $content = testRunner.getAreaBroker().getContentArea();
+    const $qtiIteractionsNodeList = $content.find('.key-navigation-focusable,.qti-interaction').filter(function() {
         //filter out interaction as it will be managed separately
         return !$(this).parents('.qti-interaction').length;
     });
-    var $qtiChoiceNodesList = $qtiIteractionsNodeList.find('.qti-choice');
+    const $qtiChoiceNodesList = $qtiIteractionsNodeList.find('.qti-choice');
 
     //the item focusable body elements are considered scrollable
     $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
 
     $qtiChoiceNodesList.each(function() {
-        var $itemElement = $(this);
-        var keyNavigatorItem = keyNavigator({
+        const $itemElement = $(this);
+        const keyNavigatorItem = keyNavigator({
             elements: navigableDomElement.createFromDoms($itemElement),
             group: $itemElement,
             propagateTab: false
         });
 
         keyNavigatorItem.on('activate', function(cursor) {
-            var $elt = cursor.navigable.getElement();
+            const $elt = cursor.navigable.getElement();
             //jQuery <= 1.9.0 the checkbox values are set
             //after the click event if triggerred with jQuery
             if ($elt.is(':checkbox')) {
@@ -362,17 +453,19 @@ function initAllContentButtonsNavigation(testRunner) {
 /**
  * Init interaction key navigation from the interaction navigator
  *
- * @param {JQuery} $interaction - the interaction container
+ * @param {jQuery} $interaction - the interaction container
+ * @param {Object} testRunner
+ * @param {Object} config
  * @returns {Array} array of navigators created from interaction container
  */
-function initInteractionNavigation($interaction, testRunner) {
-    var $inputs;
-    var interactionNavigables;
-    var interactionNavigators = [];
+function initInteractionNavigation($interaction, testRunner, config) {
+    let $inputs;
+    let interactionNavigables;
+    const interactionNavigators = [];
 
     //add navigable elements from prompt
     $interaction.find('.key-navigation-focusable').each(function() {
-        var $nav = $(this);
+        const $nav = $(this);
         if (!$nav.closest('.qti-choice').length) {
             interactionNavigators.push(
                 keyNavigator({
@@ -399,14 +492,14 @@ function initInteractionNavigation($interaction, testRunner) {
         });
 
         keyNavigatorItem
-            .on('right down', function(elem) {
+            .on(config.nextInGroup, function(elem) {
                 if (!allowedToNavigateFrom(elem)) {
                     return false;
                 } else {
                     this.next();
                 }
             })
-            .on('left up', function(elem) {
+            .on(config.prevInGroup, function(elem) {
                 if (!allowedToNavigateFrom(elem)) {
                     return false;
                 } else {
@@ -414,7 +507,7 @@ function initInteractionNavigation($interaction, testRunner) {
                 }
             })
             .on('activate', function(cursor) {
-                var $elt = cursor.navigable.getElement();
+                const $elt = cursor.navigable.getElement();
 
                 //jQuery <= 1.9.0 the checkbox values are set
                 //after the click event if triggerred with jQuery
@@ -427,7 +520,7 @@ function initInteractionNavigation($interaction, testRunner) {
                 }
             })
             .on('focus', function(cursor) {
-		const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
+                const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
                 $qtiChoice.addClass('key-navigation-highlight');
                 showElementsContent($qtiChoice, testRunner.getAreaBroker().getContentArea());
             })
@@ -446,6 +539,8 @@ function initInteractionNavigation($interaction, testRunner) {
 
 /**
  * Scrolling to the top of the required element
+ * @param {jQuery} $el
+ * @param {jQuery} $visibleContainer
  */
 function showElementsContent($el, $visibleContainer) {
     const $wrapper = $visibleContainer.closest('.content-wrapper');
@@ -458,18 +553,17 @@ function showElementsContent($el, $visibleContainer) {
  * Init the navigation of test rubric blocks
  * It returns an array of keyNavigator ids as the content is dynamically determined
  *
- * @param {Object} testRunner
  * @returns {Array} of keyNavigator ids
  */
 function initRubricNavigation() {
-    var $itemElements;
-    var rubricNavigators = [];
-    var $rubricArea = $('#qti-rubrics');
+    let $itemElements;
+    const rubricNavigators = [];
+    const $rubricArea = $('#qti-rubrics');
 
     $itemElements = $rubricArea.find('.qti-rubricBlock');
     $itemElements.each(function() {
-        var $itemElement = $(this);
-        var id = `rubric_element_navigation_group_${rubricNavigators.length}`;
+        const $itemElement = $(this);
+        const id = `rubric_element_navigation_group_${rubricNavigators.length}`;
 
         rubricNavigators.push(
             keyNavigator({
@@ -519,40 +613,66 @@ function initDefaultItemNavigation(testRunner) {
 
 /**
  * Init test runner navigation
- * @param testRunner
+ * @param {Object} testRunner
+ * @param {Object} pluginConfig
  * @returns {*}
  */
-function initTestRunnerNavigation(testRunner, config) {
-    var keyNavigatorItem;
-    var navigators;
+function initTestRunnerNavigation(testRunner, pluginConfig) {
+    let keyNavigatorItem;
+    let navigators;
 
     //blur current focused element, to reinitialize keyboard navigation
     if (document.activeElement) {
         document.activeElement.blur();
     }
-
+    const config = Object.assign({}, pluginConfig, keysForTypesMap[pluginConfig.contentNavigatorType]);
     switch (config.contentNavigatorType) {
         case 'linear':
             navigators = _.union(
-                initRubricNavigation(testRunner),
+                initRubricNavigation(),
                 initAllContentButtonsNavigation(testRunner),
-                initToolbarNavigation(testRunner),
-                initNavigatorNavigation(testRunner),
-                initHeaderNavigation(testRunner),
+                initToolbarNavigation(config),
+                initHeaderNavigation(config),
+                initNavigatorNavigation(testRunner, config),
                 initDefaultItemNavigation(testRunner)
             );
             break;
-
+        case 'native':
+            navigators = _.union(
+                initHeaderNavigation(config),
+                initNavigatorNavigation(testRunner, config),
+                initRubricNavigation(),
+                initDefaultContentNavigation(testRunner, config),
+                initToolbarNavigation(config)
+            );
+            break;
         default:
             navigators = _.union(
-                initRubricNavigation(testRunner),
-                initDefaultContentNavigation(testRunner),
-                initToolbarNavigation(testRunner),
-                initNavigatorNavigation(testRunner),
-                initHeaderNavigation(testRunner),
+                initRubricNavigation(),
+                initDefaultContentNavigation(testRunner, config),
+                initToolbarNavigation(config),
+                initHeaderNavigation(config),
+                initNavigatorNavigation(testRunner, config),
                 initDefaultItemNavigation(testRunner)
             );
             break;
+    }
+    const isNativeNavigation = config.contentNavigatorType === 'native';
+    if (isNativeNavigation) {
+        _.forEach(navigators, function addListeners(navigator){
+            navigator
+                .on('upperbound', function moveToNextGroup() {
+                    if (allowedToNavigateFrom(navigator)) {
+                        keyNavigatorItem.next();
+                    }
+                })
+                .on('lowerbound', function moveToPrevGroup() {
+                    if (allowedToNavigateFrom(navigator)) {
+                        keyNavigatorItem.previous();
+                        keyNavigatorItem.getCursor().navigable.getKeyNavigator().last();
+                    }
+                });
+        });
     }
 
     navigators = navigableGroupElement.createFromNavigators(navigators);
@@ -564,32 +684,34 @@ function initTestRunnerNavigation(testRunner, config) {
         elements: navigators,
         // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
         // there is an issue with nested navigators
-        propagateTab: false,
+        propagateTab: isNativeNavigation,
     });
 
-    keyNavigatorItem
-        .on('tab', function(elem) {
-            if (allowedToNavigateFrom(elem)) {
-                this.next();
-            }
-        })
-        .on('shift+tab', function(elem) {
-            if (allowedToNavigateFrom(elem)) {
-                this.previous();
-            }
-        });
+    if (!isNativeNavigation) {
+        keyNavigatorItem
+            .on(config.nextGroup, function(elem) {
+                if (allowedToNavigateFrom(elem)) {
+                    this.next();
+                }
+            })
+            .on(config.prevGroup, function(elem) {
+                if (allowedToNavigateFrom(elem)) {
+                    this.previous();
+                }
+            });
+    }
 
     if (config.contentNavigatorType === 'linear') {
         keyNavigatorItem
-            .on('right', function(elem) {
-                var isCurrentElementFirst = $(elem).is(':first-child');
+            .on(config.nextLinearFromFirst, function(elem) {
+                const isCurrentElementFirst = $(elem).is(':first-child');
 
                 if (isCurrentElementFirst && allowedToNavigateFrom(elem)) {
                     this.next();
                 }
             })
-            .on('left', function(elem) {
-                var isCurrentElementLast = $(elem).is(':last-child');
+            .on(config.prevLinearFromLast, function(elem) {
+                const isCurrentElementLast = $(elem).is(':last-child');
 
                 if (isCurrentElementLast && allowedToNavigateFrom(elem)) {
                     this.previous();
@@ -607,7 +729,7 @@ function initTestRunnerNavigation(testRunner, config) {
  * @returns {boolean}
  */
 function allowedToNavigateFrom(element) {
-    var $element = $(element);
+    const $element = $(element);
 
     if ($element.hasClass(ignoredClass) || $element.parents(`.${ignoredClass}`).length > 0) {
         return false;
@@ -626,9 +748,9 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var pluginConfig = Object.assign({}, defaultPluginConfig, this.getConfig());
+        const self = this;
+        const testRunner = this.getTestRunner();
+        const pluginConfig = Object.assign({}, defaultPluginConfig, this.getConfig());
 
         //start disabled
         this.disable();

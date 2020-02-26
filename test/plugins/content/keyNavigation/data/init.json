@@ -33,7 +33,7 @@
             },
             "catEngineWarning": null,
             "progressIndicator": {
-                "type": "percentage",
+                "type": "position",
                 "renderer": "percentage",
                 "scope": "test",
                 "forced": false,

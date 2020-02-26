@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <title>Key Navigation - Test Runner Plugin test</title>
+        <link rel="stylesheet" href="assets/tao-3.css"/>
         <link rel="stylesheet" href="assets/qti-runner.css"/>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
@@ -25,8 +26,7 @@
         <style>
             #visual-playground {
                 position: relative;
-                width: calc(100vw - 20px);
-                height: calc(100vh - 20px);
+                width: 100%;
                 display: flex;
                 flex-direction: column;
             }
@@ -34,10 +34,16 @@
                 position: relative;
                 width: 100%;
                 padding: 5px;
+                border-bottom: 2px solid #266d9c;
                 flex: 0 0 auto;
             }
             .playground-view {
                 flex: 1 1 auto;
+            }
+            footer {
+                position: relative;
+                line-height: 2em;
+                min-height: 2em;
             }
         </style>
     </head>

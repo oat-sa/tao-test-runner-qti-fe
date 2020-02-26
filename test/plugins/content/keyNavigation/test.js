@@ -20,12 +20,14 @@ define([
     'jquery',
     'lodash',
     'context',
+    'ui/dialog/alert',
     'taoTests/runner/runner',
     'taoTests/runner/runnerComponent',
     'taoQtiTest/runner/helpers/map',
     'taoQtiTest/runner/helpers/testContextBuilder',
     'taoQtiTest/runner/plugins/content/accessibility/keyNavigation',
     'taoQtiTest/test/runner/mocks/providerMock',
+    'tpl!taoQtiTest/test/runner/plugins/content/keyNavigation/layout',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/config.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/init.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/item.json',
@@ -34,12 +36,14 @@ define([
     $,
     _,
     context,
+    dialogAlert,
     runnerFactory,
     runnerComponent,
     mapHelper,
     testContextBuilder,
     pluginFactory,
     providerMock,
+    layoutTpl,
     configData,
     initData,
     itemData
@@ -154,13 +158,15 @@ define([
     QUnit.test('Visual test', assert => {
         const ready = assert.async();
         const $container = $('#visual-playground');
+        const $selector = $container.find('.playground-selector');
         const $view = $container.find('.playground-view');
         const modes = [];
         assert.expect(1);
 
         Promise.resolve()
             .then(() => new Promise((resolve, reject) => {
-                runnerComponent($view, configData)
+                $view.html(layoutTpl());
+                runnerComponent($view.find('.runner'), configData)
                     .on('error', reject)
                     .on('ready', runner => {
                         runner
@@ -178,7 +184,12 @@ define([
                     runner.trigger('setcontenttabtype', id);
                 }
 
-                $container.find('.playground-selector')
+                $view.find('header').on('click', 'a', e => {
+                    dialogAlert(`You clicked on <b>${$(e.currentTarget).text()}</b>`);
+                    e.preventDefault();
+                });
+
+                $selector
                     .on('click', 'button', e => {
                         activateMode(e.target.dataset.mode);
                     })

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Key Navigation - Test Runner Plugin test</title>
+        <link rel="stylesheet" href="assets/qti-runner.css"/>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function() {
+                require(['qunitEnv'], function() {
+                    // mock Client Config data:
+                    requirejs.config({
+                        config: {
+                            'core/request': {
+                                noToken: true
+                            }
+                        }
+                    });
+                    require(['taoQtiTest/test/runner/plugins/content/keyNavigation/test'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+        <style>
+            #visual-playground {
+                position: relative;
+                width: calc(100vw - 20px);
+                height: calc(100vh - 20px);
+                display: flex;
+                flex-direction: column;
+            }
+            .playground-selector {
+                position: relative;
+                width: 100%;
+                border-bottom: 2px solid #266d9c;;
+                flex: 0 0 auto;
+            }
+            .playground-view {
+                flex: 1 1 auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <div id="visual-playground">
+            <nav class="playground-selector">
+                <button data-mode="default">Default</button>
+                <button data-mode="linear">Linear</button>
+                <button data-mode="native">Native</button>
+            </nav>
+            <section class="playground-view" data-mode="default"></section>
+        </div>
+    </body>
+</html>

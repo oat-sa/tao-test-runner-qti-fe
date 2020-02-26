@@ -56,6 +56,27 @@ define([
     // Provision the context with a proper root url to prevent failure from the URL helper
     context.root_url = window.location.origin;
 
+    // Basic navigator to move inside the test
+    function navigator(itemId, direction, ref) {
+        const {testMap, testContext} = initData;
+        mapHelper.createJumpTable(testMap);
+        const item = mapHelper.getItem(testMap, itemId);
+        const last = testMap.jumps.length - 1;
+        const actions = {
+            next() {
+                return item.position < last ? item.position + 1 : 0;
+            },
+            previous() {
+                return Math.max(0, item.position - 1);
+            },
+            jump() {
+                return ref;
+            }
+        };
+        const action = actions[direction] || actions.next();
+        return testContextBuilder.buildTestContextFromPosition(testContext, testMap, action(), 1);
+    }
+
     // Mock the queries
     $.mockjax({
         url: '/init*',
@@ -76,21 +97,11 @@ define([
             const url = new URL(settings.url);
             const params = url.searchParams;
             const itemId = params && params.get('itemDefinition');
-
-            const {testMap, testContext} = initData;
-            const {direction} = settings.data;
-            const dir = direction === 'previous' ? -1 : 1;
-            mapHelper.createJumpTable(testMap);
-
-            const item = mapHelper.getItem(testMap, itemId);
-            let position = Math.max(0, (item.position || 0) + dir);
-            if (position >= testMap.jumps.length) {
-                position = 0;
-            }
+            const {direction, ref} = settings.data;
 
             this.responseText = {
                 success: true,
-                testContext: testContextBuilder.buildTestContextFromPosition(testContext, testMap, position, 1)
+                testContext: navigator(itemId, direction, ref)
             };
         }
     });

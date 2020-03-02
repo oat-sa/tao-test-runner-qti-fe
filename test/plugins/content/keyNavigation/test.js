@@ -152,6 +152,61 @@ define([
 
     QUnit.module('Behavior');
 
+    QUnit.test('Switch the navigation mode', assert => {
+        const ready = assert.async();
+        const $container = $('#qunit-fixture');
+        const config = _.cloneDeep(configData);
+        assert.expect(10);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        Promise.resolve()
+            .then(() => new Promise((resolve, reject) => {
+                $container.html(layoutTpl());
+                assert.equal($container.children().length, 1, 'The layout is rendered');
+                assert.equal($container.find('.runner').children().length, 0, 'The test runner is not rendered yet');
+
+                runnerComponent($container.find('.runner'), config)
+                    .on('error', reject)
+                    .on('ready', runner => {
+                        assert.equal($container.find('.runner').children().length, 1, 'The test runner is rendered');
+
+                        runner
+                            .after('renderitem.runnerComponent', () => {
+                                runner.off('renderitem.runnerComponent');
+                                resolve(runner);
+                            });
+                    });
+            }))
+            .then(runner => {
+                assert.ok(true, 'Test runner up an running');
+                assert.equal(typeof runner.getPluginConfig('keyNavigation'), 'object', 'There is a configuration for the plugin');
+                return runner;
+            })
+            .then(runner => new Promise(resolve => {
+                const plugin = runner.getPlugin('keyNavigation');
+                const newMode = 'native';
+
+                assert.equal(plugin.getConfig().contentNavigatorType, 'default', 'The navigation mode is set to default');
+
+                runner
+                    .after('setcontenttabtype', mode => {
+                        assert.equal(mode, newMode, 'The new mode is provided as parameter to the event');
+                        assert.equal(plugin.getConfig().contentNavigatorType, newMode, 'The navigation mode has been changed');
+                        resolve(runner);
+                    })
+                    .trigger('setcontenttabtype', newMode);
+            }))
+            .then(runner => runner.destroy())
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(() => assert.ok(true, 'done!'))
+            .then(ready);
+    });
 
     QUnit.module('Visual');
 

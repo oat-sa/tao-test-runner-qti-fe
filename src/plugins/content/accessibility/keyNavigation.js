@@ -13,12 +13,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2020 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Test Runner Content Plugin : Navigate through the item focusable elements using the keyboard
  *
- * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
+ * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import $ from 'jquery';
 import _ from 'lodash';
@@ -778,7 +778,8 @@ export default pluginFactory({
              * @param {string} type - type of content tab navigation,
              * can be: 'default' || 'linear'
              */
-            .on('setcontenttabtype', function(type) {
+            .on('setcontenttabtype', type => {
+                this.getConfig().contentNavigatorType = type;
                 pluginConfig.contentNavigatorType = type;
             });
     },

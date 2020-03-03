@@ -25,10 +25,10 @@ define([
     'taoTests/runner/runnerComponent',
     'taoQtiTest/runner/helpers/map',
     'taoQtiTest/runner/helpers/testContextBuilder',
-    'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/plugin',
+    'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigator',
     'taoQtiTest/test/runner/mocks/providerMock',
     'tpl!taoQtiTest/test/runner/plugins/content/keyNavigation/assets/layout',
-    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/config.json',
+    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/config-nokb.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/init.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/item.json',
     'jquery.simulate',
@@ -42,7 +42,7 @@ define([
     runnerComponent,
     mapHelper,
     testContextBuilder,
-    pluginFactory,
+    keyNavigatorFactory,
     providerMock,
     layoutTpl,
     configData,
@@ -117,108 +117,57 @@ define([
         }
     });
 
-    QUnit.module('pluginFactory');
+    QUnit.module('keyNavigatorFactory');
 
     QUnit.test('module', assert => {
-        const runner = runnerFactory(providerName);
-
-        assert.equal(typeof pluginFactory, 'function', 'The pluginFactory module exposes a function');
-        assert.equal(typeof pluginFactory(runner), 'object', 'The plugin factory produces an instance');
+        assert.equal(typeof keyNavigatorFactory, 'function', 'The keyNavigatorFactory module exposes a function');
+        assert.equal(typeof keyNavigatorFactory(), 'object', 'The keyNavigator factory produces an instance');
         assert.notStrictEqual(
-            pluginFactory(runner),
-            pluginFactory(runner),
-            'The plugin factory provides a different instance on each call'
+            keyNavigatorFactory(),
+            keyNavigatorFactory(),
+            'The keyNavigator factory provides a different instance on each call'
         );
     });
 
     QUnit.cases.init([
         {title: 'init'},
-        {title: 'render'},
-        {title: 'finish'},
-        {title: 'destroy'},
-        {title: 'trigger'},
-        {title: 'getTestRunner'},
-        {title: 'getAreaBroker'},
-        {title: 'getConfig'},
-        {title: 'setConfig'},
-        {title: 'getState'},
-        {title: 'setState'},
-        {title: 'show'},
-        {title: 'hide'},
-        {title: 'enable'},
-        {title: 'disable'}
-    ]).test('plugin API ', (data, assert) => {
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner);
+        {title: 'setMode'},
+        {title: 'destroy'}
+    ]).test('keyNavigator API ', (data, assert) => {
+        const keyNavigator = keyNavigatorFactory();
         assert.equal(
-            typeof plugin[data.title],
+            typeof keyNavigator[data.title],
             'function',
-            `The pluginFactory instance exposes a "${data.title}" function`
+            `The keyNavigatorFactory instance exposes a "${data.title}" function`
         );
     });
 
     QUnit.module('Behavior');
 
     QUnit.test('Switch the navigation mode', assert => {
-        const ready = assert.async();
-        const $container = $('#qunit-fixture');
-        const config = _.cloneDeep(configData);
-        assert.expect(10);
+        assert.expect(3);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        const config = {
+            contentNavigatorType: 'default'
+        };
+        const keyNavigator = keyNavigatorFactory(config);
 
-        Promise.resolve()
-            .then(() => new Promise((resolve, reject) => {
-                $container.html(layoutTpl());
-                assert.equal($container.children().length, 1, 'The layout is rendered');
-                assert.equal($container.find('.runner').children().length, 0, 'The test runner is not rendered yet');
+        assert.equal(config.contentNavigatorType, 'default', 'The default mode is set');
 
-                runnerComponent($container.find('.runner'), config)
-                    .on('error', reject)
-                    .on('ready', runner => {
-                        assert.equal($container.find('.runner').children().length, 1, 'The test runner is rendered');
+        keyNavigator.setMode('native');
+        assert.equal(config.contentNavigatorType, 'native', 'The native mode is set');
 
-                        runner
-                            .after('renderitem.runnerComponent', () => {
-                                runner.off('renderitem.runnerComponent');
-                                resolve(runner);
-                            });
-                    });
-            }))
-            .then(runner => {
-                assert.ok(true, 'Test runner up an running');
-                assert.equal(typeof runner.getPluginConfig('keyNavigation'), 'object', 'There is a configuration for the plugin');
-                return runner;
-            })
-            .then(runner => new Promise(resolve => {
-                const plugin = runner.getPlugin('keyNavigation');
-                const newMode = 'native';
-
-                assert.equal(plugin.getConfig().contentNavigatorType, 'default', 'The navigation mode is set to default');
-
-                runner
-                    .after('setcontenttabtype', mode => {
-                        assert.equal(mode, newMode, 'The new mode is provided as parameter to the event');
-                        assert.equal(plugin.getConfig().contentNavigatorType, newMode, 'The navigation mode has been changed');
-                        resolve(runner);
-                    })
-                    .trigger('setcontenttabtype', newMode);
-            }))
-            .then(runner => runner.destroy())
-            .catch(err => {
-                assert.pushResult({
-                    result: false,
-                    message: err
-                });
-            })
-            .then(() => assert.ok(true, 'done!'))
-            .then(ready);
+        keyNavigator.setMode('linear');
+        assert.equal(config.contentNavigatorType, 'linear', 'The linear mode is set');
     });
 
     QUnit.test('Default navigation mode', assert => {
         const ready = assert.async();
         const $container = $('#qunit-fixture');
-        const config = _.cloneDeep(configData);
+        const config = {
+            contentNavigatorType: 'default'
+        };
+        const keyNavigator = keyNavigatorFactory(config);
         const cycle = [{
             label: 'Item interaction 1',
             selector: '.qti-interaction input[value="choice_1"]',
@@ -353,7 +302,7 @@ define([
             }, delay);
         });
 
-        assert.expect(8 + cycle.length);
+        assert.expect(7 + cycle.length);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -363,7 +312,7 @@ define([
                 assert.equal($container.children().length, 1, 'The layout is rendered');
                 assert.equal($container.find('.runner').children().length, 0, 'The test runner is not rendered yet');
 
-                runnerComponent($container.find('.runner'), config)
+                runnerComponent($container.find('.runner'), _.cloneDeep(configData))
                     .on('error', reject)
                     .on('ready', runner => {
                         assert.equal($container.find('.runner').children().length, 1, 'The test runner is rendered');
@@ -380,13 +329,11 @@ define([
             }))
             .then(runner => {
                 assert.ok(true, 'Test runner up an running');
-                assert.equal(typeof runner.getPluginConfig('keyNavigation'), 'object', 'There is a configuration for the plugin');
+                keyNavigator.init(runner);
                 return runner;
             })
             .then(runner => new Promise(resolve => {
-                const plugin = runner.getPlugin('keyNavigation');
-
-                assert.equal(plugin.getConfig().contentNavigatorType, 'default', 'The navigation mode is set to default');
+                assert.equal(config.contentNavigatorType, 'default', 'The navigation mode is set to default');
 
                 let queue = Promise.resolve(0);
                 document.activeElement.blur();
@@ -394,7 +341,10 @@ define([
 
                 queue.then(() => resolve(runner));
             }))
-            .then(runner => runner.destroy())
+            .then(runner => () => {
+                keyNavigator.destroy();
+                runner.destroy();
+            })
             .catch(err => {
                 assert.pushResult({
                     result: false,
@@ -408,7 +358,10 @@ define([
     QUnit.test('Linear navigation mode', assert => {
         const ready = assert.async();
         const $container = $('#qunit-fixture');
-        const config = _.cloneDeep(configData);
+        const config = {
+            contentNavigatorType: 'linear'
+        };
+        const keyNavigator = keyNavigatorFactory(config);
         const cycle = [{
             label: 'Item interaction 1',
             selector: '.qti-interaction [data-identifier="choice_1"]',
@@ -556,7 +509,7 @@ define([
             }, delay);
         });
 
-        assert.expect(8 + cycle.length);
+        assert.expect(7 + cycle.length);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -566,32 +519,28 @@ define([
                 assert.equal($container.children().length, 1, 'The layout is rendered');
                 assert.equal($container.find('.runner').children().length, 0, 'The test runner is not rendered yet');
 
-                runnerComponent($container.find('.runner'), config)
+                runnerComponent($container.find('.runner'), _.cloneDeep(configData))
                     .on('error', reject)
                     .on('ready', runner => {
                         assert.equal($container.find('.runner').children().length, 1, 'The test runner is rendered');
 
-                        runner
-                            .after('setcontenttabtype', () => runner.next())
-                            .after('renderitem.runnerComponent', itemRef => {
-                                if (itemRef === 'item-1') {
-                                    runner.trigger('setcontenttabtype', 'linear');
-                                } else {
-                                    runner.off('renderitem.runnerComponent');
-                                    resolve(runner);
-                                }
-                            });
+                        runner.after('renderitem.runnerComponent', itemRef => {
+                            if (itemRef === 'item-1') {
+                                runner.next();
+                            } else {
+                                runner.off('renderitem.runnerComponent');
+                                resolve(runner);
+                            }
+                        });
                     });
             }))
             .then(runner => {
                 assert.ok(true, 'Test runner up an running');
-                assert.equal(typeof runner.getPluginConfig('keyNavigation'), 'object', 'There is a configuration for the plugin');
+                keyNavigator.init(runner);
                 return runner;
             })
             .then(runner => new Promise(resolve => {
-                const plugin = runner.getPlugin('keyNavigation');
-
-                assert.equal(plugin.getConfig().contentNavigatorType, 'linear', 'The navigation mode is set to linear');
+                assert.equal(config.contentNavigatorType, 'linear', 'The navigation mode is set to linear');
 
                 let queue = Promise.resolve(0);
                 document.activeElement.blur();
@@ -599,7 +548,10 @@ define([
 
                 queue.then(() => resolve(runner));
             }))
-            .then(runner => runner.destroy())
+            .then(runner => () => {
+                keyNavigator.destroy();
+                runner.destroy();
+            })
             .catch(err => {
                 assert.pushResult({
                     result: false,
@@ -613,7 +565,10 @@ define([
     QUnit.test('Native navigation mode', assert => {
         const ready = assert.async();
         const $container = $('#qunit-fixture');
-        const config = _.cloneDeep(configData);
+        const config = {
+            contentNavigatorType: 'native'
+        };
+        const keyNavigator = keyNavigatorFactory(config);
         const cycle = [{
             label: 'Home link',
             selector: '#home',
@@ -762,7 +717,7 @@ define([
             }, delay);
         });
 
-        assert.expect(8 + cycle.length);
+        assert.expect(7 + cycle.length);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -772,32 +727,28 @@ define([
                 assert.equal($container.children().length, 1, 'The layout is rendered');
                 assert.equal($container.find('.runner').children().length, 0, 'The test runner is not rendered yet');
 
-                runnerComponent($container.find('.runner'), config)
+                runnerComponent($container.find('.runner'), _.cloneDeep(configData))
                     .on('error', reject)
                     .on('ready', runner => {
                         assert.equal($container.find('.runner').children().length, 1, 'The test runner is rendered');
 
-                        runner
-                            .after('setcontenttabtype', () => runner.next())
-                            .after('renderitem.runnerComponent', itemRef => {
-                                if (itemRef === 'item-1') {
-                                    runner.trigger('setcontenttabtype', 'native');
-                                } else {
-                                    runner.off('renderitem.runnerComponent');
-                                    resolve(runner);
-                                }
-                            });
+                        runner.after('renderitem.runnerComponent', itemRef => {
+                            if (itemRef === 'item-1') {
+                                runner.next();
+                            } else {
+                                runner.off('renderitem.runnerComponent');
+                                resolve(runner);
+                            }
+                        });
                     });
             }))
             .then(runner => {
                 assert.ok(true, 'Test runner up an running');
-                assert.equal(typeof runner.getPluginConfig('keyNavigation'), 'object', 'There is a configuration for the plugin');
+                keyNavigator.init(runner);
                 return runner;
             })
             .then(runner => new Promise(resolve => {
-                const plugin = runner.getPlugin('keyNavigation');
-
-                assert.equal(plugin.getConfig().contentNavigatorType, 'native', 'The navigation mode is set to native');
+                assert.equal(config.contentNavigatorType, 'native', 'The navigation mode is set to native');
 
                 let queue = Promise.resolve(0);
                 document.activeElement.blur();
@@ -805,7 +756,10 @@ define([
 
                 queue.then(() => resolve(runner));
             }))
-            .then(runner => runner.destroy())
+            .then(runner => () => {
+                keyNavigator.destroy();
+                runner.destroy();
+            })
             .catch(err => {
                 assert.pushResult({
                     result: false,
@@ -813,65 +767,6 @@ define([
                 });
             })
             .then(() => assert.ok(true, 'done!'))
-            .then(ready);
-    });
-
-    QUnit.module('Visual');
-
-    QUnit.test('Visual test', assert => {
-        const ready = assert.async();
-        const $container = $('#visual-playground');
-        const $selector = $container.find('.playground-selector');
-        const $view = $container.find('.playground-view');
-        const modes = [];
-        assert.expect(1);
-
-        Promise.resolve()
-            .then(() => new Promise((resolve, reject) => {
-                $view.html(layoutTpl());
-                runnerComponent($view.find('.runner'), configData)
-                    .on('error', reject)
-                    .on('ready', runner => {
-                        runner
-                            .after('renderitem.runnerComponent', () => {
-                                runner.off('renderitem.runnerComponent');
-                                resolve(runner);
-                            })
-                            .after('setcontenttabtype', () => runner.jump(0));
-                    });
-            }))
-            .then(runner => {
-                function activateMode(id) {
-                    modes.forEach(mode => mode.$button.toggleClass('btn-info', id === mode.id));
-                    $view.attr('data-mode', id);
-                    runner.trigger('setcontenttabtype', id);
-                }
-
-                $view.find('header').on('click', 'a', e => {
-                    dialogAlert(`You clicked on <b>${$(e.currentTarget).text()}</b>`);
-                    e.preventDefault();
-                });
-
-                $selector
-                    .on('click', 'button', e => {
-                        activateMode(e.target.dataset.mode);
-                    })
-                    .find('button').each(function () {
-                        modes.push({
-                            id: this.dataset.mode,
-                            $button: $(this)
-                        });
-                    });
-
-                activateMode('default');
-                assert.ok(true, 'The playground is ready');
-            })
-            .catch(err => {
-                assert.pushResult({
-                    result: false,
-                    message: err
-                });
-            })
             .then(ready);
     });
 });

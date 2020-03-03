@@ -77,13 +77,6 @@
                 "active": true
             },
             {
-                "id": "keyNavigation",
-                "module": "taoQtiTest\/runner\/plugins\/content\/accessibility\/keyNavigation\/plugin",
-                "bundle": "taoQtiTest\/loader\/testPlugins.min",
-                "category": "content",
-                "active": true
-            },
-            {
                 "id": "review",
                 "module": "taoQtiTest\/runner\/plugins\/navigation\/review\/review",
                 "bundle": "taoQtiTest\/loader\/testPlugins.min",

@@ -26,8 +26,6 @@ import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import shortcut from 'util/shortcut';
-import pluginFactory from 'taoTests/runner/plugin';
-import 'taoQtiTest/runner/plugins/content/accessibility/css/key-navigation.css';
 
 /**
  * When either an element or its parents have this class - navigation from it would be disabled.
@@ -35,16 +33,6 @@ import 'taoQtiTest/runner/plugins/content/accessibility/css/key-navigation.css';
  * @type {String}
  */
 const ignoredClass = 'no-key-navigation';
-
-/**
- * If we have now config from backend side - we set this default dataset
- *
- * @typedef {object}
- * @properties {string} contentNavigatorType - ('default' | 'linear') - type of content navigation
- */
-const defaultPluginConfig = {
-    contentNavigatorType: 'default'
-};
 
 const keysForTypesMap = {
     default: {
@@ -739,58 +727,61 @@ function allowedToNavigateFrom(element) {
 }
 
 /**
- * Returns the configured plugin
+ * Builds a key navigator that can apply onto a test runner
+ * @param {Object} config - the config to apply
+ * @returns {testRunnerKeyNavigator}
  */
-export default pluginFactory({
-    name: 'keyNavigation',
+export default function keyNavigatorFactory(config) {
+    let groupNavigator = null;
 
     /**
-     * Initialize the plugin (called during runner's init)
+     * @typedef {Object} testRunnerKeyNavigator
      */
-    init: function init() {
-        const self = this;
-        const testRunner = this.getTestRunner();
-        const pluginConfig = Object.assign({}, defaultPluginConfig, this.getConfig());
-
-        //start disabled
-        this.disable();
-
+    return {
         /**
-         *  Update plugin state based on changes
+         * Setup the keyNavigator
+         * @param {testRunner} testRunner - the test runner instance to control
+         * @returns {testRunnerKeyNavigator}
          */
-        testRunner
-            .after('renderitem', function() {
-                self.groupNavigator = initTestRunnerNavigation(testRunner, pluginConfig);
+        init(testRunner) {
+            groupNavigator = initTestRunnerNavigation(testRunner, config);
 
-                shortcut.add('tab shift+tab', function(e) {
+            shortcut
+                .remove('.keyNavigator')
+                .add('tab.keyNavigator shift+tab.keyNavigator', function(e) {
                     if (!allowedToNavigateFrom(e.target)) {
                         return false;
                     }
-                    if (!self.groupNavigator.isFocused()) {
-                        self.groupNavigator.focus();
+                    if (!groupNavigator.isFocused()) {
+                        groupNavigator.focus();
                     }
                 });
-            })
-            .on('unloaditem', function() {
-                self.disable();
-            })
-            /**
-             * @param {string} type - type of content tab navigation,
-             * can be: 'default' || 'linear'
-             */
-            .on('setcontenttabtype', type => {
-                this.getConfig().contentNavigatorType = type;
-                pluginConfig.contentNavigatorType = type;
-            });
-    },
 
-    /**
-     * Called during the runner's destroy phase
-     */
-    destroy: function destroy() {
-        shortcut.remove(`.${this.getName()}`);
-        if (this.groupNavigator) {
-            this.groupNavigator.destroy();
+            return this;
+        },
+
+        /**
+         * Switches the navigation mode
+         * @param {String} mode
+         * @returns {testRunnerKeyNavigator}
+         */
+        setMode(mode) {
+            config.contentNavigatorType = mode;
+            return this;
+        },
+
+        /**
+         * Tears down the keyNavigator
+         * @returns {testRunnerKeyNavigator}
+         */
+        destroy() {
+            shortcut.remove('.keyNavigator');
+
+            if (groupNavigator) {
+                groupNavigator.destroy();
+            }
+
+            return this;
         }
-    }
-});
+    };
+}

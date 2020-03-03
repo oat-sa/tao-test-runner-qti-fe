@@ -27,7 +27,7 @@ define([
     'taoQtiTest/runner/helpers/testContextBuilder',
     'taoQtiTest/runner/plugins/content/accessibility/keyNavigation',
     'taoQtiTest/test/runner/mocks/providerMock',
-    'tpl!taoQtiTest/test/runner/plugins/content/keyNavigation/layout',
+    'tpl!taoQtiTest/test/runner/plugins/content/keyNavigation/assets/layout',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/config.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/init.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/item.json',

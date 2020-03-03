@@ -3,8 +3,8 @@
     <head>
         <meta charset="utf-8" />
         <title>Key Navigation - Test Runner Plugin test</title>
-        <link rel="stylesheet" href="assets/tao-3.css"/>
-        <link rel="stylesheet" href="assets/qti-runner.css"/>
+        <link rel="stylesheet" href="../assets/tao-3.css"/>
+        <link rel="stylesheet" href="../assets/qti-runner.css"/>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
@@ -17,7 +17,7 @@
                             }
                         }
                     });
-                    require(['taoQtiTest/test/runner/plugins/content/keyNavigation/test'], function() {
+                    require(['taoQtiTest/test/runner/plugins/content/keyNavigation/plugin/test'], function() {
                         QUnit.start();
                     });
                 });

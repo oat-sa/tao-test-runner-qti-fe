@@ -19,35 +19,23 @@
 define([
     'jquery',
     'lodash',
-    'context',
-    'ui/dialog/alert',
     'taoTests/runner/runner',
     'taoTests/runner/runnerComponent',
-    'taoQtiTest/runner/helpers/map',
-    'taoQtiTest/runner/helpers/testContextBuilder',
     'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigator',
     'taoQtiTest/test/runner/mocks/providerMock',
     'tpl!taoQtiTest/test/runner/plugins/content/keyNavigation/assets/layout',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/config-nokb.json',
-    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/init.json',
-    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/item.json',
-    'jquery.simulate',
-    'lib/jquery.mockjax'
+    'taoQtiTest/test/runner/plugins/content/keyNavigation/mock/backend',
+    'jquery.simulate'
 ], function (
     $,
     _,
-    context,
-    dialogAlert,
     runnerFactory,
     runnerComponent,
-    mapHelper,
-    testContextBuilder,
     keyNavigatorFactory,
     providerMock,
     layoutTpl,
-    configData,
-    initData,
-    itemData
+    configData
 ) {
     'use strict';
 
@@ -59,63 +47,6 @@ define([
 
     const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
-
-    // Prevent the AJAX mocks to pollute the logs
-    $.mockjaxSettings.logger = null;
-    $.mockjaxSettings.responseTime = 1;
-
-    // Provision the context with a proper root url to prevent failure from the URL helper
-    context.root_url = window.location.origin;
-
-    // Basic navigator to move inside the test
-    function navigator(itemId, direction, ref) {
-        const {testMap, testContext} = initData;
-        mapHelper.createJumpTable(testMap);
-        const item = mapHelper.getItem(testMap, itemId);
-        const last = testMap.jumps.length - 1;
-        const actions = {
-            next() {
-                return item.position < last ? item.position + 1 : 0;
-            },
-            previous() {
-                return Math.max(0, item.position - 1);
-            },
-            jump() {
-                return ref;
-            }
-        };
-        const action = actions[direction] || actions.next();
-        return testContextBuilder.buildTestContextFromPosition(testContext, testMap, action(), 1);
-    }
-
-    // Mock the queries
-    $.mockjax({
-        url: '/init*',
-        responseText: initData
-    });
-    $.mockjax({
-        url: '/getItem*',
-        response: function(settings) {
-            const url = new URL(settings.url);
-            const params = url.searchParams;
-            const itemId = params && params.get('itemDefinition');
-            this.responseText = itemData[itemId];
-        }
-    });
-    $.mockjax({
-        url: '/move*',
-        response: function(settings) {
-            const url = new URL(settings.url);
-            const params = url.searchParams;
-            const itemId = params && params.get('itemDefinition');
-            const {direction, ref} = settings.data;
-
-            this.responseText = {
-                success: true,
-                testContext: navigator(itemId, direction, ref)
-            };
-        }
-    });
 
     QUnit.module('keyNavigatorFactory');
 

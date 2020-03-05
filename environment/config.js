@@ -28,6 +28,7 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
 
                 /* TEST related */
                 'qunit-parameterize': '/environment/qunit2-parameterize',
+                'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
                 qunit: '/node_modules/qunit/qunit',
                 'taoQtiTest/test/runner': '/test',
                 'taoQtiItem/test/samples': '/test/samples',

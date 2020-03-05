@@ -1,0 +1,321 @@
+{
+    "success": true,
+    "testData": {
+        "title": "mock test",
+        "identifier": "mock-test",
+        "className": "assessmentTest",
+        "toolName": "tao",
+        "exclusivelyLinear": false,
+        "hasTimeLimits": true,
+        "states": {
+            "initial": 0,
+            "interacting": 1,
+            "modalFeedback": 2,
+            "suspended": 3,
+            "closed": 4
+        },
+        "itemStates": {
+            "initial": 0,
+            "interacting": 1,
+            "modalFeedback": 2,
+            "suspended": 3,
+            "closed": 4,
+            "solution": 5,
+            "review": 6,
+            "notSelected": 255
+        },
+        "config": {
+            "timerWarning": {
+                "assessmentItemRef": null,
+                "assessmentSection": null,
+                "testPart": null,
+                "assessmentTest": null
+            },
+            "catEngineWarning": null,
+            "progressIndicator": {
+                "type": "position",
+                "renderer": "percentage",
+                "scope": "test",
+                "forced": false,
+                "showLabel": true,
+                "showTotal": true,
+                "categories": []
+            },
+            "review": {
+                "enabled": true,
+                "scope": "test",
+                "useTitle": true,
+                "forceTitle": false,
+                "forceInformationalTitle": false,
+                "showLegend": true,
+                "defaultOpen": true,
+                "itemTitle": "Item %d",
+                "informationalItemTitle": "Instructions",
+                "preventsUnseen": true,
+                "canCollapse": false,
+                "displaySubsectionTitle": true,
+                "allowSkipahead": false
+            },
+            "exitButton": false,
+            "nextSection": false,
+            "plugins": {
+                "overlay": {
+                    "full": false
+                },
+                "dialog": {
+                    "alert": {
+                        "focus": "ok"
+                    },
+                    "confirm": {
+                        "focus": "ok"
+                    }
+                },
+                "keyNavigation": {
+                    "contentNavigatorType": "default"
+                }
+            },
+            "security": {
+                "csrfToken": false
+            },
+            "timer": {
+                "target": "server",
+                "resetAfterResume": false,
+                "keepUpToTimeout": false,
+                "restoreTimerFromClient": false
+            },
+            "enableAllowSkipping": true,
+            "enableValidateResponses": true,
+            "checkInformational": true,
+            "enableUnansweredItemsWarning": true,
+            "allowShortcuts": true,
+            "shortcuts": {
+                "review": {
+                    "toggle": "R",
+                    "flag": "M"
+                },
+                "keyNavigation": {
+                    "previous": "Shift+Tab",
+                    "next": "Tab"
+                },
+                "next": {
+                    "trigger": "J"
+                },
+                "previous": {
+                    "trigger": "K"
+                },
+                "dialog": []
+            },
+            "itemCaching": {
+                "enabled": false,
+                "amount": 3
+            },
+            "guidedNavigation": false,
+            "toolStateServerStorage": [],
+            "forceEnableLinearNextItemWarning": false,
+            "enableLinearNextItemWarningCheckbox": true
+        }
+    },
+    "testContext": {
+        "state": 1,
+        "navigationMode": 0,
+        "submissionMode": 0,
+        "remainingAttempts": -1,
+        "isAdaptive": false,
+        "isLinear": true,
+        "isTimeout": false,
+        "itemIdentifier": "item-1",
+        "attempt": 1,
+        "itemSessionState": 1,
+        "isCatAdaptive": false,
+        "needMapUpdate": false,
+        "isLast": false,
+        "itemPosition": 0,
+        "itemFlagged": false,
+        "itemAnswered": true,
+        "timeConstraints": [],
+        "testPartId": "testPart-1",
+        "sectionId": "assessmentSection-1",
+        "sectionTitle": "Section 1",
+        "numberItems": 5,
+        "numberCompleted": 0,
+        "numberPresented": 1,
+        "considerProgress": true,
+        "isDeepestSectionVisible": true,
+        "canMoveBackward": false,
+        "numberRubrics": 0,
+        "enableAllowSkipping": true,
+        "allowSkipping": true,
+        "enableValidateResponses": true,
+        "validateResponses": false,
+        "hasFeedbacks": false,
+        "options": {
+            "allowComment": false,
+            "allowSkipping": true,
+            "exitButton": false,
+            "logoutButton": true,
+            "validateResponses": false,
+            "sectionPause": false,
+            "reviewScreen": true
+        }
+    },
+    "testMap": {
+        "scope": "test",
+        "parts": {
+            "testPart-1": {
+                "id": "testPart-1",
+                "label": "testPart-1",
+                "position": 0,
+                "isLinear": true,
+                "timeConstraint": null,
+                "sections": {
+                    "assessmentSection-1": {
+                        "id": "assessmentSection-1",
+                        "label": "Section 1",
+                        "isCatAdaptive": false,
+                        "position": 0,
+                        "timeConstraint": null,
+                        "items": {
+                            "item-1": {
+                                "id": "item-1",
+                                "label": "mock 1",
+                                "position": 0,
+                                "occurrence": 0,
+                                "remainingAttempts": -1,
+                                "answered": true,
+                                "flagged": false,
+                                "viewed": true,
+                                "categories": [
+                                    "x-tao-option-reviewScreen"
+                                ],
+                                "informational": true
+                            }
+                        },
+                        "stats": {
+                            "questions": 0,
+                            "answered": 0,
+                            "flagged": 0,
+                            "viewed": 1,
+                            "total": 1,
+                            "questionsViewed": 0
+                        }
+                    }
+                },
+                "stats": {
+                    "questions": 0,
+                    "answered": 0,
+                    "flagged": 0,
+                    "viewed": 1,
+                    "total": 1,
+                    "questionsViewed": 0
+                }
+            },
+            "testPart-2": {
+                "id": "testPart-2",
+                "label": "testPart-2",
+                "position": 1,
+                "isLinear": false,
+                "timeConstraint": null,
+                "sections": {
+                    "section-1": {
+                        "id": "section-1",
+                        "label": "Section 1",
+                        "isCatAdaptive": false,
+                        "position": 1,
+                        "timeConstraint": null,
+                        "items": {
+                            "item-3": {
+                                "id": "item-3",
+                                "label": "mock 2",
+                                "position": 1,
+                                "occurrence": 0,
+                                "remainingAttempts": 1,
+                                "answered": false,
+                                "flagged": false,
+                                "viewed": false,
+                                "categories": [
+                                    "x-tao-option-reviewScreen"
+                                ],
+                                "informational": false
+                            },
+                            "item-2": {
+                                "id": "item-2",
+                                "label": "mock 3",
+                                "position": 2,
+                                "occurrence": 0,
+                                "remainingAttempts": 1,
+                                "answered": false,
+                                "flagged": false,
+                                "viewed": false,
+                                "categories": [
+                                    "x-tao-option-reviewScreen"
+                                ],
+                                "informational": false
+                            },
+                            "item-4": {
+                                "id": "item-4",
+                                "label": "mock 4",
+                                "position": 3,
+                                "occurrence": 0,
+                                "remainingAttempts": 1,
+                                "answered": false,
+                                "flagged": false,
+                                "viewed": false,
+                                "categories": [
+                                    "x-tao-option-reviewScreen"
+                                ],
+                                "informational": false
+                            },
+                            "item-6": {
+                                "id": "item-6",
+                                "label": "mock 6",
+                                "position": 4,
+                                "occurrence": 0,
+                                "remainingAttempts": 1,
+                                "answered": false,
+                                "flagged": false,
+                                "viewed": false,
+                                "categories": [
+                                    "x-tao-option-reviewScreen"
+                                ],
+                                "informational": false
+                            }
+                        },
+                        "stats": {
+                            "questions": 4,
+                            "answered": 0,
+                            "flagged": 0,
+                            "viewed": 0,
+                            "total": 4,
+                            "questionsViewed": 0
+                        }
+                    }
+                },
+                "stats": {
+                    "questions": 4,
+                    "answered": 0,
+                    "flagged": 0,
+                    "viewed": 0,
+                    "total": 4,
+                    "questionsViewed": 0
+                }
+            }
+        },
+        "title": "mock test",
+        "identifier": "mock-test",
+        "className": "assessmentTest",
+        "toolName": "tao",
+        "exclusivelyLinear": false,
+        "hasTimeLimits": true,
+        "stats": {
+            "questions": 4,
+            "answered": 0,
+            "flagged": 0,
+            "viewed": 1,
+            "total": 5,
+            "questionsViewed": 0
+        }
+    },
+    "toolStates": [],
+    "lastStoreId": false,
+    "messages": []
+}

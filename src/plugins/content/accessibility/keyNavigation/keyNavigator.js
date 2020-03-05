@@ -771,6 +771,14 @@ export default function keyNavigatorFactory(config) {
         },
 
         /**
+         * Gets the active navigation mode
+         * @returns {String}
+         */
+        getMode() {
+            return config.contentNavigatorType;
+        },
+
+        /**
          * Tears down the keyNavigator
          * @returns {testRunnerKeyNavigator}
          */
@@ -780,6 +788,7 @@ export default function keyNavigatorFactory(config) {
             if (groupNavigator) {
                 groupNavigator.destroy();
             }
+            groupNavigator = null;
 
             return this;
         }

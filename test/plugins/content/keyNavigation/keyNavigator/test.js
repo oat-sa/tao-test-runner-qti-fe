@@ -63,6 +63,7 @@ define([
     QUnit.cases.init([
         {title: 'init'},
         {title: 'setMode'},
+        {title: 'getMode'},
         {title: 'destroy'}
     ]).test('keyNavigator API ', (data, assert) => {
         const keyNavigator = keyNavigatorFactory();
@@ -76,7 +77,7 @@ define([
     QUnit.module('Behavior');
 
     QUnit.test('Switch the navigation mode', assert => {
-        assert.expect(3);
+        assert.expect(5);
 
         const config = {
             contentNavigatorType: 'default'
@@ -87,9 +88,11 @@ define([
 
         keyNavigator.setMode('native');
         assert.equal(config.contentNavigatorType, 'native', 'The native mode is set');
+        assert.equal(keyNavigator.getMode(), 'native', 'The native mode is claimed');
 
         keyNavigator.setMode('linear');
         assert.equal(config.contentNavigatorType, 'linear', 'The linear mode is set');
+        assert.equal(keyNavigator.getMode(), 'linear', 'The linear mode is claimed');
     });
 
     QUnit.test('Default navigation mode', assert => {
@@ -233,7 +236,7 @@ define([
             }, delay);
         });
 
-        assert.expect(7 + cycle.length);
+        assert.expect(8 + cycle.length);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -265,6 +268,7 @@ define([
             })
             .then(runner => new Promise(resolve => {
                 assert.equal(config.contentNavigatorType, 'default', 'The navigation mode is set to default');
+                assert.equal(keyNavigator.getMode(), 'default', 'The default mode is claimed');
 
                 let queue = Promise.resolve(0);
                 document.activeElement.blur();
@@ -440,7 +444,7 @@ define([
             }, delay);
         });
 
-        assert.expect(7 + cycle.length);
+        assert.expect(8 + cycle.length);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -472,6 +476,7 @@ define([
             })
             .then(runner => new Promise(resolve => {
                 assert.equal(config.contentNavigatorType, 'linear', 'The navigation mode is set to linear');
+                assert.equal(keyNavigator.getMode(), 'linear', 'The linear mode is claimed');
 
                 let queue = Promise.resolve(0);
                 document.activeElement.blur();
@@ -648,7 +653,7 @@ define([
             }, delay);
         });
 
-        assert.expect(7 + cycle.length);
+        assert.expect(8 + cycle.length);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -680,6 +685,7 @@ define([
             })
             .then(runner => new Promise(resolve => {
                 assert.equal(config.contentNavigatorType, 'native', 'The navigation mode is set to native');
+                assert.equal(keyNavigator.getMode(), 'native', 'The native mode is claimed');
 
                 let queue = Promise.resolve(0);
                 document.activeElement.blur();

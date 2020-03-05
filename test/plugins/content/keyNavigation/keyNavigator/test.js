@@ -23,9 +23,12 @@ define([
     'taoTests/runner/runnerComponent',
     'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigator',
     'taoQtiTest/test/runner/mocks/providerMock',
+    'taoQtiTest/test/runner/plugins/content/keyNavigation/mock/backend',
     'tpl!taoQtiTest/test/runner/plugins/content/keyNavigation/assets/layout',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/config-nokb.json',
-    'taoQtiTest/test/runner/plugins/content/keyNavigation/mock/backend',
+    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/test.json',
+    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/item.json',
+    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/rubrics.json',
     'jquery.simulate'
 ], function (
     $,
@@ -34,8 +37,12 @@ define([
     runnerComponent,
     keyNavigatorFactory,
     providerMock,
+    backendMockFactory,
     layoutTpl,
-    configData
+    configData,
+    testDefinition,
+    itemsBank,
+    rubricsBank
 ) {
     'use strict';
 
@@ -47,6 +54,8 @@ define([
 
     const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
+
+    const backendMock = backendMockFactory(testDefinition, itemsBank);
 
     QUnit.module('keyNavigatorFactory');
 
@@ -103,6 +112,12 @@ define([
         };
         const keyNavigator = keyNavigatorFactory(config);
         const cycle = [{
+            label: 'Rubrick block',
+            selector: '.qti-rubricBlock',
+            key: {
+                keyCode: key.TAB
+            }
+        }, {
             label: 'Item interaction 1',
             selector: '.qti-interaction input[value="choice_1"]',
             key: {
@@ -193,8 +208,8 @@ define([
                 keyCode: key.DOWN
             }
         }, {
-            label: 'Item interaction 1',
-            selector: '.qti-interaction input[value="choice_1"]',
+            label: 'Rubrick block',
+            selector: '.qti-rubricBlock',
             key: {
                 keyCode: key.TAB
             }
@@ -235,6 +250,8 @@ define([
                 resolve(index + 1);
             }, delay);
         });
+
+        backendMock.setRubricsBank(rubricsBank);
 
         assert.expect(8 + cycle.length);
 
@@ -298,6 +315,12 @@ define([
         };
         const keyNavigator = keyNavigatorFactory(config);
         const cycle = [{
+            label: 'Rubrick block',
+            selector: '.qti-rubricBlock',
+            key: {
+                keyCode: key.TAB
+            }
+        }, {
             label: 'Item interaction 1',
             selector: '.qti-interaction [data-identifier="choice_1"]',
             key: {
@@ -401,8 +424,8 @@ define([
                 keyCode: key.DOWN
             }
         }, {
-            label: 'Item interaction 1',
-            selector: '.qti-interaction [data-identifier="choice_1"]',
+            label: 'Rubrick block',
+            selector: '.qti-rubricBlock',
             key: {
                 keyCode: key.TAB
             }
@@ -443,6 +466,8 @@ define([
                 resolve(index + 1);
             }, delay);
         });
+
+        backendMock.setRubricsBank(rubricsBank);
 
         assert.expect(8 + cycle.length);
 
@@ -652,6 +677,8 @@ define([
                 resolve(index + 1);
             }, delay);
         });
+
+        backendMock.setRubricsBank({});
 
         assert.expect(8 + cycle.length);
 

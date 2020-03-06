@@ -203,6 +203,7 @@
                             }
                         }
 
+                        &:focus,
                         &.hover,
                         &:hover {
                             background-color: $info;

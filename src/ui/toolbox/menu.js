@@ -141,25 +141,21 @@ var menuComponentApi = {
         const activeItemIndex = _.findIndex(this.menuItems, item => item.is('active'));
         if (activeItemIndex >= 0) {
             this.hoverIndex = activeItemIndex;
-            this.$menuContainer.focus();
+            this.$menuItems[this.hoverIndex].focus();
             this.hoverItem(this.menuItems[activeItemIndex].id);
         }
         else if (this.navType === 'fromLast') {
             // fromLast (default) navigation: focus on button and then using UP go to last item
-            this.hoverIndex = this.menuItems.length; // we start on the button, not at the max array index
+            this.hoverIndex = this.menuItems.length - 1; // we start on the button, not at the max array index
             // which would be menuItems.length-1
-            this.$menuButton.focus();
+            this.$menuItems[this.hoverIndex].focus();
         }
         else if (this.navType === 'fromFirst') {
             // fromFirst navigation: focus on button and then using DOWN go to first item
-            this.hoverIndex = -1; // we start on the button, not the first element
+            this.hoverIndex = 0; // we start on the button, not the first element
             // which would be 0
-            this.$menuButton.focus();
+            this.$menuItems[this.hoverIndex].focus();
         }
-       
-
-
-        
 
         // component inner state
         this.setState('opened', true);

@@ -120,8 +120,14 @@ export default pluginFactory({
 
             allMenuEntries.forEach(function(menuEntry) {
                 if (menuEntry.getId() === themeId) {
+                    menuEntry
+                        .getElement()
+                        .attr('aria-checked', 'true');
                     menuEntry.turnOn();
                 } else {
+                    menuEntry
+                        .getElement()
+                        .attr('aria-checked', 'false');
                     menuEntry.turnOff();
                 }
             });
@@ -169,6 +175,7 @@ export default pluginFactory({
                 .getAreaBroker()
                 .getToolbox()
                 .createEntry({
+                    role: 'option',
                     control: theme.id,
                     title: theme.label,
                     icon: 'preview',

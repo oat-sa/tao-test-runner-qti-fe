@@ -728,10 +728,12 @@ function allowedToNavigateFrom(element) {
 
 /**
  * Builds a key navigator that can apply onto a test runner
+ * @param {testRunner} testRunner - the test runner instance to control
  * @param {Object} config - the config to apply
+ * @param {String} config.contentNavigatorType - the keyboard navigation mode
  * @returns {testRunnerKeyNavigator}
  */
-export default function keyNavigatorFactory(config) {
+export default function keyNavigatorFactory(testRunner, config) {
     let groupNavigator = null;
 
     /**
@@ -740,10 +742,9 @@ export default function keyNavigatorFactory(config) {
     return {
         /**
          * Setup the keyNavigator
-         * @param {testRunner} testRunner - the test runner instance to control
          * @returns {testRunnerKeyNavigator}
          */
-        init(testRunner) {
+        init() {
             groupNavigator = initTestRunnerNavigation(testRunner, config);
 
             shortcut
@@ -758,6 +759,14 @@ export default function keyNavigatorFactory(config) {
                 });
 
             return this;
+        },
+
+        /**
+         * Gets the attached testRunner
+         * @returns {testRunner}
+         */
+        getTestRunner() {
+            return testRunner;
         },
 
         /**

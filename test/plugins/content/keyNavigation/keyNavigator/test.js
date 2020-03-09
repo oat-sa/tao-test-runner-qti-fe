@@ -50,7 +50,7 @@ define([
     const key = $.simulate.keyCode;
 
     // Wait delay between each cycle step (test the keyboard behavior)
-    const cycleDelay = 25;
+    const cycleDelay = 1;
 
     const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());

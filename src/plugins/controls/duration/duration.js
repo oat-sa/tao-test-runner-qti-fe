@@ -145,11 +145,6 @@ export default pluginFactory({
                 .on('enableitem', () => {
                     self.enable();
                 })
-                .before('move skip exit timeout error disableitem', () => {
-                    updateDuration()
-                      .then(() => self.disable())
-                      .catch(() => self.disable());
-                })
                 .before('move skip exit timeout pause', () => currentUpdatePromise
                     .then(addDuractionToCallActionParams)
                     .catch(addDuractionToCallActionParams)

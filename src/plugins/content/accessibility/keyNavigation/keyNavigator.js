@@ -36,40 +36,40 @@ const ignoredClass = 'no-key-navigation';
 
 const keysForTypesMap = {
     default: {
-        nextGroup: 'tab',
-        prevGroup: 'shift+tab',
-        nextInGroup: 'right down',
-        prevInGroup: 'left up',
-        nextInFilters: 'right',
-        prevInFilters: 'left',
-        nextInList: 'down',
-        prevInList: 'up',
-        nextLinearFromFirst: '',
-        prevLinearFromLast: ''
+        keyNextGroup: 'tab',
+        keyPrevGroup: 'shift+tab',
+        keyNextInGroup: 'right down',
+        keyPrevInGroup: 'left up',
+        keyNextInFilters: 'right',
+        keyPrevInFilters: 'left',
+        keyNextInList: 'down',
+        keyPrevInList: 'up',
+        keyNextLinearFromFirst: '',
+        keyPrevLinearFromLast: ''
     },
     linear: {
-        nextGroup: 'tab',
-        prevGroup: 'shift+tab',
-        nextInGroup: 'right down',
-        prevInGroup: 'left up',
-        nextInFilters: 'right',
-        prevInFilters: 'left',
-        nextInList: 'down',
-        prevInList: 'up',
-        nextLinearFromFirst: 'right',
-        prevLinearFromLast: 'left'
+        keyNextGroup: 'tab',
+        keyPrevGroup: 'shift+tab',
+        keyNextInGroup: 'right down',
+        keyPrevInGroup: 'left up',
+        keyNextInFilters: 'right',
+        keyPrevInFilters: 'left',
+        keyNextInList: 'down',
+        keyPrevInList: 'up',
+        keyNextLinearFromFirst: 'right',
+        keyPrevLinearFromLast: 'left'
     },
     native: {
-        nextGroup: '',
-        prevGroup: '',
-        nextInGroup: 'tab',
-        prevInGroup: 'shift+tab',
-        nextInFilters: 'tab',
-        prevInFilters: 'shift+tab',
-        nextInList: 'tab',
-        prevInList: 'shift+tab',
-        nextLinearFromFirst: '',
-        prevLinearFromLast: ''
+        keyNextGroup: '',
+        keyPrevGroup: '',
+        keyNextInGroup: 'tab',
+        keyPrevInGroup: 'shift+tab',
+        keyNextInFilters: 'tab',
+        keyPrevInFilters: 'shift+tab',
+        keyNextInList: 'tab',
+        keyPrevInList: 'shift+tab',
+        keyNextLinearFromFirst: '',
+        keyPrevLinearFromLast: ''
     }
 };
 
@@ -110,14 +110,14 @@ function initToolbarNavigation(config) {
                     return pos;
                 }
             })
-                .on(config.nextInGroup, function(elem) {
+                .on(config.keyNextInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on(config.prevInGroup, function(elem) {
+                .on(config.keyPrevInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
@@ -154,14 +154,14 @@ function initHeaderNavigation(config) {
                 elements: navigables,
                 replace: true
             })
-                .on(config.nextInGroup, function(elem) {
+                .on(config.keyNextInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on(config.prevInGroup, function(elem) {
+                .on(config.keyPrevInGroup, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
@@ -208,14 +208,14 @@ function initNavigatorNavigation(testRunner, config) {
                 elements: navigableFilters,
                 group: $navigator.find('.qti-navigator-filters')
             })
-                .on(config.nextInFilters, function(elem) {
+                .on(config.keyNextInFilters, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on(config.prevInFilters, function(elem) {
+                .on(config.keyPrevInFilters, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
@@ -241,7 +241,7 @@ function initNavigatorNavigation(testRunner, config) {
                 });
             if (!isNativeNavigation) {
                 filtersNavigator
-                    .on(config.nextInList, function(elem) {
+                    .on(config.keyNextInList, function(elem) {
                         if (!allowedToNavigateFrom(elem)) {
                             return false;
                         } else if (itemsNavigator) {
@@ -254,7 +254,7 @@ function initNavigatorNavigation(testRunner, config) {
                             });
                         }
                     })
-                    .on(config.prevInList, function(elem) {
+                    .on(config.keyPrevInList, function(elem) {
                         if (!allowedToNavigateFrom(elem)) {
                             return false;
                         } else if (itemsNavigator) {
@@ -292,14 +292,14 @@ function initNavigatorNavigation(testRunner, config) {
                     return pos;
                 }
             })
-                .on(config.nextInList, function(elem) {
+                .on(config.keyNextInList, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
                         this.next();
                     }
                 })
-                .on(config.prevInList, function(elem) {
+                .on(config.keyPrevInList, function(elem) {
                     if (!allowedToNavigateFrom(elem)) {
                         return false;
                     } else {
@@ -329,14 +329,14 @@ function initNavigatorNavigation(testRunner, config) {
                 });
             if (!isNativeNavigation) {
                 itemsNavigator
-                    .on(config.nextInFilters, function(elem) {
+                    .on(config.keyNextInFilters, function(elem) {
                         if (!allowedToNavigateFrom(elem)) {
                             return false;
                         } else if (filtersNavigator) {
                             filtersNavigator.focus().next();
                         }
                     })
-                    .on(config.prevInFilters, function(elem) {
+                    .on(config.keyPrevInFilters, function(elem) {
                         if (!allowedToNavigateFrom(elem)) {
                             return false;
                         } else if (filtersNavigator) {
@@ -480,14 +480,14 @@ function initInteractionNavigation($interaction, testRunner, config) {
         });
 
         keyNavigatorItem
-            .on(config.nextInGroup, function(elem) {
+            .on(config.keyNextInGroup, function(elem) {
                 if (!allowedToNavigateFrom(elem)) {
                     return false;
                 } else {
                     this.next();
                 }
             })
-            .on(config.prevInGroup, function(elem) {
+            .on(config.keyPrevInGroup, function(elem) {
                 if (!allowedToNavigateFrom(elem)) {
                     return false;
                 } else {
@@ -677,12 +677,12 @@ function initTestRunnerNavigation(testRunner, pluginConfig) {
 
     if (!isNativeNavigation) {
         keyNavigatorItem
-            .on(config.nextGroup, function(elem) {
+            .on(config.keyNextGroup, function(elem) {
                 if (allowedToNavigateFrom(elem)) {
                     this.next();
                 }
             })
-            .on(config.prevGroup, function(elem) {
+            .on(config.keyPrevGroup, function(elem) {
                 if (allowedToNavigateFrom(elem)) {
                     this.previous();
                 }
@@ -691,14 +691,14 @@ function initTestRunnerNavigation(testRunner, pluginConfig) {
 
     if (config.contentNavigatorType === 'linear') {
         keyNavigatorItem
-            .on(config.nextLinearFromFirst, function(elem) {
+            .on(config.keyNextLinearFromFirst, function(elem) {
                 const isCurrentElementFirst = $(elem).is(':first-child');
 
                 if (isCurrentElementFirst && allowedToNavigateFrom(elem)) {
                     this.next();
                 }
             })
-            .on(config.prevLinearFromLast, function(elem) {
+            .on(config.keyPrevLinearFromLast, function(elem) {
                 const isCurrentElementLast = $(elem).is(':last-child');
 
                 if (isCurrentElementLast && allowedToNavigateFrom(elem)) {

@@ -27,6 +27,16 @@
  *      icon: 'icon',
  *      text: __('Displayed label')
  * });
+ * Optional setting: navType - navigation type 
+ * navType: 'fromLast' (default behavior) - focus on button (if no active item) and then using UP go to last item, when press DOWN at last item menu will be closed,
+ * navType: 'fromFirst' - focus on button (if no active item) and then using DOWN go to first item, when press UP at first item menu will be closed
+ * toolbox.createMenu({
+ *      control: 'menu-id',
+ *      title: __('Html title'),
+ *      icon: 'icon',
+ *      text: __('Displayed label'),
+ *      navType: 'fromFirst'
+ * });
  *
  * @author Christophe Noël <christophe@taotesting.com>
  */
@@ -55,6 +65,7 @@ var menuComponentApi = {
      */
     initMenu: function initMenu() {
         this.id = this.config.control;
+        this.navType = this.config.navType ? this.config.navType : 'fromLast';
         this.menuItems = [];
     },
 
@@ -124,14 +135,31 @@ var menuComponentApi = {
         // setup keyboard navigation & highlighting
         this.enableShortcuts();
         this.hoverOffAll();
-        this.hoverIndex = this.menuItems.length; // we start on the button, not at the max array index
-        // which would be menuItems.length-1
-
-        // focus the button, for keyboard navigation
         if (document.activeElement) {
             document.activeElement.blur();
         }
-        this.$menuContainer.focus();
+        const activeItemIndex = _.findIndex(this.menuItems, item => item.is('active'));
+        if (activeItemIndex >= 0) {
+            this.hoverIndex = activeItemIndex;
+            this.$menuContainer.focus();
+            this.hoverItem(this.menuItems[activeItemIndex].id);
+        }
+        else if (this.navType === 'fromLast') {
+            // fromLast (default) navigation: focus on button and then using UP go to last item
+            this.hoverIndex = this.menuItems.length; // we start on the button, not at the max array index
+            // which would be menuItems.length-1
+            this.$menuButton.focus();
+        }
+        else if (this.navType === 'fromFirst') {
+            // fromFirst navigation: focus on button and then using DOWN go to first item
+            this.hoverIndex = -1; // we start on the button, not the first element
+            // which would be 0
+            this.$menuButton.focus();
+        }
+       
+
+
+        
 
         // component inner state
         this.setState('opened', true);
@@ -282,11 +310,20 @@ var menuComponentApi = {
         this.$menuButton.on('keydown.menuNavigation', function(e) {
             var currentKeyCode = e.keyCode ? e.keyCode : e.charCode;
 
-            if (currentKeyCode === keyCodes.UP) {
-                e.stopPropagation();
-                self.hoverIndex = self.menuItems.length - 1;
+            function setFocusToItem(index) {
+                self.hoverIndex = index;
                 self.$menuContainer.focus();
                 self.hoverItem(self.menuItems[self.hoverIndex].id);
+            }
+
+            if (currentKeyCode === keyCodes.UP && self.navType === 'fromLast') {
+                e.stopPropagation();
+                setFocusToItem(self.menuItems.length - 1);
+            }
+
+            if (currentKeyCode === keyCodes.DOWN && self.navType === 'fromFirst') {
+                e.stopPropagation();
+                setFocusToItem(0);
             }
         });
     },
@@ -306,6 +343,12 @@ var menuComponentApi = {
         if (this.hoverIndex > 0) {
             this.hoverIndex--;
             this.hoverItem(this.menuItems[this.hoverIndex].id);
+            // move to the menu button
+        } else if (this.hoverIndex === 0  && this.navType === 'fromFirst') {
+            this.hoverIndex--;
+            this.hoverOffAll();
+            this.$menuButton.closest('.action').focus();
+            this.closeMenu();
         }
     },
 
@@ -319,7 +362,7 @@ var menuComponentApi = {
             this.hoverItem(this.menuItems[this.hoverIndex].id);
 
             // move to the menu button
-        } else if (this.hoverIndex === this.menuItems.length - 1) {
+        } else if (this.hoverIndex === this.menuItems.length - 1 && this.navType === 'fromLast') {
             this.hoverIndex++;
             this.hoverOffAll();
             this.$menuButton.closest('.action').focus();
@@ -365,6 +408,16 @@ var menuComponentApi = {
             if (document.activeElement) {
                 document.activeElement.blur();
             }
+        }
+    },
+
+    /**
+     * Set navigation type
+     * @param {String} type - 'fromLast', 'fromFirst'
+     */
+    setNavigationType: function setNavigationType(type) {
+        if (['fromLast', 'fromFirst'].includes(type)) {
+            this.navType = type;
         }
     }
 };

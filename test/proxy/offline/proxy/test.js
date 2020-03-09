@@ -1612,7 +1612,7 @@ define([
 
         var testMap = { title: 'testTitle' };
         var testData = { title: 'testTitle' };
-        var actions = 'testActions';
+        var actions = ['testActions'];
 
         var proxy;
 

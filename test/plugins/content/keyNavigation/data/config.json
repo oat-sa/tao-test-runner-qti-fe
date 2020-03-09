@@ -1,0 +1,127 @@
+{
+    "testDefinition": "mock",
+    "testCompilation": "mock",
+    "serviceCallId": "mock",
+    "bootstrap": {
+        "serviceController": "TestRunner",
+        "serviceExtension": "taoQtiTest",
+        "timeout": 0,
+        "communication": {
+            "enabled": false
+        }
+    },
+    "testTaker": {
+        "login": "jdoe",
+        "firstName": "John",
+        "lastName": "Doe"
+    },
+    "provider": {
+        "runner": "qti"
+    },
+    "providers": {
+        "runner": {
+            "id": "qti",
+            "module": "taoQtiTest/runner/provider/qti",
+            "bundle": "taoQtiTest/loader/taoQtiTestRunner.min",
+            "category": "runner",
+            "active": true
+        },
+        "proxy": {
+            "id": "qtiServiceProxy",
+            "module": "taoQtiTest/runner/proxy/qtiServiceProxy",
+            "bundle": "taoQtiTest/loader/taoQtiTestRunner.min",
+            "category": "proxy",
+            "active": true
+        },
+        "plugins": [
+            {
+                "id": "rubricBlock",
+                "module": "taoQtiTest\/runner\/plugins\/content\/rubricBlock\/rubricBlock",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "content",
+                "active": true
+            },
+            {
+                "id": "overlay",
+                "module": "taoQtiTest\/runner\/plugins\/content\/overlay\/overlay",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "content",
+                "active": true
+            },
+            {
+                "id": "dialog",
+                "module": "taoQtiTest\/runner\/plugins\/content\/dialog\/dialog",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "content",
+                "active": true
+            },
+            {
+                "id": "exitMessages",
+                "module": "taoQtiTest\/runner\/plugins\/content\/dialog\/exitMessages",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "content",
+                "active": true
+            },
+            {
+                "id": "title",
+                "module": "taoQtiTest\/runner\/plugins\/controls\/title\/title",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "controls",
+                "active": true
+            },
+            {
+                "id": "progressBar",
+                "module": "taoQtiTest\/runner\/plugins\/controls\/progressbar\/progressbar",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "controls",
+                "active": true
+            },
+            {
+                "id": "keyNavigation",
+                "module": "taoQtiTest\/runner\/plugins\/content\/accessibility\/keyNavigation\/plugin",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "content",
+                "active": true
+            },
+            {
+                "id": "review",
+                "module": "taoQtiTest\/runner\/plugins\/navigation\/review\/review",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "navigation",
+                "active": true
+            },
+            {
+                "id": "previous",
+                "module": "taoQtiTest\/runner\/plugins\/navigation\/previous",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "navigation",
+                "active": true
+            },
+            {
+                "id": "next",
+                "module": "taoQtiTest\/runner\/plugins\/navigation\/next",
+                "bundle": "taoQtiTest\/loader\/testPlugins.min",
+                "category": "navigation",
+                "active": true
+            }
+        ]
+    },
+    "locale": "en-US",
+    "options": {
+        "fullScreen": false,
+        "fullPage": false,
+        "readOnly": false,
+        "proctored": false,
+        "timer": "client",
+        "themes": {},
+        "plugins": {},
+        "bootstrap": {
+            "timeout": 0,
+            "communication": {
+                "enabled": false
+            }
+        }
+    }
+}
+
+

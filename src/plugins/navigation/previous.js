@@ -132,6 +132,10 @@ export default pluginFactory({
                 testRunner.trigger('disablenav');
             }
 
+            function triggerAction() {
+                testRunner.previous();
+            }
+
             testRunner.trigger('disablenav');
 
             if (self.getState('enabled') !== false) {
@@ -141,11 +145,11 @@ export default pluginFactory({
                         __(
                             'You are about to go to the previous item. Click OK to continue and go to the previous item.'
                         ),
-                        testRunner.previous, // if the test taker accept
+                        triggerAction, // if the test taker accept
                         enableNav() // if he refuses
                     );
                 } else {
-                    testRunner.previous();
+                    triggerAction();
                 }
             }
         }

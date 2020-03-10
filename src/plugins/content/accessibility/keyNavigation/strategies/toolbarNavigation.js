@@ -41,7 +41,7 @@ export default function toolbarNavigationStrategyFactory(testRunner, config) {
     return {
         /**
          * Setup the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
+         * @returns {keyNavigator[]}
          */
         init() {
             const $navigationBar = $('.bottom-action-bar');
@@ -98,7 +98,7 @@ export default function toolbarNavigationStrategyFactory(testRunner, config) {
                 );
             }
 
-            return this;
+            return this.getNavigators();
         },
 
         /**

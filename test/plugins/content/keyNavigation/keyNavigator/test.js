@@ -87,22 +87,20 @@ define([
     QUnit.module('Behavior');
 
     QUnit.test('Switch the navigation mode', assert => {
-        assert.expect(5);
+        assert.expect(3);
 
         const config = {
             contentNavigatorType: 'default'
         };
         const keyNavigator = keyNavigatorFactory({}, config);
 
-        assert.equal(config.contentNavigatorType, 'default', 'The default mode is set');
+        assert.equal(keyNavigator.getMode(), 'default', 'The default mode is set');
 
         keyNavigator.setMode('native');
-        assert.equal(config.contentNavigatorType, 'native', 'The native mode is set');
-        assert.equal(keyNavigator.getMode(), 'native', 'The native mode is claimed');
+        assert.equal(keyNavigator.getMode(), 'native', 'The native mode is set');
 
         keyNavigator.setMode('linear');
-        assert.equal(config.contentNavigatorType, 'linear', 'The linear mode is set');
-        assert.equal(keyNavigator.getMode(), 'linear', 'The linear mode is claimed');
+        assert.equal(keyNavigator.getMode(), 'linear', 'The linear mode is set');
     });
 
     QUnit.test('Access the test runner', assert => {

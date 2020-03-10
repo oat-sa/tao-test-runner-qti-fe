@@ -39,7 +39,7 @@ export default function rubricsNavigationStrategyFactory(testRunner, config) {
     return {
         /**
          * Setup the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
+         * @returns {keyNavigator[]}
          */
         init() {
             const $rubricArea = $('#qti-rubrics');
@@ -59,7 +59,7 @@ export default function rubricsNavigationStrategyFactory(testRunner, config) {
                 );
             });
 
-            return this;
+            return this.getNavigators();
         },
 
         /**

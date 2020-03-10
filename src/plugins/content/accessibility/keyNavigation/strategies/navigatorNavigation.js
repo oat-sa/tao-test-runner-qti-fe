@@ -40,7 +40,7 @@ export default function navigatorNavigationStrategyFactory(testRunner, config) {
     return {
         /**
          * Setup the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
+         * @returns {keyNavigator[]}
          */
         init() {
             const $panel = testRunner.getAreaBroker().getPanelArea();
@@ -208,7 +208,7 @@ export default function navigatorNavigationStrategyFactory(testRunner, config) {
                 }
             }
 
-            return this;
+            return this.getNavigators();
         },
 
         /**

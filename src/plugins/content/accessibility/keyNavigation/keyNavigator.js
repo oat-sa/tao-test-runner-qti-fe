@@ -33,251 +33,70 @@ import rubricsNavigationStrategyFactory from 'taoQtiTest/runner/plugins/content/
 import itemNavigationStrategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategies/itemNavigation';
 import shortcut from 'util/shortcut';
 
-const keysForTypesMap = {
-    default: {
-        keyNextGroup: 'tab',
-        keyPrevGroup: 'shift+tab',
-        keyNextInGroup: 'right down',
-        keyPrevInGroup: 'left up',
-        keyNextInFilters: 'right',
-        keyPrevInFilters: 'left',
-        keyNextInList: 'down',
-        keyPrevInList: 'up',
-        keyNextLinearFromFirst: '',
-        keyPrevLinearFromLast: ''
-    },
-    linear: {
-        keyNextGroup: 'tab',
-        keyPrevGroup: 'shift+tab',
-        keyNextInGroup: 'right down',
-        keyPrevInGroup: 'left up',
-        keyNextInFilters: 'right',
-        keyPrevInFilters: 'left',
-        keyNextInList: 'down',
-        keyPrevInList: 'up',
-        keyNextLinearFromFirst: 'right',
-        keyPrevLinearFromLast: 'left'
-    },
-    native: {
-        keyNextGroup: '',
-        keyPrevGroup: '',
-        keyNextInGroup: 'tab',
-        keyPrevInGroup: 'shift+tab',
-        keyNextInFilters: 'tab',
-        keyPrevInFilters: 'shift+tab',
-        keyNextInList: 'tab',
-        keyPrevInList: 'shift+tab',
-        keyNextLinearFromFirst: '',
-        keyPrevLinearFromLast: ''
-    }
+/**
+ * A list of navigation factories per navigation areas
+ * @type {Object}
+ */
+const navigationAreaFactories = {
+    header: headerNavigationStrategyFactory,
+    toolbar: toolbarNavigationStrategyFactory,
+    navigator: navigatorNavigationStrategyFactory,
+    page: pageNavigationStrategyFactory,
+    rubrics: rubricsNavigationStrategyFactory,
+    item: itemNavigationStrategyFactory
 };
 
 /**
- * Init the navigation in the toolbar
- *
- * @param {Object} testRunner
- * @param {Object} config
- * @returns {Array}
+ * The list of available modes
+ * @type {Object}
  */
-function initToolbarNavigation(testRunner, config) {
-    const strategy = toolbarNavigationStrategyFactory(testRunner, config);
-    strategy.init();
-    return strategy.getNavigators();
-}
-
-/**
- * Init the navigation in the header block
- *
- * @param {Object} testRunner
- * @param {Object} config
- * @returns {Array}
- */
-function initHeaderNavigation(testRunner, config) {
-    const strategy = headerNavigationStrategyFactory(testRunner, config);
-    strategy.init();
-    return strategy.getNavigators();
-}
-
-/**
- * Init the navigation in the review panel
- *
- * @param {Object} testRunner
- * @param {Object} config
- * @returns {Array} the keyNavigator of the main navigation group
- */
-function initNavigatorNavigation(testRunner, config) {
-    const strategy = navigatorNavigationStrategyFactory(testRunner, config);
-    strategy.init();
-    return strategy.getNavigators();
-}
-
-/**
- * Init the navigation in the item content
- * Navigable item content are interaction choices and body element with the special class "key-navigation-focusable"
- * It returns an array of keyNavigators as the content is dynamically determined
- *
- * @param {Object} testRunner
- * @param {Object} config
- * @returns {Array} of keyNavigator ids
- */
-function initDefaultContentNavigation(testRunner, config) {
-    const strategy = itemNavigationStrategyFactory(testRunner, config);
-    strategy.init();
-    return strategy.getNavigators();
-}
-
-/**
- * Init the navigation in the item content
- * Navigable item content are interaction choices only
- * It's works with templates for default key
- *
- * @param {Object} testRunner
- * @returns {Array} of keyNavigator ids
- */
-function initAllContentButtonsNavigation(testRunner, config) {
-    const strategy = itemNavigationStrategyFactory(testRunner, config);
-    strategy.init();
-    return strategy.getNavigators();
-}
-
-/**
- * Init the navigation of test rubric blocks
- * It returns an array of keyNavigator ids as the content is dynamically determined
- *
- * @param {Object} testRunner
- * @param {Object} config
- * @returns {Array} of keyNavigator ids
- */
-function initRubricNavigation(testRunner, config) {
-    const strategy = rubricsNavigationStrategyFactory(testRunner, config);
-    strategy.init();
-    return strategy.getNavigators();
-}
-
-/**
- * Init the navigation to select all item page
- * make this element scrollable
- *
- * @param {Object} testRunner
- * @param {Object} config
- * @returns {Array} of keyNavigator ids
- */
-function initDefaultItemNavigation(testRunner, config) {
-    const strategy = pageNavigationStrategyFactory(testRunner, config);
-    strategy.init();
-    return strategy.getNavigators();
-}
-
-/**
- * Init test runner navigation
- * @param {Object} testRunner
- * @param {Object} pluginConfig
- * @returns {*}
- */
-function initTestRunnerNavigation(testRunner, pluginConfig) {
-    let keyNavigatorItem;
-    let navigators;
-
-    //blur current focused element, to reinitialize keyboard navigation
-    if (document.activeElement) {
-        document.activeElement.blur();
-    }
-    const config = Object.assign({}, pluginConfig, keysForTypesMap[pluginConfig.contentNavigatorType]);
-    switch (config.contentNavigatorType) {
-        case 'linear':
-            navigators = _.union(
-                initRubricNavigation(testRunner, config),
-                initAllContentButtonsNavigation(testRunner, config),
-                initToolbarNavigation(testRunner, config),
-                initHeaderNavigation(testRunner, config),
-                initNavigatorNavigation(testRunner, config),
-                initDefaultItemNavigation(testRunner, config)
-            );
-            break;
-        case 'native':
-            navigators = _.union(
-                initHeaderNavigation(testRunner, config),
-                initNavigatorNavigation(testRunner, config),
-                initRubricNavigation(testRunner, config),
-                initDefaultContentNavigation(testRunner, config),
-                initToolbarNavigation(testRunner, config)
-            );
-            break;
-        default:
-            navigators = _.union(
-                initRubricNavigation(testRunner, config),
-                initDefaultContentNavigation(testRunner, config),
-                initToolbarNavigation(testRunner, config),
-                initHeaderNavigation(testRunner, config),
-                initNavigatorNavigation(testRunner, config),
-                initDefaultItemNavigation(testRunner, config)
-            );
-            break;
-    }
-    const isNativeNavigation = config.contentNavigatorType === 'native';
-    if (isNativeNavigation) {
-        _.forEach(navigators, function addListeners(navigator){
-            navigator
-                .on('upperbound', function moveToNextGroup() {
-                    if (allowedToNavigateFrom(navigator)) {
-                        keyNavigatorItem.next();
-                    }
-                })
-                .on('lowerbound', function moveToPrevGroup() {
-                    if (allowedToNavigateFrom(navigator)) {
-                        keyNavigatorItem.previous();
-                        keyNavigatorItem.getCursor().navigable.getKeyNavigator().last();
-                    }
-                });
-        });
-    }
-
-    navigators = navigableGroupElement.createFromNavigators(navigators);
-
-    keyNavigatorItem = keyNavigator({
-        id: 'test-runner',
-        replace: true,
-        loop: true,
-        elements: navigators,
-        // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
-        // there is an issue with nested navigators
-        propagateTab: isNativeNavigation,
-    });
-
-    if (!isNativeNavigation) {
-        keyNavigatorItem
-            .on(config.keyNextGroup, function(elem) {
-                if (allowedToNavigateFrom(elem)) {
-                    this.next();
-                }
-            })
-            .on(config.keyPrevGroup, function(elem) {
-                if (allowedToNavigateFrom(elem)) {
-                    this.previous();
-                }
-            });
-    }
-
-    if (config.contentNavigatorType === 'linear') {
-        keyNavigatorItem
-            .on(config.keyNextLinearFromFirst, function(elem) {
-                const isCurrentElementFirst = $(elem).is(':first-child');
-
-                if (isCurrentElementFirst && allowedToNavigateFrom(elem)) {
-                    this.next();
-                }
-            })
-            .on(config.keyPrevLinearFromLast, function(elem) {
-                const isCurrentElementLast = $(elem).is(':last-child');
-
-                if (isCurrentElementLast && allowedToNavigateFrom(elem)) {
-                    this.previous();
-                }
-            });
-    }
-
-    return keyNavigatorItem;
-}
+const navigationModes = {
+    native: {
+        areas: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
+        keys: {
+            keyNextGroup: '',
+            keyPrevGroup: '',
+            keyNextInGroup: 'tab',
+            keyPrevInGroup: 'shift+tab',
+            keyNextInFilters: 'tab',
+            keyPrevInFilters: 'shift+tab',
+            keyNextInList: 'tab',
+            keyPrevInList: 'shift+tab',
+            keyNextLinearFromFirst: '',
+            keyPrevLinearFromLast: ''
+        }
+    },
+    linear: {
+        areas: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
+        keys: {
+            keyNextGroup: 'tab',
+            keyPrevGroup: 'shift+tab',
+            keyNextInGroup: 'right down',
+            keyPrevInGroup: 'left up',
+            keyNextInFilters: 'right',
+            keyPrevInFilters: 'left',
+            keyNextInList: 'down',
+            keyPrevInList: 'up',
+            keyNextLinearFromFirst: 'right',
+            keyPrevLinearFromLast: 'left'
+        }
+    },
+    default: {
+        areas: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
+        keys: {
+            keyNextGroup: 'tab',
+            keyPrevGroup: 'shift+tab',
+            keyNextInGroup: 'right down',
+            keyPrevInGroup: 'left up',
+            keyNextInFilters: 'right',
+            keyPrevInFilters: 'left',
+            keyNextInList: 'down',
+            keyPrevInList: 'up',
+            keyNextLinearFromFirst: '',
+            keyPrevLinearFromLast: ''
+        }
+    },
+};
 
 /**
  * Builds a key navigator that can apply onto a test runner
@@ -286,8 +105,10 @@ function initTestRunnerNavigation(testRunner, pluginConfig) {
  * @param {String} config.contentNavigatorType - the keyboard navigation mode
  * @returns {testRunnerKeyNavigator}
  */
-export default function keyNavigatorFactory(testRunner, config) {
+export default function keyNavigatorFactory(testRunner, config = {}) {
+    let {contentNavigatorType} = config;
     let groupNavigator = null;
+    let strategies = [];
 
     /**
      * @typedef {Object} testRunnerKeyNavigator
@@ -298,7 +119,77 @@ export default function keyNavigatorFactory(testRunner, config) {
          * @returns {testRunnerKeyNavigator}
          */
         init() {
-            groupNavigator = initTestRunnerNavigation(testRunner, config);
+            const isNativeNavigation = contentNavigatorType === 'native';
+            const navigationMode = navigationModes[contentNavigatorType];
+            const navigationConfig = Object.assign({contentNavigatorType}, navigationMode.keys);
+            const navigators = _.flatten(navigationMode.areas.map(area => {
+                const strategyFactory = navigationAreaFactories[area];
+                const strategy = strategyFactory(testRunner, navigationConfig);
+                strategies.push(strategy);
+                return strategy.init();
+            }));
+
+            //blur current focused element, to reinitialize keyboard navigation
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+
+            groupNavigator = keyNavigator({
+                id: 'test-runner',
+                replace: true,
+                loop: true,
+                elements: navigableGroupElement.createFromNavigators(navigators),
+                // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
+                // there is an issue with nested navigators
+                propagateTab: isNativeNavigation,
+            });
+
+            if (isNativeNavigation) {
+                navigators.forEach(navigator => {
+                    navigator
+                        .on('upperbound', function moveToNextGroup() {
+                            if (allowedToNavigateFrom(navigator)) {
+                                groupNavigator.next();
+                            }
+                        })
+                        .on('lowerbound', function moveToPrevGroup() {
+                            if (allowedToNavigateFrom(navigator)) {
+                                groupNavigator.previous();
+                                groupNavigator.getCursor().navigable.getKeyNavigator().last();
+                            }
+                        });
+                });
+            } else {
+                groupNavigator
+                    .on(navigationConfig.keyNextGroup, function(elem) {
+                        if (allowedToNavigateFrom(elem)) {
+                            this.next();
+                        }
+                    })
+                    .on(navigationConfig.keyPrevGroup, function(elem) {
+                        if (allowedToNavigateFrom(elem)) {
+                            this.previous();
+                        }
+                    });
+
+                if (contentNavigatorType === 'linear') {
+                    groupNavigator
+                        .on(navigationConfig.keyNextLinearFromFirst, function(elem) {
+                            const isCurrentElementFirst = $(elem).is(':first-child');
+
+                            if (isCurrentElementFirst && allowedToNavigateFrom(elem)) {
+                                this.next();
+                            }
+                        })
+                        .on(navigationConfig.keyPrevLinearFromLast, function(elem) {
+                            const isCurrentElementLast = $(elem).is(':last-child');
+
+                            if (isCurrentElementLast && allowedToNavigateFrom(elem)) {
+                                this.previous();
+                            }
+                        });
+                }
+            }
 
             shortcut
                 .remove('.keyNavigator')
@@ -328,7 +219,7 @@ export default function keyNavigatorFactory(testRunner, config) {
          * @returns {testRunnerKeyNavigator}
          */
         setMode(mode) {
-            config.contentNavigatorType = mode;
+            contentNavigatorType = mode;
             return this;
         },
 
@@ -337,7 +228,7 @@ export default function keyNavigatorFactory(testRunner, config) {
          * @returns {String}
          */
         getMode() {
-            return config.contentNavigatorType;
+            return contentNavigatorType;
         },
 
         /**
@@ -347,10 +238,13 @@ export default function keyNavigatorFactory(testRunner, config) {
         destroy() {
             shortcut.remove('.keyNavigator');
 
+            strategies.forEach(strategy => strategy.destroy());
+
             if (groupNavigator) {
                 groupNavigator.destroy();
             }
             groupNavigator = null;
+            strategies = [];
 
             return this;
         }

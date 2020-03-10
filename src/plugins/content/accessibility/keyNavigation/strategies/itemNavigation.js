@@ -16,7 +16,6 @@
  * Copyright (c) 2020 Open Assessment Technologies SA ;
  */
 
-import _ from "lodash";
 import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
@@ -26,7 +25,10 @@ import {
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
- * Builds a key navigator strategy applying inside the item
+ * Builds a key navigator strategy applying inside the item.
+ * Navigable item content are interaction choices and body element with the special class "key-navigation-focusable".
+ * Depending on the mode it can be reduced to interaction choices only.
+ *
  * @param {testRunner} testRunner - the test runner instance to control
  * @param {Object} config - the config to apply
  * @param {String} config.keyNextItem - the keyboard shortcut to move to the next item (inside the scope)
@@ -44,7 +46,7 @@ export default function itemNavigationStrategyFactory(testRunner, config) {
     return {
         /**
          * Setup the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
+         * @returns {keyNavigator[]}
          */
         init() {
             const $content = testRunner.getAreaBroker().getContentArea();
@@ -100,7 +102,7 @@ export default function itemNavigationStrategyFactory(testRunner, config) {
                     });
             }
 
-            return this;
+            return this.getNavigators();
         },
 
         /**

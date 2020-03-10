@@ -38,7 +38,7 @@ export default function pageNavigationStrategyFactory(testRunner, config) {
     return {
         /**
          * Setup the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
+         * @returns {keyNavigator[]}
          */
         init() {
             const $wrapper = testRunner.getAreaBroker().getContainer().find('.content-wrapper');
@@ -58,7 +58,7 @@ export default function pageNavigationStrategyFactory(testRunner, config) {
                 );
             }
 
-            return this;
+            return this.getNavigators();
         },
 
         /**

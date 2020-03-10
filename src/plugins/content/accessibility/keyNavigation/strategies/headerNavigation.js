@@ -40,7 +40,7 @@ export default function headerNavigationStrategyFactory(testRunner, config) {
     return {
         /**
          * Setup the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
+         * @returns {keyNavigator[]}
          */
         init() {
             //need global selector as currently no way to access delivery frame from test runner
@@ -76,7 +76,7 @@ export default function headerNavigationStrategyFactory(testRunner, config) {
                 );
             }
 
-            return this;
+            return this.getNavigators();
         },
 
         /**

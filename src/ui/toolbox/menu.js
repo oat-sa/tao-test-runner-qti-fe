@@ -333,35 +333,52 @@ var menuComponentApi = {
     },
 
     /**
-     * Move the highlight to the previous item
+     * Move the highlight to the previous not hidden item
      */
     moveUp: function moveUp() {
         if (this.hoverIndex > 0) {
             this.hoverIndex--;
+            let elem = this.menuItems[this.hoverIndex].getElement();
+            while (elem && elem.hasClass('hidden')) {
+                this.hoverIndex--;
+                if (this.hoverIndex < 0) {
+                    return;
+                }
+                elem = this.menuItems[this.hoverIndex].getElement();
+            }
             this.hoverItem(this.menuItems[this.hoverIndex].id);
+            elem.focus();
             // move to the menu button
         } else if (this.hoverIndex === 0  && this.navType === 'fromFirst') {
             this.hoverIndex--;
             this.hoverOffAll();
-            this.$menuButton.closest('.action').focus();
+            this.$menuButton.first().focus();
             this.closeMenu();
         }
     },
 
     /**
-     * Move the highlight to the next item, or to the menu button if we are on the last item
+     * Move the highlight to the next not hidden item, or to the menu button if we are on the last item
      */
     moveDown: function moveDown() {
         // move to the next item
         if (this.hoverIndex < this.menuItems.length - 1) {
             this.hoverIndex++;
+            let elem = this.menuItems[this.hoverIndex].getElement();
+            while (elem && elem.hasClass('hidden')) {
+                this.hoverIndex++;
+                if (this.hoverIndex === this.menuItems.length) {
+                    return;
+                }
+                elem = this.menuItems[this.hoverIndex].getElement();
+            }
             this.hoverItem(this.menuItems[this.hoverIndex].id);
-
+            elem.focus();
             // move to the menu button
         } else if (this.hoverIndex === this.menuItems.length - 1 && this.navType === 'fromLast') {
             this.hoverIndex++;
             this.hoverOffAll();
-            this.$menuButton.closest('.action').focus();
+            this.$menuButton.first().focus();
             this.closeMenu();
         }
     },
@@ -376,6 +393,9 @@ var menuComponentApi = {
 
         if (itemToHover) {
             itemToHover.hoverOn();
+            itemToHover
+                .getElement()
+                .focus();
         }
     },
 

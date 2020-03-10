@@ -120,14 +120,8 @@ export default pluginFactory({
 
             allMenuEntries.forEach(function(menuEntry) {
                 if (menuEntry.getId() === themeId) {
-                    menuEntry
-                        .getElement()
-                        .attr('aria-checked', 'true');
                     menuEntry.turnOn();
                 } else {
-                    menuEntry
-                        .getElement()
-                        .attr('aria-checked', 'false');
                     menuEntry.turnOff();
                 }
             });

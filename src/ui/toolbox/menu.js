@@ -148,13 +148,17 @@ var menuComponentApi = {
             // fromLast (default) navigation: focus on button and then using UP go to last item
             this.hoverIndex = this.menuItems.length - 1; // we start on the button, not at the max array index
             // which would be menuItems.length-1
-            this.$menuItems[this.hoverIndex].focus();
+            if (this.$menuItems[this.hoverIndex]) {
+                this.$menuItems[this.hoverIndex].focus();
+            }
         }
         else if (this.navType === 'fromFirst') {
             // fromFirst navigation: focus on button and then using DOWN go to first item
             this.hoverIndex = 0; // we start on the button, not the first element
             // which would be 0
-            this.$menuItems[this.hoverIndex].focus();
+            if (this.$menuItems[this.hoverIndex]) {
+                this.$menuItems[this.hoverIndex].focus();
+            }
         }
 
         // component inner state

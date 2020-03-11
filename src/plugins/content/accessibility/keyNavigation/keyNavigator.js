@@ -61,9 +61,7 @@ const navigationModes = {
             keyNextInFilters: 'tab',
             keyPrevInFilters: 'shift+tab',
             keyNextInList: 'tab',
-            keyPrevInList: 'shift+tab',
-            keyNextLinearFromFirst: '',
-            keyPrevLinearFromLast: ''
+            keyPrevInList: 'shift+tab'
         }
     },
     linear: {
@@ -76,9 +74,7 @@ const navigationModes = {
             keyNextInFilters: 'right',
             keyPrevInFilters: 'left',
             keyNextInList: 'down',
-            keyPrevInList: 'up',
-            keyNextLinearFromFirst: 'right',
-            keyPrevLinearFromLast: 'left'
+            keyPrevInList: 'up'
         }
     },
     default: {
@@ -91,9 +87,7 @@ const navigationModes = {
             keyNextInFilters: 'right',
             keyPrevInFilters: 'left',
             keyNextInList: 'down',
-            keyPrevInList: 'up',
-            keyNextLinearFromFirst: '',
-            keyPrevLinearFromLast: ''
+            keyPrevInList: 'up'
         }
     },
 };
@@ -141,7 +135,7 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
                 elements: navigableGroupElement.createFromNavigators(navigators),
                 // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
                 // there is an issue with nested navigators
-                propagateTab: isNativeNavigation,
+                propagateTab: isNativeNavigation
             });
 
             if (isNativeNavigation) {
@@ -171,24 +165,6 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
                             this.previous();
                         }
                     });
-
-                if (contentNavigatorType === 'linear') {
-                    groupNavigator
-                        .on(navigationConfig.keyNextLinearFromFirst, function(elem) {
-                            const isCurrentElementFirst = $(elem).is(':first-child');
-
-                            if (isCurrentElementFirst && allowedToNavigateFrom(elem)) {
-                                this.next();
-                            }
-                        })
-                        .on(navigationConfig.keyPrevLinearFromLast, function(elem) {
-                            const isCurrentElementLast = $(elem).is(':last-child');
-
-                            if (isCurrentElementLast && allowedToNavigateFrom(elem)) {
-                                this.previous();
-                            }
-                        });
-                }
             }
 
             shortcut

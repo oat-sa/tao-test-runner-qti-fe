@@ -19,6 +19,7 @@
 import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
+import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import {
     showElementsContent,
     allowedToNavigateFrom
@@ -39,6 +40,7 @@ import {
  */
 export default function itemNavigationStrategyFactory(testRunner, config) {
     let keyNavigators = [];
+    let choicesNavigators = [];
 
     /**
      * @typedef {Object} keyNavigatorStrategy
@@ -62,28 +64,62 @@ export default function itemNavigationStrategyFactory(testRunner, config) {
 
             if (config.contentNavigatorType === 'linear') {
                 const $qtiChoiceNodesList = $qtiIteractionsNodeList.find('.qti-choice');
-                $qtiChoiceNodesList.each(function () {
-                    const $itemElement = $(this);
-                    keyNavigators.push(
+                let $lastParent = null;
+                let list = [];
+                const setupListNavigator = () => {
+                    choicesNavigators.push(
                         keyNavigator({
-                            elements: navigableDomElement.createFromDoms($itemElement),
-                            group: $itemElement,
+                            elements: navigableGroupElement.createFromNavigators(list),
                             propagateTab: false
                         })
-                            .on('activate', function (cursor) {
-                                const $elt = cursor.navigable.getElement();
-                                //jQuery <= 1.9.0 the checkbox values are set
-                                //after the click event if triggerred with jQuery
-                                if ($elt.is(':checkbox')) {
-                                    $elt.each(function () {
-                                        this.click();
-                                    });
-                                } else {
-                                    $elt.click();
+                            .on(config.keyNextInGroup, function(elem) {
+                                if (allowedToNavigateFrom(elem)) {
+                                    this.next();
+                                }
+                            })
+                            .on(config.keyPrevInGroup, function(elem) {
+                                if (allowedToNavigateFrom(elem)) {
+                                    this.previous();
                                 }
                             })
                     );
+                };
+
+                $qtiChoiceNodesList.each(function () {
+                    const $itemElement = $(this);
+                    const $parent = $itemElement.parent();
+                    const choiceNavigator = keyNavigator({
+                        elements: navigableDomElement.createFromDoms($itemElement),
+                        group: $itemElement,
+                        propagateTab: false
+                    })
+                        .on('activate', function (cursor) {
+                            const $elt = cursor.navigable.getElement();
+                            // jQuery <= 1.9.0
+                            // the checkbox values are set after the click event if triggered with jQuery
+                            if ($elt.is(':checkbox')) {
+                                $elt.each(function () {
+                                    this.click();
+                                });
+                            } else {
+                                $elt.click();
+                            }
+                        });
+
+                    if ($lastParent && !$parent.is($lastParent)) {
+                        setupListNavigator();
+                        list = [];
+                    }
+
+                    keyNavigators.push(choiceNavigator);
+                    list.push(choiceNavigator);
+                    $lastParent = $parent;
                 });
+
+                if (list.length) {
+                    setupListNavigator();
+                    list = [];
+                }
             } else {
                 $qtiIteractionsNodeList
                     .each((i, el) => {
@@ -198,6 +234,8 @@ export default function itemNavigationStrategyFactory(testRunner, config) {
          */
         destroy() {
             keyNavigators.forEach(navigator => navigator.destroy());
+            choicesNavigators.forEach(navigator => navigator.destroy());
+            choicesNavigators = [];
             keyNavigators = [];
 
             return this;

@@ -135,12 +135,12 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
             if (navigationConfig.flatNavigation) {
                 navigators.forEach(navigator => {
                     navigator
-                        .on('upperbound', function moveToNextGroup() {
+                        .on('upperbound', () => {
                             if (allowedToNavigateFrom(navigator)) {
                                 groupNavigator.next();
                             }
                         })
-                        .on('lowerbound', function moveToPrevGroup() {
+                        .on('lowerbound', () => {
                             if (allowedToNavigateFrom(navigator)) {
                                 groupNavigator.previous();
                                 groupNavigator.getCursor().navigable.getKeyNavigator().last();
@@ -149,12 +149,12 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
                 });
             } else {
                 groupNavigator
-                    .on(navigationConfig.keyNextGroup, function(elem) {
+                    .on(navigationConfig.keyNextGroup, function (elem) {
                         if (allowedToNavigateFrom(elem)) {
                             this.next();
                         }
                     })
-                    .on(navigationConfig.keyPrevGroup, function(elem) {
+                    .on(navigationConfig.keyPrevGroup, function (elem) {
                         if (allowedToNavigateFrom(elem)) {
                             this.previous();
                         }
@@ -163,7 +163,7 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
 
             shortcut
                 .remove('.keyNavigator')
-                .add('tab.keyNavigator shift+tab.keyNavigator', function(e) {
+                .add('tab.keyNavigator shift+tab.keyNavigator', function (e) {
                     if (!allowedToNavigateFrom(e.target)) {
                         return false;
                     }

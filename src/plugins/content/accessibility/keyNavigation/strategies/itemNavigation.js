@@ -21,8 +21,8 @@ import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import {
-    showElementsContent,
-    allowedToNavigateFrom
+    allowedToNavigateFrom,
+    showElementsContent
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**

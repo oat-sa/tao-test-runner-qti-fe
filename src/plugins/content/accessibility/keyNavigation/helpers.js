@@ -39,10 +39,17 @@ export function showElementsContent($el, $visibleContainer) {
 /**
  * Checks whether element is navigable from
  *
- * @param {HTMLElement} element
+ * @param {HTMLElement|keyNavigator} element
  * @returns {boolean}
  */
 export function allowedToNavigateFrom(element) {
+    if (element.getCursor) {
+        const {navigable} = element.getCursor();
+        element = navigable;
+    }
+    if (element.getElement) {
+        element = element.getElement();
+    }
     const $element = $(element);
 
     if ($element.hasClass(ignoredClass) || $element.parents(`.${ignoredClass}`).length > 0) {

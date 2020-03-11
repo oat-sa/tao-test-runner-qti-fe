@@ -35,7 +35,6 @@ const navigationModes = {
     native: {
         strategies: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
         config: {
-            mode: 'native',
             autoFocus: false,
             keepState: false,
             propagateTab: true,
@@ -53,7 +52,6 @@ const navigationModes = {
     linear: {
         strategies: ['rubrics', 'linearItem', 'toolbar', 'header', 'navigator', 'page'],
         config: {
-            mode: 'linear',
             autoFocus: true,
             keepState: true,
             propagateTab: false,
@@ -71,7 +69,6 @@ const navigationModes = {
     default: {
         strategies: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
         config: {
-            mode: 'default',
             autoFocus: true,
             keepState: true,
             propagateTab: false,

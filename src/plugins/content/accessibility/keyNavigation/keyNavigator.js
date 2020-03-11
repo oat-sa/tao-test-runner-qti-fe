@@ -25,65 +25,8 @@ import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 import strategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategiesManager';
+import modeFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/modesManager';
 import shortcut from 'util/shortcut';
-
-/**
- * The list of available modes
- * @type {Object}
- */
-const navigationModes = {
-    native: {
-        strategies: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
-        config: {
-            autoFocus: false,
-            keepState: false,
-            propagateTab: true,
-            flatNavigation: true,
-            keyNextGroup: '',
-            keyPrevGroup: '',
-            keyNextItem: 'tab',
-            keyPrevItem: 'shift+tab',
-            keyNextTab: '',
-            keyPrevTab: '',
-            keyNextContent: '',
-            keyPrevContent: ''
-        }
-    },
-    linear: {
-        strategies: ['rubrics', 'linearItem', 'toolbar', 'header', 'navigator', 'page'],
-        config: {
-            autoFocus: true,
-            keepState: true,
-            propagateTab: false,
-            flatNavigation: false,
-            keyNextGroup: 'tab',
-            keyPrevGroup: 'shift+tab',
-            keyNextItem: 'right down',
-            keyPrevItem: 'left up',
-            keyNextTab: 'right',
-            keyPrevTab: 'left',
-            keyNextContent: 'down',
-            keyPrevContent: 'up'
-        }
-    },
-    default: {
-        strategies: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
-        config: {
-            autoFocus: true,
-            keepState: true,
-            propagateTab: false,
-            flatNavigation: false,
-            keyNextGroup: 'tab',
-            keyPrevGroup: 'shift+tab',
-            keyNextItem: 'right down',
-            keyPrevItem: 'left up',
-            keyNextTab: 'right',
-            keyPrevTab: 'left',
-            keyNextContent: 'down',
-            keyPrevContent: 'up'
-        }
-    },
-};
 
 /**
  * Builds a key navigator that can apply onto a test runner
@@ -106,9 +49,8 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {testRunnerKeyNavigator}
          */
         init() {
-            const navigationMode = navigationModes[mode];
-            const navigationConfig = navigationMode.config;
-            const navigators = _.flatten(navigationMode.strategies.map(area => {
+            const {strategies: navigationStrategies, config: navigationConfig} = modeFactory(mode);
+            const navigators = _.flatten(navigationStrategies.map(area => {
                 const strategy = strategyFactory(area, testRunner, navigationConfig);
                 strategies.push(strategy);
                 return strategy.init();

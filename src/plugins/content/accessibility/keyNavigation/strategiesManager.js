@@ -15,9 +15,6 @@
  *
  * Copyright (c) 2020 Open Assessment Technologies SA ;
  */
-/**
- * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
- */
 
 import providerRegistry from 'core/providerRegistry';
 import * as strategies from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategies/index';

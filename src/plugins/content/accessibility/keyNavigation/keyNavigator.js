@@ -51,7 +51,7 @@ const navigationModes = {
         }
     },
     linear: {
-        strategies: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
+        strategies: ['rubrics', 'linearItem', 'toolbar', 'header', 'navigator', 'page'],
         config: {
             mode: 'linear',
             autoFocus: true,

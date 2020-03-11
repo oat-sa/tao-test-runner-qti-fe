@@ -19,7 +19,6 @@
 import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
-import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import {
     allowedToNavigateFrom,
     showElementsContent
@@ -28,7 +27,6 @@ import {
 /**
  * Key navigator strategy applying inside the item.
  * Navigable item content are interaction choices and body element with the special class "key-navigation-focusable".
- * Depending on the mode it can be reduced to interaction choices only.
  */
 export default {
     name: 'item',
@@ -42,7 +40,6 @@ export default {
      */
     init(testRunner, config) {
         let keyNavigators = [];
-        let choicesNavigators = [];
 
         /**
          * @typedef {Object} keyNavigationStrategy
@@ -64,81 +61,21 @@ export default {
                 // the item focusable body elements are considered scrollable
                 $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
 
-                if (config.mode === 'linear') {
-                    const $qtiChoiceNodesList = $qtiIteractionsNodeList.find('.qti-choice');
-                    let $lastParent = null;
-                    let list = [];
-                    const setupListNavigator = () => {
-                        choicesNavigators.push(
-                            keyNavigator({
-                                elements: navigableGroupElement.createFromNavigators(list),
-                                propagateTab: false
-                            })
-                                .on(config.keyNextItem, function (elem) {
-                                    if (allowedToNavigateFrom(elem)) {
-                                        this.next();
-                                    }
+                $qtiIteractionsNodeList
+                    .each((i, el) => {
+                        const $itemElement = $(el);
+                        if ($itemElement.hasClass('qti-interaction')) {
+                            this.addInteraction($itemElement);
+                        } else {
+                            keyNavigators.push(
+                                keyNavigator({
+                                    elements: navigableDomElement.createFromDoms($itemElement),
+                                    group: $itemElement,
+                                    propagateTab: false
                                 })
-                                .on(config.keyPrevItem, function (elem) {
-                                    if (allowedToNavigateFrom(elem)) {
-                                        this.previous();
-                                    }
-                                })
-                        );
-                    };
-
-                    $qtiChoiceNodesList.each(function () {
-                        const $itemElement = $(this);
-                        const $parent = $itemElement.parent();
-                        const choiceNavigator = keyNavigator({
-                            elements: navigableDomElement.createFromDoms($itemElement),
-                            group: $itemElement,
-                            propagateTab: false
-                        })
-                            .on('activate', function (cursor) {
-                                const $elt = cursor.navigable.getElement();
-                                // jQuery <= 1.9.0
-                                // the checkbox values are set after the click event if triggered with jQuery
-                                if ($elt.is(':checkbox')) {
-                                    $elt.each(function () {
-                                        this.click();
-                                    });
-                                } else {
-                                    $elt.click();
-                                }
-                            });
-
-                        if ($lastParent && !$parent.is($lastParent)) {
-                            setupListNavigator();
-                            list = [];
+                            );
                         }
-
-                        keyNavigators.push(choiceNavigator);
-                        list.push(choiceNavigator);
-                        $lastParent = $parent;
                     });
-
-                    if (list.length) {
-                        setupListNavigator();
-                        list = [];
-                    }
-                } else {
-                    $qtiIteractionsNodeList
-                        .each((i, el) => {
-                            const $itemElement = $(el);
-                            if ($itemElement.hasClass('qti-interaction')) {
-                                this.addInteraction($itemElement);
-                            } else {
-                                keyNavigators.push(
-                                    keyNavigator({
-                                        elements: navigableDomElement.createFromDoms($itemElement),
-                                        group: $itemElement,
-                                        propagateTab: false
-                                    })
-                                );
-                            }
-                        });
-                }
 
                 return this.getNavigators();
             },
@@ -232,8 +169,6 @@ export default {
              */
             destroy() {
                 keyNavigators.forEach(navigator => navigator.destroy());
-                choicesNavigators.forEach(navigator => navigator.destroy());
-                choicesNavigators = [];
                 keyNavigators = [];
 
                 return this;

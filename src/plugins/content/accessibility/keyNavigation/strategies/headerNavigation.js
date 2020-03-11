@@ -60,16 +60,12 @@ export default {
                             replace: true
                         })
                             .on(config.keyNextItem, function (elem) {
-                                if (!allowedToNavigateFrom(elem)) {
-                                    return false;
-                                } else {
+                                if (allowedToNavigateFrom(elem)) {
                                     this.next();
                                 }
                             })
                             .on(config.keyPrevItem, function (elem) {
-                                if (!allowedToNavigateFrom(elem)) {
-                                    return false;
-                                } else {
+                                if (allowedToNavigateFrom(elem)) {
                                     this.previous();
                                 }
                             })

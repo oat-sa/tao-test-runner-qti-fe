@@ -35,6 +35,7 @@ export default {
      * @returns {keyNavigationStrategy}
      */
     init(testRunner, config) {
+        let managedNavigators = [];
         let keyNavigators = [];
 
         /**
@@ -48,7 +49,6 @@ export default {
             init() {
                 const $panel = testRunner.getAreaBroker().getPanelArea();
                 const $navigator = $panel.find('.qti-navigator');
-                const isNativeNavigation = config.mode === 'native';
                 let filtersNavigator;
                 let itemsNavigator;
                 let $filters, $trees, navigableFilters, navigableTrees;
@@ -63,31 +63,29 @@ export default {
                     navigableFilters = navigableDomElement.createFromDoms($filters);
                     if (navigableFilters.length) {
                         filtersNavigator = keyNavigator({
-                            keepState: !isNativeNavigation,
+                            keepState: config.keepState,
                             id: 'navigator-filters',
                             replace: true,
                             elements: navigableFilters,
                             group: $navigator.find('.qti-navigator-filters')
                         })
-                            .on(config.keyNextTab, function (elem) {
-                                if (!allowedToNavigateFrom(elem)) {
-                                    return false;
-                                } else {
+                            .on(config.keyNextTab || config.keyNextItem, function (elem) {
+                                if (allowedToNavigateFrom(elem)) {
                                     this.next();
                                 }
                             })
-                            .on(config.keyPrevTab, function (elem) {
-                                if (!allowedToNavigateFrom(elem)) {
-                                    return false;
-                                } else {
+                            .on(config.keyPrevTab || config.keyPrevItem, function (elem) {
+                                if (allowedToNavigateFrom(elem)) {
                                     this.previous();
                                 }
                             })
-                            .on('activate', function (cursor) {
+                            .on('activate', cursor => {
                                 cursor.navigable.getElement().click();
-                            })
-                            .on('focus', function (cursor, origin) {
-                                if (!isNativeNavigation) {
+                            });
+
+                        if (config.keepState) {
+                            filtersNavigator.on('focus', (cursor, origin) => {
+                                if (config.keepState) {
                                     //activate the tab in the navigators
                                     cursor.navigable.getElement().click();
 
@@ -98,34 +96,34 @@ export default {
                                     //set the filter cursor in memory
                                     filterCursor = cursor;
                                 }
-
                             });
-                        if (!isNativeNavigation) {
-                            filtersNavigator
-                                .on(config.keyNextContent, function (elem) {
-                                    if (!allowedToNavigateFrom(elem)) {
-                                        return false;
-                                    } else if (itemsNavigator) {
-                                        _.defer(function () {
-                                            if (itemListingVisited) {
-                                                itemsNavigator.focus().first();
-                                            } else {
-                                                itemsNavigator.focus();
-                                            }
-                                        });
-                                    }
-                                })
-                                .on(config.keyPrevContent, function (elem) {
-                                    if (!allowedToNavigateFrom(elem)) {
-                                        return false;
-                                    } else if (itemsNavigator) {
-                                        _.defer(function () {
-                                            itemsNavigator.last();
-                                        });
-                                    }
-                                });
                         }
+
+                        if (config.keyNextContent) {
+                            filtersNavigator.on(config.keyNextContent, elem => {
+                                if (allowedToNavigateFrom(elem) && itemsNavigator) {
+                                    _.defer(() => {
+                                        if (itemListingVisited) {
+                                            itemsNavigator.focus().first();
+                                        } else {
+                                            itemsNavigator.focus();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        if (config.keyPrevContent) {
+                            filtersNavigator.on(config.keyPrevContent, elem => {
+                                if (allowedToNavigateFrom(elem) && itemsNavigator) {
+                                    _.defer(() => {
+                                        itemsNavigator.last();
+                                    });
+                                }
+                            });
+                        }
+
                         keyNavigators.push(filtersNavigator);
+                        managedNavigators.push(filtersNavigator);
                     }
 
                     const $navigatorTree = $panel.find('.qti-navigator-tree');
@@ -153,61 +151,61 @@ export default {
                                 return pos;
                             }
                         })
-                            .on(config.keyNextContent, function (elem) {
-                                if (!allowedToNavigateFrom(elem)) {
-                                    return false;
-                                } else {
+                            .on(config.keyNextContent || config.keyNextItem, function (elem) {
+                                if (allowedToNavigateFrom(elem)) {
                                     this.next();
                                 }
                             })
-                            .on(config.keyPrevContent, function (elem) {
-                                if (!allowedToNavigateFrom(elem)) {
-                                    return false;
-                                } else {
+                            .on(config.keyPrevContent || config.keyPrevItem, function (elem) {
+                                if (allowedToNavigateFrom(elem)) {
                                     this.previous();
                                 }
                             })
-                            .on('activate', function (cursor) {
+                            .on('activate', cursor => {
                                 cursor.navigable.getElement().click();
                             })
-                            .on('lowerbound upperbound', function () {
-                                if (!isNativeNavigation && filtersNavigator) {
-                                    filtersNavigator.focus();
-                                }
-                            })
-                            .on('focus', function (cursor) {
+                            .on('focus', cursor => {
                                 itemListingVisited = true;
                                 cursor.navigable
                                     .getElement()
                                     .parent()
                                     .addClass('key-navigation-highlight');
                             })
-                            .on('blur', function (cursor) {
+                            .on('blur', cursor => {
                                 cursor.navigable
                                     .getElement()
                                     .parent()
                                     .removeClass('key-navigation-highlight');
                             });
-                        if (!isNativeNavigation) {
-                            itemsNavigator
-                                .on(config.keyNextTab, function (elem) {
-                                    if (!allowedToNavigateFrom(elem)) {
-                                        return false;
-                                    } else if (filtersNavigator) {
+
+                        if (config.keepState) {
+                            itemsNavigator.on('lowerbound upperbound', () => {
+                                if (filtersNavigator) {
+                                    filtersNavigator.focus();
+                                }
+                            });
+                        }
+
+                        if (config.keyNextTab && config.keyPrevTab) {
+                            if (config.keyNextTab) {
+                                itemsNavigator.on(config.keyNextTab, function (elem) {
+                                    if (allowedToNavigateFrom(elem) && filtersNavigator) {
                                         filtersNavigator.focus().next();
                                     }
-                                })
-                                .on(config.keyPrevTab, function (elem) {
-                                    if (!allowedToNavigateFrom(elem)) {
-                                        return false;
-                                    } else if (filtersNavigator) {
+                                });
+                            }
+
+                            if (config.keyPrevTab) {
+                                itemsNavigator.on(config.keyPrevTab, function (elem) {
+                                    if (allowedToNavigateFrom(elem) && filtersNavigator) {
                                         filtersNavigator.focus().previous();
                                     }
                                 });
-                        }
-                        if (isNativeNavigation) {
+                            }
+                        } else {
                             keyNavigators.push(itemsNavigator);
                         }
+                        managedNavigators.push(itemsNavigator);
                     }
                 }
 
@@ -227,7 +225,8 @@ export default {
              * @returns {keyNavigationStrategy}
              */
             destroy() {
-                keyNavigators.forEach(navigator => navigator.destroy());
+                managedNavigators.forEach(navigator => navigator.destroy());
+                managedNavigators = [];
                 keyNavigators = [];
 
                 return this;

@@ -50,8 +50,6 @@ export default {
                 const $navigationBar = $('.bottom-action-bar');
                 const $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
                 const elements = navigableDomElement.createFromDoms($focusables);
-                const isNativeNavigation = config.mode === 'native';
-
                 if (elements.length) {
                     keyNavigators.push(
                         keyNavigator({
@@ -60,21 +58,20 @@ export default {
                             group: $navigationBar,
                             elements: elements,
                             defaultPosition(navigables) {
-                                if (isNativeNavigation) {
-                                    return 0;
+                                let pos = 0;
+
+                                // search for the position of the "Next" button if any,
+                                // otherwise take the position of the last element
+                                if (config.autoFocus) {
+                                    pos = navigables.length - 1;
+                                    _.forEach(navigables, (navigable, i) => {
+                                        const $element = navigable.getElement();
+                                        if ($element.data('control') === 'move-forward' || $element.data('control') === 'move-end') {
+                                            pos = i;
+                                        }
+                                    });
                                 }
-                                let pos = navigables.length - 1;
-                                // start from the button "Next" or the button "End test"
-                                _.forEach(navigables, (navigable, i) => {
-                                    const $element = navigable.getElement();
-                                    // find button "Next"
-                                    if ($element.data('control') &&
-                                        ($element.data('control') === 'move-forward' ||
-                                            $element.data('control') === 'move-end')) {
-                                        pos = i;
-                                    }
-                                });
-                                // else the last button
+
                                 return pos;
                             }
                         })

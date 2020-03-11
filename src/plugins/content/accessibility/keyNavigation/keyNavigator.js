@@ -34,20 +34,30 @@ import shortcut from 'util/shortcut';
 const navigationModes = {
     native: {
         strategies: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
-        keys: {
+        config: {
+            mode: 'native',
+            autoFocus: false,
+            keepState: false,
+            propagateTab: true,
+            flatNavigation: true,
             keyNextGroup: '',
             keyPrevGroup: '',
             keyNextItem: 'tab',
             keyPrevItem: 'shift+tab',
-            keyNextTab: 'tab',
-            keyPrevTab: 'shift+tab',
-            keyNextContent: 'tab',
-            keyPrevContent: 'shift+tab'
+            keyNextTab: '',
+            keyPrevTab: '',
+            keyNextContent: '',
+            keyPrevContent: ''
         }
     },
     linear: {
         strategies: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
-        keys: {
+        config: {
+            mode: 'linear',
+            autoFocus: true,
+            keepState: true,
+            propagateTab: false,
+            flatNavigation: false,
             keyNextGroup: 'tab',
             keyPrevGroup: 'shift+tab',
             keyNextItem: 'right down',
@@ -60,7 +70,12 @@ const navigationModes = {
     },
     default: {
         strategies: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
-        keys: {
+        config: {
+            mode: 'default',
+            autoFocus: true,
+            keepState: true,
+            propagateTab: false,
+            flatNavigation: false,
             keyNextGroup: 'tab',
             keyPrevGroup: 'shift+tab',
             keyNextItem: 'right down',
@@ -94,9 +109,8 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {testRunnerKeyNavigator}
          */
         init() {
-            const isNativeNavigation = mode === 'native';
             const navigationMode = navigationModes[mode];
-            const navigationConfig = Object.assign({mode}, navigationMode.keys);
+            const navigationConfig = navigationMode.config;
             const navigators = _.flatten(navigationMode.strategies.map(area => {
                 const strategy = strategyFactory(area, testRunner, navigationConfig);
                 strategies.push(strategy);
@@ -115,10 +129,10 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
                 elements: navigableGroupElement.createFromNavigators(navigators),
                 // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
                 // there is an issue with nested navigators
-                propagateTab: isNativeNavigation
+                propagateTab: navigationConfig.propagateTab
             });
 
-            if (isNativeNavigation) {
+            if (navigationConfig.flatNavigation) {
                 navigators.forEach(navigator => {
                     navigator
                         .on('upperbound', function moveToNextGroup() {

@@ -22,80 +22,84 @@ import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
- * Builds a key navigator strategy applying onto the header bar
- * @param {testRunner} testRunner - the test runner instance to control
- * @param {Object} config - the config to apply
- * @param {String} config.keyNextItem - the keyboard shortcut to move to the next item (inside the scope)
- * @param {String} config.keyPreviousItem - the keyboard shortcut to move to the previous item (inside the scope)
- * @param {String} config.keyNextGroup - the keyboard shortcut to move to the next group (outside the scope)
- * @param {String} config.keyPreviousGroup - the keyboard shortcut to move to the previous group (outside the scope)
- * @returns {keyNavigatorStrategy}
+ * Key navigator strategy applying onto the header bar.
  */
-export default function headerNavigationStrategyFactory(testRunner, config) {
-    let keyNavigators = [];
+export default {
+    name: 'header',
 
     /**
-     * @typedef {Object} keyNavigatorStrategy
+     * Builds the header navigation strategy.
+     *
+     * @param {testRunner} testRunner - the test runner instance to control
+     * @param {keyNavigationStrategyConfig} config - the config to apply
+     * @returns {keyNavigationStrategy}
      */
-    return {
-        /**
-         * Setup the keyNavigator strategy
-         * @returns {keyNavigator[]}
-         */
-        init() {
-            //need global selector as currently no way to access delivery frame from test runner
-            const $header = $('header');
-            const $headerElements = $header.find('a:visible');
-            const navigables = navigableDomElement.createFromDoms($headerElements);
+    init(testRunner, config) {
+        let keyNavigators = [];
 
-            if (navigables.length) {
-                keyNavigators.push(
-                    keyNavigator({
-                        id: 'header-toolbar',
-                        group: $header,
-                        elements: navigables,
-                        replace: true
-                    })
-                        .on(config.keyNextInGroup, function (elem) {
-                            if (!allowedToNavigateFrom(elem)) {
-                                return false;
-                            } else {
-                                this.next();
-                            }
+        /**
+         * @typedef {Object} keyNavigationStrategy
+         */
+        return {
+            /**
+             * Setup the keyNavigator strategy
+             * @returns {keyNavigator[]}
+             */
+            init() {
+                //need global selector as currently no way to access delivery frame from test runner
+                const $header = $('header');
+                const $headerElements = $header.find('a:visible');
+                const navigables = navigableDomElement.createFromDoms($headerElements);
+
+                if (navigables.length) {
+                    keyNavigators.push(
+                        keyNavigator({
+                            id: 'header-toolbar',
+                            group: $header,
+                            elements: navigables,
+                            replace: true
                         })
-                        .on(config.keyPrevInGroup, function (elem) {
-                            if (!allowedToNavigateFrom(elem)) {
-                                return false;
-                            } else {
-                                this.previous();
-                            }
-                        })
-                        .on('activate', function (cursor) {
-                            cursor.navigable.getElement().click();
-                        })
-                );
+                            .on(config.keyNextItem, function (elem) {
+                                if (!allowedToNavigateFrom(elem)) {
+                                    return false;
+                                } else {
+                                    this.next();
+                                }
+                            })
+                            .on(config.keyPrevItem, function (elem) {
+                                if (!allowedToNavigateFrom(elem)) {
+                                    return false;
+                                } else {
+                                    this.previous();
+                                }
+                            })
+                            .on('activate', function (cursor) {
+                                cursor.navigable.getElement().click();
+                            })
+                    );
+                }
+
+                return this.getNavigators();
+            },
+
+            /**
+             * Gets the list of applied navigators
+             * @returns {keyNavigator[]}
+             */
+            getNavigators() {
+                return keyNavigators;
+            },
+
+            /**
+             * Tears down the keyNavigator strategy
+             * @returns {keyNavigationStrategy}
+             */
+            destroy() {
+                keyNavigators.forEach(navigator => navigator.destroy());
+                keyNavigators = [];
+
+                return this;
             }
-
-            return this.getNavigators();
-        },
-
-        /**
-         * Gets the list of applied navigators
-         * @returns {keyNavigator[]}
-         */
-        getNavigators() {
-            return keyNavigators;
-        },
-
-        /**
-         * Tears down the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
-         */
-        destroy() {
-            keyNavigators.forEach(navigator => navigator.destroy());
-            keyNavigators = [];
-
-            return this;
-        }
-    };
-}
+        };
+    }
+};

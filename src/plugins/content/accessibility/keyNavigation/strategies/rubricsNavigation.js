@@ -21,64 +21,68 @@ import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 
 /**
- * Builds a key navigator strategy applying onto the rubric blocks
- * @param {testRunner} testRunner - the test runner instance to control
- * @param {Object} config - the config to apply
- * @param {String} config.keyNextItem - the keyboard shortcut to move to the next item (inside the scope)
- * @param {String} config.keyPreviousItem - the keyboard shortcut to move to the previous item (inside the scope)
- * @param {String} config.keyNextGroup - the keyboard shortcut to move to the next group (outside the scope)
- * @param {String} config.keyPreviousGroup - the keyboard shortcut to move to the previous group (outside the scope)
- * @returns {keyNavigatorStrategy}
+ * Key navigator strategy applying onto the rubric blocks.
  */
-export default function rubricsNavigationStrategyFactory(testRunner, config) {
-    let keyNavigators = [];
+export default {
+    name: 'rubrics',
 
     /**
-     * @typedef {Object} keyNavigatorStrategy
+     * Builds the rubric blocks navigation strategy.
+     *
+     * @param {testRunner} testRunner - the test runner instance to control
+     * @param {keyNavigationStrategyConfig} config - the config to apply
+     * @returns {keyNavigationStrategy}
      */
-    return {
-        /**
-         * Setup the keyNavigator strategy
-         * @returns {keyNavigator[]}
-         */
-        init() {
-            const $rubricArea = $('#qti-rubrics');
-            const $itemElements = $rubricArea.find('.qti-rubricBlock');
-
-            $itemElements.each(function () {
-                const $itemElement = $(this);
-                const id = `rubric_element_navigation_group_${keyNavigators.length}`;
-
-                keyNavigators.push(
-                    keyNavigator({
-                        id: id,
-                        elements: navigableDomElement.createFromDoms($itemElement),
-                        group: $itemElement,
-                        replace: true
-                    })
-                );
-            });
-
-            return this.getNavigators();
-        },
+    init(testRunner, config) {
+        let keyNavigators = [];
 
         /**
-         * Gets the list of applied navigators
-         * @returns {keyNavigator[]}
+         * @typedef {Object} keyNavigationStrategy
          */
-        getNavigators() {
-            return keyNavigators;
-        },
+        return {
+            /**
+             * Setup the keyNavigator strategy
+             * @returns {keyNavigator[]}
+             */
+            init() {
+                const $rubricArea = $('#qti-rubrics');
+                const $itemElements = $rubricArea.find('.qti-rubricBlock');
 
-        /**
-         * Tears down the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
-         */
-        destroy() {
-            keyNavigators.forEach(navigator => navigator.destroy());
-            keyNavigators = [];
+                $itemElements.each(function () {
+                    const $itemElement = $(this);
+                    const id = `rubric_element_navigation_group_${keyNavigators.length}`;
 
-            return this;
-        }
-    };
-}
+                    keyNavigators.push(
+                        keyNavigator({
+                            id: id,
+                            elements: navigableDomElement.createFromDoms($itemElement),
+                            group: $itemElement,
+                            replace: true
+                        })
+                    );
+                });
+
+                return this.getNavigators();
+            },
+
+            /**
+             * Gets the list of applied navigators
+             * @returns {keyNavigator[]}
+             */
+            getNavigators() {
+                return keyNavigators;
+            },
+
+            /**
+             * Tears down the keyNavigator strategy
+             * @returns {keyNavigationStrategy}
+             */
+            destroy() {
+                keyNavigators.forEach(navigator => navigator.destroy());
+                keyNavigators = [];
+
+                return this;
+            }
+        };
+    }
+};

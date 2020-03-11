@@ -20,64 +20,68 @@ import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 
 /**
- * Builds a key navigator strategy applying onto the page
- * @param {testRunner} testRunner - the test runner instance to control
- * @param {Object} config - the config to apply
- * @param {String} config.keyNextItem - the keyboard shortcut to move to the next item (inside the scope)
- * @param {String} config.keyPreviousItem - the keyboard shortcut to move to the previous item (inside the scope)
- * @param {String} config.keyNextGroup - the keyboard shortcut to move to the next group (outside the scope)
- * @param {String} config.keyPreviousGroup - the keyboard shortcut to move to the previous group (outside the scope)
- * @returns {keyNavigatorStrategy}
+ * Key navigator strategy applying onto the page.
  */
-export default function pageNavigationStrategyFactory(testRunner, config) {
-    let keyNavigators = [];
+export default {
+    name: 'page',
 
     /**
-     * @typedef {Object} keyNavigatorStrategy
+     * Builds the page navigation strategy.
+     *
+     * @param {testRunner} testRunner - the test runner instance to control
+     * @param {keyNavigationStrategyConfig} config - the config to apply
+     * @returns {keyNavigationStrategy}
      */
-    return {
-        /**
-         * Setup the keyNavigator strategy
-         * @returns {keyNavigator[]}
-         */
-        init() {
-            const $wrapper = testRunner.getAreaBroker().getContainer().find('.content-wrapper');
-            const navigables = navigableDomElement.createFromDoms($wrapper);
+    init(testRunner, config) {
+        let keyNavigators = [];
 
-            $wrapper.addClass('key-navigation-scrollable');
-            if (navigables.length) {
-                const {id} = testRunner.getCurrentItem();
-                keyNavigators.push(
-                    keyNavigator({
-                        id: `item-content-wrapper_${id}`,
-                        group: $wrapper,
-                        elements: navigables,
-                        propagateTab: false, // inner item navigators will send tab to this element
-                        replace: true,
-                    })
-                );
+        /**
+         * @typedef {Object} keyNavigationStrategy
+         */
+        return {
+            /**
+             * Setup the keyNavigator strategy
+             * @returns {keyNavigator[]}
+             */
+            init() {
+                const $wrapper = testRunner.getAreaBroker().getContainer().find('.content-wrapper');
+                const navigables = navigableDomElement.createFromDoms($wrapper);
+
+                $wrapper.addClass('key-navigation-scrollable');
+                if (navigables.length) {
+                    const {id} = testRunner.getCurrentItem();
+                    keyNavigators.push(
+                        keyNavigator({
+                            id: `item-content-wrapper_${id}`,
+                            group: $wrapper,
+                            elements: navigables,
+                            propagateTab: false, // inner item navigators will send tab to this element
+                            replace: true,
+                        })
+                    );
+                }
+
+                return this.getNavigators();
+            },
+
+            /**
+             * Gets the list of applied navigators
+             * @returns {keyNavigator[]}
+             */
+            getNavigators() {
+                return keyNavigators;
+            },
+
+            /**
+             * Tears down the keyNavigator strategy
+             * @returns {keyNavigationStrategy}
+             */
+            destroy() {
+                keyNavigators.forEach(navigator => navigator.destroy());
+                keyNavigators = [];
+
+                return this;
             }
-
-            return this.getNavigators();
-        },
-
-        /**
-         * Gets the list of applied navigators
-         * @returns {keyNavigator[]}
-         */
-        getNavigators() {
-            return keyNavigators;
-        },
-
-        /**
-         * Tears down the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
-         */
-        destroy() {
-            keyNavigators.forEach(navigator => navigator.destroy());
-            keyNavigators = [];
-
-            return this;
-        }
-    };
-}
+        };
+    }
+};

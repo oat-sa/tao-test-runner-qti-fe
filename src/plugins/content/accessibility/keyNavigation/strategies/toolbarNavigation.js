@@ -23,101 +23,105 @@ import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
- * Builds a key navigator strategy applying onto the tools bar
- * @param {testRunner} testRunner - the test runner instance to control
- * @param {Object} config - the config to apply
- * @param {String} config.keyNextItem - the keyboard shortcut to move to the next item (inside the scope)
- * @param {String} config.keyPreviousItem - the keyboard shortcut to move to the previous item (inside the scope)
- * @param {String} config.keyNextGroup - the keyboard shortcut to move to the next group (outside the scope)
- * @param {String} config.keyPreviousGroup - the keyboard shortcut to move to the previous group (outside the scope)
- * @returns {keyNavigatorStrategy}
+ * Key navigator strategy applying onto the tools bar
  */
-export default function toolbarNavigationStrategyFactory(testRunner, config) {
-    let keyNavigators = [];
+export default {
+    name: 'toolbar',
 
     /**
-     * @typedef {Object} keyNavigatorStrategy
+     * Builds the toolbar navigation strategy.
+     *
+     * @param {testRunner} testRunner - the test runner instance to control
+     * @param {keyNavigationStrategyConfig} config - the config to apply
+     * @returns {keyNavigationStrategy}
      */
-    return {
-        /**
-         * Setup the keyNavigator strategy
-         * @returns {keyNavigator[]}
-         */
-        init() {
-            const $navigationBar = $('.bottom-action-bar');
-            const $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
-            const elements = navigableDomElement.createFromDoms($focusables);
-            const isNativeNavigation = config.contentNavigatorType === 'native';
+    init(testRunner, config) {
+        let keyNavigators = [];
 
-            if (elements.length) {
-                keyNavigators.push(
-                    keyNavigator({
-                        id: 'bottom-toolbar',
-                        replace: true,
-                        group: $navigationBar,
-                        elements: elements,
-                        defaultPosition(navigables) {
-                            if (isNativeNavigation) {
-                                return 0;
-                            }
-                            let pos = navigables.length - 1;
-                            // start from the button "Next" or the button "End test"
-                            _.forEach(navigables, (navigable, i) => {
-                                const $element = navigable.getElement();
-                                // find button "Next"
-                                if ($element.data('control') &&
-                                    ($element.data('control') === 'move-forward' ||
-                                        $element.data('control') === 'move-end')) {
-                                    pos = i;
+        /**
+         * @typedef {Object} keyNavigationStrategy
+         */
+        return {
+            /**
+             * Setup the keyNavigator strategy
+             * @returns {keyNavigator[]}
+             */
+            init() {
+                const $navigationBar = $('.bottom-action-bar');
+                const $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
+                const elements = navigableDomElement.createFromDoms($focusables);
+                const isNativeNavigation = config.mode === 'native';
+
+                if (elements.length) {
+                    keyNavigators.push(
+                        keyNavigator({
+                            id: 'bottom-toolbar',
+                            replace: true,
+                            group: $navigationBar,
+                            elements: elements,
+                            defaultPosition(navigables) {
+                                if (isNativeNavigation) {
+                                    return 0;
                                 }
-                            });
-                            // else the last button
-                            return pos;
-                        }
-                    })
-                        .on(config.keyNextInGroup, function (elem) {
-                            if (!allowedToNavigateFrom(elem)) {
-                                return false;
-                            } else {
-                                this.next();
+                                let pos = navigables.length - 1;
+                                // start from the button "Next" or the button "End test"
+                                _.forEach(navigables, (navigable, i) => {
+                                    const $element = navigable.getElement();
+                                    // find button "Next"
+                                    if ($element.data('control') &&
+                                        ($element.data('control') === 'move-forward' ||
+                                            $element.data('control') === 'move-end')) {
+                                        pos = i;
+                                    }
+                                });
+                                // else the last button
+                                return pos;
                             }
                         })
-                        .on(config.keyPrevInGroup, function (elem) {
-                            if (!allowedToNavigateFrom(elem)) {
-                                return false;
-                            } else {
-                                this.previous();
-                            }
-                        })
-                        .on('activate', function (cursor) {
-                            cursor.navigable
-                                .getElement()
-                                .click()
-                                .mousedown();
-                        })
-                );
+                            .on(config.keyNextItem, function (elem) {
+                                if (!allowedToNavigateFrom(elem)) {
+                                    return false;
+                                } else {
+                                    this.next();
+                                }
+                            })
+                            .on(config.keyPrevItem, function (elem) {
+                                if (!allowedToNavigateFrom(elem)) {
+                                    return false;
+                                } else {
+                                    this.previous();
+                                }
+                            })
+                            .on('activate', function (cursor) {
+                                cursor.navigable
+                                    .getElement()
+                                    .click()
+                                    .mousedown();
+                            })
+                    );
+                }
+
+                return this.getNavigators();
+            },
+
+            /**
+             * Gets the list of applied navigators
+             * @returns {keyNavigator[]}
+             */
+            getNavigators() {
+                return keyNavigators;
+            },
+
+            /**
+             * Tears down the keyNavigator strategy
+             * @returns {keyNavigationStrategy}
+             */
+            destroy() {
+                keyNavigators.forEach(navigator => navigator.destroy());
+                keyNavigators = [];
+
+                return this;
             }
-
-            return this.getNavigators();
-        },
-
-        /**
-         * Gets the list of applied navigators
-         * @returns {keyNavigator[]}
-         */
-        getNavigators() {
-            return keyNavigators;
-        },
-
-        /**
-         * Tears down the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
-         */
-        destroy() {
-            keyNavigators.forEach(navigator => navigator.destroy());
-            keyNavigators = [];
-
-            return this;
-        }
-    };
-}
+        };
+    }
+};

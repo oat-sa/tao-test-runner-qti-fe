@@ -22,212 +22,216 @@ import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
- * Builds a key navigator strategy applying onto the navigation panel
- * @param {testRunner} testRunner - the test runner instance to control
- * @param {Object} config - the config to apply
- * @param {String} config.keyNextItem - the keyboard shortcut to move to the next item (inside the scope)
- * @param {String} config.keyPreviousItem - the keyboard shortcut to move to the previous item (inside the scope)
- * @param {String} config.keyNextGroup - the keyboard shortcut to move to the next group (outside the scope)
- * @param {String} config.keyPreviousGroup - the keyboard shortcut to move to the previous group (outside the scope)
- * @returns {keyNavigatorStrategy}
+ * Key navigator strategy applying onto the navigation panel.
  */
-export default function navigatorNavigationStrategyFactory(testRunner, config) {
-    let keyNavigators = [];
+export default {
+    name: 'navigator',
 
     /**
-     * @typedef {Object} keyNavigatorStrategy
+     * Builds the navigator navigation strategy.
+     *
+     * @param {testRunner} testRunner - the test runner instance to control
+     * @param {keyNavigationStrategyConfig} config - the config to apply
+     * @returns {keyNavigationStrategy}
      */
-    return {
+    init(testRunner, config) {
+        let keyNavigators = [];
+
         /**
-         * Setup the keyNavigator strategy
-         * @returns {keyNavigator[]}
+         * @typedef {Object} keyNavigationStrategy
          */
-        init() {
-            const $panel = testRunner.getAreaBroker().getPanelArea();
-            const $navigator = $panel.find('.qti-navigator');
-            const isNativeNavigation = config.contentNavigatorType === 'native';
-            let filtersNavigator;
-            let itemsNavigator;
-            let $filters, $trees, navigableFilters, navigableTrees;
+        return {
+            /**
+             * Setup the keyNavigator strategy
+             * @returns {keyNavigator[]}
+             */
+            init() {
+                const $panel = testRunner.getAreaBroker().getPanelArea();
+                const $navigator = $panel.find('.qti-navigator');
+                const isNativeNavigation = config.mode === 'native';
+                let filtersNavigator;
+                let itemsNavigator;
+                let $filters, $trees, navigableFilters, navigableTrees;
 
-            //the tag to identify if the item listing has been browsed, to only "smart jump" to active item only on the first visit
-            let itemListingVisited = false;
-            //the position of the filter in memory, to only "smart jump" to active item only on the first visit
-            let filterCursor;
+                //the tag to identify if the item listing has been browsed, to only "smart jump" to active item only on the first visit
+                let itemListingVisited = false;
+                //the position of the filter in memory, to only "smart jump" to active item only on the first visit
+                let filterCursor;
 
-            if ($navigator.length && !$navigator.hasClass('disabled')) {
-                $filters = $navigator.find('.qti-navigator-filters .qti-navigator-filter');
-                navigableFilters = navigableDomElement.createFromDoms($filters);
-                if (navigableFilters.length) {
-                    filtersNavigator = keyNavigator({
-                        keepState: !isNativeNavigation,
-                        id: 'navigator-filters',
-                        replace: true,
-                        elements: navigableFilters,
-                        group: $navigator.find('.qti-navigator-filters')
-                    })
-                        .on(config.keyNextInFilters, function(elem) {
-                            if (!allowedToNavigateFrom(elem)) {
-                                return false;
-                            } else {
-                                this.next();
-                            }
+                if ($navigator.length && !$navigator.hasClass('disabled')) {
+                    $filters = $navigator.find('.qti-navigator-filters .qti-navigator-filter');
+                    navigableFilters = navigableDomElement.createFromDoms($filters);
+                    if (navigableFilters.length) {
+                        filtersNavigator = keyNavigator({
+                            keepState: !isNativeNavigation,
+                            id: 'navigator-filters',
+                            replace: true,
+                            elements: navigableFilters,
+                            group: $navigator.find('.qti-navigator-filters')
                         })
-                        .on(config.keyPrevInFilters, function(elem) {
-                            if (!allowedToNavigateFrom(elem)) {
-                                return false;
-                            } else {
-                                this.previous();
-                            }
-                        })
-                        .on('activate', function(cursor) {
-                            cursor.navigable.getElement().click();
-                        })
-                        .on('focus', function(cursor, origin) {
-                            if (!isNativeNavigation) {
-                                //activate the tab in the navigators
-                                cursor.navigable.getElement().click();
-
-                                //reset the item listing browsed tag whenever the focus on the filter happens after a focus on another element
-                                if ((filterCursor && filterCursor.position !== cursor.position) || origin) {
-                                    itemListingVisited = false;
-                                }
-                                //set the filter cursor in memory
-                                filterCursor = cursor;
-                            }
-
-                        });
-                    if (!isNativeNavigation) {
-                        filtersNavigator
-                            .on(config.keyNextInList, function(elem) {
+                            .on(config.keyNextTab, function (elem) {
                                 if (!allowedToNavigateFrom(elem)) {
                                     return false;
-                                } else if (itemsNavigator) {
-                                    _.defer(function() {
-                                        if (itemListingVisited) {
-                                            itemsNavigator.focus().first();
-                                        } else {
-                                            itemsNavigator.focus();
+                                } else {
+                                    this.next();
+                                }
+                            })
+                            .on(config.keyPrevTab, function (elem) {
+                                if (!allowedToNavigateFrom(elem)) {
+                                    return false;
+                                } else {
+                                    this.previous();
+                                }
+                            })
+                            .on('activate', function (cursor) {
+                                cursor.navigable.getElement().click();
+                            })
+                            .on('focus', function (cursor, origin) {
+                                if (!isNativeNavigation) {
+                                    //activate the tab in the navigators
+                                    cursor.navigable.getElement().click();
+
+                                    //reset the item listing browsed tag whenever the focus on the filter happens after a focus on another element
+                                    if ((filterCursor && filterCursor.position !== cursor.position) || origin) {
+                                        itemListingVisited = false;
+                                    }
+                                    //set the filter cursor in memory
+                                    filterCursor = cursor;
+                                }
+
+                            });
+                        if (!isNativeNavigation) {
+                            filtersNavigator
+                                .on(config.keyNextContent, function (elem) {
+                                    if (!allowedToNavigateFrom(elem)) {
+                                        return false;
+                                    } else if (itemsNavigator) {
+                                        _.defer(function () {
+                                            if (itemListingVisited) {
+                                                itemsNavigator.focus().first();
+                                            } else {
+                                                itemsNavigator.focus();
+                                            }
+                                        });
+                                    }
+                                })
+                                .on(config.keyPrevContent, function (elem) {
+                                    if (!allowedToNavigateFrom(elem)) {
+                                        return false;
+                                    } else if (itemsNavigator) {
+                                        _.defer(function () {
+                                            itemsNavigator.last();
+                                        });
+                                    }
+                                });
+                        }
+                        keyNavigators.push(filtersNavigator);
+                    }
+
+                    const $navigatorTree = $panel.find('.qti-navigator-tree');
+                    $trees = $navigator.find('.qti-navigator-tree .qti-navigator-item:not(.unseen) .qti-navigator-label');
+                    navigableTrees = navigableDomElement.createFromDoms($trees);
+                    if (navigableTrees.length) {
+                        //instantiate a key navigator but do not add it to the returned list of navigators as this is not supposed to be reached with tab key
+                        itemsNavigator = keyNavigator({
+                            id: 'navigator-items',
+                            replace: true,
+                            elements: navigableTrees,
+                            group: $navigatorTree,
+                            defaultPosition(navigables) {
+                                let pos = 0;
+                                if (filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
+                                    _.forEach(navigables, function (navigable, i) {
+                                        const $parent = navigable.getElement().parent('.qti-navigator-item');
+                                        //find the first active and visible item
+                                        if ($parent.hasClass('active') && $parent.is(':visible')) {
+                                            pos = i;
+                                            return false;
                                         }
                                     });
                                 }
-                            })
-                            .on(config.keyPrevInList, function(elem) {
+                                return pos;
+                            }
+                        })
+                            .on(config.keyNextContent, function (elem) {
                                 if (!allowedToNavigateFrom(elem)) {
                                     return false;
-                                } else if (itemsNavigator) {
-                                    _.defer(function() {
-                                        itemsNavigator.last();
-                                    });
+                                } else {
+                                    this.next();
                                 }
+                            })
+                            .on(config.keyPrevContent, function (elem) {
+                                if (!allowedToNavigateFrom(elem)) {
+                                    return false;
+                                } else {
+                                    this.previous();
+                                }
+                            })
+                            .on('activate', function (cursor) {
+                                cursor.navigable.getElement().click();
+                            })
+                            .on('lowerbound upperbound', function () {
+                                if (!isNativeNavigation && filtersNavigator) {
+                                    filtersNavigator.focus();
+                                }
+                            })
+                            .on('focus', function (cursor) {
+                                itemListingVisited = true;
+                                cursor.navigable
+                                    .getElement()
+                                    .parent()
+                                    .addClass('key-navigation-highlight');
+                            })
+                            .on('blur', function (cursor) {
+                                cursor.navigable
+                                    .getElement()
+                                    .parent()
+                                    .removeClass('key-navigation-highlight');
                             });
-                    }
-                    keyNavigators.push(filtersNavigator);
-                }
-
-                const $navigatorTree = $panel.find('.qti-navigator-tree');
-                $trees = $navigator.find('.qti-navigator-tree .qti-navigator-item:not(.unseen) .qti-navigator-label');
-                navigableTrees = navigableDomElement.createFromDoms($trees);
-                if (navigableTrees.length) {
-                    //instantiate a key navigator but do not add it to the returned list of navigators as this is not supposed to be reached with tab key
-                    itemsNavigator = keyNavigator({
-                        id: 'navigator-items',
-                        replace: true,
-                        elements: navigableTrees,
-                        group: $navigatorTree,
-                        defaultPosition(navigables) {
-                            let pos = 0;
-                            if (filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
-                                _.forEach(navigables, function(navigable, i) {
-                                    const $parent = navigable.getElement().parent('.qti-navigator-item');
-                                    //find the first active and visible item
-                                    if ($parent.hasClass('active') && $parent.is(':visible')) {
-                                        pos = i;
+                        if (!isNativeNavigation) {
+                            itemsNavigator
+                                .on(config.keyNextTab, function (elem) {
+                                    if (!allowedToNavigateFrom(elem)) {
                                         return false;
+                                    } else if (filtersNavigator) {
+                                        filtersNavigator.focus().next();
+                                    }
+                                })
+                                .on(config.keyPrevTab, function (elem) {
+                                    if (!allowedToNavigateFrom(elem)) {
+                                        return false;
+                                    } else if (filtersNavigator) {
+                                        filtersNavigator.focus().previous();
                                     }
                                 });
-                            }
-                            return pos;
                         }
-                    })
-                        .on(config.keyNextInList, function(elem) {
-                            if (!allowedToNavigateFrom(elem)) {
-                                return false;
-                            } else {
-                                this.next();
-                            }
-                        })
-                        .on(config.keyPrevInList, function(elem) {
-                            if (!allowedToNavigateFrom(elem)) {
-                                return false;
-                            } else {
-                                this.previous();
-                            }
-                        })
-                        .on('activate', function(cursor) {
-                            cursor.navigable.getElement().click();
-                        })
-                        .on('lowerbound upperbound', function() {
-                            if (!isNativeNavigation && filtersNavigator) {
-                                filtersNavigator.focus();
-                            }
-                        })
-                        .on('focus', function(cursor) {
-                            itemListingVisited = true;
-                            cursor.navigable
-                                .getElement()
-                                .parent()
-                                .addClass('key-navigation-highlight');
-                        })
-                        .on('blur', function(cursor) {
-                            cursor.navigable
-                                .getElement()
-                                .parent()
-                                .removeClass('key-navigation-highlight');
-                        });
-                    if (!isNativeNavigation) {
-                        itemsNavigator
-                            .on(config.keyNextInFilters, function(elem) {
-                                if (!allowedToNavigateFrom(elem)) {
-                                    return false;
-                                } else if (filtersNavigator) {
-                                    filtersNavigator.focus().next();
-                                }
-                            })
-                            .on(config.keyPrevInFilters, function(elem) {
-                                if (!allowedToNavigateFrom(elem)) {
-                                    return false;
-                                } else if (filtersNavigator) {
-                                    filtersNavigator.focus().previous();
-                                }
-                            });
-                    }
-                    if (isNativeNavigation) {
-                        keyNavigators.push(itemsNavigator);
+                        if (isNativeNavigation) {
+                            keyNavigators.push(itemsNavigator);
+                        }
                     }
                 }
+
+                return this.getNavigators();
+            },
+
+            /**
+             * Gets the list of applied navigators
+             * @returns {keyNavigator[]}
+             */
+            getNavigators() {
+                return keyNavigators;
+            },
+
+            /**
+             * Tears down the keyNavigator strategy
+             * @returns {keyNavigationStrategy}
+             */
+            destroy() {
+                keyNavigators.forEach(navigator => navigator.destroy());
+                keyNavigators = [];
+
+                return this;
             }
-
-            return this.getNavigators();
-        },
-
-        /**
-         * Gets the list of applied navigators
-         * @returns {keyNavigator[]}
-         */
-        getNavigators() {
-            return keyNavigators;
-        },
-
-        /**
-         * Tears down the keyNavigator strategy
-         * @returns {keyNavigatorStrategy}
-         */
-        destroy() {
-            keyNavigators.forEach(navigator => navigator.destroy());
-            keyNavigators = [];
-
-            return this;
-        }
-    };
-}
+        };
+    }
+};

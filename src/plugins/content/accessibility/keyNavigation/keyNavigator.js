@@ -20,31 +20,12 @@
  *
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-import $ from 'jquery';
 import _ from 'lodash';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
-import headerNavigationStrategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategies/headerNavigation';
-import toolbarNavigationStrategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategies/toolbarNavigation';
-import navigatorNavigationStrategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategies/navigatorNavigation';
-import pageNavigationStrategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategies/pageNavigation';
-import rubricsNavigationStrategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategies/rubricsNavigation';
-import itemNavigationStrategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategies/itemNavigation';
+import strategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategiesManager';
 import shortcut from 'util/shortcut';
-
-/**
- * A list of navigation factories per navigation areas
- * @type {Object}
- */
-const navigationAreaFactories = {
-    header: headerNavigationStrategyFactory,
-    toolbar: toolbarNavigationStrategyFactory,
-    navigator: navigatorNavigationStrategyFactory,
-    page: pageNavigationStrategyFactory,
-    rubrics: rubricsNavigationStrategyFactory,
-    item: itemNavigationStrategyFactory
-};
 
 /**
  * The list of available modes
@@ -52,42 +33,42 @@ const navigationAreaFactories = {
  */
 const navigationModes = {
     native: {
-        areas: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
+        strategies: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
         keys: {
             keyNextGroup: '',
             keyPrevGroup: '',
-            keyNextInGroup: 'tab',
-            keyPrevInGroup: 'shift+tab',
-            keyNextInFilters: 'tab',
-            keyPrevInFilters: 'shift+tab',
-            keyNextInList: 'tab',
-            keyPrevInList: 'shift+tab'
+            keyNextItem: 'tab',
+            keyPrevItem: 'shift+tab',
+            keyNextTab: 'tab',
+            keyPrevTab: 'shift+tab',
+            keyNextContent: 'tab',
+            keyPrevContent: 'shift+tab'
         }
     },
     linear: {
-        areas: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
+        strategies: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
         keys: {
             keyNextGroup: 'tab',
             keyPrevGroup: 'shift+tab',
-            keyNextInGroup: 'right down',
-            keyPrevInGroup: 'left up',
-            keyNextInFilters: 'right',
-            keyPrevInFilters: 'left',
-            keyNextInList: 'down',
-            keyPrevInList: 'up'
+            keyNextItem: 'right down',
+            keyPrevItem: 'left up',
+            keyNextTab: 'right',
+            keyPrevTab: 'left',
+            keyNextContent: 'down',
+            keyPrevContent: 'up'
         }
     },
     default: {
-        areas: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
+        strategies: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
         keys: {
             keyNextGroup: 'tab',
             keyPrevGroup: 'shift+tab',
-            keyNextInGroup: 'right down',
-            keyPrevInGroup: 'left up',
-            keyNextInFilters: 'right',
-            keyPrevInFilters: 'left',
-            keyNextInList: 'down',
-            keyPrevInList: 'up'
+            keyNextItem: 'right down',
+            keyPrevItem: 'left up',
+            keyNextTab: 'right',
+            keyPrevTab: 'left',
+            keyNextContent: 'down',
+            keyPrevContent: 'up'
         }
     },
 };
@@ -100,7 +81,7 @@ const navigationModes = {
  * @returns {testRunnerKeyNavigator}
  */
 export default function keyNavigatorFactory(testRunner, config = {}) {
-    let {contentNavigatorType} = config;
+    let {contentNavigatorType: mode} = config;
     let groupNavigator = null;
     let strategies = [];
 
@@ -113,12 +94,11 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {testRunnerKeyNavigator}
          */
         init() {
-            const isNativeNavigation = contentNavigatorType === 'native';
-            const navigationMode = navigationModes[contentNavigatorType];
-            const navigationConfig = Object.assign({contentNavigatorType}, navigationMode.keys);
-            const navigators = _.flatten(navigationMode.areas.map(area => {
-                const strategyFactory = navigationAreaFactories[area];
-                const strategy = strategyFactory(testRunner, navigationConfig);
+            const isNativeNavigation = mode === 'native';
+            const navigationMode = navigationModes[mode];
+            const navigationConfig = Object.assign({mode}, navigationMode.keys);
+            const navigators = _.flatten(navigationMode.strategies.map(area => {
+                const strategy = strategyFactory(area, testRunner, navigationConfig);
                 strategies.push(strategy);
                 return strategy.init();
             }));
@@ -191,11 +171,11 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
 
         /**
          * Switches the navigation mode
-         * @param {String} mode
+         * @param {String} newMode
          * @returns {testRunnerKeyNavigator}
          */
-        setMode(mode) {
-            contentNavigatorType = mode;
+        setMode(newMode) {
+            mode = newMode;
             return this;
         },
 
@@ -204,7 +184,7 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {String}
          */
         getMode() {
-            return contentNavigatorType;
+            return mode;
         },
 
         /**

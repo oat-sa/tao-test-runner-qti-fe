@@ -356,7 +356,7 @@ var menuComponentApi = {
         } else if (this.hoverIndex === 0  && this.navType === 'fromFirst') {
             this.hoverIndex--;
             this.hoverOffAll();
-            this.$menuButton.first().focus();
+            this.$menuButton.closest('.action').focus();
             this.closeMenu();
         }
     },
@@ -382,7 +382,7 @@ var menuComponentApi = {
         } else if (this.hoverIndex === this.menuItems.length - 1 && this.navType === 'fromLast') {
             this.hoverIndex++;
             this.hoverOffAll();
-            this.$menuButton.first().focus();
+            this.$menuButton.closest('.action').focus();
             this.closeMenu();
         }
     },

@@ -83,6 +83,10 @@ export default pluginFactory({
                 title: __('Highlight Text'),
                 icon: 'text-marker',
                 control: 'highlight-trigger',
+                aria: {
+                    pressed: 'false',
+                    label: __('Highlight Text')
+                },
                 text: __('Highlight')
             });
 
@@ -313,11 +317,15 @@ export default pluginFactory({
                         instance
                             .on('start', function() {
                                 self.buttonMain.turnOn();
+                                self.buttonMain.$component
+                                    .attr('aria-pressed', 'true');
                                 self.trigger('start');
                                 hasHighlights = true;
                             })
                             .on('end', function() {
                                 self.buttonMain.turnOff();
+                                self.buttonMain.$component
+                                    .attr('aria-pressed', 'false');
                                 self.trigger('end');
                             });
                     }

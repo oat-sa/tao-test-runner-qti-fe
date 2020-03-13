@@ -42,7 +42,7 @@ export default {
         return {
             /**
              * Setup the keyNavigator strategy
-             * @returns {keyNavigator[]}
+             * @returns {keyNavigationStrategy}
              */
             init() {
                 const $rubricArea = $('#qti-rubrics');
@@ -62,7 +62,7 @@ export default {
                     );
                 });
 
-                return this.getNavigators();
+                return this;
             },
 
             /**

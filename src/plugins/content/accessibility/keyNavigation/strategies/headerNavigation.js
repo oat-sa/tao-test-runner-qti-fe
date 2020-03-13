@@ -43,7 +43,7 @@ export default {
         return {
             /**
              * Setup the keyNavigator strategy
-             * @returns {keyNavigator[]}
+             * @returns {keyNavigationStrategy}
              */
             init() {
                 //need global selector as currently no way to access delivery frame from test runner
@@ -75,7 +75,7 @@ export default {
                     );
                 }
 
-                return this.getNavigators();
+                return this;
             },
 
             /**

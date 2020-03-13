@@ -20,11 +20,13 @@
  *
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-import _ from 'lodash';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
-import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
-import strategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategiesManager';
+import {
+    allowedToNavigateFrom,
+    getStrategies,
+    getNavigators
+} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 import modeFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/modesManager';
 import shortcut from 'util/shortcut';
 
@@ -41,8 +43,8 @@ const eventNS = '.keyNavigation';
  * @param {String} config.contentNavigatorType - the keyboard navigation mode
  * @returns {testRunnerKeyNavigator}
  */
-export default function keyNavigatorFactory(testRunner, config = {}) {
-    let {contentNavigatorType: mode} = config;
+export default function keyNavigationFactory(testRunner, config = {}) {
+    let {contentNavigatorType} = config;
     let groupNavigator = null;
     let strategies = [];
 
@@ -55,12 +57,10 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {testRunnerKeyNavigator}
          */
         init() {
-            const {strategies: navigationStrategies, config: navigationConfig} = modeFactory(mode, config);
-            const navigators = _.flatten(navigationStrategies.map(area => {
-                const strategy = strategyFactory(area, testRunner, navigationConfig);
-                strategies.push(strategy);
-                return strategy.init();
-            }));
+            const navigationMode = modeFactory(contentNavigatorType, config);
+            const navigationConfig = navigationMode.config;
+            strategies = getStrategies(navigationMode, testRunner);
+            const navigators = getNavigators(strategies);
 
             //blur current focused element, to reinitialize keyboard navigation
             if (document.activeElement) {
@@ -134,7 +134,7 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {testRunnerKeyNavigator}
          */
         setMode(newMode) {
-            mode = newMode;
+            contentNavigatorType = newMode;
             return this;
         },
 
@@ -143,7 +143,7 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {String}
          */
         getMode() {
-            return mode;
+            return contentNavigatorType;
         },
 
         /**

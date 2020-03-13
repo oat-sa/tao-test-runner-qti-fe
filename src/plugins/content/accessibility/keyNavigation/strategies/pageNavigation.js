@@ -41,7 +41,7 @@ export default {
         return {
             /**
              * Setup the keyNavigator strategy
-             * @returns {keyNavigator[]}
+             * @returns {keyNavigationStrategy}
              */
             init() {
                 const $wrapper = testRunner.getAreaBroker().getContainer().find('.content-wrapper');
@@ -61,7 +61,7 @@ export default {
                     );
                 }
 
-                return this.getNavigators();
+                return this;
             },
 
             /**

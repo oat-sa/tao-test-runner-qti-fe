@@ -16,6 +16,8 @@
  * Copyright (c) 2016-2020 (original work) Open Assessment Technologies SA ;
  */
 import $ from 'jquery';
+import _ from "lodash";
+import strategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/strategiesManager';
 
 /**
  * When either an element or its parents have this class - navigation from it would be disabled.
@@ -57,4 +59,29 @@ export function allowedToNavigateFrom(element) {
     }
 
     return true;
+}
+
+/**
+ * Build the strategies related to a key navigation mode
+ * @param {keyNavigationMode} navigationMode
+ * @param {testRunner} testRunner
+ * @returns {keyNavigationStrategy[]}
+ */
+export function getStrategies(navigationMode, testRunner) {
+    return navigationMode.strategies.map(
+        area => strategyFactory(area, testRunner, navigationMode.config).init()
+    );
+}
+
+/**
+ * Gets the key navigators from the provided strategies
+ * @param {keyNavigationStrategy[]} strategies
+ * @returns {keyNavigator[]}
+ */
+export function getNavigators(strategies) {
+    return _.flatten(
+        strategies.map(
+            strategy => strategy.getNavigators()
+        )
+    );
 }

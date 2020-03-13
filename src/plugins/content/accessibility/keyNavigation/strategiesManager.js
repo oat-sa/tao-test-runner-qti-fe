@@ -50,14 +50,14 @@ import * as strategies from 'taoQtiTest/runner/plugins/content/accessibility/key
 /**
  * Builds a key navigator strategies manager.
  *
- * @param {String} strategy - the name of the strategy to build
+ * @param {String} name - the name of the strategy to build
  * @param {testRunner} testRunner - the test runner instance to control
  * @param {keyNavigationStrategyConfig} config - the config to apply
  * @returns {keyNavigationStrategy}
  */
-export default function strategyFactory(strategy, testRunner, config) {
-    const instance = strategyFactory.getProvider(strategy);
-    return instance.init(testRunner, config);
+export default function strategyFactory(name, testRunner, config) {
+    return strategyFactory.getProvider(name)
+        .init(testRunner, config);
 }
 
 // bootstrap the manager and register the strategies

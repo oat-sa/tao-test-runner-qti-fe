@@ -44,7 +44,7 @@ export default {
         return {
             /**
              * Setup the keyNavigator strategy
-             * @returns {keyNavigator[]}
+             * @returns {keyNavigationStrategy}
              */
             init() {
                 const $navigationBar = $('.bottom-action-bar');
@@ -94,7 +94,7 @@ export default {
                     );
                 }
 
-                return this.getNavigators();
+                return this;
             },
 
             /**

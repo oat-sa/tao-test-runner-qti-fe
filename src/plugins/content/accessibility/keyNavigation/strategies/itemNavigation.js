@@ -47,7 +47,7 @@ export default {
         return {
             /**
              * Setup the keyNavigator strategy
-             * @returns {keyNavigator[]}
+             * @returns {keyNavigationStrategy}
              */
             init() {
                 const $content = testRunner.getAreaBroker().getContentArea();
@@ -77,7 +77,7 @@ export default {
                         }
                     });
 
-                return this.getNavigators();
+                return this;
             },
 
             /**

@@ -12,13 +12,16 @@
         </section>
     </div>
 
-    <nav class="action-bar content-action-bar horizontal-action-bar bottom-action-bar">
+    <div class="action-bar content-action-bar horizontal-action-bar bottom-action-bar">
         <div class="control-box size-wrapper">
-            <div class="lft tools-box"></div>
-            <div class="rgt navi-box">
+            <aside class="lft tools-box" aria-labelledby="toolboxheader">
+              <h2 id="toolboxheader" class="landmark-title--hidden">{{__ "Tool box and flagging for review"}}</h2>
+            </aside>
+            <nav class="rgt navi-box" aria-labelledby="navheader">
+                <h2 id="navheader" class="landmark-title--hidden">{{__ "Main navigation"}}</h2>
                 <ul class="plain navi-box-list"></ul>
             </div>
         </div>
-    </nav>
+    </div>
 
 </main>

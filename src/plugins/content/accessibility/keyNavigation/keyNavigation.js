@@ -29,6 +29,12 @@ import modeFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavi
 import shortcut from 'util/shortcut';
 
 /**
+ * The event namespace used to register removable listeners
+ * @type {String}
+ */
+const eventNS = '.keyNavigation';
+
+/**
  * Builds a key navigator that can apply onto a test runner
  * @param {testRunner} testRunner - the test runner instance to control
  * @param {Object} config - the config to apply
@@ -101,8 +107,8 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
             }
 
             shortcut
-                .remove('.keyNavigator')
-                .add('tab.keyNavigator shift+tab.keyNavigator', function (e) {
+                .remove(eventNS)
+                .add(`tab${eventNS} shift+tab${eventNS}`, function (e) {
                     if (!allowedToNavigateFrom(e.target)) {
                         return false;
                     }
@@ -145,7 +151,7 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {testRunnerKeyNavigator}
          */
         destroy() {
-            shortcut.remove('.keyNavigator');
+            shortcut.remove(eventNS);
 
             strategies.forEach(strategy => strategy.destroy());
 

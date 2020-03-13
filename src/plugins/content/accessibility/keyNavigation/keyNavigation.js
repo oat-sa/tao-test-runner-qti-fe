@@ -49,7 +49,7 @@ export default function keyNavigatorFactory(testRunner, config = {}) {
          * @returns {testRunnerKeyNavigator}
          */
         init() {
-            const {strategies: navigationStrategies, config: navigationConfig} = modeFactory(mode);
+            const {strategies: navigationStrategies, config: navigationConfig} = modeFactory(mode, config);
             const navigators = _.flatten(navigationStrategies.map(area => {
                 const strategy = strategyFactory(area, testRunner, navigationConfig);
                 strategies.push(strategy);

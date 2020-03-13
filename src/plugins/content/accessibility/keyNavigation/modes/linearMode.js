@@ -21,10 +21,16 @@
  */
 export default {
     name: 'linear',
-    init() {
+
+    /**
+     * Builds the key navigation config for the "linear" mode
+     * @param {keyNavigationStrategyConfig} config - additional config to set
+     * @returns {keyNavigationMode}
+     */
+    init(config = {}) {
         return {
             strategies: ['rubrics', 'linearItem', 'toolbar', 'header', 'navigator', 'page'],
-            config: {
+            config: Object.assign({
                 autoFocus: true,
                 keepState: true,
                 propagateTab: false,
@@ -37,7 +43,7 @@ export default {
                 keyPrevTab: 'left',
                 keyNextContent: 'down',
                 keyPrevContent: 'up'
-            }
+            }, config)
         };
     }
 };

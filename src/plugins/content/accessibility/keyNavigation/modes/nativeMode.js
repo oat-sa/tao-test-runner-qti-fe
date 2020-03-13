@@ -21,10 +21,16 @@
  */
 export default {
     name: 'native',
-    init() {
+
+    /**
+     * Builds the key navigation config for the "native" mode
+     * @param {keyNavigationStrategyConfig} config - additional config to set
+     * @returns {keyNavigationMode}
+     */
+    init(config = {}) {
         return {
             strategies: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
-            config: {
+            config: Object.assign({
                 autoFocus: false,
                 keepState: false,
                 propagateTab: true,
@@ -37,7 +43,7 @@ export default {
                 keyPrevTab: '',
                 keyNextContent: '',
                 keyPrevContent: ''
-            }
+            }, config)
         };
     }
 };

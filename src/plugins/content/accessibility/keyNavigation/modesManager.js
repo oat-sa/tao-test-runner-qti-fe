@@ -31,11 +31,12 @@ import * as modes from 'taoQtiTest/runner/plugins/content/accessibility/keyNavig
  * Builds a key navigator modes manager.
  *
  * @param {String} mode - the name of the mode to get
+ * @param {keyNavigationStrategyConfig} config - additional config to set
  * @returns {keyNavigationMode}
  */
-export default function modeFactory(mode) {
+export default function modeFactory(mode, config = {}) {
     const instance = modeFactory.getProvider(mode);
-    return instance.init();
+    return instance.init(config);
 }
 
 // bootstrap the manager and register the strategies

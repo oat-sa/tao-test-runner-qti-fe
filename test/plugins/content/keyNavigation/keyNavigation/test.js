@@ -21,7 +21,7 @@ define([
     'lodash',
     'taoTests/runner/runner',
     'taoTests/runner/runnerComponent',
-    'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigator',
+    'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigation',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/test/runner/plugins/content/keyNavigation/mock/backend',
     'tpl!taoQtiTest/test/runner/plugins/content/keyNavigation/assets/layout',
@@ -36,7 +36,7 @@ define([
     _,
     runnerFactory,
     runnerComponent,
-    keyNavigatorFactory,
+    keyNavigationFactory,
     providerMock,
     backendMockFactory,
     layoutTpl,
@@ -59,15 +59,15 @@ define([
 
     const backendMock = backendMockFactory(testDefinition, itemsBank);
 
-    QUnit.module('keyNavigatorFactory');
+    QUnit.module('keyNavigationFactory');
 
     QUnit.test('module', assert => {
-        assert.equal(typeof keyNavigatorFactory, 'function', 'The keyNavigatorFactory module exposes a function');
-        assert.equal(typeof keyNavigatorFactory(), 'object', 'The keyNavigator factory produces an instance');
+        assert.equal(typeof keyNavigationFactory, 'function', 'The keyNavigationFactory module exposes a function');
+        assert.equal(typeof keyNavigationFactory(), 'object', 'The keyNavigation factory produces an instance');
         assert.notStrictEqual(
-            keyNavigatorFactory(),
-            keyNavigatorFactory(),
-            'The keyNavigator factory provides a different instance on each call'
+            keyNavigationFactory(),
+            keyNavigationFactory(),
+            'The keyNavigation factory provides a different instance on each call'
         );
     });
 
@@ -77,12 +77,12 @@ define([
         {title: 'setMode'},
         {title: 'getMode'},
         {title: 'destroy'}
-    ]).test('keyNavigator API ', (data, assert) => {
-        const keyNavigator = keyNavigatorFactory();
+    ]).test('keyNavigation API ', (data, assert) => {
+        const keyNavigation = keyNavigationFactory();
         assert.equal(
-            typeof keyNavigator[data.title],
+            typeof keyNavigation[data.title],
             'function',
-            `The keyNavigatorFactory instance exposes a "${data.title}" function`
+            `The keyNavigationFactory instance exposes a "${data.title}" function`
         );
     });
 
@@ -94,15 +94,15 @@ define([
         const config = {
             contentNavigatorType: 'default'
         };
-        const keyNavigator = keyNavigatorFactory({}, config);
+        const keyNavigation = keyNavigationFactory({}, config);
 
-        assert.equal(keyNavigator.getMode(), 'default', 'The default mode is set');
+        assert.equal(keyNavigation.getMode(), 'default', 'The default mode is set');
 
-        keyNavigator.setMode('native');
-        assert.equal(keyNavigator.getMode(), 'native', 'The native mode is set');
+        keyNavigation.setMode('native');
+        assert.equal(keyNavigation.getMode(), 'native', 'The native mode is set');
 
-        keyNavigator.setMode('linear');
-        assert.equal(keyNavigator.getMode(), 'linear', 'The linear mode is set');
+        keyNavigation.setMode('linear');
+        assert.equal(keyNavigation.getMode(), 'linear', 'The linear mode is set');
     });
 
     QUnit.test('Access the test runner', assert => {
@@ -114,9 +114,9 @@ define([
         const testRunner = {
             init() {}
         };
-        const keyNavigator = keyNavigatorFactory(testRunner, config);
+        const keyNavigation = keyNavigationFactory(testRunner, config);
 
-        assert.equal(keyNavigator.getTestRunner(), testRunner, 'The test runner is accessible');
+        assert.equal(keyNavigation.getTestRunner(), testRunner, 'The test runner is accessible');
     });
 
     QUnit.cases.init(navigationCases).test('Navigation mode ', (data, assert) => {
@@ -164,19 +164,19 @@ define([
                     });
             }))
             .then(runner => {
-                const keyNavigator = keyNavigatorFactory(runner, config);
+                const keyNavigation = keyNavigationFactory(runner, config);
                 assert.ok(true, 'Test runner up an running');
-                keyNavigator.init();
+                keyNavigation.init();
 
                 assert.equal(config.contentNavigatorType, data.mode, `The navigation mode is set to ${data.mode}`);
-                assert.equal(keyNavigator.getMode(), data.mode, `The ${data.mode} mode is claimed`);
+                assert.equal(keyNavigation.getMode(), data.mode, `The ${data.mode} mode is claimed`);
 
                 let queue = Promise.resolve(0);
                 document.activeElement.blur();
                 _.times(data.steps.length, () => queue = queue.then(processNavigationStep));
 
                 return queue.then(() => {
-                    keyNavigator.destroy();
+                    keyNavigation.destroy();
                     return runner.destroy();
                 });
             })

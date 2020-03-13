@@ -169,6 +169,7 @@ export default pluginFactory({
                 .getAreaBroker()
                 .getToolbox()
                 .createEntry({
+                    role: 'option',
                     control: theme.id,
                     title: theme.label,
                     icon: 'preview',

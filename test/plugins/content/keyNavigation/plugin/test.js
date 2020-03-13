@@ -252,7 +252,9 @@ define([
                                 resolve(runner);
                             })
                             .after('setcontenttabtype', mode => {
-                                if (mode !== 'native') {
+                                const modeData = navigationCases.find(navigation => navigation.mode === mode);
+                                const {rubrics} = modeData;
+                                if (rubrics) {
                                     backendMock.setRubricsBank(rubricsBank);
                                 } else {
                                     backendMock.setRubricsBank({});

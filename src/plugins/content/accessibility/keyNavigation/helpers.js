@@ -27,18 +27,6 @@ import strategyFactory from 'taoQtiTest/runner/plugins/content/accessibility/key
 const ignoredClass = 'no-key-navigation';
 
 /**
- * Scrolling to the top of the required element
- * @param {jQuery} $el
- * @param {jQuery} $visibleContainer
- */
-export function showElementsContent($el, $visibleContainer) {
-    const $wrapper = $visibleContainer.closest('.content-wrapper');
-    if ($wrapper.length && $el.length) {
-        $wrapper.scrollTop($el.offset().top + $wrapper.scrollTop() - $wrapper.offset().top);
-    }
-}
-
-/**
  * Checks whether element is navigable from
  *
  * @param {HTMLElement|keyNavigator} element
@@ -59,6 +47,41 @@ export function allowedToNavigateFrom(element) {
     }
 
     return true;
+}
+
+/**
+ * Applies an items' navigation scheme on a keyNavigator.
+ * @param {keyNavigator} navigator
+ * @param {keyNavigationStrategyConfig} config - the config to apply
+ * @returns {keyNavigator}
+ */
+export function setupItemsNavigator(navigator, config) {
+    return navigator
+        .on(config.keyNextItem, function navigateToNextItem(elem) {
+            if (allowedToNavigateFrom(elem)) {
+                this.next();
+            }
+        })
+        .on(config.keyPrevItem, function navigateToPrevItem(elem) {
+            if (allowedToNavigateFrom(elem)) {
+                this.previous();
+            }
+        });
+}
+
+/**
+ * Applies an items' navigation scheme on a keyNavigator.
+ * @param {keyNavigator} navigator
+ * @returns {keyNavigator}
+ */
+export function setupClickableNavigator(navigator) {
+    return navigator
+        .on('activate', function activateItem(cursor) {
+            cursor.navigable
+                .getElement()
+                .click()
+                .mousedown();
+        });
 }
 
 /**

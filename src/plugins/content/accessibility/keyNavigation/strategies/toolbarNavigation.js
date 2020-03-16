@@ -20,7 +20,16 @@ import _ from "lodash";
 import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
-import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import {
+    setupItemsNavigator,
+    setupClickableNavigator
+} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+
+/**
+ * The identifier the keyNavigator group
+ * @type {String}
+ */
+const groupId = 'bottom-toolbar';
 
 /**
  * Key navigator strategy applying onto the tools bar
@@ -48,15 +57,16 @@ export default {
              */
             init() {
                 const $navigationBar = $('.bottom-action-bar');
-                const $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
-                const elements = navigableDomElement.createFromDoms($focusables);
-                if (elements.length) {
-                    keyNavigators.push(
-                        keyNavigator({
-                            id: 'bottom-toolbar',
+                const $toolbarElements = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
+
+                const registerToolbarNavigator = (id, group, $elements) => {
+                    const elements = navigableDomElement.createFromDoms($elements);
+                    if (elements.length) {
+                        const navigator = keyNavigator({
+                            id,
+                            group,
+                            elements,
                             replace: true,
-                            group: $navigationBar,
-                            elements: elements,
                             defaultPosition(navigables) {
                                 let pos = 0;
 
@@ -74,24 +84,21 @@ export default {
 
                                 return pos;
                             }
-                        })
-                            .on(config.keyNextItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.next();
-                                }
-                            })
-                            .on(config.keyPrevItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.previous();
-                                }
-                            })
-                            .on('activate', function (cursor) {
-                                cursor.navigable
-                                    .getElement()
-                                    .click()
-                                    .mousedown();
-                            })
-                    );
+                        });
+
+                        setupItemsNavigator(navigator, config);
+                        setupClickableNavigator(navigator);
+                        keyNavigators.push(navigator);
+                    }
+                };
+
+                if (config.flatNavigation) {
+                    $toolbarElements.each((index, el) => {
+                        const $element = $(el);
+                        registerToolbarNavigator(`${groupId}-${index}`, $element, $element);
+                    });
+                } else {
+                    registerToolbarNavigator(groupId, $navigationBar, $toolbarElements);
                 }
 
                 return this;

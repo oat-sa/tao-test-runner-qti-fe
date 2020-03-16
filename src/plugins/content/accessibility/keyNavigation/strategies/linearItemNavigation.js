@@ -20,7 +20,10 @@ import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
-import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import {
+    setupItemsNavigator,
+    setupClickableNavigator
+} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
  * Key navigator strategy applying inside the item.
@@ -37,6 +40,9 @@ export default {
      * @returns {keyNavigationStrategy}
      */
     init(testRunner, config) {
+        // this strategy manages 2 navigators:
+        // - keyNavigators lists all elements separately, allowing to navigate among them as identified groups
+        // - choicesNavigators lists elements with the same parent, allowing to navigate "horizontally" among them
         let keyNavigators = [];
         let choicesNavigators = [];
 
@@ -64,22 +70,13 @@ export default {
                 let $lastParent = null;
                 let list = [];
                 const setupListNavigator = () => {
-                    choicesNavigators.push(
-                        keyNavigator({
-                            elements: navigableGroupElement.createFromNavigators(list),
-                            propagateTab: false
-                        })
-                            .on(config.keyNextItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.next();
-                                }
-                            })
-                            .on(config.keyPrevItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.previous();
-                                }
-                            })
-                    );
+                    const navigator = keyNavigator({
+                        elements: navigableGroupElement.createFromNavigators(list),
+                        propagateTab: false
+                    });
+
+                    setupItemsNavigator(navigator, config);
+                    choicesNavigators.push(navigator);
                 };
 
                 $qtiChoiceNodesList.each(function () {
@@ -89,19 +86,9 @@ export default {
                         elements: navigableDomElement.createFromDoms($itemElement),
                         group: $itemElement,
                         propagateTab: false
-                    })
-                        .on('activate', function (cursor) {
-                            const $elt = cursor.navigable.getElement();
-                            // jQuery <= 1.9.0
-                            // the checkbox values are set after the click event if triggered with jQuery
-                            if ($elt.is(':checkbox')) {
-                                $elt.each(function () {
-                                    this.click();
-                                });
-                            } else {
-                                $elt.click();
-                            }
-                        });
+                    });
+
+                    setupClickableNavigator(choiceNavigator);
 
                     if ($lastParent && !$parent.is($lastParent)) {
                         setupListNavigator();

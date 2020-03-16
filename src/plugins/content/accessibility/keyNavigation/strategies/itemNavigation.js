@@ -20,7 +20,10 @@ import $ from 'jquery';
 import scrollHelper from 'ui/scroller';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
-import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import {
+    setupItemsNavigator,
+    setupClickableNavigator
+} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
  * Key navigator strategy applying inside the item.
@@ -107,50 +110,29 @@ export default {
                 const interactionNavigables = navigableDomElement.createFromDoms($inputs);
 
                 if (interactionNavigables.length) {
-                    keyNavigators.push(
-                        keyNavigator({
-                            elements: interactionNavigables,
-                            group: $interaction,
-                            loop: false
+                    const navigator = keyNavigator({
+                        elements: interactionNavigables,
+                        group: $interaction,
+                        loop: false
+                    })
+                        .on('focus', function (cursor) {
+                            const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
+                            $qtiChoice.addClass('key-navigation-highlight');
+                            return scrollHelper.scrollTo(
+                                $qtiChoice,
+                                testRunner.getAreaBroker().getContentArea().closest('.content-wrapper')
+                            );
                         })
-                            .on(config.keyNextItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.next();
-                                }
-                            })
-                            .on(config.keyPrevItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.previous();
-                                }
-                            })
-                            .on('activate', function (cursor) {
-                                const $elt = cursor.navigable.getElement();
+                        .on('blur', function (cursor) {
+                            cursor.navigable
+                                .getElement()
+                                .closest('.qti-choice')
+                                .removeClass('key-navigation-highlight');
+                        });
 
-                                //jQuery <= 1.9.0 the checkbox values are set
-                                //after the click event if triggerred with jQuery
-                                if ($elt.is(':checkbox')) {
-                                    $elt.each(function () {
-                                        this.click();
-                                    });
-                                } else {
-                                    $elt.click();
-                                }
-                            })
-                            .on('focus', function (cursor) {
-                                const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
-                                $qtiChoice.addClass('key-navigation-highlight');
-                                return scrollHelper.scrollTo(
-                                    $qtiChoice,
-                                    testRunner.getAreaBroker().getContentArea().closest('.content-wrapper')
-                                );
-                            })
-                            .on('blur', function (cursor) {
-                                cursor.navigable
-                                    .getElement()
-                                    .closest('.qti-choice')
-                                    .removeClass('key-navigation-highlight');
-                            })
-                    );
+                    setupItemsNavigator(navigator, config);
+                    setupClickableNavigator(navigator);
+                    keyNavigators.push(navigator);
                 }
 
                 return this;

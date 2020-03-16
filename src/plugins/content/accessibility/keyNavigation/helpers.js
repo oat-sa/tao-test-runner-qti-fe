@@ -77,10 +77,19 @@ export function setupItemsNavigator(navigator, config) {
 export function setupClickableNavigator(navigator) {
     return navigator
         .on('activate', function activateItem(cursor) {
-            cursor.navigable
-                .getElement()
-                .click()
-                .mousedown();
+            const $elt = cursor.navigable.getElement();
+
+            // jQuery <= 1.9.0
+            // the checkbox values are set after the click event if triggered with jQuery
+            if ($elt.is(':checkbox')) {
+                $elt.each(function () {
+                    this.click();
+                });
+            } else {
+                $elt
+                    .click()
+                    .mousedown();
+            }
         });
 }
 

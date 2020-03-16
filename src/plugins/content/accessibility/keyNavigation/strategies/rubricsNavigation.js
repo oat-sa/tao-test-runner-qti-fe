@@ -21,6 +21,12 @@ import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 
 /**
+ * The identifier the keyNavigator group
+ * @type {String}
+ */
+const groupId = 'rubric-element-navigation-group';
+
+/**
  * Key navigator strategy applying onto the rubric blocks.
  */
 export default {
@@ -50,11 +56,9 @@ export default {
 
                 $itemElements.each(function () {
                     const $itemElement = $(this);
-                    const id = `rubric_element_navigation_group_${keyNavigators.length}`;
-
                     keyNavigators.push(
                         keyNavigator({
-                            id: id,
+                            id: `${groupId}-${keyNavigators.length}`,
                             elements: navigableDomElement.createFromDoms($itemElement),
                             group: $itemElement,
                             replace: true

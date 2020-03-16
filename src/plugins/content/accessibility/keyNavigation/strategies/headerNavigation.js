@@ -19,7 +19,16 @@
 import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
-import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import {
+    setupItemsNavigator,
+    setupClickableNavigator
+} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+
+/**
+ * The identifier the keyNavigator group
+ * @type {String}
+ */
+const groupId = 'header-toolbar';
 
 /**
  * Key navigator strategy applying onto the header bar.
@@ -47,32 +56,32 @@ export default {
              */
             init() {
                 //need global selector as currently no way to access delivery frame from test runner
-                const $header = $('header');
-                const $headerElements = $header.find('a:visible');
-                const navigables = navigableDomElement.createFromDoms($headerElements);
+                const $headerBar = $('header');
+                const $headerElements = $headerBar.find('a:visible');
 
-                if (navigables.length) {
-                    keyNavigators.push(
-                        keyNavigator({
-                            id: 'header-toolbar',
-                            group: $header,
-                            elements: navigables,
+                const registerHeaderbarNavigator = (id, group, $elements) => {
+                    const elements = navigableDomElement.createFromDoms($elements);
+                    if (elements.length) {
+                        const navigator = keyNavigator({
+                            id,
+                            group,
+                            elements,
                             replace: true
-                        })
-                            .on(config.keyNextItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.next();
-                                }
-                            })
-                            .on(config.keyPrevItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.previous();
-                                }
-                            })
-                            .on('activate', function (cursor) {
-                                cursor.navigable.getElement().click();
-                            })
-                    );
+                        });
+
+                        setupItemsNavigator(navigator, config);
+                        setupClickableNavigator(navigator);
+                        keyNavigators.push(navigator);
+                    }
+                };
+
+                if (config.flatNavigation) {
+                    $headerElements.each((index, el) => {
+                        const $element = $(el);
+                        registerHeaderbarNavigator(`${groupId}-${index}`, $element, $element);
+                    });
+                } else {
+                    registerHeaderbarNavigator(groupId, $headerBar, $headerElements);
                 }
 
                 return this;

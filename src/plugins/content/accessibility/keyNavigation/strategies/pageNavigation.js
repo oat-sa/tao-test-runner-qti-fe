@@ -20,6 +20,12 @@ import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 
 /**
+ * The identifier the keyNavigator group
+ * @type {String}
+ */
+const groupId = 'item-content-wrapper';
+
+/**
  * Key navigator strategy applying onto the page.
  */
 export default {
@@ -52,7 +58,7 @@ export default {
                     const {id} = testRunner.getCurrentItem();
                     keyNavigators.push(
                         keyNavigator({
-                            id: `item-content-wrapper_${id}`,
+                            id: `${groupId}-${id}`,
                             group: $wrapper,
                             elements: navigables,
                             propagateTab: false, // inner item navigators will send tab to this element

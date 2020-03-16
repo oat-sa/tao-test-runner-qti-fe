@@ -19,7 +19,11 @@
 import _ from "lodash";
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
-import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import {
+    allowedToNavigateFrom,
+    setupItemsNavigator,
+    setupClickableNavigator
+} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
  * Key navigator strategy applying onto the navigation panel.
@@ -68,20 +72,13 @@ export default {
                             replace: true,
                             elements: navigableFilters,
                             group: $navigator.find('.qti-navigator-filters')
-                        })
-                            .on(config.keyNextTab || config.keyNextItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.next();
-                                }
-                            })
-                            .on(config.keyPrevTab || config.keyPrevItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.previous();
-                                }
-                            })
-                            .on('activate', cursor => {
-                                cursor.navigable.getElement().click();
-                            });
+                        });
+
+                        setupItemsNavigator(filtersNavigator, {
+                            keyNextItem: config.keyNextTab || config.keyNextItem,
+                            keyPrevItem: config.keyPrevTab || config.keyPrevItem
+                        });
+                        setupClickableNavigator(filtersNavigator);
 
                         if (config.keepState) {
                             filtersNavigator.on('focus', (cursor, origin) => {
@@ -151,19 +148,6 @@ export default {
                                 return pos;
                             }
                         })
-                            .on(config.keyNextContent || config.keyNextItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.next();
-                                }
-                            })
-                            .on(config.keyPrevContent || config.keyPrevItem, function (elem) {
-                                if (allowedToNavigateFrom(elem)) {
-                                    this.previous();
-                                }
-                            })
-                            .on('activate', cursor => {
-                                cursor.navigable.getElement().click();
-                            })
                             .on('focus', cursor => {
                                 itemListingVisited = true;
                                 cursor.navigable
@@ -177,6 +161,12 @@ export default {
                                     .parent()
                                     .removeClass('key-navigation-highlight');
                             });
+
+                        setupItemsNavigator(itemsNavigator, {
+                            keyNextItem: config.keyNextContent || config.keyNextItem,
+                            keyPrevItem: config.keyPrevContent || config.keyPrevItem
+                        });
+                        setupClickableNavigator(itemsNavigator);
 
                         if (config.keepState) {
                             itemsNavigator.on('lowerbound upperbound', () => {

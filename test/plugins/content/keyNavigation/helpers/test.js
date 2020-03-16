@@ -65,8 +65,11 @@ define([
 
 
     QUnit.cases.init(fixtureCases).test('allowedToNavigateFrom ', (data, assert) => {
-        assert.expect(12);
-        $('.testable', data.fixture).each((i, el) => {
+        const $fixtures = $('.testable', data.fixture);
+
+        assert.expect($fixtures.length * 4);
+
+        $fixtures.each((i, el) => {
             const mockElement = {
                 getElement() {
                     return el;
@@ -88,6 +91,7 @@ define([
 
     QUnit.cases.init(fixtureCases).test('setupItemsNavigator ', (data, assert) => {
         const ready = assert.async();
+        const $fixtures = $('.testable', data.fixture);
         const config = {
             keyNextItem: 'right',
             keyPrevItem: 'left',
@@ -111,9 +115,9 @@ define([
         });
         const cases = [];
 
-        assert.expect(6);
+        assert.expect($fixtures.length * 2);
 
-        $('.testable', data.fixture).each((i, el) => {
+        $fixtures.each((i, el) => {
             cases.push(
                 getNavigationPromise(config.keyNextItem, 'next', el)
                     .then(() => assert.ok(data.allowed, 'The "next()" method has been called'))
@@ -139,11 +143,12 @@ define([
 
     QUnit.cases.init(fixtureCases).test('setupClickableNavigator ', (data, assert) => {
         const ready = assert.async();
+        const $fixtures = $('.testable', data.fixture);
         const cases = [];
 
-        assert.expect(6);
+        assert.expect($fixtures.length * 2);
 
-        $('.testable', data.fixture).each((i, el) => {
+        $fixtures.each((i, el) => {
             const $el = $(el);
             const navigator = eventifier({});
             const cursor = {
@@ -161,10 +166,15 @@ define([
                 });
             }));
             cases.push(new Promise(resolve => {
-                $el.off('mousedown').on('mousedown', () => {
-                    assert.ok('ok', 'The element has received a mouse down event');
+                if ($el.is(':checkbox')) {
+                    assert.ok('ok', 'No mouse down event expected');
                     resolve();
-                });
+                } else {
+                    $el.off('mousedown').on('mousedown', () => {
+                        assert.ok('ok', 'The element has received a mouse down event');
+                        resolve();
+                    });
+                }
             }));
 
             helpers.setupClickableNavigator(navigator);

@@ -17,12 +17,10 @@
  */
 
 import $ from 'jquery';
+import scrollHelper from 'ui/scroller';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
-import {
-    allowedToNavigateFrom,
-    showElementsContent
-} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import {allowedToNavigateFrom} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
  * Key navigator strategy applying inside the item.
@@ -141,7 +139,10 @@ export default {
                             .on('focus', function (cursor) {
                                 const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
                                 $qtiChoice.addClass('key-navigation-highlight');
-                                showElementsContent($qtiChoice, testRunner.getAreaBroker().getContentArea());
+                                return scrollHelper.scrollTo(
+                                    $qtiChoice,
+                                    testRunner.getAreaBroker().getContentArea().closest('.content-wrapper')
+                                );
                             })
                             .on('blur', function (cursor) {
                                 cursor.navigable

@@ -51,7 +51,7 @@ export default {
              * @returns {keyNavigationStrategy}
              */
             init() {
-                const $rubricArea = $('#qti-rubrics');
+                const $rubricArea = testRunner.getAreaBroker().getContainer().find('#qti-rubrics');
                 const $itemElements = $rubricArea.find('.qti-rubricBlock');
 
                 $itemElements.each(function () {

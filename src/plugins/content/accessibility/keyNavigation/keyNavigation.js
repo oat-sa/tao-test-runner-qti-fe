@@ -24,6 +24,7 @@ import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import {
     allowedToNavigateFrom,
+    setupItemsNavigator,
     getStrategies,
     getNavigators
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
@@ -93,17 +94,10 @@ export default function keyNavigationFactory(testRunner, config = {}) {
                         });
                 });
             } else {
-                groupNavigator
-                    .on(navigationConfig.keyNextGroup, function (elem) {
-                        if (allowedToNavigateFrom(elem)) {
-                            this.next();
-                        }
-                    })
-                    .on(navigationConfig.keyPrevGroup, function (elem) {
-                        if (allowedToNavigateFrom(elem)) {
-                            this.previous();
-                        }
-                    });
+                setupItemsNavigator(groupNavigator, {
+                    keyNextItem: navigationConfig.keyNextGroup,
+                    keyPrevItem: navigationConfig.keyPrevGroup
+                });
             }
 
             shortcut

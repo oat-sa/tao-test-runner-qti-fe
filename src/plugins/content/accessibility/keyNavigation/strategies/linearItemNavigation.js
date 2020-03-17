@@ -28,6 +28,7 @@ import {
 /**
  * Key navigator strategy applying inside the item.
  * Navigable item content are interaction choices with the special class "key-navigation-focusable".
+ * @type {Object} keyNavigationStrategy
  */
 export default {
     name: 'linearItem',
@@ -35,99 +36,87 @@ export default {
     /**
      * Builds the item navigation strategy.
      *
-     * @param {testRunner} testRunner - the test runner instance to control
-     * @param {keyNavigationStrategyConfig} config - the config to apply
      * @returns {keyNavigationStrategy}
      */
-    init(testRunner, config) {
+    init() {
+        const config = this.getConfig();
+        const $content = this.getTestRunner().getAreaBroker().getContentArea();
+        const $qtiIteractionsNodeList = $content
+            .find('.key-navigation-focusable,.qti-interaction')
+            .filter(function () {
+                //filter out interaction as it will be managed separately
+                return !$(this).parents('.qti-interaction').length;
+            });
+
+        const $qtiChoiceNodesList = $qtiIteractionsNodeList.find('.qti-choice');
+        let $lastParent = null;
+        let list = [];
+        const setupListNavigator = () => {
+            const navigator = keyNavigator({
+                elements: navigableGroupElement.createFromNavigators(list),
+                propagateTab: false
+            });
+
+            setupItemsNavigator(navigator, config);
+            this.choicesNavigators.push(navigator);
+        };
+
         // this strategy manages 2 navigators:
         // - keyNavigators lists all elements separately, allowing to navigate among them as identified groups
         // - choicesNavigators lists elements with the same parent, allowing to navigate "horizontally" among them
-        let keyNavigators = [];
-        let choicesNavigators = [];
+        this.keyNavigators = [];
+        this.choicesNavigators = [];
 
-        /**
-         * @typedef {Object} keyNavigationStrategy
-         */
-        return {
-            /**
-             * Setup the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            init() {
-                const $content = testRunner.getAreaBroker().getContentArea();
-                const $qtiIteractionsNodeList = $content
-                    .find('.key-navigation-focusable,.qti-interaction')
-                    .filter(function () {
-                        //filter out interaction as it will be managed separately
-                        return !$(this).parents('.qti-interaction').length;
-                    });
+        // the item focusable body elements are considered scrollable
+        $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
 
-                // the item focusable body elements are considered scrollable
-                $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
+        $qtiChoiceNodesList.each((i, el) => {
+            const $itemElement = $(el);
+            const $parent = $itemElement.parent();
+            const choiceNavigator = keyNavigator({
+                elements: navigableDomElement.createFromDoms($itemElement),
+                group: $itemElement,
+                propagateTab: false
+            });
 
-                const $qtiChoiceNodesList = $qtiIteractionsNodeList.find('.qti-choice');
-                let $lastParent = null;
-                let list = [];
-                const setupListNavigator = () => {
-                    const navigator = keyNavigator({
-                        elements: navigableGroupElement.createFromNavigators(list),
-                        propagateTab: false
-                    });
+            setupClickableNavigator(choiceNavigator);
 
-                    setupItemsNavigator(navigator, config);
-                    choicesNavigators.push(navigator);
-                };
-
-                $qtiChoiceNodesList.each(function () {
-                    const $itemElement = $(this);
-                    const $parent = $itemElement.parent();
-                    const choiceNavigator = keyNavigator({
-                        elements: navigableDomElement.createFromDoms($itemElement),
-                        group: $itemElement,
-                        propagateTab: false
-                    });
-
-                    setupClickableNavigator(choiceNavigator);
-
-                    if ($lastParent && !$parent.is($lastParent)) {
-                        setupListNavigator();
-                        list = [];
-                    }
-
-                    keyNavigators.push(choiceNavigator);
-                    list.push(choiceNavigator);
-                    $lastParent = $parent;
-                });
-
-                if (list.length) {
-                    setupListNavigator();
-                    list = [];
-                }
-
-                return this;
-            },
-
-            /**
-             * Gets the list of applied navigators
-             * @returns {keyNavigator[]}
-             */
-            getNavigators() {
-                return keyNavigators;
-            },
-
-            /**
-             * Tears down the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            destroy() {
-                keyNavigators.forEach(navigator => navigator.destroy());
-                choicesNavigators.forEach(navigator => navigator.destroy());
-                choicesNavigators = [];
-                keyNavigators = [];
-
-                return this;
+            if ($lastParent && !$parent.is($lastParent)) {
+                setupListNavigator();
+                list = [];
             }
-        };
+
+            this.keyNavigators.push(choiceNavigator);
+            list.push(choiceNavigator);
+            $lastParent = $parent;
+        });
+
+        if (list.length) {
+            setupListNavigator();
+            list = [];
+        }
+
+        return this;
+    },
+
+    /**
+     * Gets the list of applied navigators
+     * @returns {keyNavigator[]}
+     */
+    getNavigators() {
+        return this.keyNavigators;
+    },
+
+    /**
+     * Tears down the keyNavigator strategy
+     * @returns {keyNavigationStrategy}
+     */
+    destroy() {
+        this.keyNavigators.forEach(navigator => navigator.destroy());
+        this.choicesNavigators.forEach(navigator => navigator.destroy());
+        this.choicesNavigators = [];
+        this.keyNavigators = [];
+
+        return this;
     }
 };

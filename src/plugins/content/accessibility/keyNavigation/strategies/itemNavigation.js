@@ -28,6 +28,7 @@ import {
 /**
  * Key navigator strategy applying inside the item.
  * Navigable item content are interaction choices and body element with the special class "key-navigation-focusable".
+ * @type {Object} keyNavigationStrategy
  */
 export default {
     name: 'item',
@@ -35,127 +36,103 @@ export default {
     /**
      * Builds the item navigation strategy.
      *
-     * @param {testRunner} testRunner - the test runner instance to control
-     * @param {keyNavigationStrategyConfig} config - the config to apply
      * @returns {keyNavigationStrategy}
      */
-    init(testRunner, config) {
-        let keyNavigators = [];
+    init() {
+        this.keyNavigators = [];
 
-        /**
-         * @typedef {Object} keyNavigationStrategy
-         */
-        return {
-            /**
-             * Setup the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            init() {
-                const $content = testRunner.getAreaBroker().getContentArea();
-                const $qtiIteractionsNodeList = $content
-                    .find('.key-navigation-focusable,.qti-interaction')
-                    .filter(function () {
-                        //filter out interaction as it will be managed separately
-                        return !$(this).parents('.qti-interaction').length;
-                    });
+        const config = this.getConfig();
+        const $content = this.getTestRunner().getAreaBroker().getContentArea();
+        const $qtiIteractionsNodeList = $content
+            .find('.key-navigation-focusable,.qti-interaction')
+            .filter(function () {
+                //filter out interaction as it will be managed separately
+                return !$(this).parents('.qti-interaction').length;
+            });
 
-                // the item focusable body elements are considered scrollable
-                $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
+        // the item focusable body elements are considered scrollable
+        $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
 
-                $qtiIteractionsNodeList
-                    .each((i, el) => {
-                        const $itemElement = $(el);
-                        if ($itemElement.hasClass('qti-interaction')) {
-                            this.addInteraction($itemElement);
-                        } else {
-                            keyNavigators.push(
+        $qtiIteractionsNodeList
+            .each((i, el) => {
+                const $itemElement = $(el);
+                if ($itemElement.hasClass('qti-interaction')) {
+                    //add navigable elements from prompt
+                    $itemElement.find('.key-navigation-focusable').each((i, el) => {
+                        const $nav = $(el);
+                        if (!$nav.closest('.qti-choice').length) {
+                            this.keyNavigators.push(
                                 keyNavigator({
-                                    elements: navigableDomElement.createFromDoms($itemElement),
-                                    group: $itemElement,
+                                    elements: navigableDomElement.createFromDoms($nav),
+                                    group: $nav,
                                     propagateTab: false
                                 })
                             );
                         }
                     });
 
-                return this;
-            },
+                    //reset interaction custom key navigation to override the behaviour with the new one
+                    $itemElement.off('.keyNavigation');
 
-            /**
-             * Set key navigation on the interaction
-             *
-             * @param {jQuery} $interaction - the interaction container
-             * @returns {keyNavigationStrategy}
-             */
-            addInteraction($interaction) {
-                //add navigable elements from prompt
-                $interaction.find('.key-navigation-focusable').each(function () {
-                    const $nav = $(this);
-                    if (!$nav.closest('.qti-choice').length) {
-                        keyNavigators.push(
-                            keyNavigator({
-                                elements: navigableDomElement.createFromDoms($nav),
-                                group: $nav,
-                                propagateTab: false
-                            })
-                        );
-                    }
-                });
+                    //search for inputs that represent the interaction focusable choices
+                    const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
+                    const interactionNavigables = navigableDomElement.createFromDoms($inputs);
 
-                //reset interaction custom key navigation to override the behaviour with the new one
-                $interaction.off('.keyNavigation');
-
-                //search for inputs that represent the interaction focusable choices
-                const $inputs = $interaction.is(':input') ? $interaction : $interaction.find(':input');
-                const interactionNavigables = navigableDomElement.createFromDoms($inputs);
-
-                if (interactionNavigables.length) {
-                    const navigator = keyNavigator({
-                        elements: interactionNavigables,
-                        group: $interaction,
-                        loop: false
-                    })
-                        .on('focus', function (cursor) {
-                            const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
-                            $qtiChoice.addClass('key-navigation-highlight');
-                            return scrollHelper.scrollTo(
-                                $qtiChoice,
-                                testRunner.getAreaBroker().getContentArea().closest('.content-wrapper')
-                            );
+                    if (interactionNavigables.length) {
+                        const navigator = keyNavigator({
+                            elements: interactionNavigables,
+                            group: $itemElement,
+                            loop: false
                         })
-                        .on('blur', function (cursor) {
-                            cursor.navigable
-                                .getElement()
-                                .closest('.qti-choice')
-                                .removeClass('key-navigation-highlight');
-                        });
+                            .on('focus', cursor => {
+                                const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
+                                $qtiChoice.addClass('key-navigation-highlight');
+                                return scrollHelper.scrollTo(
+                                    $qtiChoice,
+                                    this.getTestRunner().getAreaBroker().getContentArea().closest('.content-wrapper')
+                                );
+                            })
+                            .on('blur', cursor => {
+                                cursor.navigable
+                                    .getElement()
+                                    .closest('.qti-choice')
+                                    .removeClass('key-navigation-highlight');
+                            });
 
-                    setupItemsNavigator(navigator, config);
-                    setupClickableNavigator(navigator);
-                    keyNavigators.push(navigator);
+                        setupItemsNavigator(navigator, config);
+                        setupClickableNavigator(navigator);
+                        this.keyNavigators.push(navigator);
+                    }
+                } else {
+                    this.keyNavigators.push(
+                        keyNavigator({
+                            elements: navigableDomElement.createFromDoms($itemElement),
+                            group: $itemElement,
+                            propagateTab: false
+                        })
+                    );
                 }
+            });
 
-                return this;
-            },
+        return this;
+    },
 
-            /**
-             * Gets the list of applied navigators
-             * @returns {keyNavigator[]}
-             */
-            getNavigators() {
-                return keyNavigators;
-            },
+    /**
+     * Gets the list of applied navigators
+     * @returns {keyNavigator[]}
+     */
+    getNavigators() {
+        return this.keyNavigators;
+    },
 
-            /**
-             * Tears down the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            destroy() {
-                keyNavigators.forEach(navigator => navigator.destroy());
-                keyNavigators = [];
+    /**
+     * Tears down the keyNavigator strategy
+     * @returns {keyNavigationStrategy}
+     */
+    destroy() {
+        this.keyNavigators.forEach(navigator => navigator.destroy());
+        this.keyNavigators = [];
 
-                return this;
-            }
-        };
+        return this;
     }
 };

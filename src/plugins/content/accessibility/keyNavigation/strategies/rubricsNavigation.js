@@ -28,6 +28,7 @@ const groupId = 'rubric-element-navigation-group';
 
 /**
  * Key navigator strategy applying onto the rubric blocks.
+ * @type {Object} keyNavigationStrategy
  */
 export default {
     name: 'rubrics',
@@ -35,58 +36,45 @@ export default {
     /**
      * Builds the rubric blocks navigation strategy.
      *
-     * @param {testRunner} testRunner - the test runner instance to control
-     * @param {keyNavigationStrategyConfig} config - the config to apply
      * @returns {keyNavigationStrategy}
      */
-    init(testRunner, config) {
-        let keyNavigators = [];
+    init() {
+        this.keyNavigators = [];
 
-        /**
-         * @typedef {Object} keyNavigationStrategy
-         */
-        return {
-            /**
-             * Setup the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            init() {
-                testRunner.getAreaBroker().getContainer()
-                    .find('.qti-rubricBlock')
-                    .addClass('key-navigation-scrollable')
-                    .each((i, el) => {
-                        const $element = $(el);
-                        keyNavigators.push(
-                            keyNavigator({
-                                id: `${groupId}-${keyNavigators.length}`,
-                                elements: navigableDomElement.createFromDoms($element),
-                                group: $element,
-                                replace: true
-                            })
-                        );
-                    });
+        this.getTestRunner().getAreaBroker().getContainer()
+            .find('.qti-rubricBlock')
+            .addClass('key-navigation-scrollable')
+            .each((i, el) => {
+                const $element = $(el);
+                this.keyNavigators.push(
+                    keyNavigator({
+                        id: `${groupId}-${this.keyNavigators.length}`,
+                        elements: navigableDomElement.createFromDoms($element),
+                        group: $element,
+                        replace: true
+                    })
+                );
+            });
 
-                return this;
-            },
+        return this;
+    },
 
-            /**
-             * Gets the list of applied navigators
-             * @returns {keyNavigator[]}
-             */
-            getNavigators() {
-                return keyNavigators;
-            },
+    /**
+     * Gets the list of applied navigators
+     * @returns {keyNavigator[]}
+     */
+    getNavigators() {
+        return this.keyNavigators;
+    },
 
-            /**
-             * Tears down the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            destroy() {
-                keyNavigators.forEach(navigator => navigator.destroy());
-                keyNavigators = [];
+    /**
+     * Tears down the keyNavigator strategy
+     * @returns {keyNavigationStrategy}
+     */
+    destroy() {
+        this.keyNavigators.forEach(navigator => navigator.destroy());
+        this.keyNavigators = [];
 
-                return this;
-            }
-        };
+        return this;
     }
 };

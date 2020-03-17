@@ -25,6 +25,9 @@ import * as strategies from 'taoQtiTest/runner/plugins/content/accessibility/key
  * @property {Function} init
  * @property {Function} destroy
  * @property {Function} getNavigators
+ * @property {Function} getName
+ * @property {Function} getConfig
+ * @property {Function} getTestRunner
  */
 
 /**
@@ -56,8 +59,67 @@ import * as strategies from 'taoQtiTest/runner/plugins/content/accessibility/key
  * @returns {keyNavigationStrategy}
  */
 export default function strategyFactory(name, testRunner, config) {
-    return strategyFactory.getProvider(name)
-        .init(testRunner, config);
+    const strategy = strategyFactory.getProvider(name);
+
+    /**
+     * @type {Object} keyNavigationStrategy
+     */
+    return {
+        /**
+         * Setup the keyNavigator strategy
+         * @returns {keyNavigationStrategy}
+         */
+        init() {
+            strategy.init.call(this);
+            return this;
+        },
+
+        /**
+         * Gets the name of the applied strategy
+         * @returns {String}
+         */
+        getName() {
+            return name;
+        },
+
+        /**
+         * Gets the config of the strategy
+         * @returns {keyNavigationStrategyConfig}
+         */
+        getConfig() {
+            return config;
+        },
+
+        /**
+         * Gets the test runner
+         * @returns {testRunner}
+         */
+        getTestRunner() {
+            return testRunner;
+        },
+
+        /**
+         * Gets the list of applied navigators
+         * @returns {keyNavigator[]}
+         */
+        getNavigators() {
+            if ('function' === typeof strategy.getNavigators) {
+                return strategy.getNavigators.call(this);
+            }
+            return [];
+        },
+
+        /**
+         * Tears down the keyNavigator strategy
+         * @returns {keyNavigationStrategy}
+         */
+        destroy() {
+            if ('function' === typeof strategy.destroy) {
+                strategy.destroy.call(this);
+            }
+            return this;
+        }
+    };
 }
 
 // bootstrap the manager and register the strategies

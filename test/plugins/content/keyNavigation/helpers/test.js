@@ -194,7 +194,8 @@ define([
 
     QUnit.test('getStrategies', assert => {
         const testRunnerMock = {
-            init() {}
+            init() {
+            }
         };
         const navigationMode = {
             strategies: ['strategy1', 'strategy2'],
@@ -204,39 +205,25 @@ define([
         };
         const strategy1 = {
             name: 'strategy1',
-            init(testRunner, config) {
+            init() {
                 assert.ok(true, 'strategy1 created');
-                assert.equal(testRunner, testRunnerMock, 'The test runner instance has been supplied');
-                assert.equal(config, navigationMode.config, 'The config has been supplied');
-                return {
-                    init() {
-                        assert.ok(true, 'strategy1 initialized');
-                        return strategy1;
-                    }
-                };
             }
         };
         const strategy2 = {
             name: 'strategy2',
-            init(testRunner, config) {
+            init() {
                 assert.ok(true, 'strategy2 created');
-                assert.equal(testRunner, testRunnerMock, 'The test runner instance has been supplied');
-                assert.equal(config, navigationMode.config, 'The config has been supplied');
-                return {
-                    init() {
-                        assert.ok(true, 'strategy2 initialized');
-                        return strategy2;
-                    }
-                };
             }
         };
 
-        assert.expect(9);
+        assert.expect(5);
 
         strategyFactory.registerProvider('strategy1', strategy1);
         strategyFactory.registerProvider('strategy2', strategy2);
         const strategies = helpers.getStrategies(navigationMode, testRunnerMock);
-        assert.deepEqual(strategies, [strategy1, strategy2], 'The strategies have been built');
+        assert.equal(strategies.length, navigationMode.strategies.length, 'The strategies have been built');
+        assert.equal(strategies[0].getName(), 'strategy1', 'Strategy 1 has been created');
+        assert.equal(strategies[1].getName(), 'strategy2', 'Strategy 2 has been created');
     });
 
     QUnit.cases.init([

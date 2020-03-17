@@ -28,6 +28,7 @@ const groupId = 'item-content-wrapper';
 
 /**
  * Key navigator strategy applying onto the page.
+ * @type {Object} keyNavigationStrategy
  */
 export default {
     name: 'page',
@@ -35,59 +36,46 @@ export default {
     /**
      * Builds the page navigation strategy.
      *
-     * @param {testRunner} testRunner - the test runner instance to control
-     * @param {keyNavigationStrategyConfig} config - the config to apply
      * @returns {keyNavigationStrategy}
      */
-    init(testRunner, config) {
-        let keyNavigators = [];
+    init() {
+        this.keyNavigators = [];
 
-        /**
-         * @typedef {Object} keyNavigationStrategy
-         */
-        return {
-            /**
-             * Setup the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            init() {
-                testRunner.getAreaBroker().getContainer()
-                    .find('.content-wrapper')
-                    .addClass('key-navigation-scrollable')
-                    .each((i, el) => {
-                        const $element = $(el);
-                        keyNavigators.push(
-                            keyNavigator({
-                                id: `${groupId}-${keyNavigators.length}`,
-                                elements: navigableDomElement.createFromDoms($element),
-                                group: $element,
-                                propagateTab: false, // inner item navigators will send tab to this element
-                                replace: true
-                            })
-                        );
-                    });
+        this.getTestRunner().getAreaBroker().getContainer()
+            .find('.content-wrapper')
+            .addClass('key-navigation-scrollable')
+            .each((i, el) => {
+                const $element = $(el);
+                this.keyNavigators.push(
+                    keyNavigator({
+                        id: `${groupId}-${this.keyNavigators.length}`,
+                        elements: navigableDomElement.createFromDoms($element),
+                        group: $element,
+                        propagateTab: false, // inner item navigators will send tab to this element
+                        replace: true
+                    })
+                );
+            });
 
-                return this;
-            },
+        return this;
+    },
 
-            /**
-             * Gets the list of applied navigators
-             * @returns {keyNavigator[]}
-             */
-            getNavigators() {
-                return keyNavigators;
-            },
+    /**
+     * Gets the list of applied navigators
+     * @returns {keyNavigator[]}
+     */
+    getNavigators() {
+        return this.keyNavigators;
+    },
 
-            /**
-             * Tears down the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            destroy() {
-                keyNavigators.forEach(navigator => navigator.destroy());
-                keyNavigators = [];
+    /**
+     * Tears down the keyNavigator strategy
+     * @returns {keyNavigationStrategy}
+     */
+    destroy() {
+        this.keyNavigators.forEach(navigator => navigator.destroy());
+        this.keyNavigators = [];
 
-                return this;
-            }
-        };
+        return this;
     }
 };

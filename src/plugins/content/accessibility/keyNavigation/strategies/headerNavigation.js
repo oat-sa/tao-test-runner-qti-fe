@@ -32,6 +32,7 @@ const groupId = 'header-toolbar';
 
 /**
  * Key navigator strategy applying onto the header bar.
+ * @type {Object} keyNavigationStrategy
  */
 export default {
     name: 'header',
@@ -39,72 +40,60 @@ export default {
     /**
      * Builds the header navigation strategy.
      *
-     * @param {testRunner} testRunner - the test runner instance to control
-     * @param {keyNavigationStrategyConfig} config - the config to apply
      * @returns {keyNavigationStrategy}
      */
-    init(testRunner, config) {
-        let keyNavigators = [];
+    init() {
+        const config = this.getConfig();
+        //need global selector as currently no way to access delivery frame from test runner
+        const $headerBar = $('header');
+        const $headerElements = $headerBar.find('a:visible');
 
-        /**
-         * @typedef {Object} keyNavigationStrategy
-         */
-        return {
-            /**
-             * Setup the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            init() {
-                //need global selector as currently no way to access delivery frame from test runner
-                const $headerBar = $('header');
-                const $headerElements = $headerBar.find('a:visible');
+        const registerHeaderNavigator = (id, group, $elements) => {
+            const elements = navigableDomElement.createFromDoms($elements);
+            if (elements.length) {
+                const navigator = keyNavigator({
+                    id,
+                    group,
+                    elements,
+                    replace: true
+                });
 
-                const registerHeaderbarNavigator = (id, group, $elements) => {
-                    const elements = navigableDomElement.createFromDoms($elements);
-                    if (elements.length) {
-                        const navigator = keyNavigator({
-                            id,
-                            group,
-                            elements,
-                            replace: true
-                        });
-
-                        setupItemsNavigator(navigator, config);
-                        setupClickableNavigator(navigator);
-                        keyNavigators.push(navigator);
-                    }
-                };
-
-                if (config.flatNavigation) {
-                    $headerElements.each((index, el) => {
-                        const $element = $(el);
-                        registerHeaderbarNavigator(`${groupId}-${index}`, $element, $element);
-                    });
-                } else {
-                    registerHeaderbarNavigator(groupId, $headerBar, $headerElements);
-                }
-
-                return this;
-            },
-
-            /**
-             * Gets the list of applied navigators
-             * @returns {keyNavigator[]}
-             */
-            getNavigators() {
-                return keyNavigators;
-            },
-
-            /**
-             * Tears down the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            destroy() {
-                keyNavigators.forEach(navigator => navigator.destroy());
-                keyNavigators = [];
-
-                return this;
+                setupItemsNavigator(navigator, config);
+                setupClickableNavigator(navigator);
+                this.keyNavigators.push(navigator);
             }
         };
+
+        this.keyNavigators = [];
+
+        if (config.flatNavigation) {
+            $headerElements.each((index, el) => {
+                const $element = $(el);
+                registerHeaderNavigator(`${groupId}-${index}`, $element, $element);
+            });
+        } else {
+            registerHeaderNavigator(groupId, $headerBar, $headerElements);
+        }
+
+        return this;
+    },
+
+    /**
+     * Gets the list of applied navigators
+     * @returns {keyNavigator[]}
+     */
+    getNavigators() {
+        return this.keyNavigators;
+    },
+
+    /**
+     * Tears down the keyNavigator strategy
+     * @returns {keyNavigationStrategy}
+     */
+    destroy() {
+        this.keyNavigators.forEach(navigator => navigator.destroy());
+        this.keyNavigators = [];
+
+        return this;
     }
 };

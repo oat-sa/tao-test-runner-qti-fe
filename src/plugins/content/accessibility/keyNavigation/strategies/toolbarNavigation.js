@@ -33,6 +33,7 @@ const groupId = 'bottom-toolbar';
 
 /**
  * Key navigator strategy applying onto the tools bar
+ * @type {Object} keyNavigationStrategy
  */
 export default {
     name: 'toolbar',
@@ -40,88 +41,76 @@ export default {
     /**
      * Builds the toolbar navigation strategy.
      *
-     * @param {testRunner} testRunner - the test runner instance to control
-     * @param {keyNavigationStrategyConfig} config - the config to apply
      * @returns {keyNavigationStrategy}
      */
-    init(testRunner, config) {
-        let keyNavigators = [];
+    init() {
+        const config = this.getConfig();
+        const $navigationBar = this.getTestRunner().getAreaBroker().getContainer().find('.bottom-action-bar');
+        const $toolbarElements = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
 
-        /**
-         * @typedef {Object} keyNavigationStrategy
-         */
-        return {
-            /**
-             * Setup the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            init() {
-                const $navigationBar = $('.bottom-action-bar');
-                const $toolbarElements = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
+        const registerToolbarNavigator = (id, group, $elements) => {
+            const elements = navigableDomElement.createFromDoms($elements);
+            if (elements.length) {
+                const navigator = keyNavigator({
+                    id,
+                    group,
+                    elements,
+                    replace: true,
+                    defaultPosition(navigables) {
+                        let pos = 0;
 
-                const registerToolbarNavigator = (id, group, $elements) => {
-                    const elements = navigableDomElement.createFromDoms($elements);
-                    if (elements.length) {
-                        const navigator = keyNavigator({
-                            id,
-                            group,
-                            elements,
-                            replace: true,
-                            defaultPosition(navigables) {
-                                let pos = 0;
-
-                                // search for the position of the "Next" button if any,
-                                // otherwise take the position of the last element
-                                if (config.autoFocus) {
-                                    pos = navigables.length - 1;
-                                    _.forEach(navigables, (navigable, i) => {
-                                        const $element = navigable.getElement();
-                                        if ($element.data('control') === 'move-forward' || $element.data('control') === 'move-end') {
-                                            pos = i;
-                                        }
-                                    });
+                        // search for the position of the "Next" button if any,
+                        // otherwise take the position of the last element
+                        if (config.autoFocus) {
+                            pos = navigables.length - 1;
+                            _.forEach(navigables, (navigable, i) => {
+                                const $element = navigable.getElement();
+                                if ($element.data('control') === 'move-forward' || $element.data('control') === 'move-end') {
+                                    pos = i;
                                 }
+                            });
+                        }
 
-                                return pos;
-                            }
-                        });
-
-                        setupItemsNavigator(navigator, config);
-                        setupClickableNavigator(navigator);
-                        keyNavigators.push(navigator);
+                        return pos;
                     }
-                };
+                });
 
-                if (config.flatNavigation) {
-                    $toolbarElements.each((index, el) => {
-                        const $element = $(el);
-                        registerToolbarNavigator(`${groupId}-${index}`, $element, $element);
-                    });
-                } else {
-                    registerToolbarNavigator(groupId, $navigationBar, $toolbarElements);
-                }
-
-                return this;
-            },
-
-            /**
-             * Gets the list of applied navigators
-             * @returns {keyNavigator[]}
-             */
-            getNavigators() {
-                return keyNavigators;
-            },
-
-            /**
-             * Tears down the keyNavigator strategy
-             * @returns {keyNavigationStrategy}
-             */
-            destroy() {
-                keyNavigators.forEach(navigator => navigator.destroy());
-                keyNavigators = [];
-
-                return this;
+                setupItemsNavigator(navigator, config);
+                setupClickableNavigator(navigator);
+                this.keyNavigators.push(navigator);
             }
         };
+
+        this.keyNavigators = [];
+
+        if (config.flatNavigation) {
+            $toolbarElements.each((index, el) => {
+                const $element = $(el);
+                registerToolbarNavigator(`${groupId}-${index}`, $element, $element);
+            });
+        } else {
+            registerToolbarNavigator(groupId, $navigationBar, $toolbarElements);
+        }
+
+        return this;
+    },
+
+    /**
+     * Gets the list of applied navigators
+     * @returns {keyNavigator[]}
+     */
+    getNavigators() {
+        return this.keyNavigators;
+    },
+
+    /**
+     * Tears down the keyNavigator strategy
+     * @returns {keyNavigationStrategy}
+     */
+    destroy() {
+        this.keyNavigators.forEach(navigator => navigator.destroy());
+        this.keyNavigators = [];
+
+        return this;
     }
 };

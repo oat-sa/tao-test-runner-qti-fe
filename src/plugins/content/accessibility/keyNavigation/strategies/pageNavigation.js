@@ -16,6 +16,7 @@
  * Copyright (c) 2020 Open Assessment Technologies SA ;
  */
 
+import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 
@@ -50,22 +51,21 @@ export default {
              * @returns {keyNavigationStrategy}
              */
             init() {
-                const $wrapper = testRunner.getAreaBroker().getContainer().find('.content-wrapper');
-                const navigables = navigableDomElement.createFromDoms($wrapper);
-
-                $wrapper.addClass('key-navigation-scrollable');
-                if (navigables.length) {
-                    const {id} = testRunner.getCurrentItem();
-                    keyNavigators.push(
-                        keyNavigator({
-                            id: `${groupId}-${id}`,
-                            group: $wrapper,
-                            elements: navigables,
-                            propagateTab: false, // inner item navigators will send tab to this element
-                            replace: true,
-                        })
-                    );
-                }
+                testRunner.getAreaBroker().getContainer()
+                    .find('.content-wrapper')
+                    .addClass('key-navigation-scrollable')
+                    .each((i, el) => {
+                        const $element = $(el);
+                        keyNavigators.push(
+                            keyNavigator({
+                                id: `${groupId}-${keyNavigators.length}`,
+                                elements: navigableDomElement.createFromDoms($element),
+                                group: $element,
+                                propagateTab: false, // inner item navigators will send tab to this element
+                                replace: true
+                            })
+                        );
+                    });
 
                 return this;
             },

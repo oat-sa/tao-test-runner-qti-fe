@@ -51,20 +51,20 @@ export default {
              * @returns {keyNavigationStrategy}
              */
             init() {
-                const $rubricArea = testRunner.getAreaBroker().getContainer().find('#qti-rubrics');
-                const $itemElements = $rubricArea.find('.qti-rubricBlock');
-
-                $itemElements.each(function () {
-                    const $itemElement = $(this);
-                    keyNavigators.push(
-                        keyNavigator({
-                            id: `${groupId}-${keyNavigators.length}`,
-                            elements: navigableDomElement.createFromDoms($itemElement),
-                            group: $itemElement,
-                            replace: true
-                        })
-                    );
-                });
+                testRunner.getAreaBroker().getContainer()
+                    .find('.qti-rubricBlock')
+                    .addClass('key-navigation-scrollable')
+                    .each((i, el) => {
+                        const $element = $(el);
+                        keyNavigators.push(
+                            keyNavigator({
+                                id: `${groupId}-${keyNavigators.length}`,
+                                elements: navigableDomElement.createFromDoms($element),
+                                group: $element,
+                                replace: true
+                            })
+                        );
+                    });
 
                 return this;
             },

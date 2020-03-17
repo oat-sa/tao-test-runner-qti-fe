@@ -118,6 +118,30 @@ var menuComponentApi = {
     },
 
     /**
+     * It needs to find nearest visible item.
+     *
+     * @param {-1|1} inc - incrementor. -1 - navigate to the top,  1 - to the bottom.
+     *
+     * @returns {JQuery} element.
+     */
+    _findClosestVisibleItem(inc = 1) {
+        if (!this.menuItems.length) {
+            return;
+        }
+        const last = inc === 1 ? this.menuItems.length : -1;
+        let elem;
+        do {
+            this.hoverIndex += inc;
+            if (this.hoverIndex === last) {
+                return;
+            }
+            elem = this.menuItems[this.hoverIndex].getElement();
+        } while (elem && elem.hasClass('hidden'));
+
+        return elem;
+    },
+
+    /**
      * open the menu
      */
     openMenu: function openMenu() {
@@ -148,16 +172,18 @@ var menuComponentApi = {
             // fromLast (default) navigation: focus on button and then using UP go to last item
             this.hoverIndex = this.menuItems.length - 1; // we start on the button, not at the max array index
             // which would be menuItems.length-1
-            if (this.$menuItems[this.hoverIndex]) {
-                this.$menuItems[this.hoverIndex].focus();
+            const elem = this._findClosestVisibleItem(-1);
+            if (elem) {
+                this.hoverItem(this.menuItems[this.hoverIndex].id);
             }
         }
         else if (this.navType === 'fromFirst') {
             // fromFirst navigation: focus on button and then using DOWN go to first item
             this.hoverIndex = 0; // we start on the button, not the first element
             // which would be 0
-            if (this.$menuItems[this.hoverIndex]) {
-                this.$menuItems[this.hoverIndex].focus();
+            const elem = this._findClosestVisibleItem();
+            if (elem) {
+                this.hoverItem(this.menuItems[this.hoverIndex].id);
             }
         }
 
@@ -187,6 +213,7 @@ var menuComponentApi = {
         // component inner state
         this.setState('opened', false);
         this.trigger('closemenu', this);
+        this.$menuButton.parent().focus();  // It needs for screenreaders to correctly read menu button after submenu was closed
     },
 
     /**
@@ -341,22 +368,15 @@ var menuComponentApi = {
      */
     moveUp: function moveUp() {
         if (this.hoverIndex > 0) {
-            this.hoverIndex--;
-            let elem = this.menuItems[this.hoverIndex].getElement();
-            while (elem && elem.hasClass('hidden')) {
-                this.hoverIndex--;
-                if (this.hoverIndex < 0) {
-                    return;
-                }
-                elem = this.menuItems[this.hoverIndex].getElement();
+            const elem = this._findClosestVisibleItem(-1);
+            if (elem) {
+                this.hoverItem(this.menuItems[this.hoverIndex].id);
+            } else {
+                this.closeMenu();
             }
-            this.hoverItem(this.menuItems[this.hoverIndex].id);
-            elem.focus();
             // move to the menu button
         } else if (this.hoverIndex === 0  && this.navType === 'fromFirst') {
             this.hoverIndex--;
-            this.hoverOffAll();
-            this.$menuButton.parent().focus(); // It needs for screenreaders to correctly read menu button after submenu was closed
             this.closeMenu();
         }
     },
@@ -367,22 +387,15 @@ var menuComponentApi = {
     moveDown: function moveDown() {
         // move to the next item
         if (this.hoverIndex < this.menuItems.length - 1) {
-            this.hoverIndex++;
-            let elem = this.menuItems[this.hoverIndex].getElement();
-            while (elem && elem.hasClass('hidden')) {
-                this.hoverIndex++;
-                if (this.hoverIndex === this.menuItems.length) {
-                    return;
-                }
-                elem = this.menuItems[this.hoverIndex].getElement();
+            const elem = this._findClosestVisibleItem();
+            if (elem) {
+                this.hoverItem(this.menuItems[this.hoverIndex].id);
+            } else {
+                this.closeMenu();
             }
-            this.hoverItem(this.menuItems[this.hoverIndex].id);
-            elem.focus();
             // move to the menu button
         } else if (this.hoverIndex === this.menuItems.length - 1 && this.navType === 'fromLast') {
             this.hoverIndex++;
-            this.hoverOffAll();
-            this.$menuButton.parent().focus();  // It needs for screenreaders to correctly read menu button after submenu was closed
             this.closeMenu();
         }
     },

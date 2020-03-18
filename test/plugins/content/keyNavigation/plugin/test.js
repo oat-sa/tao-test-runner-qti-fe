@@ -194,7 +194,7 @@ define([
                         runner
                             .after('setcontenttabtype', () => runner.next())
                             .after('renderitem.runnerComponent', itemRef => {
-                                if (itemRef === 'item-1') {
+                                if (itemRef !== 'item-3') {
                                     runner.trigger('setcontenttabtype', data.mode);
                                 } else {
                                     runner.off('renderitem.runnerComponent');

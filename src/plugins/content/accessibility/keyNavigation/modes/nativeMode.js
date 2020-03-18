@@ -29,7 +29,8 @@ export default {
      */
     init(config = {}) {
         return {
-            strategies: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
+            // todo: add access to the page and the rubric blocks
+            strategies: ['header', 'navigator', 'item', 'toolbar'],
             config: Object.assign({
                 autoFocus: false,
                 keepState: false,

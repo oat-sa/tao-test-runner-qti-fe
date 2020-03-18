@@ -90,7 +90,7 @@ define([
             additional: 'foo'
         },
         expected: {
-            strategies: ['header', 'navigator', 'rubrics', 'item', 'toolbar'],
+            strategies: ['header', 'navigator', 'item', 'toolbar'],
             config: {
                 autoFocus: false,
                 keepState: false,

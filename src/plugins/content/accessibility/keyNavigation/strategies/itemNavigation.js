@@ -54,12 +54,12 @@ export default {
         $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
 
         $qtiIteractionsNodeList
-            .each((i, el) => {
-                const $itemElement = $(el);
+            .each((itemPos, itemElement) => {
+                const $itemElement = $(itemElement);
                 if ($itemElement.hasClass('qti-interaction')) {
                     //add navigable elements from prompt
-                    $itemElement.find('.key-navigation-focusable').each((i, el) => {
-                        const $nav = $(el);
+                    $itemElement.find('.key-navigation-focusable').each((navPos, nav) => {
+                        const $nav = $(nav);
                         if (!$nav.closest('.qti-choice').length) {
                             this.keyNavigators.push(
                                 keyNavigator({

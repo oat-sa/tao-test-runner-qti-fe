@@ -259,7 +259,7 @@ define([
                                 } else {
                                     backendMock.setRubricsBank({});
                                 }
-                                runner.jump(0);
+                                runner.jump(runner.getTestContext().itemPosition);
                             });
                     });
             }))

@@ -118,17 +118,18 @@ var menuComponentApi = {
     },
 
     /**
-     * It needs to find nearest visible item.
+     * It needs to hover closest visible item.
      *
+     * @param {NUmber} last - index to stop.
      * @param {-1|1} inc - incrementor. -1 - navigate to the top,  1 - to the bottom.
      *
-     * @returns {JQuery} element.
+     * @returns {jQuery|undefined} returns visible item if it exists, otherwise undefined.
      */
-    _findClosestVisibleItem(inc = 1) {
+    hoverClosestVisibleItem(inc, last) {
         if (!this.menuItems.length) {
             return;
         }
-        const last = inc === 1 ? this.menuItems.length : -1;
+
         let elem;
         do {
             this.hoverIndex += inc;
@@ -138,7 +139,19 @@ var menuComponentApi = {
             elem = this.menuItems[this.hoverIndex].getElement();
         } while (elem && elem.hasClass('hidden'));
 
+        if (elem) {
+            this.hoverItem(this.menuItems[this.hoverIndex].id);
+        }
+
         return elem;
+    },
+
+    hoverNextVisibleItem() {
+        return this.hoverClosestVisibleItem(1, this.menuItems.length);
+    },
+
+    hoverPreviousVisibleItem() {
+        return this.hoverClosestVisibleItem(-1, -1);
     },
 
     /**
@@ -172,19 +185,13 @@ var menuComponentApi = {
             // fromLast (default) navigation: focus on button and then using UP go to last item
             this.hoverIndex = this.menuItems.length - 1; // we start on the button, not at the max array index
             // which would be menuItems.length-1
-            const elem = this._findClosestVisibleItem(-1);
-            if (elem) {
-                this.hoverItem(this.menuItems[this.hoverIndex].id);
-            }
+            this.hoverPreviousVisibleItem();
         }
         else if (this.navType === 'fromFirst') {
             // fromFirst navigation: focus on button and then using DOWN go to first item
             this.hoverIndex = 0; // we start on the button, not the first element
             // which would be 0
-            const elem = this._findClosestVisibleItem();
-            if (elem) {
-                this.hoverItem(this.menuItems[this.hoverIndex].id);
-            }
+            this.hoverNextVisibleItem();
         }
 
         // component inner state
@@ -368,10 +375,8 @@ var menuComponentApi = {
      */
     moveUp: function moveUp() {
         if (this.hoverIndex > 0) {
-            const elem = this._findClosestVisibleItem(-1);
-            if (elem) {
-                this.hoverItem(this.menuItems[this.hoverIndex].id);
-            } else {
+            const elem = this.hoverPreviousVisibleItem();
+            if (!elem) {
                 this.closeMenu();
             }
             // move to the menu button
@@ -387,10 +392,8 @@ var menuComponentApi = {
     moveDown: function moveDown() {
         // move to the next item
         if (this.hoverIndex < this.menuItems.length - 1) {
-            const elem = this._findClosestVisibleItem();
-            if (elem) {
-                this.hoverItem(this.menuItems[this.hoverIndex].id);
-            } else {
+            const elem = this.hoverNextVisibleItem();
+            if (!elem) {
                 this.closeMenu();
             }
             // move to the menu button

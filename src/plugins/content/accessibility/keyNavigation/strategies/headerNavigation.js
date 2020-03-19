@@ -44,7 +44,7 @@ export default {
      */
     init() {
         const config = this.getConfig();
-        //need global selector as currently no way to access delivery frame from test runner
+        // we need a global selector as there is currently no way to access the delivery frame from the test runner
         const $headerBar = $('header');
         const $headerElements = $headerBar.find('a:visible');
 

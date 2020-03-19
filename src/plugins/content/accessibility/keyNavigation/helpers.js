@@ -29,15 +29,16 @@ const ignoredClass = 'no-key-navigation';
 /**
  * Checks whether element is navigable from
  *
- * @param {HTMLElement|keyNavigator} element
+ * @param {HTMLElement|keyNavigator} from
  * @returns {boolean}
  */
-export function allowedToNavigateFrom(element) {
-    if (element.getCursor) {
+export function allowedToNavigateFrom(from) {
+    let element = from;
+    if (element && 'function' === typeof element.getCursor) {
         const {navigable} = element.getCursor();
         element = navigable;
     }
-    if (element.getElement) {
+    if (element && 'function' === typeof element.getElement) {
         element = element.getElement();
     }
     const $element = $(element);

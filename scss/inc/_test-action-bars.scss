@@ -203,6 +203,7 @@
                             }
                         }
 
+                        &:focus,
                         &.hover,
                         &:hover {
                             background-color: $info;
@@ -253,6 +254,14 @@
                     }
                 }
 
+                .landmark-title--hidden {
+                    position: absolute;
+                    clip: rect(1px, 1px, 1px, 1px);
+                    overflow: hidden;
+                    height: 1px;
+                    width: 1px;
+                    word-wrap: normal;
+                }
             }
         }
     }

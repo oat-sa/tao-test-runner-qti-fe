@@ -99,7 +99,8 @@ var toolboxComponentApi = {
      * @returns {Component} the create instance
      */
     createEntry: function createEntry(config) {
-        var item = entryFactory().init(config);
+        const extendedConfig = Object.assign({ role: "option" }, config);
+        const item = entryFactory().init(extendedConfig);
         this.allItems.push(item);
         return item;
     },

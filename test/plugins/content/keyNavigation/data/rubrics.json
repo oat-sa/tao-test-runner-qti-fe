@@ -1,0 +1,10 @@
+{
+    "assessmentSection-1": {
+        "numberRubrics": 1,
+        "rubrics": "<div id=\"tao5e60f91068325\" data-view=\"candidate\" class=\"qti-bodyElement qti-rubricBlock qti-view-candidate\">\n        <div class=\"qti-bodyElement qti-div\">Lorem ipsum sic amet dolorosa est. Blablatum in secula et caetera.</div>\n        </div>"
+    },
+    "assessmentSection-2": {
+        "numberRubrics": 1,
+        "rubrics": "<div id=\"tao5e60f91068643\" data-view=\"candidate\" class=\"qti-bodyElement qti-rubricBlock qti-view-candidate\">\n        <div class=\"qti-bodyElement qti-div\"> The quick brown fox jumps over the lazy dog</div>\n        </div>"
+    }
+}

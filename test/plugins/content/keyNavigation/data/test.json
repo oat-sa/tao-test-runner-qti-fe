@@ -1,5 +1,4 @@
 {
-    "success": true,
     "testData": {
         "title": "mock test",
         "identifier": "mock-test",
@@ -216,8 +215,8 @@
                 "isLinear": false,
                 "timeConstraint": null,
                 "sections": {
-                    "section-1": {
-                        "id": "section-1",
+                    "assessmentSection-2": {
+                        "id": "assessmentSection-2",
                         "label": "Section 1",
                         "isCatAdaptive": false,
                         "position": 1,
@@ -314,8 +313,5 @@
             "total": 5,
             "questionsViewed": 0
         }
-    },
-    "toolStates": [],
-    "lastStoreId": false,
-    "messages": []
+    }
 }

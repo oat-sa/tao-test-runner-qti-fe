@@ -65,15 +65,7 @@ export default {
         };
 
         this.keyNavigators = [];
-
-        if (config.flatNavigation) {
-            $headerElements.each((index, el) => {
-                const $element = $(el);
-                registerHeaderNavigator(`${groupId}-${index}`, $element, $element);
-            });
-        } else {
-            registerHeaderNavigator(groupId, $headerBar, $headerElements);
-        }
+        registerHeaderNavigator(groupId, $headerBar, $headerElements);
 
         return this;
     },

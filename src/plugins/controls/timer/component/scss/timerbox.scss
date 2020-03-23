@@ -8,6 +8,10 @@
         @include transition(opacity, 300ms, linear);
     }
 
+    & #timerbox-aria-label {
+        display:none;
+    }
+
     padding-top: 0;
     white-space: nowrap;
 

@@ -35,6 +35,7 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
+import __ from 'i18n';
 import timeEncoder from 'core/encoder/time';
 import pollingFactory from 'core/polling';
 import timerFactory from 'core/timer';
@@ -88,6 +89,7 @@ var warningTimeout = {
  */
 export default function countdownFactory($container, config) {
     var $time;
+    var $timeAriaLabel;
 
     /**
      * @typedef {Object} countdown
@@ -106,6 +108,7 @@ export default function countdownFactory($container, config) {
                 var encodedTime;
                 var warningId;
                 var warningMessage;
+                var hours, minutes;
 
                 if (!this.is('completed')) {
                     if (remainingTime <= 0) {
@@ -117,8 +120,10 @@ export default function countdownFactory($container, config) {
                         encodedTime = timeEncoder.encode(this.remainingTime / precision);
                         if (encodedTime !== this.encodedTime) {
                             this.encodedTime = encodedTime;
+                            [hours, minutes/* , seconds */] = this.encodedTime.split(':');
 
                             $time.text(this.encodedTime);
+                            $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
                         }
 
                         if (this.warnings) {
@@ -273,9 +278,13 @@ export default function countdownFactory($container, config) {
         })
         .on('render', function() {
             $time = $('.time', this.getElement());
+            $timeAriaLabel = $('#timerbox-aria-label', this.getElement());
+            const timeString = timeEncoder.encode(this.remainingTime / precision);
+            const [hours, minutes/* , seconds */] = timeString.split(':');
 
             if (this.config.showBeforeStart === true) {
-                $time.text(timeEncoder.encode(this.remainingTime / precision));
+                $time.text(timeString);
+                $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
             }
         })
         .on('warn', function(message, level) {

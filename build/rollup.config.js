@@ -19,6 +19,7 @@
 import path from 'path';
 import glob from 'glob-promise';
 import alias from 'rollup-plugin-alias';
+import clear from 'rollup-plugin-clear';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import cssResolve from './css-resolve';
 import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
@@ -87,6 +88,10 @@ export default inputs.map(input => {
             'layout/loading-bar'
         ],
         plugins: [
+            clear({
+                targets: [outputDir],
+                watch: false
+            }),
             cssResolve(),
             wildcardExternal(['core/**', 'ui/**', 'util/**', 'lib/**', 'taoTests/**', 'taoItems/**', 'taoQtiItem/**']),
             alias({

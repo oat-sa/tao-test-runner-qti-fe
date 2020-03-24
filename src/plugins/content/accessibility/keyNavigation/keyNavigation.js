@@ -58,6 +58,7 @@ export default function keyNavigationFactory(testRunner, config = {}) {
          * @returns {testRunnerKeyNavigator}
          */
         init() {
+            console.log('TEST3')
             const navigationMode = modeFactory(contentNavigatorType, config);
             const navigationConfig = navigationMode.config;
             strategies = getStrategies(navigationMode, testRunner);

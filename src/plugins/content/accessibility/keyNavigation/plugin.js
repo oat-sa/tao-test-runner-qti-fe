@@ -21,7 +21,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import keyNavigatorFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigator';
+import keyNavigatorFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigation';
 import pluginFactory from 'taoTests/runner/plugin';
 import 'taoQtiTest/runner/plugins/content/accessibility/css/key-navigation.css';
 
@@ -47,13 +47,13 @@ export default pluginFactory({
     init() {
         const testRunner = this.getTestRunner();
         const pluginConfig = _.defaults(this.getConfig(), defaultPluginConfig);
-        const keyNavigator = keyNavigatorFactory(pluginConfig);
+        const keyNavigator = keyNavigatorFactory(testRunner, pluginConfig);
 
         /**
          *  Update plugin state based on changes
          */
         testRunner
-            .after('renderitem', () => keyNavigator.init(testRunner))
+            .after('renderitem', () => keyNavigator.init())
             .on('unloaditem', () => keyNavigator.destroy())
 
             /**

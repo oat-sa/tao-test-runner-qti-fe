@@ -108,7 +108,6 @@ export default function countdownFactory($container, config) {
                 var encodedTime;
                 var warningId;
                 var warningMessage;
-                var hours, minutes;
 
                 if (!this.is('completed')) {
                     if (remainingTime <= 0) {
@@ -120,7 +119,9 @@ export default function countdownFactory($container, config) {
                         encodedTime = timeEncoder.encode(this.remainingTime / precision);
                         if (encodedTime !== this.encodedTime) {
                             this.encodedTime = encodedTime;
-                            [hours, minutes/* , seconds */] = this.encodedTime.split(':');
+                            const timeArr = this.encodedTime.split(':');
+                            const hours = timeArr[0];
+                            const minutes = timeArr[1];
 
                             $time.text(this.encodedTime);
                             $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
@@ -280,7 +281,9 @@ export default function countdownFactory($container, config) {
             $time = $('.time', this.getElement());
             $timeAriaLabel = $('#timerbox-aria-label', this.getElement());
             const timeString = timeEncoder.encode(this.remainingTime / precision);
-            const [hours, minutes/* , seconds */] = timeString.split(':');
+            const timeArr = this.encodedTime.split(':');
+            const hours = timeArr[0];
+            const minutes = timeArr[1];
 
             if (this.config.showBeforeStart === true) {
                 $time.text(timeString);

@@ -16,7 +16,6 @@
  * Copyright (c) 2020 Open Assessment Technologies SA ;
  */
 
-import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
@@ -44,7 +43,6 @@ export default {
      */
     init() {
         const config = this.getConfig();
-        //need global selector as currently no way to access delivery frame from test runner
         const $topToolbar = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
         const $elements = $topToolbar.find('a:visible');
 

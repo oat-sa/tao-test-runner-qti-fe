@@ -5,7 +5,9 @@
 
     <div class="test-runner-sections">
 
-        <aside class="test-sidebar test-sidebar-left"></aside>
+        <aside class="test-sidebar test-sidebar-left" aria-labelledby="test-sidebar-left-header">
+            <h2 id="test-sidebar-left-header" class="landmark-title--hidden">{{__ 'Test status and review structure'}}</h2>
+        </aside>
 
         <section class="content-wrapper">
             <div id="qti-content"></div>

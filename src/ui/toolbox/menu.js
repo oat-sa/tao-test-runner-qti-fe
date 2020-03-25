@@ -49,6 +49,8 @@ import menuTpl from 'taoQtiTest/runner/ui/toolbox/templates/menu';
 import menuItemTpl from 'taoQtiTest/runner/ui/toolbox/templates/menu-item';
 
 var keyCodes = {
+    TAB: 9,
+    ESC: 27,
     ENTER: 13,
     SPACE: 32,
     LEFT: 37,
@@ -289,6 +291,10 @@ var menuComponentApi = {
             e.preventDefault();
 
             switch (currentKeyCode) {
+                case keyCodes.ESC:
+                case keyCodes.TAB:
+                    self.closeMenu();
+                    break;
                 case keyCodes.SPACE:
                 case keyCodes.ENTER:
                     self.triggerHighlightedItem();

@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-test-runner-qti",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "TAO Test Runner QTI implementation",
     "files": [
         "dist",
@@ -86,6 +86,7 @@
         "rollup": "^1.16.7",
         "rollup-plugin-alias": "^1.5.2",
         "rollup-plugin-babel": "^4.3.3",
+        "rollup-plugin-clear": "^2.0.7",
         "rollup-plugin-handlebars-plus": "^0.2.4",
         "rollup-plugin-istanbul": "^2.0.1",
         "select2": "3.5.1",

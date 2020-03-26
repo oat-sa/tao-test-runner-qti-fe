@@ -45,7 +45,7 @@ export default {
     init() {
         const config = this.getConfig();
         //need global selector as currently no way to access delivery frame from test runner
-        const $headerBar = $('header');
+        const $headerBar = $('.header-bar');
         const $headerElements = $headerBar.find('a:visible');
 
         const registerHeaderNavigator = (id, group, $elements) => {

@@ -145,17 +145,13 @@ export default pluginFactory({
          * @returns {Boolean}
          */
         var isReviewPanelEnabled = function isReviewPanelAllowed() {
-            const currentContext = testRunner.getTestContext();
-            const currentMap = testRunner.getTestMap();
-
             const reviewEnabled = mapHelper.hasItemCategory(
-                currentMap,
-                currentContext.itemIdentifier,
+                testRunner.getTestMap(),
+                testRunner.getTestContext().itemIdentifier,
                 'reviewScreen',
                 true
             );
             const itemReviewEnabled = testRunner.getOptions().review.enabled;
-
             return reviewEnabled && itemReviewEnabled;
         };
 
@@ -197,7 +193,7 @@ export default pluginFactory({
                     .then(function(startZen) {
                         //set up the timerbox
                         self.timerbox = timerboxFactory({
-                            ariaHidden: !isReviewPanelEnabled(),
+                            ariaHidden: isReviewPanelEnabled(),
                             zenMode: {
                                 enabled: true,
                                 startHidden: !!startZen

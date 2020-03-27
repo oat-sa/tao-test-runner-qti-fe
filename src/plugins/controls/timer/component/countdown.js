@@ -108,6 +108,9 @@ export default function countdownFactory($container, config) {
                 var encodedTime;
                 var warningId;
                 var warningMessage;
+                var timeArr;
+                var hours;
+                var minutes;
 
                 if (!this.is('completed')) {
                     if (remainingTime <= 0) {
@@ -120,9 +123,9 @@ export default function countdownFactory($container, config) {
                         if (encodedTime !== this.encodedTime) {
                             this.encodedTime = encodedTime;
                             if (encodedTime) {
-                                const timeArr = encodedTime.split(':');
-                                const hours = timeArr[0];
-                                const minutes = timeArr[1];
+                                timeArr = encodedTime.split(':');
+                                hours = timeArr[0];
+                                minutes = timeArr[1];
                                 $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
                             }
                             $time.text(this.encodedTime);
@@ -279,15 +282,18 @@ export default function countdownFactory($container, config) {
             this.render($container);
         })
         .on('render', function() {
+            var timeString = timeEncoder.encode(this.remainingTime / precision);
+            var timeArr;
+            var hours;
+            var minutes;
             $time = $('.time', this.getElement());
             $timeAriaLabel = $('#timerbox-aria-label', this.getElement());
-            const timeString = timeEncoder.encode(this.remainingTime / precision);
 
             if (this.config.showBeforeStart === true) {
                 if (timeString) {
-                    const timeArr = timeString.split(':');
-                    const hours = timeArr[0];
-                    const minutes = timeArr[1];
+                    timeArr = timeString.split(':');
+                    hours = timeArr[0];
+                    minutes = timeArr[1];
                     $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
                 }
                 $time.text(timeString);

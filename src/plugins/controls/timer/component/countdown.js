@@ -119,12 +119,13 @@ export default function countdownFactory($container, config) {
                         encodedTime = timeEncoder.encode(this.remainingTime / precision);
                         if (encodedTime !== this.encodedTime) {
                             this.encodedTime = encodedTime;
-                            const timeArr = this.encodedTime.split(':');
-                            const hours = timeArr[0];
-                            const minutes = timeArr[1];
-
+                            if (encodedTime) {
+                                const timeArr = encodedTime.split(':');
+                                const hours = timeArr[0];
+                                const minutes = timeArr[1];
+                                $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
+                            }
                             $time.text(this.encodedTime);
-                            $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
                         }
 
                         if (this.warnings) {
@@ -281,13 +282,15 @@ export default function countdownFactory($container, config) {
             $time = $('.time', this.getElement());
             $timeAriaLabel = $('#timerbox-aria-label', this.getElement());
             const timeString = timeEncoder.encode(this.remainingTime / precision);
-            const timeArr = this.encodedTime.split(':');
-            const hours = timeArr[0];
-            const minutes = timeArr[1];
 
             if (this.config.showBeforeStart === true) {
+                if (timeString) {
+                    const timeArr = timeString.split(':');
+                    const hours = timeArr[0];
+                    const minutes = timeArr[1];
+                    $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
+                }
                 $time.text(timeString);
-                $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
             }
         })
         .on('warn', function(message, level) {

@@ -178,6 +178,7 @@ export default pluginFactory({
                     })
                     .after('renderitem', function() {
                         if (self.timerbox) {
+                            self.timerbox.getElement().attr('aria-hidden', isReviewPanelEnabled());
                             self.timerbox.start();
                         }
                     })

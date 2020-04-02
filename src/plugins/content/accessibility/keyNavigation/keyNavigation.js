@@ -21,7 +21,6 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import keyNavigator from 'ui/keyNavigation/navigator';
-import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import {
     allowedToNavigateFrom,
     setupItemsNavigator,
@@ -72,7 +71,7 @@ export default function keyNavigationFactory(testRunner, config = {}) {
                 id: 'test-runner',
                 replace: true,
                 loop: true,
-                elements: navigableGroupElement.createFromNavigators(navigators),
+                elements: navigators,
                 // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
                 // there is an issue with nested navigators
                 propagateTab: navigationConfig.propagateTab
@@ -89,7 +88,7 @@ export default function keyNavigationFactory(testRunner, config = {}) {
                         .on('lowerbound', () => {
                             if (allowedToNavigateFrom(navigator)) {
                                 groupNavigator.previous();
-                                groupNavigator.getCursor().navigable.getKeyNavigator().last();
+                                groupNavigator.getCursor().navigable.last();
                             }
                         });
                 });

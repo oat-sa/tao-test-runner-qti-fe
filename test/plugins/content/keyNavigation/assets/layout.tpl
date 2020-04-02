@@ -1,5 +1,5 @@
 <div class="content-wrapper">
-    <header class="dark-bar clearfix key-navigation-group" data-navigation-id="header-toolbar">
+    <header class="dark-bar clearfix">
         <span class="lft">
             <img src="../assets/tao-logo.png" alt="TAO Logo" id="tao-main-logo">
         </span>

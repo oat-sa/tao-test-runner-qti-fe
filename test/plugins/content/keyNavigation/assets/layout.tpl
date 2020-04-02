@@ -1,11 +1,12 @@
 <div class="content-wrapper">
-    <header>
-        <div class="dark-bar header-bar clearfix key-navigation-group" data-navigation-id="header-toolbar">
-        <span class="lft">
-            <img src="assets/tao-logo.png" alt="TAO Logo" id="tao-main-logo">
-        </span>
+    <div role="banner" aria-label="Main Menu.">
+        <!-- added the role div -->
+        <header role="menubar" class="dark-bar clearfix key-navigation-group" data-navigation-id="header-toolbar">
+            <span class="lft">
+                <img src="assets/tao-logo.png" alt="TAO Logo" id="tao-main-logo">
+            </span>
             <div class="lft title-box"></div>
-            <div class="rgt">
+            <nav role="menu" class="rgt">
                 <div class="settings-menu">
                     <ul class="clearfix plain">
                         <li data-control="home">
@@ -34,9 +35,9 @@
                         </li>
                     </ul>
                 </div>
-            </div>
-        </div>
-    </header>
+            </nav>
+        </header>
+    </div>
     <div id="feedback-box"></div>
     <div class="runner"></div>
     <footer class="dark-bar">

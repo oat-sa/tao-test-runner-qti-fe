@@ -22,6 +22,7 @@ import {
     setupItemsNavigator,
     setupClickableNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 
 /**
  * The identifier the keyNavigator group
@@ -73,6 +74,9 @@ export default {
      * @returns {keyNavigator[]}
      */
     getNavigators() {
+        if (isReviewPanelEnabled(this.getTestRunner())) {
+            return [];
+        }
         return this.keyNavigators;
     },
 

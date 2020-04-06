@@ -33,7 +33,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import getStrategyHandler from 'taoQtiTest/runner/plugins/controls/timer/strategy/strategyHandler';
 import timerboxFactory from 'taoQtiTest/runner/plugins/controls/timer/component/timerbox';
 import timersFactory from 'taoQtiTest/runner/plugins/controls/timer/timers';
-import mapHelper from 'taoQtiTest/runner/helpers/map';
+import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 
 /**
  * Creates the plugin
@@ -140,21 +140,6 @@ export default pluginFactory({
             testRunner.trigger('error', err);
         };
 
-        /**
-         * Tells if the review panel is enabled
-         * @returns {Boolean}
-         */
-        var isReviewPanelEnabled = function isReviewPanelAllowed() {
-            const reviewEnabled = mapHelper.hasItemCategory(
-                testRunner.getTestMap(),
-                testRunner.getTestContext().itemIdentifier,
-                'reviewScreen',
-                true
-            );
-            const itemReviewEnabled = testRunner.getOptions().review.enabled;
-            return reviewEnabled && itemReviewEnabled;
-        };
-
         return new Promise(function(resolve) {
             //load the plugin store
             return testRunner.getPluginStore(self.getName()).then(function(timeStore) {
@@ -178,7 +163,7 @@ export default pluginFactory({
                     })
                     .after('renderitem', function() {
                         if (self.timerbox) {
-                            self.timerbox.getElement().attr('aria-hidden', isReviewPanelEnabled());
+                            self.timerbox.getElement().attr('aria-hidden', isReviewPanelEnabled(testRunner));
                             self.timerbox.start();
                         }
                     })
@@ -194,7 +179,7 @@ export default pluginFactory({
                     .then(function(startZen) {
                         //set up the timerbox
                         self.timerbox = timerboxFactory({
-                            ariaHidden: isReviewPanelEnabled(),
+                            ariaHidden: isReviewPanelEnabled(testRunner),
                             zenMode: {
                                 enabled: true,
                                 startHidden: !!startZen

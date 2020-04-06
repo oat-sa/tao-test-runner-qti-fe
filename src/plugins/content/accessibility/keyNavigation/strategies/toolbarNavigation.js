@@ -21,8 +21,8 @@ import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
-    setupItemsNavigator,
-    setupClickableNavigator
+    setupClickableNavigator,
+    setupItemsNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
@@ -55,15 +55,15 @@ export default {
                     id,
                     group,
                     elements,
-                    replace: true,
-                    defaultPosition(navigables) {
+                    propagateTab: false,
+                    defaultPosition(navigableElements) {
                         let pos = 0;
 
                         // search for the position of the "Next" button if any,
                         // otherwise take the position of the last element
                         if (config.autoFocus) {
-                            pos = navigables.length - 1;
-                            _.forEach(navigables, (navigable, i) => {
+                            pos = navigableElements.length - 1;
+                            _.forEach(navigableElements, (navigable, i) => {
                                 const $element = navigable.getElement();
                                 if ($element.data('control') === 'move-forward' || $element.data('control') === 'move-end') {
                                     pos = i;

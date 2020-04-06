@@ -51,8 +51,7 @@ export default {
                         id: `${groupId}-${this.keyNavigators.length}`,
                         elements: navigableDomElement.createFromDoms($element),
                         group: $element,
-                        propagateTab: false, // inner item navigators will send tab to this element
-                        replace: true
+                        propagateTab: false
                     })
                 );
             });

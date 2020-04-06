@@ -76,13 +76,14 @@ export default {
 
                     //search for inputs that represent the interaction focusable choices
                     const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
-                    const interactionNavigables = navigableDomElement.createFromDoms($inputs);
+                    const navigableElements = navigableDomElement.createFromDoms($inputs);
 
-                    if (interactionNavigables.length) {
+                    if (navigableElements.length) {
                         const navigator = keyNavigator({
-                            elements: interactionNavigables,
+                            elements: navigableElements,
                             group: $itemElement,
-                            loop: false
+                            loop: false,
+                            propagateTab: false
                         })
                             .on('focus', cursor => {
                                 const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');

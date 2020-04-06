@@ -20,8 +20,8 @@ import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
-    setupItemsNavigator,
-    setupClickableNavigator
+    setupClickableNavigator,
+    setupItemsNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
@@ -55,7 +55,7 @@ export default {
                     id,
                     group,
                     elements,
-                    replace: true
+                    propagateTab: false
                 });
 
                 setupItemsNavigator(navigator, config);

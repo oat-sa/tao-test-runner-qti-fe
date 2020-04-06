@@ -60,7 +60,7 @@ export default {
                 filtersNavigator = keyNavigator({
                     keepState: config.keepState,
                     id: 'navigator-filters',
-                    replace: true,
+                    propagateTab: false,
                     elements: navigableFilters,
                     group: $navigator.find('.qti-navigator-filters')
                 });
@@ -121,13 +121,12 @@ export default {
                 //instantiate a key navigator but do not add it to the returned list of navigators as this is not supposed to be reached with tab key
                 itemsNavigator = keyNavigator({
                     id: 'navigator-items',
-                    replace: true,
                     elements: navigableTrees,
                     group: $navigatorTree,
-                    defaultPosition(navigables) {
+                    defaultPosition(navigableElements) {
                         let pos = 0;
                         if (filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
-                            _.forEach(navigables, function (navigable, i) {
+                            _.forEach(navigableElements, function (navigable, i) {
                                 const $parent = navigable.getElement().parent('.qti-navigator-item');
                                 //find the first active and visible item
                                 if ($parent.hasClass('active') && $parent.is(':visible')) {

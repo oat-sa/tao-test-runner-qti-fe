@@ -125,13 +125,11 @@ export default {
                     group: $navigatorTree,
                     defaultPosition(navigableElements) {
                         let pos = 0;
-                        if (filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
-                            _.forEach(navigableElements, function (navigable, i) {
+                        if (config.flatNavigation || filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
+                            pos = _.findIndex(navigableElements, navigable => {
                                 const $parent = navigable.getElement().parent('.qti-navigator-item');
-                                //find the first active and visible item
                                 if ($parent.hasClass('active') && $parent.is(':visible')) {
-                                    pos = i;
-                                    return false;
+                                    return true;
                                 }
                             });
                         }

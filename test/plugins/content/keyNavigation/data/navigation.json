@@ -534,13 +534,6 @@
                 }
             },
             {
-                "label": "Navigation panel previous item",
-                "selector": ".qti-navigator-item[data-id=\"item-2\"] .qti-navigator-label",
-                "key": {
-                    "keyCode": "TAB"
-                }
-            },
-            {
                 "label": "Navigation panel current item",
                 "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
                 "key": {

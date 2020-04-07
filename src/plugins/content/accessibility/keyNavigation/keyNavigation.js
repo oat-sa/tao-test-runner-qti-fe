@@ -69,11 +69,8 @@ export default function keyNavigationFactory(testRunner, config = {}) {
 
             groupNavigator = keyNavigator({
                 id: 'test-runner',
-                replace: true,
                 loop: true,
                 elements: navigators,
-                // we don't need to propagate tabs for the main navigation, because we've rewritten them and this is not an element
-                // there is an issue with nested navigators
                 propagateTab: navigationConfig.propagateTab
             });
 

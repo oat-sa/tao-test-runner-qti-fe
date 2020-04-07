@@ -82,7 +82,12 @@ export default {
         };
 
         this.keyNavigators = [];
-        registerToolbarNavigator(groupId, $navigationBar, $toolbarElements);
+
+        if (config.flatNavigation) {
+            $toolbarElements.each((index, element) => registerToolbarNavigator(`${groupId}-${index}`, $navigationBar, $(element)));
+        } else {
+            registerToolbarNavigator(groupId, $navigationBar, $toolbarElements);
+        }
 
         return this;
     },

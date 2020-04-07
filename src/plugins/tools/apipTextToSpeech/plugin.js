@@ -66,7 +66,6 @@ export default pluginFactory({
                 id: groupNavigationId,
                 group: $navigationGroupElement,
                 elements: navigableDomElement.createFromDoms($navigationElements.add($navigationGroupElement)),
-                replace: true,
                 propagateTab: false,
                 loop: true,
                 keepState: true,

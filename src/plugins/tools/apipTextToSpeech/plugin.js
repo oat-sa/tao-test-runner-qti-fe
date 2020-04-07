@@ -99,7 +99,7 @@ export default pluginFactory({
                         0
                     );
                 })
-                .focusPosition($navigationElements.length);
+                .setCursorAt($navigationElements.length);
 
             ttsComponent.on('next finish', () => {
                 if (ttsComponent.is('sfhMode')) {

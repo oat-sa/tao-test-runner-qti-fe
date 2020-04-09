@@ -45,7 +45,7 @@ export default {
     init() {
         const config = this.getConfig();
         const $topToolbar = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
-        const $elements = $topToolbar.find('a:visible');
+        const $elements = $topToolbar.find('.countdown');
 
         const registerTopToolbarNavigator = (id, group, $elements) => {
             const elements = navigableDomElement.createFromDoms($elements);

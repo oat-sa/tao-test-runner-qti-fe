@@ -1,6 +1,6 @@
 <main class="test-runner-scope">
     <div class="action-bar content-action-bar horizontal-action-bar top-action-bar">
-        <div class="jump-links-box">
+        <nav class="jump-links-box">
             <ul>
                 <li data-control="jump-link-question">
                     <a role="button" class="jump-link" href="#jump-link-question">{{__ "Jump to:"}} <b>{{__ "Question"}}</b></a>
@@ -18,7 +18,7 @@
                     <a role="button" class="jump-link" href="#jump-link-shortcuts">{{__ "Open Keyboard Shortcuts"}}</a>
                 </li>
             </ul>
-        </div>
+        </nav>
         <div class="control-box size-wrapper"></div>
     </div>
 

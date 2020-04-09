@@ -41,6 +41,43 @@
         }
     }
 
+    .jump-links-box {
+        display: block;
+        width:0px;
+        height:0px;
+
+        li[data-control^=jump-link] {
+            position: fixed;
+            display: block;
+            z-index: 1001;
+        }
+
+        .jump-link {
+            z-index: 1001;
+            position: fixed;
+            display: block;
+            overflow: hidden;
+            top: 10px;
+            left: 10px;
+            width: 0px;
+            padding: 0px !important;
+            @include font-size(24);
+        }
+        .jump-link:focus {
+            width:auto;
+            height:auto;
+            padding: 30px !important;
+            background: $uiClickableDefaultBg;
+            color: $textColor !important;
+            border: 3px solid $textColor;
+            outline: none;
+        }
+        .jump-link:focus:hover {
+            background: $uiClickableDefaultBg;
+            text-decoration: underline;
+        }
+    }
+
     &.horizontal-action-bar {
         padding: 5px;
         height: 35px;

@@ -3,6 +3,14 @@
 
 .runner {
     position: relative;
+    margin-bottom: -2px; // This is needed to compensate the height for proctorio-placeholder
+}
+
+/**
+  This placeholder is needed for Proctorio to render the test runner correctly in their iFrame
+ */
+.proctorio-placeholder {
+    height: 2px;
 }
 
 .test-runner-scope {

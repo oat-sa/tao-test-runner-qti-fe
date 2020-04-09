@@ -120,6 +120,8 @@
         max-width: map-get($widths, item-max-width) * 1px;
         width: 100%;
         margin: auto;
+        position: absolute;
+        z-index: 1;
     }
 
     #qti-item {

@@ -54,7 +54,10 @@ export default {
                     id,
                     group,
                     elements,
-                    replace: true
+                    replace: true,
+                    defaultPosition(navigables) {
+                        return navigables.length - 1;
+                    }
                 });
 
                 setupItemsNavigator(navigator, config);

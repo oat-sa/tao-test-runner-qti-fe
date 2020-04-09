@@ -43,8 +43,9 @@
 
     .jump-links-box {
         display: block;
-        width:0px;
-        height:0px;
+        width: 0px;
+        height: 0px;
+        position: absolute;
 
         li[data-control^=jump-link] {
             position: fixed;
@@ -64,8 +65,8 @@
             @include font-size(24);
         }
         .jump-link:focus {
-            width:auto;
-            height:auto;
+            width: auto;
+            height: auto;
             padding: 30px !important;
             background: $uiClickableDefaultBg;
             color: $textColor !important;

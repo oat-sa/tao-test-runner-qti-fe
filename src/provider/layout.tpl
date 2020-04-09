@@ -1,21 +1,21 @@
 <main class="test-runner-scope">
     <div class="action-bar content-action-bar horizontal-action-bar top-action-bar">
-        <nav class="jump-links-box">
+        <nav class="jump-links-box" aria-label="{{__ "Jump Menu"}}">
             <ul>
                 <li data-control="jump-link-question">
-                    <a role="button" class="jump-link" href="#jump-link-question">{{__ "Jump to:"}} <b>{{__ "Question"}}</b></a>
+                    <a role="button" class="jump-link" href="#">{{__ "Jump to:"}} <b>{{__ "Question"}}</b></a>
                 </li>
                 <li data-control="jump-link-navigation">
-                    <a role="button" class="jump-link" href="#jump-link-navigation">{{__ "Jump to:"}} <b>{{__ "Navigation"}}</b></a>
+                    <a role="button" class="jump-link" href="#">{{__ "Jump to:"}} <b>{{__ "Navigation"}}</b></a>
                 </li>
                 <li data-control="jump-link-toolbox">
-                    <a role="button" class="jump-link" href="#jump-link-toolbox">{{__ "Jump to:"}} <b>{{__ "Toolbox"}}</b></a>
+                    <a role="button" class="jump-link" href="#">{{__ "Jump to:"}} <b>{{__ "Toolbox"}}</b></a>
                 </li>
                 <li data-control="jump-link-teststatus">
-                    <a role="button" class="jump-link" href="#jump-link-teststatus">{{__ "Jump to:"}} <b>{{__ "Test Status and Structure"}}</b></a>
+                    <a role="button" class="jump-link" href="#">{{__ "Jump to:"}} <b>{{__ "Test Status and Structure"}}</b></a>
                 </li>
                 <li data-control="jump-link-shortcuts">
-                    <a role="button" class="jump-link" href="#jump-link-shortcuts">{{__ "Open Keyboard Shortcuts"}}</a>
+                    <a role="button" class="jump-link" href="#">{{__ "Open Keyboard Shortcuts"}}</a>
                 </li>
             </ul>
         </nav>

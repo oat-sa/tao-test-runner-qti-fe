@@ -42,7 +42,7 @@ define([
             additional: 'foo'
         },
         expected: {
-            strategies: ['rubrics', 'item', 'toolbar', 'header', 'navigator', 'page'],
+            strategies: ['rubrics', 'item', 'toolbar', 'header', 'top-toolbar', 'navigator', 'page'],
             config: {
                 autoFocus: true,
                 keepState: true,
@@ -66,7 +66,7 @@ define([
             additional: 'foo'
         },
         expected: {
-            strategies: ['rubrics', 'linearItem', 'toolbar', 'header', 'navigator', 'page'],
+            strategies: ['rubrics', 'linearItem', 'toolbar', 'header', 'top-toolbar', 'navigator', 'page'],
             config: {
                 autoFocus: true,
                 keepState: true,
@@ -90,7 +90,7 @@ define([
             additional: 'foo'
         },
         expected: {
-            strategies: ['header', 'navigator', 'item', 'toolbar'],
+            strategies: ['header', 'top-toolbar', 'navigator', 'item', 'toolbar'],
             config: {
                 autoFocus: false,
                 keepState: false,

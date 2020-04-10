@@ -33,6 +33,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import getStrategyHandler from 'taoQtiTest/runner/plugins/controls/timer/strategy/strategyHandler';
 import timerboxFactory from 'taoQtiTest/runner/plugins/controls/timer/component/timerbox';
 import timersFactory from 'taoQtiTest/runner/plugins/controls/timer/timers';
+import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 
 /**
  * Creates the plugin
@@ -162,6 +163,7 @@ export default pluginFactory({
                     })
                     .after('renderitem', function() {
                         if (self.timerbox) {
+                            self.timerbox.getElement().attr('aria-hidden', isReviewPanelEnabled(testRunner));
                             self.timerbox.start();
                         }
                     })
@@ -177,6 +179,7 @@ export default pluginFactory({
                     .then(function(startZen) {
                         //set up the timerbox
                         self.timerbox = timerboxFactory({
+                            ariaHidden: isReviewPanelEnabled(testRunner),
                             zenMode: {
                                 enabled: true,
                                 startHidden: !!startZen

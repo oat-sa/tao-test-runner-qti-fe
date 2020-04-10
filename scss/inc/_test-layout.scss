@@ -74,6 +74,14 @@
     }
     .test-sidebar-left {
         border-right: 1px $uiGeneralContentBorder solid;
+
+        .landmark-title--hidden {
+            position: absolute;
+            overflow: hidden;
+            height: 1px;
+            width: 1px;
+            word-wrap: normal;
+        }
     }
 
     .test-sidebar-right {
@@ -112,6 +120,8 @@
         max-width: map-get($widths, item-max-width) * 1px;
         width: 100%;
         margin: auto;
+        position: absolute;
+        z-index: 1;
     }
 
     #qti-item {

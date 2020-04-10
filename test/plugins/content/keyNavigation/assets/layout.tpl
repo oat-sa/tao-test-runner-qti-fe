@@ -1,14 +1,15 @@
 <div class="content-wrapper">
-    <header class="dark-bar clearfix">
-        <span class="lft">
-            <img src="../assets/tao-logo.png" alt="TAO Logo" id="tao-main-logo">
-        </span>
+    <!-- added the role div -->
+    <header role="menubar" class="dark-bar clearfix key-navigation-group" data-navigation-id="header-toolbar">
+            <span class="lft">
+                <img src="../assets/tao-logo.png" alt="TAO Logo" id="tao-main-logo">
+            </span>
         <div class="lft title-box"></div>
-        <nav class="rgt">
+        <nav role="menu" class="rgt">
             <div class="settings-menu">
                 <ul class="clearfix plain">
                     <li data-control="home">
-                        <a id="home" href="#">
+                        <a role="button" id="home" href="#">
                             <span class="icon-home"></span>
                             <span class="text hidden">Tests Home</span>
                         </a>
@@ -20,13 +21,13 @@
                     </span>
                     </li>
                     <li class="infoControl sep-before" data-control="logout">
-                        <a id="logout" href="#">
+                        <a role="button" id="logout" href="#">
                             <span class="icon-logout"></span>
                             <span class="text">Logout</span>
                         </a>
                     </li>
                     <li class="infoControl sep-before" data-control="exit">
-                        <a id="exit" href="#">
+                        <a role="button" id="exit" href="#">
                             <span class="icon-logout"></span>
                             <span class="text">Exit</span>
                         </a>

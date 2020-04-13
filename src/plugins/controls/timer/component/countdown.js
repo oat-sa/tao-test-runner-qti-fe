@@ -35,7 +35,6 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import __ from 'i18n';
 import timeEncoder from 'core/encoder/time';
 import pollingFactory from 'core/polling';
 import timerFactory from 'core/timer';
@@ -89,7 +88,6 @@ var warningTimeout = {
  */
 export default function countdownFactory($container, config) {
     var $time;
-    var $timeAriaLabel;
 
     /**
      * @typedef {Object} countdown
@@ -108,9 +106,6 @@ export default function countdownFactory($container, config) {
                 var encodedTime;
                 var warningId;
                 var warningMessage;
-                var timeArr;
-                var hours;
-                var minutes;
 
                 if (!this.is('completed')) {
                     if (remainingTime <= 0) {
@@ -122,12 +117,7 @@ export default function countdownFactory($container, config) {
                         encodedTime = timeEncoder.encode(this.remainingTime / precision);
                         if (encodedTime !== this.encodedTime) {
                             this.encodedTime = encodedTime;
-                            if (encodedTime) {
-                                timeArr = encodedTime.split(':');
-                                hours = timeArr[0];
-                                minutes = timeArr[1];
-                                $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
-                            }
+
                             $time.text(this.encodedTime);
                         }
 
@@ -282,21 +272,10 @@ export default function countdownFactory($container, config) {
             this.render($container);
         })
         .on('render', function() {
-            var timeString = timeEncoder.encode(this.remainingTime / precision);
-            var timeArr;
-            var hours;
-            var minutes;
             $time = $('.time', this.getElement());
-            $timeAriaLabel = $('#timerbox-aria-label', this.getElement());
 
             if (this.config.showBeforeStart === true) {
-                if (timeString) {
-                    timeArr = timeString.split(':');
-                    hours = timeArr[0];
-                    minutes = timeArr[1];
-                    $timeAriaLabel.text( __('timer: %s hours %s minutes to answer', hours, minutes ));
-                }
-                $time.text(timeString);
+                $time.text(timeEncoder.encode(this.remainingTime / precision));
             }
         })
         .on('warn', function(message, level) {

@@ -213,14 +213,14 @@ export default function timerboxFactory(config) {
                                 self.trigger('timerend', self.timers[id]);
                             })
                             .on('change', function(value) {
+                                var precision, encodedTime;
                                 if (self.timers[id]) {
-                                    var precision = 1000; // precision is milliseconds
-                                    var encodedTime = timeEncoder.encode(this.remainingTime / precision).split(':');
+                                    precision = 1000; // precision is milliseconds
+                                    encodedTime = timeEncoder.encode(this.remainingTime / precision).split(':');
                                     self.trigger('timertick', encodedTime); // propogate current timer data
 
                                     //keep the current timer data in sync
                                     self.timers[id].remainingTime = value;
-
                                 }
                             });
                         countdown.spread(self, ['error', 'change', 'warn']);

@@ -2,7 +2,7 @@
     <!-- added the role div -->
     <header role="menubar" class="dark-bar clearfix key-navigation-group" data-navigation-id="header-toolbar">
             <span class="lft">
-                <img src="assets/tao-logo.png" alt="TAO Logo" id="tao-main-logo">
+                <img src="../assets/tao-logo.png" alt="TAO Logo" id="tao-main-logo">
             </span>
         <div class="lft title-box"></div>
         <nav role="menu" class="rgt">

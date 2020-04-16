@@ -54,10 +54,31 @@
                 }
             },
             {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
                 "label": "Hide review button",
                 "selector": "[data-control=\"hide-review\"]",
                 "key": {
                     "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "RIGHT"
                 }
             },
             {
@@ -79,6 +100,20 @@
                 "selector": "#exit",
                 "key": {
                     "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Logout link",
+                "selector": "#logout",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "LEFT"
                 }
             },
             {
@@ -107,6 +142,34 @@
                 "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
                 "key": {
                     "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "Navigation panel previous item",
+                "selector": ".qti-navigator-item[data-id=\"item-2\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "UP"
                 }
             },
             {
@@ -227,10 +290,31 @@
                 }
             },
             {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
                 "label": "Hide review button",
                 "selector": "[data-control=\"hide-review\"]",
                 "key": {
                     "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "RIGHT"
                 }
             },
             {
@@ -252,6 +336,20 @@
                 "selector": "#exit",
                 "key": {
                     "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Logout link",
+                "selector": "#logout",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "LEFT"
                 }
             },
             {
@@ -280,6 +378,34 @@
                 "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
                 "key": {
                     "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "Navigation panel previous item",
+                "selector": ".qti-navigator-item[data-id=\"item-2\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "UP"
                 }
             },
             {
@@ -333,7 +459,7 @@
     {
         "title": "Native",
         "mode": "native",
-        "rubrics": false,
+        "rubrics": true,
         "steps": [
             {
                 "label": "Home link",
@@ -386,6 +512,21 @@
                 }
             },
             {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
                 "label": "Navigation panel Flagged tab",
                 "selector": ".qti-navigator-filter[data-mode=\"flagged\"]",
                 "key": {
@@ -395,6 +536,35 @@
             {
                 "label": "Navigation panel current item",
                 "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel previous item",
+                "selector": ".qti-navigator-item[data-id=\"item-2\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item wrapper",
+                "selector": "section.content-wrapper",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Rubrics block",
+                "selector": ".qti-rubricBlock",
                 "key": {
                     "keyCode": "TAB"
                 }
@@ -458,6 +628,13 @@
                 }
             },
             {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
                 "label": "Next button",
                 "selector": "[data-control=\"move-forward\"]",
                 "key": {
@@ -474,6 +651,14 @@
             {
                 "label": "Next button",
                 "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
                 "key": {
                     "keyCode": "TAB",
                     "shiftKey": true

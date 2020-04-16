@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>Key Navigation - Test Runner Plugin test</title>
+        <title>Key Navigation - Visual Playground</title>
         <link rel="stylesheet" href="../assets/tao-3.css"/>
         <link rel="stylesheet" href="../assets/qti-runner.css"/>
         <script type="text/javascript" src="/environment/require.js"></script>
@@ -17,7 +17,7 @@
                             }
                         }
                     });
-                    require(['taoQtiTest/test/runner/plugins/content/keyNavigation/plugin/test'], function() {
+                    require(['taoQtiTest/test/runner/plugins/content/keyNavigation/plugin/demo'], function() {
                         QUnit.start();
                     });
                 });
@@ -27,6 +27,7 @@
             #visual-playground {
                 position: relative;
                 width: 100%;
+                height: 100vh;
                 display: flex;
                 flex-direction: column;
             }

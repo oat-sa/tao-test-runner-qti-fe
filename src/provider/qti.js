@@ -249,8 +249,8 @@ var qtiProvider = {
 
             //catch server errors
             var submitError = function submitError(err) {
-                if (err && err.unrecoverable){
-                    self.trigger('pause', {message : err.message});
+                if (err && err.unrecoverable) {
+                    self.trigger('pause', {message: err.message});
                 } else if (err.code === 200) {
                     //some server errors are valid, so we don't fail (prevent empty responses)
                     self.trigger(
@@ -277,12 +277,12 @@ var qtiProvider = {
                             self.itemRunner.getResponses(),
                             params
                         )
-                        .then( results => {
+                        .then(results => {
                             if (results.itemSession) {
                                 currentItem.answered = results.itemSession.itemAnswered;
 
                                 if (results.displayFeedbacks === true && results.feedbacks) {
-                                    self.itemRunner.renderFeedbacks(results.feedbacks, results.itemSession, function(
+                                    self.itemRunner.renderFeedbacks(results.feedbacks, results.itemSession, function (
                                         queue
                                     ) {
                                         self.trigger('modalFeedbacks', queue, resolve);
@@ -307,10 +307,10 @@ var qtiProvider = {
             });
 
             feedbackPromise
-                .then(function() {
+                .then(function () {
                     return self.toolStateBridge.getStates();
                 })
-                .then(function(toolStates) {
+                .then(function (toolStates) {
                     if (toolStates && _.size(toolStates) > 0) {
                         params.toolStates = toolStates;
                     }
@@ -320,19 +320,19 @@ var qtiProvider = {
 
                     //to be sure load start after unload...
                     //we add an intermediate ns event on unload
-                    self.on(`unloaditem.${action}`, function() {
+                    self.on(`unloaditem.${action}`, function () {
                         self.off(`.${action}`);
 
                         self.getProxy()
                             .callItemAction(context.itemIdentifier, action, params)
-                            .then(function(results) {
+                            .then(function (results) {
                                 loadPromise = loadPromise || Promise.resolve();
 
-                                return loadPromise.then(function() {
+                                return loadPromise.then(function () {
                                     return results;
                                 });
                             })
-                            .then(function(results) {
+                            .then(function (results) {
                                 //update testData, testContext and build testMap
                                 self.dataUpdater.update(results);
 
@@ -361,6 +361,70 @@ var qtiProvider = {
         areaBroker.setComponent('toolbox', toolboxFactory());
         areaBroker.getToolbox().init();
 
+
+        /**
+         * add jump links support
+         */
+        function handleJumpLinks() {
+            function findFocusable(targetElement) {
+                const elem = $(targetElement)
+                    .find( 'input, select, a[href], textarea, button, [tabindex]')
+                    .toArray()
+                    .filter( (el) => ( el.tabIndex >= 0 && !el.disabled && el.offsetParent ) )
+                    .find( (el) => (typeof el.focus === 'function') );
+                return elem;
+            }
+
+            const _jumpLinksBehavior = {
+                jumpLinkQuestion: {
+                    selector: '.jump-links-box .jump-link-question',
+                    handler: () => {
+                        const e = findFocusable( areaBroker.getContentArea() );
+                        e && e.focus();
+                    }
+                },
+                jumpLinkNavigation: {
+                    selector: '.jump-links-box .jump-link-navigation',
+                    handler: () => {
+                        const e = findFocusable( areaBroker.getNavigationArea() );
+                        e && e.focus();
+                    }
+                },
+                jumpLinkToolbox: {
+                    selector: '.jump-links-box .jump-link-toolbox',
+                    handler: () => {
+                        const e = findFocusable( areaBroker.getToolboxArea() );
+                        e && e.focus();
+                    }
+                },
+                jumpLinkTeststatus: {
+                    selector: '.jump-links-box .jump-link-teststatus',
+                    handler: () => {
+                        const e = findFocusable( areaBroker.getPanelArea() );
+                        e && e.focus();
+                    }
+                },
+                jumpLinkShortcuts: {
+                    selector: '.jump-links-box .jump-link-shortcuts',
+                    handler: () => {
+                        alert('jumpLinkShortcuts', areaBroker);
+                        // TODO show dilog with shortcuts
+                    }
+                },
+            };
+            _.forOwn(_jumpLinksBehavior, (linkDescription) => {
+                const link = $(linkDescription.selector);
+                if (link) {
+                    link.on('click', linkDescription.handler);
+                    link.on('keydown', (event) => {
+                        var activationKeys = [32, 13]; // link can be activated by click or enter/space keys
+                        if (activationKeys.includes(event.keyCode)) {
+                            linkDescription.handler(event);
+                        }
+                    });
+                }
+            });
+    }
         /*
          * Install behavior on events
          */
@@ -523,6 +587,8 @@ var qtiProvider = {
                     this.trigger('enabletools');
                 }
                 this.trigger('enablenav');
+
+                handleJumpLinks();
             })
             .on('resumeitem', function() {
                 this.trigger('enableitem enablenav');
@@ -546,6 +612,54 @@ var qtiProvider = {
             .on('flush', function() {
                 this.destroy();
             });
+
+        /**
+         * add jump links support
+         */
+        const _jumpLinksBehavior = {
+            jumpLinkQuestion: {
+                selector: '.jump-links-box .jump-link-question',
+                handler: () => {
+                    alert('jumpLinkQuestion');
+                }
+            },
+            jumpLinkNavigation: {
+                selector: '.jump-links-box .jump-link-navigation',
+                handler: () => {
+                    alert('jumpLinkNavigation');
+                }
+            },
+            jumpLinkToolbox: {
+                selector: '.jump-links-box .jump-link-toolbox',
+                handler: () => {
+                    alert('jumpLinkToolbox');
+                }
+            },
+            jumpLinkTeststatus: {
+                selector: '.jump-links-box .jump-link-teststatus',
+                handler: () => {
+                    alert('jumpLinkTeststatus');
+                }
+            },
+            jumpLinkShortcuts: {
+                selector: '.jump-links-box .jump-link-shortcuts',
+                handler: () => {
+                    alert('jumpLinkShortcuts');
+                }
+            },
+        };
+        _.forOwn(_jumpLinksBehavior, (linkDescription) => {
+            const link = $(linkDescription.selector)[0];
+            if (link) {
+                link.on('click', linkDescription.handler);
+                link.on('keydown', (event) => {
+                    var activationKeys = [ 32, 13 ];
+                    if ( activationKeys.includes(event.keyCode) ) {
+                        linkDescription.handler(event);
+                    }
+                });
+            }
+        });
 
         //starts the event collection
         if (this.getProbeOverseer()) {

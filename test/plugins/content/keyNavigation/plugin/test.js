@@ -19,12 +19,12 @@
 define([
     'jquery',
     'lodash',
-    'ui/dialog/alert',
     'taoTests/runner/runner',
     'taoTests/runner/runnerComponent',
     'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/plugin',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/test/runner/plugins/content/keyNavigation/mock/backend',
+    'taoQtiTest/test/runner/plugins/content/keyNavigation/plugin/playground',
     'tpl!taoQtiTest/test/runner/plugins/content/keyNavigation/assets/layout',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/config.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/test.json',
@@ -35,12 +35,12 @@ define([
 ], function (
     $,
     _,
-    dialogAlert,
     runnerFactory,
     runnerComponent,
     pluginFactory,
     providerMock,
     backendMockFactory,
+    visualPlayground,
     layoutTpl,
     configData,
     testDefinition,
@@ -194,7 +194,7 @@ define([
                         runner
                             .after('setcontenttabtype', () => runner.next())
                             .after('renderitem.runnerComponent', itemRef => {
-                                if (itemRef === 'item-1') {
+                                if (itemRef !== 'item-3') {
                                     runner.trigger('setcontenttabtype', data.mode);
                                 } else {
                                     runner.off('renderitem.runnerComponent');
@@ -234,59 +234,9 @@ define([
 
     QUnit.test('Visual test', assert => {
         const ready = assert.async();
-        const $container = $('#visual-playground');
-        const $selector = $container.find('.playground-selector');
-        const $view = $container.find('.playground-view');
-        const modes = [];
         assert.expect(1);
-
-        Promise.resolve()
-            .then(() => new Promise((resolve, reject) => {
-                $view.html(layoutTpl());
-                runnerComponent($view.find('.runner'), configData)
-                    .on('error', reject)
-                    .on('ready', runner => {
-                        runner
-                            .after('renderitem.runnerComponent', () => {
-                                runner.off('renderitem.runnerComponent');
-                                resolve(runner);
-                            })
-                            .after('setcontenttabtype', mode => {
-                                const modeData = navigationCases.find(navigation => navigation.mode === mode);
-                                const {rubrics} = modeData;
-                                if (rubrics) {
-                                    backendMock.setRubricsBank(rubricsBank);
-                                } else {
-                                    backendMock.setRubricsBank({});
-                                }
-                                runner.jump(0);
-                            });
-                    });
-            }))
-            .then(runner => {
-                function activateMode(id) {
-                    modes.forEach(mode => mode.$button.toggleClass('btn-info', id === mode.id));
-                    $view.attr('data-mode', id);
-                    runner.trigger('setcontenttabtype', id);
-                }
-
-                $view.find('header').on('click', 'a', e => {
-                    dialogAlert(`You clicked on <b>${$(e.currentTarget).text()}</b>`);
-                    e.preventDefault();
-                });
-
-                $selector
-                    .on('click', 'button', e => {
-                        activateMode(e.target.dataset.mode);
-                    })
-                    .find('button').each(function () {
-                        modes.push({
-                            id: this.dataset.mode,
-                            $button: $(this)
-                        });
-                    });
-
-                activateMode('default');
+        visualPlayground('#visual-playground', backendMock)
+            .then(() => {
                 assert.ok(true, 'The playground is ready');
             })
             .catch(err => {

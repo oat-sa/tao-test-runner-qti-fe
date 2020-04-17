@@ -49,7 +49,6 @@ import __ from 'i18n';
 import component from 'ui/component';
 import hider from 'ui/hider';
 import countdownFactory from 'taoQtiTest/runner/plugins/controls/timer/component/countdown';
-import timeEncoder from 'core/encoder/time';
 import timerboxTpl from 'taoQtiTest/runner/plugins/controls/timer/component/tpl/timerbox';
 import 'taoQtiTest/runner/plugins/controls/timer/component/css/timerbox.css';
 
@@ -213,11 +212,8 @@ export default function timerboxFactory(config) {
                                 self.trigger('timerend', self.timers[id]);
                             })
                             .on('change', function(value) {
-                                var precision, encodedTime;
                                 if (self.timers[id]) {
-                                    precision = 1000; // precision is milliseconds
-                                    encodedTime = timeEncoder.encode(this.remainingTime / precision).split(':');
-                                    self.trigger('timertick', encodedTime); // propogate current timer data
+                                    self.trigger('timertick', this.remainingTime); // propogate current timer data
 
                                     //keep the current timer data in sync
                                     self.timers[id].remainingTime = value;

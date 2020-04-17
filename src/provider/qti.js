@@ -628,54 +628,6 @@ var qtiProvider = {
                 this.destroy();
             });
 
-        /**
-         * add jump links support
-         */
-        const _jumpLinksBehavior = {
-            jumpLinkQuestion: {
-                selector: '.jump-links-box .jump-link-question',
-                handler: () => {
-                    alert('jumpLinkQuestion');
-                }
-            },
-            jumpLinkNavigation: {
-                selector: '.jump-links-box .jump-link-navigation',
-                handler: () => {
-                    alert('jumpLinkNavigation');
-                }
-            },
-            jumpLinkToolbox: {
-                selector: '.jump-links-box .jump-link-toolbox',
-                handler: () => {
-                    alert('jumpLinkToolbox');
-                }
-            },
-            jumpLinkTeststatus: {
-                selector: '.jump-links-box .jump-link-teststatus',
-                handler: () => {
-                    alert('jumpLinkTeststatus');
-                }
-            },
-            jumpLinkShortcuts: {
-                selector: '.jump-links-box .jump-link-shortcuts',
-                handler: () => {
-                    alert('jumpLinkShortcuts');
-                }
-            },
-        };
-        _.forOwn(_jumpLinksBehavior, (linkDescription) => {
-            const link = $(linkDescription.selector)[0];
-            if (link) {
-                link.on('click', linkDescription.handler);
-                link.on('keydown', (event) => {
-                    var activationKeys = [ 32, 13 ];
-                    if ( activationKeys.includes(event.keyCode) ) {
-                        linkDescription.handler(event);
-                    }
-                });
-            }
-        });
-
         //starts the event collection
         if (this.getProbeOverseer()) {
             this.getProbeOverseer().start();

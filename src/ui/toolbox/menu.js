@@ -204,7 +204,7 @@ var menuComponentApi = {
     /**
      * close the menu
      */
-    closeMenu: function closeMenu() {
+    closeMenu() {
         // hide the DOM element
         hider.hide(this.$menuContainer);
 
@@ -220,9 +220,14 @@ var menuComponentApi = {
         this.hoverOffAll();
 
         // component inner state
+        const wasOpen = this.is('opened');
         this.setState('opened', false);
         this.trigger('closemenu', this);
-        this.$menuButton.parent().focus();  // It needs for screenreaders to correctly read menu button after submenu was closed
+
+        // Move focus if the menu was opened before the close action was launched.
+        if (wasOpen) {
+            this.$menuButton.parent().focus();  // It needs for screenreaders to correctly read menu button after submenu was closed
+        }
     },
 
     /**

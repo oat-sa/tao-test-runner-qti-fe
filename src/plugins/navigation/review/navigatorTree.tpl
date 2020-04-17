@@ -29,9 +29,11 @@
                 </span>
                 <ul class="qti-navigator-items collapsible-panel plain">
                     {{#each items}}
-                    <li class="qti-navigator-item {{cls}}" data-id="{{id}}" data-position="{{position}}">
+                    <li class="qti-navigator-item {{cls}}" data-id="{{id}}" data-position="{{position}}"
+                        tabindex="-1" role="link" aria-disabled="{{#if viewed}}false{{else}}true{{/if}}"
+                        {{#if active}}aria-current="page"{{/if}}>
                         <span class="qti-navigator-label truncate" title="{{label}}">
-                            <span class="qti-navigator-icon icon-{{icon}}"></span>
+                            <span aria-label="{{ariaLabel}}" class="qti-navigator-icon icon-{{icon}}"></span>
                             <span class="qti-navigator-number">{{index}}</span>
                             {{label}}
                         </span>

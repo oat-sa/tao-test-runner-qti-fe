@@ -407,8 +407,23 @@ var qtiProvider = {
                 jumpLinkShortcuts: {
                     selector: '.jump-links-box .jump-link-shortcuts',
                     handler: () => {
-                        alert('jumpLinkShortcuts', areaBroker);
-                        // TODO show dilog with shortcuts
+                        const _shortcutsSelector = ".jump-links-box .shortcuts-list-wrapper";
+                        const _shortcutsList = $(_shortcutsSelector);
+                        const closeHandler = function(event) {
+                            if (event) {
+                                _shortcutsList.addClass("hidden");
+                                _shortcutsList.off("click", closeHandler);
+                                $(window).off("keydown", closeHandler);
+                            }
+                        };
+                        $(_jumpLinksBehavior.jumpLinkShortcuts.selector).blur();
+                        _shortcutsList.removeClass("hidden");
+                        _shortcutsList
+                            .off("click", closeHandler)
+                            .on("click", closeHandler);
+                        $(window)
+                            .off("keydown", closeHandler)
+                            .on("keydown", closeHandler);
                     }
                 },
             };
@@ -416,7 +431,7 @@ var qtiProvider = {
                 const link = $(linkDescription.selector);
                 if (link) {
                     link.on('click', linkDescription.handler);
-                    link.on('keydown', (event) => {
+                    link.on('keyup', (event) => {
                         var activationKeys = [32, 13]; // link can be activated by click or enter/space keys
                         if (activationKeys.includes(event.keyCode)) {
                             linkDescription.handler(event);

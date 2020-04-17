@@ -18,6 +18,7 @@
 
 export { default as headerNavigationStrategy } from './headerNavigation';
 export { default as toolbarNavigationStrategy } from './toolbarNavigation';
+export { default as topToolbarNavigationStrategy } from './topToolbarNavigation';
 export { default as navigatorNavigationStrategy } from './navigatorNavigation';
 export { default as pageNavigationStrategy } from './pageNavigation';
 export { default as rubricsNavigationStrategy } from './rubricsNavigation';

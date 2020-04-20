@@ -33,7 +33,8 @@
                         tabindex="-1" role="link" aria-disabled="{{#if viewed}}false{{else}}true{{/if}}"
                         {{#if active}}aria-current="page"{{/if}}>
                         <span class="qti-navigator-label truncate" title="{{label}}">
-                            <span aria-label="{{ariaLabel}}" class="qti-navigator-icon icon-{{icon}}"></span>
+                            <span aria-label="{{#if flagged}}flagged{{else}}{{#if answered}}answered{{else}}{{#if viewed}}viewed{{else}}unseen{{/if}}{{/if}}{{/if}}"
+                                  class="qti-navigator-icon icon-{{icon}}"></span>
                             <span class="qti-navigator-number">{{index}}</span>
                             {{label}}
                         </span>

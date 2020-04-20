@@ -374,18 +374,6 @@ var navigatorApi = {
 
             itm.cls = cls.join(' ');
             itm.icon = icon;
-
-            if (!itm.viewed) {
-                itm.ariaLabel = 'not seen'
-            } else {
-                if (itm.flagged) {
-                    itm.ariaLabel = 'flagged'
-                } else if (itm.answered) {
-                    itm.ariaLabel = 'answered'
-                } else {
-                    itm.ariaLabel = 'not answered'
-                }
-            }
         });
     },
 

@@ -97,60 +97,64 @@ let testRunnerNavigatorItem;
  * @returns {Array}
  */
 function initToolbarNavigation(config) {
-    const $navigationBar = $('.bottom-action-bar');
-    const $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
-    const navigables = navigableDomElement.createFromDoms($focusables);
-    const isNativeNavigation = config.contentNavigatorType === 'native';
-    if (navigables.length) {
-        return [
-            keyNavigator({
-                id: 'bottom-toolbar',
-                replace: true,
-                group: $navigationBar,
-                elements: navigables,
-                defaultPosition: function defaultPosition(navigables) {
-                    if (isNativeNavigation) {
-                        return 0;
-                    }
-                    let pos = navigables.length - 1;
-                    // start from the button "Next" or the button "End test"
-                    _.forIn(navigables, function(navigable, i) {
-                        const $element = navigable.getElement();
-                        // find button "Next"
-                        if ($element.data('control') &&
-                            ($element.data('control') === 'move-forward' ||
-                            $element.data('control') === 'move-end')) {
-                            pos = i;
-                            return;
+    const $navigationBars = $('.bottom-action-bar');
+    const navigators = [];
+    $navigationBars.each(function createNavigator(index, navigationBar){
+        const $navigationBar = $(navigationBar);
+        const $focusables = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
+        const navigables = navigableDomElement.createFromDoms($focusables);
+        const isNativeNavigation = config.contentNavigatorType === 'native';
+        if (navigables.length) {
+            navigators.push(
+                keyNavigator({
+                    id: index ? `bottom-toolbar${index}`:'bottom-toolbar',
+                    replace: true,
+                    group: $navigationBar,
+                    elements: navigables,
+                    defaultPosition: function defaultPosition(navigables) {
+                        if (isNativeNavigation) {
+                            return 0;
                         }
-                    });
-                    // else the last button
-                    return pos;
-                }
-            })
-                .on(config.nextInGroup, function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else {
-                        this.next();
+                        let pos = navigables.length - 1;
+                        // start from the button "Next" or the button "End test"
+                        _.forIn(navigables, function(navigable, i) {
+                            const $element = navigable.getElement();
+                            // find button "Next"
+                            if ($element.data('control') &&
+                                ($element.data('control') === 'move-forward' ||
+                                $element.data('control') === 'move-end')) {
+                                pos = i;
+                                return;
+                            }
+                        });
+                        // else the last button
+                        return pos;
                     }
                 })
-                .on(config.prevInGroup, function(elem) {
-                    if (!allowedToNavigateFrom(elem)) {
-                        return false;
-                    } else {
-                        this.previous();
-                    }
-                })
-                .on('activate', function(cursor) {
-                    cursor.navigable
-                        .getElement()
-                        .click()
-                        .mousedown();
-                })
-        ];
-    }
-    return [];
+                    .on(config.nextInGroup, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else {
+                            this.next();
+                        }
+                    })
+                    .on(config.prevInGroup, function(elem) {
+                        if (!allowedToNavigateFrom(elem)) {
+                            return false;
+                        } else {
+                            this.previous();
+                        }
+                    })
+                    .on('activate', function(cursor) {
+                        cursor.navigable
+                            .getElement()
+                            .click()
+                            .mousedown();
+                    })
+            );
+        }
+    });
+    return navigators;
 }
 
 /**

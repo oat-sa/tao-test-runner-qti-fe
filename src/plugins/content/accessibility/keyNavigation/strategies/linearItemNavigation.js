@@ -19,7 +19,6 @@
 import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
-import navigableGroupElement from 'ui/keyNavigation/navigableGroupElement';
 import {
     setupItemsNavigator,
     setupClickableNavigator
@@ -53,7 +52,7 @@ export default {
         let list = [];
         const setupListNavigator = () => {
             const navigator = keyNavigator({
-                elements: navigableGroupElement.createFromNavigators(list),
+                elements: list,
                 propagateTab: false
             });
 

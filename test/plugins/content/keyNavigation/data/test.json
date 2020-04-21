@@ -222,8 +222,8 @@
                         "position": 1,
                         "timeConstraint": null,
                         "items": {
-                            "item-3": {
-                                "id": "item-3",
+                            "item-2": {
+                                "id": "item-2",
                                 "label": "mock 2",
                                 "position": 1,
                                 "occurrence": 0,
@@ -236,8 +236,8 @@
                                 ],
                                 "informational": false
                             },
-                            "item-2": {
-                                "id": "item-2",
+                            "item-3": {
+                                "id": "item-3",
                                 "label": "mock 3",
                                 "position": 2,
                                 "occurrence": 0,

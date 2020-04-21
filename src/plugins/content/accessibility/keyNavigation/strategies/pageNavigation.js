@@ -19,6 +19,9 @@
 import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
+import {
+    setupItemsNavigator
+} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
  * The identifier the keyNavigator group
@@ -39,6 +42,7 @@ export default {
      * @returns {keyNavigationStrategy}
      */
     init() {
+        const config = this.getConfig();
         this.keyNavigators = [];
 
         this.getTestRunner().getAreaBroker().getContainer()
@@ -46,15 +50,15 @@ export default {
             .addClass('key-navigation-scrollable')
             .each((i, el) => {
                 const $element = $(el);
-                this.keyNavigators.push(
-                    keyNavigator({
-                        id: `${groupId}-${this.keyNavigators.length}`,
-                        elements: navigableDomElement.createFromDoms($element),
-                        group: $element,
-                        propagateTab: false, // inner item navigators will send tab to this element
-                        replace: true
-                    })
-                );
+                const navigator = keyNavigator({
+                    id: `${groupId}-${this.keyNavigators.length}`,
+                    elements: navigableDomElement.createFromDoms($element),
+                    group: $element,
+                    propagateTab: false
+                });
+
+                setupItemsNavigator(navigator, config);
+                this.keyNavigators.push(navigator);
             });
 
         return this;

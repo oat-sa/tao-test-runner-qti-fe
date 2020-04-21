@@ -16,62 +16,47 @@
  * Copyright (c) 2020 Open Assessment Technologies SA ;
  */
 
-import _ from "lodash";
-import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
-    setupClickableNavigator,
-    setupItemsNavigator
+    setupItemsNavigator,
+    setupClickableNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 
 /**
  * The identifier the keyNavigator group
  * @type {String}
  */
-const groupId = 'bottom-toolbar';
+const groupId = 'top-toolbar';
 
 /**
- * Key navigator strategy applying onto the tools bar
+ * Key navigator strategy applying onto the top toolbar' bar.
  * @type {Object} keyNavigationStrategy
  */
 export default {
-    name: 'toolbar',
+    name: 'top-toolbar',
 
     /**
-     * Builds the toolbar navigation strategy.
+     * Builds the top toolbar navigation strategy.
      *
      * @returns {keyNavigationStrategy}
      */
     init() {
         const config = this.getConfig();
-        const $navigationBar = this.getTestRunner().getAreaBroker().getContainer().find('.bottom-action-bar');
-        const $toolbarElements = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
+        const $topToolbar = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
+        const $elements = $topToolbar.find('.countdown');
 
-        const registerToolbarNavigator = (id, group, $elements) => {
+        const registerTopToolbarNavigator = (id, group, $elements) => {
             const elements = navigableDomElement.createFromDoms($elements);
             if (elements.length) {
                 const navigator = keyNavigator({
                     id,
                     group,
                     elements,
-                    propagateTab: false,
-                    defaultPosition(navigableElements) {
-                        let pos = 0;
-
-                        // search for the position of the "Next" button if any,
-                        // otherwise take the position of the last element
-                        if (config.autoFocus) {
-                            pos = navigableElements.length - 1;
-                            _.forEach(navigableElements, (navigable, i) => {
-                                const $element = navigable.getElement();
-                                if ($element.data('control') === 'move-forward' || $element.data('control') === 'move-end') {
-                                    pos = i;
-                                }
-                            });
-                        }
-
-                        return pos;
+                    replace: true,
+                    defaultPosition(navigables) {
+                        return navigables.length - 1;
                     }
                 });
 
@@ -82,12 +67,7 @@ export default {
         };
 
         this.keyNavigators = [];
-
-        if (config.flatNavigation) {
-            $toolbarElements.each((index, element) => registerToolbarNavigator(`${groupId}-${index}`, $navigationBar, $(element)));
-        } else {
-            registerToolbarNavigator(groupId, $navigationBar, $toolbarElements);
-        }
+        registerTopToolbarNavigator(groupId, $topToolbar, $elements);
 
         return this;
     },
@@ -97,6 +77,9 @@ export default {
      * @returns {keyNavigator[]}
      */
     getNavigators() {
+        if (isReviewPanelEnabled(this.getTestRunner())) {
+            return [];
+        }
         return this.keyNavigators;
     },
 

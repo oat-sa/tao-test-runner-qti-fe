@@ -20,8 +20,8 @@ import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
-    setupItemsNavigator,
-    setupClickableNavigator
+    setupClickableNavigator,
+    setupItemsNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
@@ -44,7 +44,7 @@ export default {
      */
     init() {
         const config = this.getConfig();
-        //need global selector as currently no way to access delivery frame from test runner
+        // we need a global selector as there is currently no way to access the delivery frame from the test runner
         const $headerBar = $('header');
         const $headerElements = $headerBar.find('a:visible');
 
@@ -55,7 +55,7 @@ export default {
                     id,
                     group,
                     elements,
-                    replace: true
+                    propagateTab: false
                 });
 
                 setupItemsNavigator(navigator, config);
@@ -65,7 +65,12 @@ export default {
         };
 
         this.keyNavigators = [];
-        registerHeaderNavigator(groupId, $headerBar, $headerElements);
+
+        if (config.flatNavigation) {
+            $headerElements.each((index, element) => registerHeaderNavigator(`${groupId}-${index}`, $headerBar, $(element)));
+        } else {
+            registerHeaderNavigator(groupId, $headerBar, $headerElements);
+        }
 
         return this;
     },

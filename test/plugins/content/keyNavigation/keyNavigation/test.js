@@ -154,7 +154,7 @@ define([
                         assert.equal($container.find('.runner').children().length, 1, 'The test runner is rendered');
 
                         runner.after('renderitem.runnerComponent', itemRef => {
-                            if (itemRef === 'item-1') {
+                            if (itemRef !== 'item-3') {
                                 runner.next();
                             } else {
                                 runner.off('renderitem.runnerComponent');

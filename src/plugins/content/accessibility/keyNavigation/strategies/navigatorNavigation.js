@@ -48,7 +48,7 @@ export default {
         //the tag to identify if the item listing has been browsed, to only "smart jump" to active item only on the first visit
         let itemListingVisited = false;
         //the position of the filter in memory, to only "smart jump" to active item only on the first visit
-        let filterCursor;
+        let currentFilter;
 
         this.managedNavigators = [];
         this.keyNavigators = [];
@@ -60,7 +60,7 @@ export default {
                 filtersNavigator = keyNavigator({
                     keepState: config.keepState,
                     id: 'navigator-filters',
-                    replace: true,
+                    propagateTab: false,
                     elements: navigableFilters,
                     group: $navigator.find('.qti-navigator-filters')
                 });
@@ -72,17 +72,17 @@ export default {
                 setupClickableNavigator(filtersNavigator);
 
                 if (config.keepState) {
-                    filtersNavigator.on('focus', (cursor, origin) => {
+                    filtersNavigator.on('focus', cursor => {
                         if (config.keepState) {
-                            //activate the tab in the navigators
-                            cursor.navigable.getElement().click();
+                            const $element = cursor.navigable.getElement();
+                            const filter = $element.data('mode');
+                            $element.click();
 
-                            //reset the item listing browsed tag whenever the focus on the filter happens after a focus on another element
-                            if ((filterCursor && filterCursor.position !== cursor.position) || origin) {
+                            if (currentFilter !== filter) {
                                 itemListingVisited = false;
                             }
-                            //set the filter cursor in memory
-                            filterCursor = cursor;
+
+                            currentFilter = filter;
                         }
                     });
                 }
@@ -92,7 +92,7 @@ export default {
                         if (allowedToNavigateFrom(elem) && itemsNavigator) {
                             _.defer(() => {
                                 if (itemListingVisited) {
-                                    itemsNavigator.focus().first();
+                                    itemsNavigator.first();
                                 } else {
                                     itemsNavigator.focus();
                                 }
@@ -121,18 +121,15 @@ export default {
                 //instantiate a key navigator but do not add it to the returned list of navigators as this is not supposed to be reached with tab key
                 itemsNavigator = keyNavigator({
                     id: 'navigator-items',
-                    replace: true,
                     elements: navigableTrees,
                     group: $navigatorTree,
-                    defaultPosition(navigables) {
+                    defaultPosition(navigableElements) {
                         let pos = 0;
-                        if (filterCursor && filterCursor.navigable.getElement().data('mode') !== 'flagged') {
-                            _.forEach(navigables, function (navigable, i) {
+                        if (config.flatNavigation || currentFilter !== 'flagged') {
+                            pos = _.findIndex(navigableElements, navigable => {
                                 const $parent = navigable.getElement().parent('.qti-navigator-item');
-                                //find the first active and visible item
                                 if ($parent.hasClass('active') && $parent.is(':visible')) {
-                                    pos = i;
-                                    return false;
+                                    return true;
                                 }
                             });
                         }

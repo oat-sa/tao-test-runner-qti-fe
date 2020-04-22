@@ -79,7 +79,7 @@ export default function shortcutsBoxFactory(config) {
                 if (link) {
                     link.on('click', linkDescription.handler);
                     link.on('keyup', (event) => {
-                        var activationKeys = [32, 13]; // link can be activated by click or enter/space keys
+                        const activationKeys = [32, 13]; // link can be activated by click or enter/space keys
                         if (activationKeys.includes(event.keyCode)) {
                             linkDescription.handler(event);
                         }

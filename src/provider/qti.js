@@ -361,85 +361,6 @@ var qtiProvider = {
         areaBroker.setComponent('toolbox', toolboxFactory());
         areaBroker.getToolbox().init();
 
-
-        /**
-         * add jump links support
-         */
-        function handleJumpLinks() {
-            function findFocusable(targetElement) {
-                const elem = $(targetElement)
-                    .find( 'input, select, a[href], textarea, button, [tabindex]')
-                    .toArray()
-                    .filter( (el) => ( el.tabIndex >= 0 && !el.disabled && el.offsetParent ) )
-                    .find( (el) => (typeof el.focus === 'function') );
-                return elem;
-            }
-
-            const _jumpLinksBehavior = {
-                jumpLinkQuestion: {
-                    selector: '.jump-links-box .jump-link-question',
-                    handler: () => {
-                        const e = findFocusable( areaBroker.getContentArea() );
-                        e && e.focus();
-                    }
-                },
-                jumpLinkNavigation: {
-                    selector: '.jump-links-box .jump-link-navigation',
-                    handler: () => {
-                        const e = findFocusable( areaBroker.getNavigationArea() );
-                        e && e.focus();
-                    }
-                },
-                jumpLinkToolbox: {
-                    selector: '.jump-links-box .jump-link-toolbox',
-                    handler: () => {
-                        const e = findFocusable( areaBroker.getToolboxArea() );
-                        e && e.focus();
-                    }
-                },
-                jumpLinkTeststatus: {
-                    selector: '.jump-links-box .jump-link-teststatus',
-                    handler: () => {
-                        const e = findFocusable( areaBroker.getPanelArea() );
-                        e && e.focus();
-                    }
-                },
-                jumpLinkShortcuts: {
-                    selector: '.jump-links-box .jump-link-shortcuts',
-                    handler: () => {
-                        const _shortcutsSelector = ".jump-links-box .shortcuts-list-wrapper";
-                        const _shortcutsList = $(_shortcutsSelector);
-                        const closeHandler = function(event) {
-                            if (event) {
-                                _shortcutsList.addClass("hidden");
-                                _shortcutsList.off("click", closeHandler);
-                                $(window).off("keydown", closeHandler);
-                            }
-                        };
-                        $(_jumpLinksBehavior.jumpLinkShortcuts.selector).blur();
-                        _shortcutsList.removeClass("hidden");
-                        _shortcutsList
-                            .off("click", closeHandler)
-                            .on("click", closeHandler);
-                        $(window)
-                            .off("keydown", closeHandler)
-                            .on("keydown", closeHandler);
-                    }
-                },
-            };
-            _.forOwn(_jumpLinksBehavior, (linkDescription) => {
-                const link = $(linkDescription.selector);
-                if (link) {
-                    link.on('click', linkDescription.handler);
-                    link.on('keyup', (event) => {
-                        var activationKeys = [32, 13]; // link can be activated by click or enter/space keys
-                        if (activationKeys.includes(event.keyCode)) {
-                            linkDescription.handler(event);
-                        }
-                    });
-                }
-            });
-    }
         /*
          * Install behavior on events
          */
@@ -602,8 +523,6 @@ var qtiProvider = {
                     this.trigger('enabletools');
                 }
                 this.trigger('enablenav');
-
-                handleJumpLinks();
             })
             .on('resumeitem', function() {
                 this.trigger('enableitem enablenav');

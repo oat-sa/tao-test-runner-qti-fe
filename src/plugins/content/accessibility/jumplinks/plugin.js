@@ -15,15 +15,18 @@
  *
  * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
  */
+
 /**
  * @author aliaksandr paliakou <lecosson@gmail.com>
  */
-// import loadingBar from 'layout/loading-bar';
+
 import pluginFactory from 'taoTests/runner/plugin';
+import jumplinksFactory from "./jumplinks";
+import shortcutsFactory from "./shortcuts";
 
 /**
- * Creates the loading bar plugin.
- * Displays a loading bar when a blocking task is running
+ * Creates the JumpLinks plugin.
+ * adding jumplinks accessibility feature for quick navigation
  */
 export default pluginFactory({
     name: 'jumplinks',
@@ -32,14 +35,20 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var testRunner = this.getTestRunner();
-        console.log('jumplinks plugin init(), testRunner:', testRunner);
-        // testRunner
-        //     .on('unloaditem', function() {
-        //         loadingBar.start();
-        //     })
-        //     .on('renderitem', function() {
-        //         loadingBar.stop();
-        //     });
-    }
+        const self = this;
+
+        self.jumplinks = jumplinksFactory({areaBroker: self.getAreaBroker()});
+        self.shortcuts = shortcutsFactory({});
+    },
+
+    /**
+     * Called during the runner's render phase
+     */
+    render: function render() {
+        const self = this;
+
+        self.jumplinks.render(self.getAreaBroker().getControlArea());
+        self.shortcuts.render(self.getAreaBroker().getControlArea());
+    },
+
 });

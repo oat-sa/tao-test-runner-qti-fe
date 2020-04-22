@@ -29,12 +29,12 @@
                 </span>
                 <ul class="qti-navigator-items collapsible-panel plain">
                     {{#each items}}
-                    <li class="qti-navigator-item {{cls}}" data-id="{{id}}" data-position="{{position}}"
-                        tabindex="-1" role="link" aria-disabled="{{#if viewed}}false{{else}}true{{/if}}"
-                        {{#if active}}aria-current="page"{{/if}}>
-                        <span class="qti-navigator-label truncate" title="{{label}}">
-                            <span aria-label="{{#if flagged}}flagged{{else}}{{#if answered}}answered{{else}}{{#if viewed}}viewed{{else}}unseen{{/if}}{{/if}}{{/if}}"
-                                  class="qti-navigator-icon icon-{{icon}}"></span>
+                    <li class="qti-navigator-item {{cls}}" data-id="{{id}}" data-position="{{position}}" tabindex="-1" >
+                        <span class="qti-navigator-label truncate" title="{{label}}"
+                              role="link" aria-disabled="{{#if viewed}}false{{else}}true{{/if}}"
+                              {{#if active}}aria-current="page"{{/if}}
+                              aria-label="item {{index}} of {{../stats.questions}} total {{label}} {{#if flagged}}flagged{{else}}{{#if answered}}answered{{else}}{{#if viewed}}viewed{{else}}unseen{{/if}}{{/if}}{{/if}}">
+                            <span class="qti-navigator-icon icon-{{icon}}"></span>
                             <span class="qti-navigator-number">{{index}}</span>
                             {{label}}
                         </span>

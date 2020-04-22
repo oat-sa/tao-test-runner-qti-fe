@@ -249,8 +249,8 @@ var qtiProvider = {
 
             //catch server errors
             var submitError = function submitError(err) {
-                if (err && err.unrecoverable) {
-                    self.trigger('pause', {message: err.message});
+                if (err && err.unrecoverable){
+                    self.trigger('pause', {message : err.message});
                 } else if (err.code === 200) {
                     //some server errors are valid, so we don't fail (prevent empty responses)
                     self.trigger(
@@ -277,12 +277,12 @@ var qtiProvider = {
                             self.itemRunner.getResponses(),
                             params
                         )
-                        .then(results => {
+                        .then( results => {
                             if (results.itemSession) {
                                 currentItem.answered = results.itemSession.itemAnswered;
 
                                 if (results.displayFeedbacks === true && results.feedbacks) {
-                                    self.itemRunner.renderFeedbacks(results.feedbacks, results.itemSession, function (
+                                    self.itemRunner.renderFeedbacks(results.feedbacks, results.itemSession, function(
                                         queue
                                     ) {
                                         self.trigger('modalFeedbacks', queue, resolve);
@@ -307,10 +307,10 @@ var qtiProvider = {
             });
 
             feedbackPromise
-                .then(function () {
+                .then(function() {
                     return self.toolStateBridge.getStates();
                 })
-                .then(function (toolStates) {
+                .then(function(toolStates) {
                     if (toolStates && _.size(toolStates) > 0) {
                         params.toolStates = toolStates;
                     }
@@ -320,19 +320,19 @@ var qtiProvider = {
 
                     //to be sure load start after unload...
                     //we add an intermediate ns event on unload
-                    self.on(`unloaditem.${action}`, function () {
+                    self.on(`unloaditem.${action}`, function() {
                         self.off(`.${action}`);
 
                         self.getProxy()
                             .callItemAction(context.itemIdentifier, action, params)
-                            .then(function (results) {
+                            .then(function(results) {
                                 loadPromise = loadPromise || Promise.resolve();
 
-                                return loadPromise.then(function () {
+                                return loadPromise.then(function() {
                                     return results;
                                 });
                             })
-                            .then(function (results) {
+                            .then(function(results) {
                                 //update testData, testContext and build testMap
                                 self.dataUpdater.update(results);
 

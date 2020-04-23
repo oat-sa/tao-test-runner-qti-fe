@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -25,7 +25,6 @@ import $ from 'jquery';
 import _ from 'lodash';
 import component from 'ui/component';
 import jumplinksTpl from 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/jumplinks.tpl';
-import 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/jumplinks.css';
 
 /**
  * Default config values, see below.

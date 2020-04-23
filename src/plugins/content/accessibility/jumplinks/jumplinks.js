@@ -21,7 +21,6 @@
  *
  *  @author aliaksandr paliakou <lecosson@gmail.com>
  */
-import $ from 'jquery';
 import _ from 'lodash';
 import component from 'ui/component';
 import jumplinksTpl from 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/jumplinks.tpl';
@@ -44,75 +43,49 @@ const defaults = {
 export default function jumplinksFactory(config) {
 
     /**
-     * adds rendered jump links support
+     * @typedef {Object} jumplinksBox
      */
-    function handleJumpLinks() {
-        const areaBroker = config.areaBroker;
-
-        function findFocusable(targetElement) {
-            const elem = $(targetElement)
-                .find('input, select, a[href], textarea, button, [tabindex]')
-                .toArray()
-                .filter((el) => (el.tabIndex >= 0 && !el.disabled && el.offsetParent ) )
-                .find((el) => (typeof el.focus === 'function') );
-            return elem;
-        }
-
+    const jumplinksBox = component({}, defaults )
+    .on('render', function() {
+        // handle related Jump Links
         const _jumpLinksBehavior = {
             jumpLinkQuestion: {
-                selector: '.top-action-bar .jump-links-box [data-jump=question] ',
-                event: 'question',
-                handler: () => {
-                    const e = findFocusable(areaBroker.getContentArea() );
-                    e && e.focus();
-                }
+                selector: '[data-jump=question] ',
+                eventName: 'question',
             },
             jumpLinkNavigation: {
-                selector: '.top-action-bar .jump-links-box [data-jump=navigation]',
-                event: 'navigation',
-                handler: () => {
-                    const e = findFocusable(areaBroker.getNavigationArea() );
-                    e && e.focus();
-                }
+                selector: '[data-jump=navigation]',
+                eventName: 'navigation',
             },
             jumpLinkToolbox: {
-                selector: '.top-action-bar .jump-links-box [data-jump=toolbox]',
-                event: 'toolbox',
-                handler: () => {
-                    const e = findFocusable(areaBroker.getToolboxArea() );
-                    e && e.focus();
-                }
+                selector: '[data-jump=toolbox]',
+                eventName: 'toolbox',
             },
             jumpLinkTeststatus: {
-                selector: '.top-action-bar .jump-links-box [data-jump=teststatus]',
-                event: 'teststatus',
-                handler: () => {
-                    const e = findFocusable(areaBroker.getPanelArea() );
-                    e && e.focus();
-                }
+                selector: '[data-jump=teststatus]',
+                eventName: 'teststatus',
+            },
+            jumpLinkShortcuts: {
+                selector: '[data-jump=shortcuts]',
+                eventName: 'shortcuts',
             },
         };
         _.forOwn(_jumpLinksBehavior, (linkDescription) => {
-            const link = $(linkDescription.selector);
-            if (link) {
-                link.on('click', linkDescription.handler);
-                link.on('keyup', (event) => {
+            const $link = this.getElement().find(linkDescription.selector);
+            if ($link) {
+                $link.on('click', () => {
+                    this.trigger(linkDescription.eventName);
+                });
+                $link.on('keyup', (event) => {
                     const activationKeys = [32, 13]; // link can be activated by click or enter/space keys
                     if (activationKeys.includes(event.keyCode)) {
-                        linkDescription.handler(event);
+                        this.trigger(linkDescription.eventName);
                     }
                 });
             }
         });
-    }
+    });
 
-    /**
-     * @typedef {Object} jumplinksBox
-     */
-    const jumplinksBox = component({}, defaults )
-        .on('render', function() {
-            handleJumpLinks();
-        });
 
     jumplinksBox.setTemplate(jumplinksTpl);
 

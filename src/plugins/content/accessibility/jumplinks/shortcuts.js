@@ -21,7 +21,6 @@
  *
  * @author aliaksandr paliakou <lecosson@gmail.com>
  */
-import $ from 'jquery';
 import _ from 'lodash';
 import component from 'ui/component';
 import shortcutsTpl from 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/shortcuts.tpl';
@@ -41,52 +40,7 @@ const defaults = {};
  */
 export default function shortcutsBoxFactory(config) {
 
-    /**
-     * @typedef {Object} jumplinksBox
-     */
-    const shortcutsBox = component({}, defaults)
-        .on('init', function() {
-        })
-        .on('render', function() {
-            // handle related Jump Links
-            const _jumpLinksBehavior = {
-                jumpLinkShortcuts: {
-                    selector: '.top-action-bar [data-jump=shortcuts]',
-                    event: 'shortcuts',
-                    handler: () => {
-                        const _shortcutsSelector = ".top-action-bar .shortcuts-list-wrapper";
-                        const _shortcutsList = $(_shortcutsSelector);
-                        const closeHandler = function(event) {
-                            if (event) {
-                                _shortcutsList.addClass("hidden");
-                                _shortcutsList.off("click", closeHandler);
-                                $(window).off("keydown", closeHandler);
-                            }
-                        };
-                        $(_jumpLinksBehavior.jumpLinkShortcuts.selector).blur();
-                        _shortcutsList.removeClass("hidden");
-                        _shortcutsList
-                            .off("click", closeHandler)
-                            .on("click", closeHandler);
-                        $(window)
-                            .off("keydown", closeHandler)
-                            .on("keydown", closeHandler);
-                    }
-                },
-            };
-            _.forOwn(_jumpLinksBehavior, (linkDescription) => {
-                const link = $(linkDescription.selector);
-                if (link) {
-                    link.on('click', linkDescription.handler);
-                    link.on('keyup', (event) => {
-                        const activationKeys = [32, 13]; // link can be activated by click or enter/space keys
-                        if (activationKeys.includes(event.keyCode)) {
-                            linkDescription.handler(event);
-                        }
-                    });
-                }
-            });
-        });
+    const shortcutsBox = component({}, defaults);
 
     shortcutsBox.setTemplate(shortcutsTpl);
 

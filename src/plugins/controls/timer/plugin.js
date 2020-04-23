@@ -218,6 +218,9 @@ export default pluginFactory({
                             .on('init', resolve)
                             .on('error', handleError);
 
+                        // share this timer values to use in other components
+                        self.timerbox.spread(testRunner, 'timertick');
+
                         if (!config.contextualWarnings) {
                             self.timerbox.on('warn', function(message, level) {
                                 if (level && message) {

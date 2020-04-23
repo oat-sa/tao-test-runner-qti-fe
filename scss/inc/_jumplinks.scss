@@ -11,13 +11,13 @@
     height: 0;
     position: absolute;
 
-    li[data-control^=jump-link] {
+    .jump-link-item {
       position: fixed;
       display: block;
       z-index: 1001;
     }
 
-    [class^=jump-link] {
+    .jump-link {
       z-index: 1002;
       position: fixed;
       display: block;

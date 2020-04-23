@@ -51,7 +51,8 @@ export default function shortcutsBoxFactory(config) {
             // handle related Jump Links
             const _jumpLinksBehavior = {
                 jumpLinkShortcuts: {
-                    selector: '.top-action-bar .jump-link-shortcuts',
+                    selector: '.top-action-bar [data-jump=shortcuts]',
+                    event: 'shortcuts',
                     handler: () => {
                         const _shortcutsSelector = ".top-action-bar .shortcuts-list-wrapper";
                         const _shortcutsList = $(_shortcutsSelector);

@@ -60,28 +60,32 @@ export default function jumplinksFactory(config) {
 
         const _jumpLinksBehavior = {
             jumpLinkQuestion: {
-                selector: '.top-action-bar .jump-links-box .jump-link-question',
+                selector: '.top-action-bar .jump-links-box [data-jump=question] ',
+                event: 'question',
                 handler: () => {
                     const e = findFocusable(areaBroker.getContentArea() );
                     e && e.focus();
                 }
             },
             jumpLinkNavigation: {
-                selector: '.top-action-bar .jump-links-box .jump-link-navigation',
+                selector: '.top-action-bar .jump-links-box [data-jump=navigation]',
+                event: 'navigation',
                 handler: () => {
                     const e = findFocusable(areaBroker.getNavigationArea() );
                     e && e.focus();
                 }
             },
             jumpLinkToolbox: {
-                selector: '.top-action-bar .jump-links-box .jump-link-toolbox',
+                selector: '.top-action-bar .jump-links-box [data-jump=toolbox]',
+                event: 'toolbox',
                 handler: () => {
                     const e = findFocusable(areaBroker.getToolboxArea() );
                     e && e.focus();
                 }
             },
             jumpLinkTeststatus: {
-                selector: '.top-action-bar .jump-links-box .jump-link-teststatus',
+                selector: '.top-action-bar .jump-links-box [data-jump=teststatus]',
+                event: 'teststatus',
                 handler: () => {
                     const e = findFocusable(areaBroker.getPanelArea() );
                     e && e.focus();

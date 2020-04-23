@@ -29,7 +29,7 @@ import shortcutsTpl from 'taoQtiTest/runner/plugins/content/accessibility/jumpli
 /**
  * Default config values, see below.
  */
-var defaults = {};
+const defaults = {};
 
 /**
  * Creates and initialize the shortcuts component.
@@ -44,7 +44,7 @@ export default function shortcutsBoxFactory(config) {
     /**
      * @typedef {Object} jumplinksBox
      */
-    var shortcutsBox = component( {}, defaults)
+    const shortcutsBox = component( {}, defaults)
         .on('init', function() {
         })
         .on('render', function() {

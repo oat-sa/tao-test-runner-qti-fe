@@ -29,7 +29,7 @@ import jumplinksTpl from 'taoQtiTest/runner/plugins/content/accessibility/jumpli
 /**
  * Default config values, see below.
  */
-var defaults = {
+const defaults = {
 };
 
 /**

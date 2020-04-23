@@ -31,12 +31,12 @@ import _ from "lodash";
  */
 
 function findFocusable(targetElement) {
-    const elem = $(targetElement)
+    const $elem = $(targetElement)
         .find('input, select, a[href], textarea, button, [tabindex]')
         .toArray()
         .filter((el) => (el.tabIndex >= 0 && !el.disabled && el.offsetParent ) )
         .find((el) => (typeof el.focus === 'function') );
-    return elem;
+    return $elem;
 }
 
 

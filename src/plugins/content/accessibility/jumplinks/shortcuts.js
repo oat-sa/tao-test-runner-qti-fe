@@ -44,7 +44,7 @@ export default function shortcutsBoxFactory(config) {
     /**
      * @typedef {Object} jumplinksBox
      */
-    const shortcutsBox = component( {}, defaults)
+    const shortcutsBox = component({}, defaults)
         .on('init', function() {
         })
         .on('render', function() {

@@ -51,10 +51,10 @@ export default function jumplinksFactory(config) {
 
         function findFocusable(targetElement) {
             const elem = $(targetElement)
-                .find( 'input, select, a[href], textarea, button, [tabindex]')
+                .find('input, select, a[href], textarea, button, [tabindex]')
                 .toArray()
-                .filter( (el) => ( el.tabIndex >= 0 && !el.disabled && el.offsetParent ) )
-                .find( (el) => (typeof el.focus === 'function') );
+                .filter((el) => (el.tabIndex >= 0 && !el.disabled && el.offsetParent ) )
+                .find((el) => (typeof el.focus === 'function') );
             return elem;
         }
 
@@ -62,28 +62,28 @@ export default function jumplinksFactory(config) {
             jumpLinkQuestion: {
                 selector: '.top-action-bar .jump-links-box .jump-link-question',
                 handler: () => {
-                    const e = findFocusable( areaBroker.getContentArea() );
+                    const e = findFocusable(areaBroker.getContentArea() );
                     e && e.focus();
                 }
             },
             jumpLinkNavigation: {
                 selector: '.top-action-bar .jump-links-box .jump-link-navigation',
                 handler: () => {
-                    const e = findFocusable( areaBroker.getNavigationArea() );
+                    const e = findFocusable(areaBroker.getNavigationArea() );
                     e && e.focus();
                 }
             },
             jumpLinkToolbox: {
                 selector: '.top-action-bar .jump-links-box .jump-link-toolbox',
                 handler: () => {
-                    const e = findFocusable( areaBroker.getToolboxArea() );
+                    const e = findFocusable(areaBroker.getToolboxArea() );
                     e && e.focus();
                 }
             },
             jumpLinkTeststatus: {
                 selector: '.top-action-bar .jump-links-box .jump-link-teststatus',
                 handler: () => {
-                    const e = findFocusable( areaBroker.getPanelArea() );
+                    const e = findFocusable(areaBroker.getPanelArea() );
                     e && e.focus();
                 }
             },
@@ -105,7 +105,7 @@ export default function jumplinksFactory(config) {
     /**
      * @typedef {Object} jumplinksBox
      */
-    const jumplinksBox = component( {}, defaults )
+    const jumplinksBox = component({}, defaults )
         .on('render', function() {
             handleJumpLinks();
         });

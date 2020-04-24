@@ -59,18 +59,18 @@ export default pluginFactory({
      */
     init: function init() {
         const self = this;
+        const mapJumpToAreaBroker = {
+            question: 'getContentArea',
+            navigation: 'getNavigationArea',
+            toolbox: 'getToolboxArea',
+            teststatus: 'getPanelArea',
+        };
         self.jumplinks = jumplinksFactory({})
             .on('render', handleJumpLinks);
         self.shortcuts = shortcutsFactory({});
 
         function handleJumpLinks() {
             const closeShortcutsHandler = closeShortcuts.bind(self);
-            const mapJumpToAreaBroker = {
-                question: 'getContentArea',
-                navigation: 'getNavigationArea',
-                toolbox: 'getToolboxArea',
-                teststatus: 'getPanelArea',
-            };
             self.jumplinks.on('jump', (jump) => {
                 const $elementGetter = self.getAreaBroker()[mapJumpToAreaBroker[jump]];
                 if ($elementGetter) {

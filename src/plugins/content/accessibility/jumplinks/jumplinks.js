@@ -36,8 +36,6 @@ const defaults = {
  * Please not the component IS NOT rendered.
  * You'll have to render it by yourself.
  *
- * @param {Object} config
- * @param {Object[]} [config.areaBroker] - test page area broker
  * @returns {jumplinks} the component, initialized and rendered
  */
 export default function jumplinksFactory() {

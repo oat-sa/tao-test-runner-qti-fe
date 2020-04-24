@@ -50,19 +50,19 @@ export default function jumplinksFactory(config) {
             // handle related Jump Links
             const behavior = [{
                 selector: '[data-jump=question] ',
-                eventName: 'jumplink',
+                eventName: 'jump',
                 eventParam: 'question',
             }, {
                 selector: '[data-jump=navigation]',
-                eventName: 'jumplink',
+                eventName: 'jump',
                 eventParam: 'navigation',
             }, {
                 selector: '[data-jump=toolbox]',
-                eventName: 'jumplink',
+                eventName: 'jump',
                 eventParam: 'toolbox',
             }, {
                 selector: '[data-jump=teststatus]',
-                eventName: 'jumplink',
+                eventName: 'jump',
                 eventParam: 'teststatus',
             }, {
                 selector: '[data-jump=shortcuts]',

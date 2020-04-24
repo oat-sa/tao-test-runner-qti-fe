@@ -71,7 +71,7 @@ export default pluginFactory({
                 toolbox: 'getToolboxArea',
                 teststatus: 'getPanelArea',
             };
-            self.jumplinks.on('jumplink', (jump) => {
+            self.jumplinks.on('jump', (jump) => {
                 const $elementGetter = self.getAreaBroker()[mapJumpToAreaBroker[jump]];
                 if ($elementGetter) {
                     const $focusable = findFocusable($elementGetter());

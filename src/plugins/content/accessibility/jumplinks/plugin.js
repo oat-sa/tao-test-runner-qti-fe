@@ -74,7 +74,6 @@ export default pluginFactory({
                 teststatus: 'getPanelArea',
             };
             self.jumplinks.on('jumplink', (jump) => {
-                self.jumplinks.getElement().find(':focus').blur();
                 const $elementGetter = self.getAreaBroker()[mapJumpToAreaBroker[jump]];
                 if ($elementGetter) {
                     const $focusable = findFocusable($elementGetter());
@@ -84,7 +83,6 @@ export default pluginFactory({
 
             const closeShortcutsHandler = closeShortcuts.bind(self);
             self.jumplinks.on('shortcuts', () => {
-                self.jumplinks.getElement().find(':focus').blur();
                 self.shortcuts.show();
                 self.shortcuts.getElement()
                     .off("click", closeShortcutsHandler)

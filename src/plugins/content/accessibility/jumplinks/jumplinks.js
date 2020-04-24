@@ -71,14 +71,16 @@ export default function jumplinksFactory(config) {
         }];
         _.forEach(behavior, (linkDescription) => {
             const $link = this.getElement().find(linkDescription.selector);
+            const handleLink = () => {
+                this.trigger(linkDescription.eventName, linkDescription.eventParam);
+                this.getElement().find(':focus').blur();
+            };
             if ($link) {
-                $link.on('click', () => {
-                    this.trigger(linkDescription.eventName, linkDescription.eventParam);
-                });
+                $link.on('click', handleLink);
                 $link.on('keyup', (event) => {
                     const activationKeys = [32, 13]; // link can be activated by click or enter/space keys
                     if (activationKeys.includes(event.keyCode)) {
-                        this.trigger(linkDescription.eventName, linkDescription.eventParam);
+                        handleLink();
                     }
                 });
             }

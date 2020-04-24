@@ -25,10 +25,6 @@ import pluginFactory from 'taoTests/runner/plugin';
 import jumplinksFactory from "./jumplinks";
 import shortcutsFactory from "./shortcuts";
 
-/**
- * adds rendered jump links support
- */
-
 function findFocusable(targetElement) {
     const $elem = $(targetElement)
         .find('input, select, a[href], textarea, button, [tabindex]')

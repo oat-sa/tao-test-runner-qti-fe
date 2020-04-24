@@ -48,29 +48,30 @@ export default function jumplinksFactory(config) {
     const jumplinksBox = component({}, defaults )
     .on('render', function() {
         // handle related Jump Links
-        const _jumpLinksBehavior = {
-            jumpLinkQuestion: {
+        const behavior = [
+            {
                 selector: '[data-jump=question] ',
-                eventName: 'question',
-            },
-            jumpLinkNavigation: {
+                eventName: 'jumplink',
+                eventParam: 'question',
+            }, {
                 selector: '[data-jump=navigation]',
-                eventName: 'navigation',
-            },
-            jumpLinkToolbox: {
+                eventName: 'jumplink',
+                eventParam: 'navigation',
+            }, {
                 selector: '[data-jump=toolbox]',
-                eventName: 'toolbox',
-            },
-            jumpLinkTeststatus: {
+                eventName: 'jumplink',
+                eventParam: 'toolbox',
+            }, {
                 selector: '[data-jump=teststatus]',
-                eventName: 'teststatus',
-            },
-            jumpLinkShortcuts: {
+                eventName: 'jumplink',
+                eventParam: 'teststatus',
+            }, {
                 selector: '[data-jump=shortcuts]',
                 eventName: 'shortcuts',
-            },
-        };
-        _.forOwn(_jumpLinksBehavior, (linkDescription) => {
+                eventParam: 'shortcuts',
+            }
+        ];
+        _.forEach(behavior, (linkDescription) => {
             const $link = this.getElement().find(linkDescription.selector);
             if ($link) {
                 $link.on('click', () => {
@@ -79,7 +80,7 @@ export default function jumplinksFactory(config) {
                 $link.on('keyup', (event) => {
                     const activationKeys = [32, 13]; // link can be activated by click or enter/space keys
                     if (activationKeys.includes(event.keyCode)) {
-                        this.trigger(linkDescription.eventName);
+                        this.trigger(linkDescription.eventName, linkDescription.eventParam);
                     }
                 });
             }

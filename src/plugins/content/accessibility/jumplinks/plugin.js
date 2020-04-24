@@ -24,7 +24,6 @@ import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';
 import jumplinksFactory from "./jumplinks";
 import shortcutsFactory from "./shortcuts";
-import _ from "lodash";
 
 /**
  * adds rendered jump links support
@@ -39,14 +38,12 @@ function findFocusable(targetElement) {
     return $elem;
 }
 
-
 /**
  * Creates the JumpLinks plugin.
  * adding jumplinks accessibility feature for quick navigation
  */
 export default pluginFactory({
     name: 'jumplinks',
-
 
     /**
      * Initializes the plugin (called during runner's init)
@@ -61,66 +58,40 @@ export default pluginFactory({
         self.shortcuts = shortcutsFactory({});
 
         function handleJumpLinks() {
-            const _jumpLinksBehavior = {
-                jumpLinkQuestion: {
-                    selector: '.top-action-bar .jump-links-box [data-jump=question] ',
-                    eventName: 'question',
-                    handler: () => {
-                        const e = findFocusable(self.getAreaBroker().getContentArea() );
-                        e && e.focus();
-                    }
-                },
-                jumpLinkNavigation: {
-                    selector: '.top-action-bar .jump-links-box [data-jump=navigation]',
-                    eventName: 'navigation',
-                    handler: () => {
-                        const e = findFocusable(self.getAreaBroker().getNavigationArea() );
-                        e && e.focus();
-                    }
-                },
-                jumpLinkToolbox: {
-                    selector: '.top-action-bar .jump-links-box [data-jump=toolbox]',
-                    eventName: 'toolbox',
-                    handler: () => {
-                        const e = findFocusable(self.getAreaBroker().getToolboxArea() );
-                        e && e.focus();
-                    }
-                },
-                jumpLinkTeststatus: {
-                    selector: '.top-action-bar .jump-links-box [data-jump=teststatus]',
-                    eventName: 'teststatus',
-                    handler: () => {
-                        const e = findFocusable(self.getAreaBroker().getPanelArea() );
-                        e && e.focus();
-                    }
-                },
-                jumpLinkShortcuts: {
-                    selector: '.top-action-bar [data-jump=shortcuts]',
-                    eventName: 'shortcuts',
-                    handler: () => {
-                        self.shortcuts.show();
-                        const closeHandler = function(event) {
-                            if (event) {
-                                self.shortcuts.hide();
-                                self.shortcuts.getElement().off("click", closeHandler);
-                                $(window).off("keydown", closeHandler);
-                            }
-                        };
-                        self.shortcuts.getElement()
-                            .off("click", closeHandler)
-                            .on("click", closeHandler);
-                        $(window)
-                            .off("keydown", closeHandler)
-                            .on("keydown", closeHandler);
-                    }
-                },
+
+            const mapJumpToAreaBroker = {
+                question: 'getContentArea',
+                navigation: 'getNavigationArea',
+                toolbox: 'getToolboxArea',
+                teststatus: 'getPanelArea',
             };
-            _.forOwn(_jumpLinksBehavior, (linkDescription) => {
-                self.jumplinks.on(linkDescription.eventName, () => {
-                    self.jumplinks.getElement().find(':focus').blur();
-                    linkDescription.handler();
-                });
+            self.jumplinks.on('jumplink', (jump) => {
+                self.jumplinks.getElement().find(':focus').blur();
+                const $elementGetter = self.getAreaBroker()[mapJumpToAreaBroker[jump]];
+                if ($elementGetter) {
+                    const $focusable = findFocusable($elementGetter());
+                    $focusable && $focusable.focus();
+                }
             });
+
+            self.jumplinks.on('shortcuts', () => {
+                self.jumplinks.getElement().find(':focus').blur();
+                self.shortcuts.show();
+                const closeHandler = function(event) {
+                    if (event) {
+                        self.shortcuts.hide();
+                        self.shortcuts.getElement().off("click", closeHandler);
+                        $(window).off("keydown", closeHandler);
+                    }
+                };
+                self.shortcuts.getElement()
+                    .off("click", closeHandler)
+                    .on("click", closeHandler);
+                $(window)
+                    .off("keydown", closeHandler)
+                    .on("keydown", closeHandler);
+            });
+
         }
     },
 

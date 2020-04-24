@@ -52,9 +52,7 @@ export default pluginFactory({
         const self = this;
 
         self.jumplinks = jumplinksFactory({})
-            .on('render', function() {
-                handleJumpLinks();
-            });
+            .on('render', handleJumpLinks);
         self.shortcuts = shortcutsFactory({});
 
         function handleJumpLinks() {
@@ -99,10 +97,8 @@ export default pluginFactory({
      * Called during the runner's render phase
      */
     render: function render() {
-        const self = this;
-
-        self.jumplinks.render(this.getAreaBroker().getControlArea());
-        self.shortcuts.render(this.getAreaBroker().getControlArea());
+        this.jumplinks.render(this.getAreaBroker().getControlArea());
+        this.shortcuts.render(this.getAreaBroker().getControlArea());
     },
 
 });

@@ -39,11 +39,21 @@ function findFocusable(targetElement) {
 }
 
 /**
+ * close shortcuts popup
+ */
+function closeShortcuts() {
+    this.shortcuts.hide();
+    this.shortcuts.getElement().off("click", this.closeShortcuts);
+    $(window).off("keydown", this.closeShortcuts);
+}
+
+/**
  * Creates the JumpLinks plugin.
  * adding jumplinks accessibility feature for quick navigation
  */
 export default pluginFactory({
     name: 'jumplinks',
+
 
     /**
      * Initializes the plugin (called during runner's init)
@@ -72,22 +82,16 @@ export default pluginFactory({
                 }
             });
 
+            const closeShortcutsHandler = closeShortcuts.bind(self);
             self.jumplinks.on('shortcuts', () => {
                 self.jumplinks.getElement().find(':focus').blur();
                 self.shortcuts.show();
-                const closeHandler = function(event) {
-                    if (event) {
-                        self.shortcuts.hide();
-                        self.shortcuts.getElement().off("click", closeHandler);
-                        $(window).off("keydown", closeHandler);
-                    }
-                };
                 self.shortcuts.getElement()
-                    .off("click", closeHandler)
-                    .on("click", closeHandler);
+                    .off("click", closeShortcutsHandler)
+                    .on("click", closeShortcutsHandler);
                 $(window)
-                    .off("keydown", closeHandler)
-                    .on("keydown", closeHandler);
+                    .off("keydown", closeShortcutsHandler)
+                    .on("keydown", closeShortcutsHandler);
             });
 
         }

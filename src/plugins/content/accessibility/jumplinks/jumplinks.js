@@ -40,7 +40,7 @@ const defaults = {
  * @param {Object[]} [config.areaBroker] - test page area broker
  * @returns {jumplinks} the component, initialized and rendered
  */
-export default function jumplinksFactory(config) {
+export default function jumplinksFactory() {
 
     /**
      * @typedef {Object} jumplinksBox
@@ -91,7 +91,7 @@ export default function jumplinksFactory(config) {
     jumplinksBox.setTemplate(jumplinksTpl);
 
     _.defer(function() {
-        jumplinksBox.init(config);
+        jumplinksBox.init();
     });
 
     return jumplinksBox;

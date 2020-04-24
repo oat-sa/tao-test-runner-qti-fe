@@ -101,8 +101,8 @@ export default pluginFactory({
     render: function render() {
         const self = this;
 
-        self.jumplinks.render(self.getAreaBroker().getControlArea());
-        self.shortcuts.render(self.getAreaBroker().getControlArea());
+        self.jumplinks.render(this.getAreaBroker().getControlArea());
+        self.shortcuts.render(this.getAreaBroker().getControlArea());
     },
 
 });

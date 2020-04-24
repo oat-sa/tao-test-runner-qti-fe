@@ -48,34 +48,32 @@ export default function jumplinksFactory(config) {
     const jumplinksBox = component({}, defaults )
     .on('render', function() {
         // handle related Jump Links
-        const behavior = [
-            {
-                selector: '[data-jump=question] ',
-                eventName: 'jumplink',
-                eventParam: 'question',
-            }, {
-                selector: '[data-jump=navigation]',
-                eventName: 'jumplink',
-                eventParam: 'navigation',
-            }, {
-                selector: '[data-jump=toolbox]',
-                eventName: 'jumplink',
-                eventParam: 'toolbox',
-            }, {
-                selector: '[data-jump=teststatus]',
-                eventName: 'jumplink',
-                eventParam: 'teststatus',
-            }, {
-                selector: '[data-jump=shortcuts]',
-                eventName: 'shortcuts',
-                eventParam: 'shortcuts',
-            }
-        ];
+        const behavior = [{
+            selector: '[data-jump=question] ',
+            eventName: 'jumplink',
+            eventParam: 'question',
+        }, {
+            selector: '[data-jump=navigation]',
+            eventName: 'jumplink',
+            eventParam: 'navigation',
+        }, {
+            selector: '[data-jump=toolbox]',
+            eventName: 'jumplink',
+            eventParam: 'toolbox',
+        }, {
+            selector: '[data-jump=teststatus]',
+            eventName: 'jumplink',
+            eventParam: 'teststatus',
+        }, {
+            selector: '[data-jump=shortcuts]',
+            eventName: 'shortcuts',
+            eventParam: 'shortcuts',
+        }];
         _.forEach(behavior, (linkDescription) => {
             const $link = this.getElement().find(linkDescription.selector);
             if ($link) {
                 $link.on('click', () => {
-                    this.trigger(linkDescription.eventName);
+                    this.trigger(linkDescription.eventName, linkDescription.eventParam);
                 });
                 $link.on('keyup', (event) => {
                     const activationKeys = [32, 13]; // link can be activated by click or enter/space keys

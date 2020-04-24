@@ -46,46 +46,46 @@ export default function jumplinksFactory(config) {
      * @typedef {Object} jumplinksBox
      */
     const jumplinksBox = component({}, defaults )
-    .on('render', function() {
-        // handle related Jump Links
-        const behavior = [{
-            selector: '[data-jump=question] ',
-            eventName: 'jumplink',
-            eventParam: 'question',
-        }, {
-            selector: '[data-jump=navigation]',
-            eventName: 'jumplink',
-            eventParam: 'navigation',
-        }, {
-            selector: '[data-jump=toolbox]',
-            eventName: 'jumplink',
-            eventParam: 'toolbox',
-        }, {
-            selector: '[data-jump=teststatus]',
-            eventName: 'jumplink',
-            eventParam: 'teststatus',
-        }, {
-            selector: '[data-jump=shortcuts]',
-            eventName: 'shortcuts',
-            eventParam: 'shortcuts',
-        }];
-        _.forEach(behavior, (linkDescription) => {
-            const $link = this.getElement().find(linkDescription.selector);
-            const handleLink = () => {
-                this.trigger(linkDescription.eventName, linkDescription.eventParam);
-                this.getElement().find(':focus').blur();
-            };
-            if ($link) {
-                $link.on('click', handleLink);
-                $link.on('keyup', (event) => {
-                    const activationKeys = [32, 13]; // link can be activated by click or enter/space keys
-                    if (activationKeys.includes(event.keyCode)) {
-                        handleLink();
-                    }
-                });
-            }
+        .on('render', function() {
+            // handle related Jump Links
+            const behavior = [{
+                selector: '[data-jump=question] ',
+                eventName: 'jumplink',
+                eventParam: 'question',
+            }, {
+                selector: '[data-jump=navigation]',
+                eventName: 'jumplink',
+                eventParam: 'navigation',
+            }, {
+                selector: '[data-jump=toolbox]',
+                eventName: 'jumplink',
+                eventParam: 'toolbox',
+            }, {
+                selector: '[data-jump=teststatus]',
+                eventName: 'jumplink',
+                eventParam: 'teststatus',
+            }, {
+                selector: '[data-jump=shortcuts]',
+                eventName: 'shortcuts',
+                eventParam: 'shortcuts',
+            }];
+            _.forEach(behavior, (linkDescription) => {
+                const $link = this.getElement().find(linkDescription.selector);
+                const handleLink = () => {
+                    this.trigger(linkDescription.eventName, linkDescription.eventParam);
+                    this.getElement().find(':focus').blur();
+                };
+                if ($link) {
+                    $link.on('click', handleLink);
+                    $link.on('keyup', (event) => {
+                        const activationKeys = [32, 13]; // link can be activated by click or enter/space keys
+                        if (activationKeys.includes(event.keyCode)) {
+                            handleLink();
+                        }
+                    });
+                }
+            });
         });
-    });
 
 
     jumplinksBox.setTemplate(jumplinksTpl);

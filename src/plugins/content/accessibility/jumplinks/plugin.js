@@ -54,19 +54,17 @@ function closeShortcuts() {
 export default pluginFactory({
     name: 'jumplinks',
 
-
     /**
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
         const self = this;
-
         self.jumplinks = jumplinksFactory({})
             .on('render', handleJumpLinks);
         self.shortcuts = shortcutsFactory({});
 
         function handleJumpLinks() {
-
+            const closeShortcutsHandler = closeShortcuts.bind(self);
             const mapJumpToAreaBroker = {
                 question: 'getContentArea',
                 navigation: 'getNavigationArea',
@@ -80,8 +78,6 @@ export default pluginFactory({
                     $focusable && $focusable.focus();
                 }
             });
-
-            const closeShortcutsHandler = closeShortcuts.bind(self);
             self.jumplinks.on('shortcuts', () => {
                 self.shortcuts.show();
                 self.shortcuts.getElement()
@@ -91,7 +87,6 @@ export default pluginFactory({
                     .off("keydown", closeShortcutsHandler)
                     .on("keydown", closeShortcutsHandler);
             });
-
         }
     },
 

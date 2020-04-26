@@ -45,20 +45,20 @@
 
 
     <div class="qti-navigator-filters">
-        <ul class="plain clearfix">
-            <li class="qti-navigator-filter active" data-mode="all">
+        <ul role="tablist" class="plain clearfix">
+            <li role="tab" aria-selected="true" class="qti-navigator-filter active" data-mode="all">
                 <span title="{{__ 'Reset filters'}}" class="qti-navigator-tab">{{__ 'All'}}
                     {{#unless showLegend}}(<span class="qti-navigator-counter">0</span>){{/unless}}
                 </span>
             </li>
 
-            <li class="qti-navigator-filter" data-mode="unanswered">
+            <li role="tab" class="qti-navigator-filter" data-mode="unanswered">
                 <span class="{{#if showLegend}}icon-unanswered {{/if}}qti-navigator-tab" title="{{__ 'Only display the unanswered items'}}">
                     {{#unless showLegend}}{{__ 'Unanswered'}} (<span class="qti-navigator-counter">0</span>){{/unless}}
                 </span>
             </li>
 
-            <li class="qti-navigator-filter" data-mode="flagged">
+            <li role="tab" class="qti-navigator-filter" data-mode="flagged">
                 <span class="{{#if showLegend}}icon-flagged {{/if}}qti-navigator-tab" title="{{__ 'Only display the items marked for review'}}">
                     {{#unless showLegend}}{{__ 'Flagged'}} (<span class="qti-navigator-counter">0</span>){{/unless}}
                 </span>

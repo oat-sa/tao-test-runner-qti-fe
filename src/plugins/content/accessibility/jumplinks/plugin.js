@@ -51,33 +51,31 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        const self = this;
         const mapJumpToAreaBroker = {
             question: 'getContentArea',
             navigation: 'getNavigationArea',
             toolbox: 'getToolboxArea',
             teststatus: 'getPanelArea',
         };
-        self.jumplinks = jumplinksFactory({})
-            .on('render', handleJumpLinks);
-        self.shortcuts = shortcutsFactory({});
+        this.jumplinks = jumplinksFactory({})
+            .on('render', () => {
+                const closeShortcutsHandler = closeShortcuts.bind(this);
+                this.jumplinks.on('jump', (jump) => {
+                    const $element = this.getAreaBroker()[mapJumpToAreaBroker[jump]]().find(":not(.hidden)[tabindex]").first();
+                    $element.focus();
+                });
+                this.jumplinks.on('shortcuts', () => {
+                    this.shortcuts.show();
+                    this.shortcuts.getElement()
+                        .off("click", closeShortcutsHandler)
+                        .on("click", closeShortcutsHandler);
+                    $(window)
+                        .off("keydown", closeShortcutsHandler)
+                        .on("keydown", closeShortcutsHandler);
+                });
+            });
+        this.shortcuts = shortcutsFactory({});
 
-        function handleJumpLinks() {
-            const closeShortcutsHandler = closeShortcuts.bind(self);
-            self.jumplinks.on('jump', (jump) => {
-                const $element = self.getAreaBroker()[mapJumpToAreaBroker[jump]].find(":not(.hidden)[tabindex]").first();
-                $element.focus();
-            });
-            self.jumplinks.on('shortcuts', () => {
-                self.shortcuts.show();
-                self.shortcuts.getElement()
-                    .off("click", closeShortcutsHandler)
-                    .on("click", closeShortcutsHandler);
-                $(window)
-                    .off("keydown", closeShortcutsHandler)
-                    .on("keydown", closeShortcutsHandler);
-            });
-        }
     },
 
     /**

@@ -27,10 +27,7 @@ import shortcutsFactory from "./shortcuts";
 
 function findFocusable(targetElement) {
     const $elem = $(targetElement)
-        .find('input, select, a[href], textarea, button, [tabindex]')
-        .toArray()
-        .filter((el) => (el.tabIndex >= 0 && !el.disabled && el.offsetParent ) )
-        .find((el) => (typeof el.focus === 'function') );
+        .find(":not(.hidden)[tabindex]").first();
     return $elem;
 }
 
@@ -68,11 +65,8 @@ export default pluginFactory({
         function handleJumpLinks() {
             const closeShortcutsHandler = closeShortcuts.bind(self);
             self.jumplinks.on('jump', (jump) => {
-                const $elementGetter = self.getAreaBroker()[mapJumpToAreaBroker[jump]];
-                if ($elementGetter) {
-                    const $focusable = findFocusable($elementGetter());
-                    $focusable && $focusable.focus();
-                }
+                const $element = self.getAreaBroker()[mapJumpToAreaBroker[jump]].find(":not(.hidden)[tabindex]").first();
+                $element.focus();
             });
             self.jumplinks.on('shortcuts', () => {
                 self.shortcuts.show();

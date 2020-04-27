@@ -1,6 +1,6 @@
 <div class="shortcuts-list-wrapper hidden">
     <div class="shortcuts-list">
-        <h1 id="keyboard-navigation">Keyboard Navigation</h1>
+        <h2 id="keyboard-navigation">Keyboard Navigation</h2>
         <blockquote>
             <p>Keyboard shortcuts for the Accessibility Tools are available to the Test-taker.</p>
         </blockquote>

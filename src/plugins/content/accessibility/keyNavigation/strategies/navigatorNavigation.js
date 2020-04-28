@@ -63,13 +63,7 @@ export default {
                     propagateTab: false,
                     elements: navigableFilters,
                     group: $navigator.find('.qti-navigator-filters')
-                })
-                    .on('focus', cursor => {
-                        cursor.navigable.getElement().attr('aria-selected', true);
-                    })
-                    .on('blur', cursor => {
-                        cursor.navigable.getElement().attr('aria-selected', false);
-                    });
+                });
 
                 setupItemsNavigator(filtersNavigator, {
                     keyNextItem: config.keyNextTab || config.keyNextItem,

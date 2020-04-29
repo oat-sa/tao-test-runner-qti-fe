@@ -16,13 +16,13 @@
  * Copyright (c) 2020 Open Assessment Technologies SA ;
  */
 
+import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
     setupItemsNavigator,
     setupClickableNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
-import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 
 /**
  * The identifier the keyNavigator group
@@ -45,7 +45,7 @@ export default {
     init() {
         const config = this.getConfig();
         const $topToolbar = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
-        const $elements = $topToolbar.find('.countdown');
+        const $toolbarElements = $topToolbar.find('.countdown, .jump-link');
 
         const registerTopToolbarNavigator = (id, group, $elements) => {
             const elements = navigableDomElement.createFromDoms($elements);
@@ -54,10 +54,7 @@ export default {
                     id,
                     group,
                     elements,
-                    replace: true,
-                    defaultPosition(navigables) {
-                        return navigables.length - 1;
-                    }
+                    propagateTab: false,
                 });
 
                 setupItemsNavigator(navigator, config);
@@ -67,7 +64,7 @@ export default {
         };
 
         this.keyNavigators = [];
-        registerTopToolbarNavigator(groupId, $topToolbar, $elements);
+        $toolbarElements.each((index, element) => registerTopToolbarNavigator(`${groupId}-${index}`, $topToolbar, $(element)));
 
         return this;
     },
@@ -77,9 +74,6 @@ export default {
      * @returns {keyNavigator[]}
      */
     getNavigators() {
-        if (isReviewPanelEnabled(this.getTestRunner())) {
-            return [];
-        }
         return this.keyNavigators;
     },
 

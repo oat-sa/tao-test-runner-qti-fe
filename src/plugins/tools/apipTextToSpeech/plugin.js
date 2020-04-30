@@ -204,6 +204,7 @@ export default pluginFactory({
             if (this.getState('enabled')) {
                 if (this.getState('active')) {
                     disablePlugin();
+                    this.setState('sleep', true);
                 } else {
                     enablePlugin();
                 }
@@ -224,6 +225,7 @@ export default pluginFactory({
         // Handle plugin button click
         this.button.on('click', (e) => {
             e.preventDefault();
+            this.setState('sleep', false);
             testRunner.trigger(`${actionPrefix}toggle`);
         });
 
@@ -252,10 +254,10 @@ export default pluginFactory({
             });
         }
 
-        // Hide plugin by default
+        // Show plugin by default
         togglePlugin();
-        this.disable();
-        this.hide();
+        this.enable();
+        this.show();
 
         //update plugin state based on changes
         testRunner
@@ -316,6 +318,10 @@ export default pluginFactory({
 
                 getTTSComponent().setMediaContentData(ttsApipData);
                 this.show();
+                if (!this.getState('sleep')) {
+                    this.setState('enabled', true);
+                    toggleTool();
+                }
             });
     },
     /**

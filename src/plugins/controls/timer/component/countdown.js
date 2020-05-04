@@ -106,6 +106,7 @@ export default function countdownFactory($container, config) {
                 var encodedTime;
                 var warningId;
                 var warningMessage;
+                let screenreaderWarningId;
 
                 if (!this.is('completed')) {
                     if (remainingTime <= 0) {
@@ -147,6 +148,33 @@ export default function countdownFactory($container, config) {
                                  * @param {String} level
                                  */
                                 this.trigger('warn', warningMessage, this.warnings[warningId].level);
+                            }
+                        }
+
+                        if (this.warningsForScreenreader) {
+                            //the warnings have already be sorted
+                            screenreaderWarningId = _.findLastKey(this.warningsForScreenreader, (warning) => (
+                                warning &&
+                                !warning.shown &&
+                                warning.threshold > 0 &&
+                                warning.threshold >= self.remainingTime
+                            ));
+
+                            if (screenreaderWarningId) {
+                                this.warningsForScreenreader[screenreaderWarningId].shown = true;
+
+                                /**
+                                 * Warn user the timer reach a threshold
+                                 * @event countdown#warn
+                                 * @param {String} message
+                                 * @param {String} level
+                                 */
+                                this.trigger(
+                                    'warnscreenreader',
+                                    this.warningsForScreenreader[screenreaderWarningId].message,
+                                    self.remainingTime,
+                                    this.warningsForScreenreader[screenreaderWarningId].scope
+                                );
                             }
                         }
 
@@ -251,6 +279,10 @@ export default function countdownFactory($container, config) {
 
             if (this.config.warnings) {
                 this.warnings = _.sortBy(this.config.warnings, 'threshold');
+            }
+
+            if (this.config.warningsForScreenreader) {
+                this.warningsForScreenreader = _.sortBy(this.config.warningsForScreenreader, 'threshold');
             }
 
             //if configured, create a polling for the countdown

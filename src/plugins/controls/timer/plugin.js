@@ -28,12 +28,14 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
+import $ from 'jquery';
 import _ from 'lodash';
 import pluginFactory from 'taoTests/runner/plugin';
 import getStrategyHandler from 'taoQtiTest/runner/plugins/controls/timer/strategy/strategyHandler';
 import timerboxFactory from 'taoQtiTest/runner/plugins/controls/timer/component/timerbox';
 import timersFactory from 'taoQtiTest/runner/plugins/controls/timer/timers';
 import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
+import statsHelper from 'taoQtiTest/runner/helpers/stats';
 
 /**
  * Creates the plugin
@@ -115,6 +117,11 @@ export default pluginFactory({
              * The list of configured warnings
              */
             warnings: (testRunnerOptions.timerWarning) || {},
+
+            /**
+             * The list of configured warnings for screenreaders
+             */
+            warningsForScreenreader: (testRunnerOptions.timerWarningForScreenreader) || {},
 
             /**
              * The guided navigation option
@@ -227,6 +234,15 @@ export default pluginFactory({
                                     testRunner.trigger(level, message);
                                 }
                             });
+
+                            self.timerbox.on('warnscreenreader', (message, remainingTime, scope) => {
+                                const stats = statsHelper.getInstantStats(scope, testRunner);
+                                const unansweredQuestions = stats && (stats.questions - stats.answered);
+
+                                self.$screenreaderWarningContainer.text(
+                                    message(remainingTime, unansweredQuestions)
+                                );
+                            });
                         }
                     })
                     .catch(handleError);
@@ -238,7 +254,11 @@ export default pluginFactory({
      * Called during the runner's render phase
      */
     render: function render() {
-        this.timerbox.render(this.getAreaBroker().getControlArea());
+        const $container = this.getAreaBroker().getControlArea();
+
+        this.$screenreaderWarningContainer = $('<div aria-live="polite" class="visible-hidden"></div>');
+        this.timerbox.render($container);
+        $container.append(this.$screenreaderWarningContainer);
     },
 
     /**

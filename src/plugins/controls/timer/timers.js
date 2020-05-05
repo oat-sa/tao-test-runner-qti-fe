@@ -199,8 +199,12 @@ export default function getTimers(timeConstraints, isLinear, config) {
         //TODO supports warnings for other types
         if (type === 'max' && _.isArray(constraintsWarnings[timer.scope])) {
             timer.warnings = constraintsWarnings[timer.scope];
+        }
+
+        if (_.isArray(constraintsWarningsForScreenreader[timer.scope])) {
             timer.warningsForScreenreader = constraintsWarningsForScreenreader[timer.scope];
         }
+
         return timer;
     };
 

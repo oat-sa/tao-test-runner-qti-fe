@@ -235,14 +235,22 @@ export default pluginFactory({
                                 }
                             });
 
-                            self.timerbox.on('warnscreenreader', (message, remainingTime, scope) => {
-                                const stats = statsHelper.getInstantStats(scope, testRunner);
-                                const unansweredQuestions = stats && (stats.questions - stats.answered);
+                            // debounce used to prevent multiple invoking at the same time
+                            self.timerbox.on('warnscreenreader', _.debounce(
+                                (message, remainingTime, scope) => {
+                                    const stats = statsHelper.getInstantStats(scope, testRunner);
+                                    const unansweredQuestions = stats && (stats.questions - stats.answered);
 
-                                self.$screenreaderWarningContainer.text(
-                                    message(remainingTime, unansweredQuestions)
-                                );
-                            });
+                                    self.$screenreaderWarningContainer.text(
+                                        message(remainingTime, unansweredQuestions)
+                                    );
+                                },
+                                1000,
+                                {
+                                    'leading': true,
+                                    'trailing': false
+                                }
+                            ));
                         }
                     })
                     .catch(handleError);

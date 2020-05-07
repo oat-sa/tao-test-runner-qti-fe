@@ -80,6 +80,47 @@ export default pluginFactory({
                 .show();
         };
 
+        const getTimerMessage = (hours, minutes, unansweredQuestions) => {
+            let timerMessage;
+
+            if (hours > 0) {
+                timerMessage = typeof unansweredQuestions === 'number'
+                    ? __(
+                        '%sh %sm to answer remaining %s questions.',
+                        hours,
+                        minutes,
+                        unansweredQuestions
+                    )
+                    : timerMessage = __(
+                        '%sh %sm to answer the current question.',
+                        hours,
+                        minutes
+                    );
+            } else if (minutes > 0) {
+                timerMessage = typeof unansweredQuestions === 'number'
+                    ? __(
+                        '%sm to answer remaining %s questions.',
+                        minutes,
+                        unansweredQuestions
+                    )
+                    : __(
+                        '%sm to answer the current question.',
+                        minutes
+                    );
+            } else {
+                timerMessage = typeof unansweredQuestions === 'number'
+                    ? __(
+                        'Less than one minute to answer remaining %s questions.',
+                        unansweredQuestions
+                    )
+                    : __(
+                        'Less than one minute to answer the current question.'
+                    );
+            }
+
+            return timerMessage;
+        };
+
         testRunner
             .after('renderitem', () => {
                 updateTitles();
@@ -109,64 +150,24 @@ export default pluginFactory({
                 const time = moment.duration(remainingTime / precision, 'seconds');
                 const hours = time.get('hours');
                 const minutes = time.get('minutes');
-                let timerMessage = '';
+                const unansweredQuestions = stats && (stats.questions - stats.answered);
 
                 // check if notification should be updated
                 if (
                     currentHours !== hours
                     || currentMinutes !== minutes
-                    || (stats && ((stats.questions - stats.answered) !== currentUnansweredQuestions))
+                    || (unansweredQuestions && (unansweredQuestions !== currentUnansweredQuestions))
                 ) {
-                    const unansweredQuestions = stats && (stats.questions - stats.answered);
-
+                    // update current timer state
                     this.titles[scope].hours = hours;
                     this.titles[scope].minutes = minutes;
-                    this.titles[scope].unansweredQuestions = stats && (stats.questions - stats.answered);
+                    this.titles[scope].unansweredQuestions = unansweredQuestions;
 
-                    if (unansweredQuestions) {
-                        if (hours > 0) {
-                            timerMessage = __(
-                                '%sh %sm to answer remaining %s questions.',
-                                hours,
-                                minutes,
-                                unansweredQuestions
-                            );
-                        } else if (minutes > 0) {
-                            timerMessage = __(
-                                '%sm to answer remaining %s questions.',
-                                minutes,
-                                unansweredQuestions
-                            );
-                        } else {
-                            timerMessage = __(
-                                'Less than one minute to answer remaining %s questions.',
-                                unansweredQuestions
-                            );
-                        }
-                    } else {
-                        if (hours > 0) {
-                            timerMessage = __(
-                                '%sh %sm to answer the current question.',
-                                hours,
-                                minutes
-                            );
-                        } else if (minutes > 0) {
-                            timerMessage = __(
-                                '%sm to answer the current question.',
-                                minutes
-                            );
-                        } else {
-                            timerMessage = __(
-                                'Less than one minute to answer the current question.'
-                            );
-                        }
-                    }
-
-                    $timer.text(timerMessage);
+                    $timer.text(getTimerMessage(hours, minutes, unansweredQuestions));
                 }
             })
             .on('unloaditem', () => {
-                $('qti-controls', this.$element).hide();
+                $('.qti-controls', this.$element).hide();
             });
     },
     render: function render() {
@@ -192,7 +193,7 @@ export default pluginFactory({
         this.$element = $(titleTpl({ titles: _.values(this.titles) }));
 
         // hide titles by default
-        $('qti-controls', this.$element).hide();
+        $('.qti-controls', this.$element).hide();
 
         $container.append(this.$element);
 

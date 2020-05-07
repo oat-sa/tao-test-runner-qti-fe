@@ -29,7 +29,7 @@
                 </span>
                 <ul aria-label="{{label}}" class="qti-navigator-items collapsible-panel plain">
                     {{#each items}}
-                    <li class="qti-navigator-item {{cls}}" data-id="{{id}}" data-position="{{position}}" tabindex="0" >
+                    <li class="qti-navigator-item {{cls}}" data-id="{{id}}" data-position="{{position}}">
                         <span class="qti-navigator-label truncate" title="{{label}}"
                               role="link" aria-disabled="{{#if viewed}}false{{else}}true{{/if}}"
                               {{#if active}}aria-current="page"{{/if}}

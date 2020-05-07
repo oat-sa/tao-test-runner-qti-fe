@@ -267,6 +267,41 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
                 ready();
             });
     });
+
+    QUnit.test('screenreader waringins', function(assert) {
+        const ready = assert.async();
+        const $container = $('#qunit-fixture .timer-box');
+        const message = () => {};
+        const scope = 'test';
+
+        assert.expect(3);
+
+        countdownFactory($container, {
+            id: 'timer-2',
+            label: 'Timer 02',
+            remainingTime: 3000,
+            polling: true,
+            warningsForScreenreader: [
+                {
+                    level: 'success',
+                    message,
+                    scope,
+                    threshold: 3000
+                }
+            ]
+        })
+            .on('render', function() {
+                this.start();
+            })
+            .on('warnscreenreader', (messageArg, remainingTime, scopeArg) => {
+                assert.equal(messageArg, message, 'the message is provided');
+                assert.equal(typeof remainingTime, 'number', 'the remaning time is provided');
+                assert.equal(scopeArg, scope, 'the scope is provided');
+
+                ready();
+            });
+    });
+
     QUnit.module('Visual test');
 
     QUnit.test('Countdow', function(assert) {

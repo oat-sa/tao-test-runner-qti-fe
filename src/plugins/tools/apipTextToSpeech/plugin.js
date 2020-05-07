@@ -225,7 +225,6 @@ export default pluginFactory({
         // Handle plugin button click
         this.button.on('click', (e) => {
             e.preventDefault();
-            this.setState('sleep', false);
             testRunner.trigger(`${actionPrefix}toggle`);
         });
 
@@ -254,11 +253,6 @@ export default pluginFactory({
             });
         }
 
-        // Show plugin by default
-        togglePlugin();
-        this.enable();
-        this.show();
-
         //update plugin state based on changes
         testRunner
             .on('loaditem', () => {
@@ -273,6 +267,7 @@ export default pluginFactory({
                 this.disable();
             })
             .on(`${actionPrefix}toggle`, () => {
+                this.setState('sleep', false);
                 if (isConfigured()) {
                     toggleTool();
                 }

@@ -207,6 +207,7 @@ export default pluginFactory({
                     this.setState('sleep', true);
                 } else {
                     enablePlugin();
+                    this.setState('sleep', false);
                 }
             }
         };
@@ -253,6 +254,11 @@ export default pluginFactory({
             });
         }
 
+        // Hide plugin by default
+        togglePlugin();
+        this.disable();
+        this.hide();
+
         //update plugin state based on changes
         testRunner
             .on('loaditem', () => {
@@ -267,7 +273,6 @@ export default pluginFactory({
                 this.disable();
             })
             .on(`${actionPrefix}toggle`, () => {
-                this.setState('sleep', false);
                 if (isConfigured()) {
                     toggleTool();
                 }

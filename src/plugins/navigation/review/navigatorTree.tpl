@@ -20,14 +20,14 @@
             </p>
         </div>
         {{else}}
-        <ul class="qti-navigator-sections collapsible-panel plain">
+        <ul aria-label="{{label}}" class="qti-navigator-sections collapsible-panel plain">
             {{#each sections}}
             <li class="qti-navigator-section collapsible {{#if active}}active{{else}}collapsed{{/if}}" data-id="{{id}}">
                 <span class="qti-navigator-label" title="{{label}}">
                     <span class="qti-navigator-text">{{label}}</span>
                     <span class="qti-navigator-counter">{{stats.answered}}/{{stats.total}}</span>
                 </span>
-                <ul class="qti-navigator-items collapsible-panel plain">
+                <ul aria-label="{{label}}" class="qti-navigator-items collapsible-panel plain">
                     {{#each items}}
                     <li class="qti-navigator-item {{cls}}" data-id="{{id}}" data-position="{{position}}" tabindex="0" >
                         <span class="qti-navigator-label truncate" title="{{label}}"

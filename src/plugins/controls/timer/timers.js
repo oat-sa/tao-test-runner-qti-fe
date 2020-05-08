@@ -77,7 +77,7 @@ var warningMessages = {
 /**
  * The text of warning messages for screenreader
  */
-var warningMessagesForScreenreder = {
+const warningMessagesForScreenraeder = {
     item: __('You have %s remaining to complete the current item.'),
     section: __('You have %s left to answer remaining %s questions.'),
     testPart: __('You have %s left to answer remaining %s questions.'),
@@ -137,7 +137,7 @@ export default function getTimers(timeConstraints, isLinear, config) {
                         .humanize();
 
                     return format(
-                        warningMessagesForScreenreder[scope],
+                        warningMessagesForScreenraeder[scope],
                         displayRemaining,
                         unansweredQuestions
                     );

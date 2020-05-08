@@ -36,6 +36,7 @@ import timerboxFactory from 'taoQtiTest/runner/plugins/controls/timer/component/
 import timersFactory from 'taoQtiTest/runner/plugins/controls/timer/timers';
 import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
+import screenreaderNotificationTpl from 'taoQtiTest/runner/plugins/controls/timer/component/tpl/screenreaderNotification.tpl';
 
 /**
  * Creates the plugin
@@ -264,7 +265,7 @@ export default pluginFactory({
     render: function render() {
         const $container = this.getAreaBroker().getControlArea();
 
-        this.$screenreaderWarningContainer = $('<div aria-live="polite" class="visible-hidden"></div>');
+        this.$screenreaderWarningContainer = $(screenreaderNotificationTpl());
         this.timerbox.render($container);
         $container.append(this.$screenreaderWarningContainer);
     },

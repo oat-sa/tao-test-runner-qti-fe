@@ -86,25 +86,25 @@ export default pluginFactory({
             if (hours > 0) {
                 timerMessage = typeof unansweredQuestions === 'number'
                     ? __(
-                        '%sh %sm to answer remaining %s questions.',
+                        '%s hours %s minutes to answer remaining %s questions.',
                         hours,
                         minutes,
                         unansweredQuestions
                     )
                     : timerMessage = __(
-                        '%sh %sm to answer the current question.',
+                        '%s hours %s minutes to answer the current question.',
                         hours,
                         minutes
                     );
             } else if (minutes > 0) {
                 timerMessage = typeof unansweredQuestions === 'number'
                     ? __(
-                        '%sm to answer remaining %s questions.',
+                        '%s minutes to answer remaining %s questions.',
                         minutes,
                         unansweredQuestions
                     )
                     : __(
-                        '%sm to answer the current question.',
+                        '%s minutes to answer the current question.',
                         minutes
                     );
             } else {

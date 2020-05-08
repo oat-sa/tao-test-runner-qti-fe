@@ -34,7 +34,7 @@ import 'nouislider';
 const defaultConfig = {
     activeElementClass: 'tts-active-content-node',
     elementClass: 'tts-content-node',
-    left: 50,
+    left: -10,
     maxPlaybackRate: 2,
     minPlaybackRate: 0.5,
     playbackRate: 1,
@@ -328,13 +328,16 @@ function maskingComponentFactory(container, config) {
             this.render(container);
         })
         .on('render', function () {
-            const {
+            let {
                 left,
                 maxPlaybackRate,
                 minPlaybackRate,
                 playbackRate: defaultPlaybackRate,
                 top
             } = this.getConfig();
+            if (left < 0) {
+                left = window.innerWidth - this.getElement().width() + left;
+            }
             const $element = this.getElement();
             const $closeElement = $('.tts-control-close', $element);
             const $dragElement = $('.tts-control-drag', $element);

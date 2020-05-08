@@ -449,6 +449,7 @@ define([
                 areaBroker.getToolbox().render($container);
 
                 runner.trigger('renderitem');
+                runner.trigger(`${actionPrefix}toggle`);
 
                 return plugin.enable();
             })

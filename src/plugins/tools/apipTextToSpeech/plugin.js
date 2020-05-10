@@ -204,8 +204,10 @@ export default pluginFactory({
             if (this.getState('enabled')) {
                 if (this.getState('active')) {
                     disablePlugin();
+                    this.setState('sleep', true);
                 } else {
                     enablePlugin();
+                    this.setState('sleep', false);
                 }
             }
         };
@@ -316,6 +318,10 @@ export default pluginFactory({
 
                 getTTSComponent().setMediaContentData(ttsApipData);
                 this.show();
+                if (!this.getState('sleep')) {
+                    this.setState('enabled', true);
+                    toggleTool();
+                }
             });
     },
     /**

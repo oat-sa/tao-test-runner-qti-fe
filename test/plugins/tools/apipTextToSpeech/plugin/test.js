@@ -411,15 +411,15 @@ define([
             .then(() => {
                 const $button = $container.find('[data-control="apiptts"]');
 
-                assert.equal(plugin.getState('active'), false, 'The plugin should not be active by default');
-
-                $button.click();
-
-                assert.equal(plugin.getState('active'), true, 'The button should toggle the plugin to active state');
+                assert.equal(plugin.getState('active'), true, 'The plugin should be active by default');
 
                 $button.click();
 
                 assert.equal(plugin.getState('active'), false, 'If the plugin is active, the button should toggle the plugin to non active state');
+
+                $button.click();
+
+                assert.equal(plugin.getState('active'), true, 'The button should toggle the plugin to active state');
             })
             .catch(err => {
                 assert.ok(false, `Unexpected error: ${err}`);
@@ -449,6 +449,7 @@ define([
                 areaBroker.getToolbox().render($container);
 
                 runner.trigger('renderitem');
+                runner.trigger(`${actionPrefix}toggle`);
 
                 return plugin.enable();
             })

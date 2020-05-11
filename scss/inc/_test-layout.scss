@@ -150,6 +150,14 @@
             display: none;
         }
     }
+
+    .visible-hidden {
+      position: absolute;
+      overflow: hidden;
+      height: 1px;
+      width: 1px;
+      word-wrap: normal;
+  }
 }
 
 .no-controls .test-runner-scope {

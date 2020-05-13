@@ -53,7 +53,47 @@ export default {
         this.managedNavigators = [];
         this.keyNavigators = [];
 
+        let testStatusNavigation;
         if ($navigator.length && !$navigator.hasClass('disabled')) {
+            const $testStatusHeader = $navigator.find('.qti-navigator-info.collapsible .qti-navigator-header');
+            const navigableTestStatus = navigableDomElement.createFromDoms($testStatusHeader);
+
+            if (navigableTestStatus.length) {
+                testStatusNavigation = keyNavigator({
+                    keepState: config.keepState,
+                    id: 'navigator-test-status',
+                    propagateTab: false,
+                    elements: navigableTestStatus,
+                    group: $testStatusHeader,
+                });
+
+                setupItemsNavigator(testStatusNavigation, {
+                    keyNextItem: config.keyNextTab || config.keyNextItem,
+                    keyPrevItem: config.keyPrevTab || config.keyPrevItem
+                });
+                setupClickableNavigator(testStatusNavigation);
+
+                if (config.keyNextContent) {
+                    testStatusNavigation.on(config.keyNextContent, elem => {
+                        if (allowedToNavigateFrom(elem) && filtersNavigator) {
+                            filtersNavigator.focus();
+                        }
+                    });
+                }
+                if (config.keyPrevContent) {
+                    testStatusNavigation.on(config.keyPrevContent, elem => {
+                        if (allowedToNavigateFrom(elem) && itemsNavigator) {
+                            _.defer(() => {
+                                itemsNavigator.last();
+                            });
+                        }
+                    });
+                }
+
+                this.keyNavigators.push(testStatusNavigation);
+                this.managedNavigators.push(testStatusNavigation);
+            }
+
             $filters = $navigator.find('.qti-navigator-filters .qti-navigator-filter');
             navigableFilters = navigableDomElement.createFromDoms($filters);
             if (navigableFilters.length) {
@@ -102,15 +142,19 @@ export default {
                 }
                 if (config.keyPrevContent) {
                     filtersNavigator.on(config.keyPrevContent, elem => {
-                        if (allowedToNavigateFrom(elem) && itemsNavigator) {
+                        if (allowedToNavigateFrom(elem) && testStatusNavigation) {
+                            testStatusNavigation.focus();
+                        } else if (allowedToNavigateFrom(elem) && itemsNavigator) {
                             _.defer(() => {
                                 itemsNavigator.last();
-                            });
+                            })
                         }
                     });
                 }
 
-                this.keyNavigators.push(filtersNavigator);
+                if (!testStatusNavigation || !config.keyNextTab || !config.keyPrevTab) {
+                    this.keyNavigators.push(filtersNavigator);
+                }
                 this.managedNavigators.push(filtersNavigator);
             }
 
@@ -157,7 +201,13 @@ export default {
                 setupClickableNavigator(itemsNavigator);
 
                 if (config.keepState) {
-                    itemsNavigator.on('lowerbound upperbound', () => {
+                    itemsNavigator.on('upperbound', () => {
+                        if (testStatusNavigation) {
+                            testStatusNavigation.focus();
+                        }
+                    });
+
+                    itemsNavigator.on('lowerbound', () => {
                         if (filtersNavigator) {
                             filtersNavigator.focus();
                         }
@@ -165,21 +215,19 @@ export default {
                 }
 
                 if (config.keyNextTab && config.keyPrevTab) {
-                    if (config.keyNextTab) {
-                        itemsNavigator.on(config.keyNextTab, function (elem) {
-                            if (allowedToNavigateFrom(elem) && filtersNavigator) {
-                                filtersNavigator.focus().next();
-                            }
-                        });
-                    }
+                    itemsNavigator.on(config.keyNextTab, function (elem) {
+                        if (allowedToNavigateFrom(elem) && testStatusNavigation) {
+                            testStatusNavigation.focus();
+                        } else if (allowedToNavigateFrom(elem) && filtersNavigator) {
+                            filtersNavigator.focus().next();
+                        }
+                    });
 
-                    if (config.keyPrevTab) {
-                        itemsNavigator.on(config.keyPrevTab, function (elem) {
-                            if (allowedToNavigateFrom(elem) && filtersNavigator) {
-                                filtersNavigator.focus().previous();
-                            }
-                        });
-                    }
+                    itemsNavigator.on(config.keyPrevTab, function (elem) {
+                        if (allowedToNavigateFrom(elem) && filtersNavigator) {
+                            filtersNavigator.focus().previous();
+                        }
+                    });
                 } else {
                     this.keyNavigators.push(itemsNavigator);
                 }

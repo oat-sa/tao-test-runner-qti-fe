@@ -240,12 +240,11 @@ var menuComponentApi = {
         this.hoverOffAll();
 
         // component inner state
-        const wasOpen = this.is('opened');
         this.setState('opened', false);
         this.trigger('closemenu', this);
 
-        // Move focus if the menu was opened before the close action was launched.
-        if (wasOpen) {
+        // Move focus if the menu wasn't disabled before the close action was launched.
+        if (!this.is('disabled')) {
             this.$menuButton.parent().focus();  // It needs for screenreaders to correctly read menu button after submenu was closed
         }
     },

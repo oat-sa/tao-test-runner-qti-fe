@@ -199,7 +199,7 @@ define([
         testRunner
             .on('plugin-render.itemAlertMessage', function(feedback) {
                 assert.equal(feedback.getState('ready'), true, 'The feedback is rendered');
-                assert.equal(feedback.$element.text(), 'text with message for user', 'The content was attached');
+                assert.equal(feedback.$element.text().trim(), 'text with message for user', 'The content was attached');
                 assert.equal(
                     $('#qUnitTestMessage', testRunner.itemRunner.container).length,
                     1,

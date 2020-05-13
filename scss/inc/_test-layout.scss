@@ -120,8 +120,6 @@
         max-width: map-get($widths, item-max-width) * 1px;
         width: 100%;
         margin: auto;
-        position: relative;
-        z-index: 1;
     }
 
     #qti-item {
@@ -152,6 +150,14 @@
             display: none;
         }
     }
+
+    .visible-hidden {
+      position: absolute;
+      overflow: hidden;
+      height: 1px;
+      width: 1px;
+      word-wrap: normal;
+  }
 }
 
 .no-controls .test-runner-scope {

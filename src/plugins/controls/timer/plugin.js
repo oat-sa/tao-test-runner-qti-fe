@@ -28,12 +28,15 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
+import $ from 'jquery';
 import _ from 'lodash';
 import pluginFactory from 'taoTests/runner/plugin';
 import getStrategyHandler from 'taoQtiTest/runner/plugins/controls/timer/strategy/strategyHandler';
 import timerboxFactory from 'taoQtiTest/runner/plugins/controls/timer/component/timerbox';
 import timersFactory from 'taoQtiTest/runner/plugins/controls/timer/timers';
 import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
+import statsHelper from 'taoQtiTest/runner/helpers/stats';
+import screenreaderNotificationTpl from 'taoQtiTest/runner/plugins/controls/timer/component/tpl/screenreaderNotification.tpl';
 
 /**
  * Creates the plugin
@@ -115,6 +118,11 @@ export default pluginFactory({
              * The list of configured warnings
              */
             warnings: (testRunnerOptions.timerWarning) || {},
+
+            /**
+             * The list of configured warnings for screenreaders
+             */
+            warningsForScreenreader: (testRunnerOptions.timerWarningForScreenreader) || {},
 
             /**
              * The guided navigation option
@@ -218,12 +226,32 @@ export default pluginFactory({
                             .on('init', resolve)
                             .on('error', handleError);
 
+                        // share this timer values to use in other components
+                        self.timerbox.spread(testRunner, 'timertick');
+
                         if (!config.contextualWarnings) {
                             self.timerbox.on('warn', function(message, level) {
                                 if (level && message) {
                                     testRunner.trigger(level, message);
                                 }
                             });
+
+                            // debounce used to prevent multiple invoking at the same time
+                            self.timerbox.on('warnscreenreader', _.debounce(
+                                (message, remainingTime, scope) => {
+                                    const stats = statsHelper.getInstantStats(scope, testRunner);
+                                    const unansweredQuestions = stats && (stats.questions - stats.answered);
+
+                                    self.$screenreaderWarningContainer.text(
+                                        message(remainingTime, unansweredQuestions)
+                                    );
+                                },
+                                1000,
+                                {
+                                    'leading': true,
+                                    'trailing': false
+                                }
+                            ));
                         }
                     })
                     .catch(handleError);
@@ -235,7 +263,11 @@ export default pluginFactory({
      * Called during the runner's render phase
      */
     render: function render() {
-        this.timerbox.render(this.getAreaBroker().getControlArea());
+        const $container = this.getAreaBroker().getControlArea();
+
+        this.$screenreaderWarningContainer = $(screenreaderNotificationTpl());
+        this.timerbox.render($container);
+        $container.append(this.$screenreaderWarningContainer);
     },
 
     /**

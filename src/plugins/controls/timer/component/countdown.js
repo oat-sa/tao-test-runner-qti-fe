@@ -150,6 +150,34 @@ export default function countdownFactory($container, config) {
                             }
                         }
 
+                        if (this.warningsForScreenreader) {
+                            //the warnings have already be sorted
+                            const screenreaderWarningId = _.findLastKey(this.warningsForScreenreader, (warning) => (
+                                warning &&
+                                !warning.shown &&
+                                warning.threshold > 0 &&
+                                warning.threshold >= self.remainingTime
+                            ));
+
+                            if (screenreaderWarningId) {
+                                this.warningsForScreenreader[screenreaderWarningId].shown = true;
+
+                                /**
+                                 * Warn user the timer reach a threshold
+                                 * @event countdown#warnscreenreader
+                                 * @param {Function} message
+                                 * @param {Number} remainingTime
+                                 * @param {String} scope
+                                 */
+                                this.trigger(
+                                    'warnscreenreader',
+                                    this.warningsForScreenreader[screenreaderWarningId].message,
+                                    self.remainingTime,
+                                    this.warningsForScreenreader[screenreaderWarningId].scope
+                                );
+                            }
+                        }
+
                         /**
                          * The current value has changed
                          * @event countdown#change
@@ -251,6 +279,10 @@ export default function countdownFactory($container, config) {
 
             if (this.config.warnings) {
                 this.warnings = _.sortBy(this.config.warnings, 'threshold');
+            }
+
+            if (this.config.warningsForScreenreader) {
+                this.warningsForScreenreader = _.sortBy(this.config.warningsForScreenreader, 'threshold');
             }
 
             //if configured, create a polling for the countdown

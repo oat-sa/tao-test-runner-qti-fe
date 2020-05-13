@@ -75,6 +75,16 @@ var warningMessages = {
 };
 
 /**
+ * The text of warning messages for screenreader
+ */
+const warningMessagesForScreenraeder = {
+    item: __('You have %s remaining to complete the current item.'),
+    section: __('You have %s left to answer remaining %s questions.'),
+    testPart: __('You have %s left to answer remaining %s questions.'),
+    test: __('You have %s left to answer remaining %s questions.')
+};
+
+/**
  * Get the timers objects from the time constraints andt the given config
  * @param {Object[]} timeConstraints - as defined in the testContext
  * @param {Boolean} isLinear - is the current navigation mode linear
@@ -98,12 +108,44 @@ export default function getTimers(timeConstraints, isLinear, config) {
                     threshold: parseInt(key, 10) * precision,
                     message: function applyMessage(remainingTime) {
                         var displayRemaining = moment.duration(remainingTime / precision, 'seconds').humanize();
+
                         return format(warningMessages[scope], displayRemaining);
                     },
                     level: value,
                     shown: false
                 };
             });
+            return acc;
+        },
+        {}
+    );
+
+
+    /**
+     * The warnings comes in a weird format (ie. {scope:[threshold, ...]}) , so we reformat them
+     */
+    const constraintsWarningsForScreenreader = _.reduce(
+        config.warningsForScreenreader,
+        (acc, warnings, qtiScope) => {
+            const scope = getScope(qtiScope);
+
+            acc[scope] = _.map(warnings, (value) => ({
+                threshold: parseInt(value, 10) * precision,
+                message: function applyMessage(remainingTime, unansweredQuestions) {
+                    const displayRemaining = moment
+                        .duration(remainingTime / precision, 'seconds')
+                        .humanize();
+
+                    return format(
+                        warningMessagesForScreenraeder[scope],
+                        displayRemaining,
+                        unansweredQuestions
+                    );
+                },
+                scope,
+                shown: false
+            }));
+
             return acc;
         },
         {}
@@ -158,6 +200,11 @@ export default function getTimers(timeConstraints, isLinear, config) {
         if (type === 'max' && _.isArray(constraintsWarnings[timer.scope])) {
             timer.warnings = constraintsWarnings[timer.scope];
         }
+
+        if (_.isArray(constraintsWarningsForScreenreader[timer.scope])) {
+            timer.warningsForScreenreader = constraintsWarningsForScreenreader[timer.scope];
+        }
+
         return timer;
     };
 

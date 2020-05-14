@@ -34,54 +34,69 @@ const defaultOptions = {
  * @param {Number} [options.interval]
  * @returns {Object} stopwatch instance
  */
-export default function stopwatchFactory(options) {
+export default function stopwatchFactory(options = {}) {
     const config = Object.assign({}, defaultOptions, options);
+    let initialized = false;
+    let polling;
+    let stopwatch;
 
     return eventifier({
+        /**
+         * Is this instance initialized
+         * @returns {Boolean}
+         */
+        isInitialized() {
+            return initialized;
+        },
         /**
          * Initialize stopwatch
          */
         init() {
-            this.stopwatch = timerFactory({
+            stopwatch = timerFactory({
                 autoStart: false,
             });
 
             /**
              * @fires tick - every time when interval is elapsed
              */
-            this.polling = pollingFactory({
-                action: () => this.trigger('tick', this.stopwatch.tick()),
+            polling = pollingFactory({
+                action: () => this.trigger('tick', stopwatch.tick()),
                 interval: config.interval,
                 autoStart: false,
             });
 
-            this.initialized = true;
+            initialized = true;
         },
         /**
          * Start stopwatch
          */
         start() {
-            if (this.initialized) {
-                this.stopwatch.resume();
-                this.polling.start();
+            if (this.isInitialized()) {
+                stopwatch.resume();
+                polling.start();
             }
         },
         /**
          * Stop stopwatch
          */
         stop() {
-            if (this.initialized) {
-                this.stopwatch.pause();
-                this.polling.stop();
+            if (this.isInitialized()) {
+                stopwatch.pause();
+                polling.stop();
             }
         },
         /**
          * Destory stopwatch by stoping the timer
          */
         destroy() {
-            if (this.initialized) {
-                this.stopwatch.stop();
-                this.polling.stop();
+            if (this.isInitialized()) {
+                initialized = false;
+
+                polling.stop();
+                polling = null;
+
+                stopwatch.stop();
+                stopwatch = null;
             }
         }
     });

@@ -37,6 +37,7 @@ import qtiItemRunner from 'taoQtiItem/runner/qtiItemRunner';
 import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
 import states from 'taoQtiTest/runner/config/states';
+import stopwatchFactory from 'taoQtiTest/runner/provider/stopwatch';
 
 /**
  * A Test runner provider to be registered against the runner
@@ -368,6 +369,11 @@ var qtiProvider = {
         areaBroker.setComponent('toolbox', toolboxFactory());
         areaBroker.getToolbox().init();
 
+        const stopwatch = stopwatchFactory({});
+
+        stopwatch.init();
+        stopwatch.spread(this, 'tick');
+
         /*
          * Install behavior on events
          */
@@ -379,6 +385,8 @@ var qtiProvider = {
                 // get the item results/state before disabling the tools
                 // otherwise the state could be partially lost for tools that clean up when disabling
                 var itemResults = getItemResults();
+
+                stopwatch.stop();
 
                 this.trigger('disablenav disabletools');
 
@@ -392,6 +400,8 @@ var qtiProvider = {
                 );
             })
             .on('skip', function(scope) {
+                stopwatch.stop();
+
                 this.trigger('disablenav disabletools');
 
                 computeNext('skip', {
@@ -400,6 +410,8 @@ var qtiProvider = {
             })
             .on('exit', function(reason) {
                 var context = self.getTestContext();
+
+                stopwatch.stop();
 
                 this.disableItem(context.itemIdentifier);
 
@@ -426,6 +438,8 @@ var qtiProvider = {
                     'noAlertTimeout',
                     true
                 );
+
+                stopwatch.stop();
 
                 context.isTimeout = true;
 
@@ -474,6 +488,8 @@ var qtiProvider = {
                 }
             })
             .on('pause', function(data) {
+                stopwatch.stop();
+
                 this.setState('closedOrSuspended', true);
 
                 this.getProxy()
@@ -531,16 +547,25 @@ var qtiProvider = {
                 }
                 this.trigger('enablenav');
             })
+            .after('renderitem', function(){
+                stopwatch.start();
+            })
             .on('resumeitem', function() {
                 this.trigger('enableitem enablenav');
             })
             .on('disableitem', function() {
+                stopwatch.stop();
+
                 this.trigger('disabletools');
             })
             .on('enableitem', function() {
+                stopwatch.start();
+
                 this.trigger('enabletools');
             })
             .on('error', function() {
+                stopwatch.stop();
+
                 this.trigger('disabletools enablenav');
             })
             .on('finish', function() {
@@ -552,6 +577,8 @@ var qtiProvider = {
             })
             .on('flush', function() {
                 this.destroy();
+
+                stopwatch.destroy();
             });
 
         //starts the event collection

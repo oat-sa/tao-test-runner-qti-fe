@@ -135,7 +135,11 @@ export default {
 
                     //search for inputs that represent the interaction focusable choices
                     const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
-                    addInputsNavigator($inputs, $itemElement);
+                    if (config.flatNavigation && itemElement.dataset.choiceType !== 'radio') {
+                        $inputs.each((i, input) => addInputsNavigator($(input), $itemElement));
+                    } else {
+                        addInputsNavigator($inputs, $itemElement);
+                    }
                 } else {
                     addNavigator($itemElement, $itemElement);
                 }

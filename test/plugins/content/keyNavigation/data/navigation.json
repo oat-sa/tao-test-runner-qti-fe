@@ -493,44 +493,35 @@
                 "label": "Navigation panel Unanswered tab",
                 "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
                 "key": {
-                    "keyCode": "TAB"
+                    "keyCode": "RIGHT"
                 }
             },
             {
                 "label": "Navigation panel Flagged tab",
                 "selector": ".qti-navigator-filter[data-mode=\"flagged\"]",
                 "key": {
-                    "keyCode": "TAB"
+                    "keyCode": "DOWN"
                 }
             },
             {
                 "label": "Navigation panel Unanswered tab",
                 "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
                 "key": {
-                    "keyCode": "TAB",
-                    "shiftKey": true
+                    "keyCode": "LEFT"
                 }
             },
             {
                 "label": "Navigation panel All tab",
                 "selector": ".qti-navigator-filter[data-mode=\"all\"]",
                 "key": {
-                    "keyCode": "TAB",
-                    "shiftKey": true
+                    "keyCode": "UP"
                 }
             },
             {
                 "label": "Navigation panel Unanswered tab",
                 "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
                 "key": {
-                    "keyCode": "TAB"
-                }
-            },
-            {
-                "label": "Navigation panel Flagged tab",
-                "selector": ".qti-navigator-filter[data-mode=\"flagged\"]",
-                "key": {
-                    "keyCode": "TAB"
+                    "keyCode": "RIGHT"
                 }
             },
             {
@@ -544,15 +535,14 @@
                 "label": "Navigation panel previous item",
                 "selector": ".qti-navigator-item[data-id=\"item-2\"] .qti-navigator-label",
                 "key": {
-                    "keyCode": "TAB",
-                    "shiftKey": true
+                    "keyCode": "LEFT"
                 }
             },
             {
                 "label": "Navigation panel current item",
                 "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
                 "key": {
-                    "keyCode": "TAB"
+                    "keyCode": "RIGHT"
                 }
             },
             {

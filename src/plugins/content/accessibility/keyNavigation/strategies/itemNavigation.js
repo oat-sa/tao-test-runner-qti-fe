@@ -43,75 +43,101 @@ export default {
 
         const config = this.getConfig();
         const $content = this.getTestRunner().getAreaBroker().getContentArea();
-        const $qtiIteractionsNodeList = $content
+
+        /**
+         * Gets the QTI choice element from the current position in the keyNavigation
+         * @param {Object} cursor - The cursor definition supplied by the keyNavigator
+         * @returns {jQuery} - The selected choice element
+         */
+        const getQtiChoice = cursor => cursor && cursor.navigable.getElement().closest('.qti-choice');
+
+        /**
+         * Creates and registers a keyNavigator for the supplied list of elements
+         * @param {jQuery} $elements - The list of navigable elements
+         * @param {jQuery} group - The group container
+         * @returns {keyNavigator} - the created navigator, if the list of element is not empty
+         */
+        const addNavigator = ($elements, group) => {
+            const elements = navigableDomElement.createFromDoms($elements);
+            if (elements.length) {
+                const navigator = keyNavigator({
+                    elements,
+                    group,
+                    propagateTab: false
+                });
+                this.keyNavigators.push(navigator);
+                return navigator;
+            }
+        };
+
+        /**
+         * Creates and setups a keyNavigator for the interaction inputs.
+         * @param {jQuery} $elements - The list of navigable elements
+         * @param {jQuery} group - The group container
+         * @returns {keyNavigator} - The supplied keyNavigator
+         */
+        const addInputsNavigator = ($elements, group) => {
+            const navigator = addNavigator($elements, group);
+            if (navigator) {
+                setupItemsNavigator(navigator, config);
+                setupClickableNavigator(navigator);
+
+                // each choice is represented by more than the input, the style must be spread to the actual element
+                navigator
+                    .on('focus', cursor => scrollHelper.scrollTo(
+                        getQtiChoice(cursor).addClass('key-navigation-highlight'),
+                        $content.closest('.content-wrapper')
+                    ))
+                    .on('blur', cursor => getQtiChoice(cursor).removeClass('key-navigation-highlight'));
+            }
+            return navigator;
+        };
+
+        // list the navigable areas inside the item. This could be either the interactions choices or the prompts
+        const $qtiInteractions = $content
             .find('.key-navigation-focusable,.qti-interaction')
-            .filter(function () {
-                //filter out interaction as it will be managed separately
-                return !$(this).parents('.qti-interaction').length;
+            .filter((i, node) => {
+                const $node = $(node);
+                // reduce the list to full interactions, each one will get its own keyNavigator
+                if (!$node.parents('.qti-interaction').length) {
+                    const $choiceInput = $node.find('.qti-choice input');
+                    if ($choiceInput.length) {
+                        // expose the type of choices: checkbox or radio
+                        $node.attr('data-choice-type', $choiceInput.attr('type'));
+                    }
+                    return true;
+                }
+                return false;
             });
 
         // the item focusable body elements are considered scrollable
-        $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
+        $content
+            .find('.key-navigation-focusable')
+            .addClass('key-navigation-scrollable');
 
-        $qtiIteractionsNodeList
+        // each navigable area will get its own keyNavigator
+        $qtiInteractions
             .each((itemPos, itemElement) => {
                 const $itemElement = $(itemElement);
                 if ($itemElement.hasClass('qti-interaction')) {
                     //add navigable elements from prompt
-                    $itemElement.find('.key-navigation-focusable').each((navPos, nav) => {
-                        const $nav = $(nav);
-                        if (!$nav.closest('.qti-choice').length) {
-                            this.keyNavigators.push(
-                                keyNavigator({
-                                    elements: navigableDomElement.createFromDoms($nav),
-                                    group: $nav,
-                                    propagateTab: false
-                                })
-                            );
-                        }
-                    });
+                    $itemElement
+                        .find('.key-navigation-focusable')
+                        .each((navPos, nav) => {
+                            const $nav = $(nav);
+                            if (!$nav.closest('.qti-choice').length) {
+                                addNavigator($nav, $nav);
+                            }
+                        });
 
                     //reset interaction custom key navigation to override the behaviour with the new one
                     $itemElement.off('.keyNavigation');
 
                     //search for inputs that represent the interaction focusable choices
                     const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
-                    const navigableElements = navigableDomElement.createFromDoms($inputs);
-
-                    if (navigableElements.length) {
-                        const navigator = keyNavigator({
-                            elements: navigableElements,
-                            group: $itemElement,
-                            loop: false,
-                            propagateTab: false
-                        })
-                            .on('focus', cursor => {
-                                const $qtiChoice = cursor.navigable.getElement().closest('.qti-choice');
-                                $qtiChoice.addClass('key-navigation-highlight');
-                                return scrollHelper.scrollTo(
-                                    $qtiChoice,
-                                    this.getTestRunner().getAreaBroker().getContentArea().closest('.content-wrapper')
-                                );
-                            })
-                            .on('blur', cursor => {
-                                cursor.navigable
-                                    .getElement()
-                                    .closest('.qti-choice')
-                                    .removeClass('key-navigation-highlight');
-                            });
-
-                        setupItemsNavigator(navigator, config);
-                        setupClickableNavigator(navigator);
-                        this.keyNavigators.push(navigator);
-                    }
+                    addInputsNavigator($inputs, $itemElement);
                 } else {
-                    this.keyNavigators.push(
-                        keyNavigator({
-                            elements: navigableDomElement.createFromDoms($itemElement),
-                            group: $itemElement,
-                            propagateTab: false
-                        })
-                    );
+                    addNavigator($itemElement, $itemElement);
                 }
             });
 

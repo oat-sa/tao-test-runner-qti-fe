@@ -141,7 +141,7 @@ export default {
                     if (config.flatNavigation && itemElement.dataset.choiceType !== 'radio') {
                         $inputs.each((i, input) => addInputsNavigator($(input), $itemElement));
                     } else {
-                        addInputsNavigator($inputs, $itemElement, () => {
+                        const navigator = addInputsNavigator($inputs, $itemElement, () => {
                             let position = 0;
 
                             // autofocus the selected radio button if any
@@ -152,6 +152,13 @@ export default {
                             });
 
                             return position;
+                        });
+
+                        navigator.on('focus', cursor => {
+                            const $element = cursor.navigable.getElement();
+                            if (!$element.is(':checked')) {
+                                $element.click();
+                            }
                         });
                     }
                 } else {

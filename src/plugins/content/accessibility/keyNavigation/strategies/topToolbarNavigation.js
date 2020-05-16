@@ -23,6 +23,7 @@ import {
     setupItemsNavigator,
     setupClickableNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 
 /**
  * The identifier the keyNavigator group
@@ -45,7 +46,10 @@ export default {
     init() {
         const config = this.getConfig();
         const $topToolbar = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
-        const $toolbarElements = $topToolbar.find('.countdown, .jump-link');
+        const $toolbarElements = $topToolbar.find('.jump-link');
+        if (!isReviewPanelEnabled(this.getTestRunner())) {
+            $toolbarElements.concat($topToolbar.find('.timer-toggler'));
+        }
 
         const registerTopToolbarNavigator = (id, group, $elements) => {
             const elements = navigableDomElement.createFromDoms($elements);

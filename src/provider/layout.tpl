@@ -1,4 +1,6 @@
-<main class="test-runner-scope">
+<main aria-labelledby="test-title-header" class="test-runner-scope">
+    <h2 id="test-title-header" class="landmark-title-hidden"></h2>
+
     <div class="action-bar content-action-bar horizontal-action-bar top-action-bar">
         <div class="control-box size-wrapper"></div>
     </div>

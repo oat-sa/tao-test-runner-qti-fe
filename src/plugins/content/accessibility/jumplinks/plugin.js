@@ -22,12 +22,14 @@
 
 import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';
-import jumplinksFactory from "./jumplinks";
-import shortcutsFactory from "./shortcuts";
+import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
+import { getJumpElementFactory, getItemStatus } from './helpers';
+import jumplinksFactory from './jumplinks';
+import shortcutsFactory from './shortcuts';
 
 function findFocusable(targetElement) {
     const $elem = $(targetElement)
-        .find(":not(.hidden)[tabindex]").first();
+        .find(':not(.hidden)[tabindex]').first();
     return $elem;
 }
 
@@ -36,8 +38,8 @@ function findFocusable(targetElement) {
  */
 function closeShortcuts() {
     this.shortcuts.hide();
-    this.shortcuts.getElement().off("click", this.closeShortcuts);
-    $(window).off("keydown", this.closeShortcuts);
+    this.shortcuts.getElement().off('click', this.closeShortcuts);
+    $(window).off('keydown', this.closeShortcuts);
 }
 
 /**
@@ -50,40 +52,40 @@ export default pluginFactory({
     /**
      * Initializes the plugin (called during runner's init)
      */
-    init: function init() {
-        const mapJumpToAreaBroker = {
-            question: 'getContentArea',
-            navigation: 'getNavigationArea',
-            toolbox: 'getToolboxArea',
-            teststatus: 'getPanelArea',
-        };
-        this.jumplinks = jumplinksFactory({})
+    init() {
+        const testRunner = this.getTestRunner();
+        const item = testRunner.getCurrentItem();
+        const config = {
+            isReviewPanelEnabled: isReviewPanelEnabled(testRunner),
+            questionStatus: getItemStatus(item)
+        }
+
+        this.jumplinks = jumplinksFactory(config)
             .on('render', () => {
                 const closeShortcutsHandler = closeShortcuts.bind(this);
-                this.jumplinks.on('jump', (jump) => {
-                    const $element = this.getAreaBroker()[mapJumpToAreaBroker[jump]]().find(":not(.hidden)[tabindex]").first();
+                this.jumplinks.on('jump', (jumpTo) => {
+                    const areaBroker = this.getAreaBroker();
+                    const $element = getJumpElementFactory(areaBroker)[jumpTo];
                     $element.focus();
                 });
                 this.jumplinks.on('shortcuts', () => {
                     this.shortcuts.show();
                     this.shortcuts.getElement()
-                        .off("click", closeShortcutsHandler)
-                        .on("click", closeShortcutsHandler);
+                        .off('click', closeShortcutsHandler)
+                        .on('click', closeShortcutsHandler);
                     $(window)
-                        .off("keydown", closeShortcutsHandler)
-                        .on("keydown", closeShortcutsHandler);
+                        .off('keydown', closeShortcutsHandler)
+                        .on('keydown', closeShortcutsHandler);
                 });
             });
         this.shortcuts = shortcutsFactory({});
-
     },
 
     /**
      * Called during the runner's render phase
      */
-    render: function render() {
+    render() {
         this.jumplinks.render(this.getAreaBroker().getControlArea());
         this.shortcuts.render(this.getAreaBroker().getControlArea());
     },
-
 });

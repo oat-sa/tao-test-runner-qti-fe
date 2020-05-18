@@ -38,12 +38,12 @@ const defaults = {
  *
  * @returns {jumplinks} the component, initialized and rendered
  */
-export default function jumplinksFactory() {
+export default function jumplinksFactory(config) {
 
     /**
      * @typedef {Object} jumplinksBox
      */
-    const jumplinksBox = component({}, defaults )
+    const jumplinksBox = component({}, defaults)
         .on('render', function() {
             // handle related Jump Links
             const behavior = [{
@@ -88,8 +88,8 @@ export default function jumplinksFactory() {
 
     jumplinksBox.setTemplate(jumplinksTpl);
 
-    _.defer(function() {
-        jumplinksBox.init();
+    _.defer(() => {
+        jumplinksBox.init(config);
     });
 
     return jumplinksBox;

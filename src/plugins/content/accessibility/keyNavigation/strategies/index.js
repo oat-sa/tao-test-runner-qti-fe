@@ -24,3 +24,4 @@ export { default as pageNavigationStrategy } from './pageNavigation';
 export { default as rubricsNavigationStrategy } from './rubricsNavigation';
 export { default as itemNavigationStrategy } from './itemNavigation';
 export { default as linearItemNavigationStrategy } from './linearItemNavigation';
+export { default as jumpLinksNavigationStrategy } from './jumpLinks';

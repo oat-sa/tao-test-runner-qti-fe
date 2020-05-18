@@ -55,7 +55,7 @@ export default {
 
         let testStatusNavigation;
         if ($navigator.length && !$navigator.hasClass('disabled')) {
-            const $testStatusHeader = $navigator.find('.qti-navigator-info.collapsible .qti-navigator-header');
+            const $testStatusHeader = $navigator.find('.qti-navigator-info.collapsible > .qti-navigator-label');
             const navigableTestStatus = navigableDomElement.createFromDoms($testStatusHeader);
 
             if (navigableTestStatus.length) {

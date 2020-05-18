@@ -74,7 +74,6 @@ export default {
                 setupClickableNavigator(testStatusNavigation);
 
                 this.keyNavigators.push(testStatusNavigation)
-                // this.managedNavigators.push(testStatusNavigation);
             }
 
             $filters = $navigator.find('.qti-navigator-filters .qti-navigator-filter');

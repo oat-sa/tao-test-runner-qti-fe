@@ -71,7 +71,6 @@ export default {
                     keyNextItem: config.keyNextTab || config.keyNextItem,
                     keyPrevItem: config.keyPrevTab || config.keyPrevItem
                 });
-                setupClickableNavigator(testStatusNavigation);
 
                 this.keyNavigators.push(testStatusNavigation)
             }

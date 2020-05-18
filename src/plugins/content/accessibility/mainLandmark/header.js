@@ -13,13 +13,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
 /**
- * Test Runner Control Plugin : Title
+ * Test Runner Content Accessibility Plugin : MainLandmark
  *
- * @author Bertrand Chevrier <bertrand@taotesting.com>
+ * @author Anastasia Razumovskaya <nastya.razum96@gmail.com>
  */
 import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';

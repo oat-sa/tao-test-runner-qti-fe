@@ -22,15 +22,13 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import $ from 'jquery';
-import __ from 'i18n';
-import _ from 'lodash';
 import pluginFactory from 'taoTests/runner/plugin';
-import headerTpl from 'taoQtiTest/runner/plugins/content/accessibility/testHeader/header.tpl';
+import headerTpl from 'taoQtiTest/runner/plugins/content/accessibility/mainLandmark/header.tpl';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 
 export default pluginFactory({
-    name: 'testTitleHeader',
+    name: 'mainLandmark',
     init: function init() {
         const testRunner = this.getTestRunner();
         const testMap = testRunner.getTestMap();
@@ -42,11 +40,6 @@ export default pluginFactory({
                 testContext.itemIdentifier
             );
 
-            // update item title
-            this.$title
-                .text(`${currentItem.label}`)
-                .show();
-
             let state = 'unseen';
             if (currentItem.flagged) {
                 state = 'flagged'
@@ -56,21 +49,20 @@ export default pluginFactory({
                 state = 'viewed'
             }
 
+            // update item title
+            this.$title
+                .text(`${currentItem.label}`)
+                .show();
+
             // update item state
             this.$state
                 .text(`${state}`)
                 .show();
-
-            this.$position
-                .text(`${__('Question')} ${currentItem.index}:`)
-                .show();
         };
 
-        testRunner
-            .after('renderitem', () => {
-                updateTitles();
-
-            });
+        testRunner.after('renderitem', () => {
+            updateTitles();
+        });
     },
     render: function render() {
         const $container = this.getAreaBroker().getArea('titleHeader');
@@ -79,6 +71,5 @@ export default pluginFactory({
 
         this.$title = $container.find(`[data-control="qti-test-item-title"]`);
         this.$state = $container.find(`[data-control="qti-test-item-state"]`);
-        this.$position = $container.find(`[data-control="qti-test-item-position"]`);
     },
 });

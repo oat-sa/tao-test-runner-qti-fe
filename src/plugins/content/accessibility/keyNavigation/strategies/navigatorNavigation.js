@@ -26,6 +26,16 @@ import {
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
+ * List of CSS selectors for the navigables
+ * @type {Object}
+ */
+const selectors = {
+    filters: '.qti-navigator-filters .qti-navigator-filter',
+    unseenItems: '.qti-navigator-tree .qti-navigator-item:not(.unseen) .qti-navigator-label',
+    allItems: '.qti-navigator-tree .qti-navigator-item .qti-navigator-label',
+};
+
+/**
  * Key navigator strategy applying onto the navigation panel.
  * @type {Object} keyNavigationStrategy
  */
@@ -43,7 +53,6 @@ export default {
         const $navigator = $panel.find('.qti-navigator');
         let filtersNavigator;
         let itemsNavigator;
-        let $filters, $trees, navigableFilters, navigableTrees;
 
         //the tag to identify if the item listing has been browsed, to only "smart jump" to active item only on the first visit
         let itemListingVisited = false;
@@ -54,8 +63,8 @@ export default {
         this.keyNavigators = [];
 
         if ($navigator.length && !$navigator.hasClass('disabled')) {
-            $filters = $navigator.find('.qti-navigator-filters .qti-navigator-filter');
-            navigableFilters = navigableDomElement.createFromDoms($filters);
+            const $filters = $navigator.find(selectors.filters);
+            const navigableFilters = navigableDomElement.createFromDoms($filters);
             if (navigableFilters.length) {
                 filtersNavigator = keyNavigator({
                     keepState: config.keepState,
@@ -115,8 +124,9 @@ export default {
             }
 
             const $navigatorTree = $panel.find('.qti-navigator-tree');
-            $trees = $navigator.find('.qti-navigator-tree .qti-navigator-item:not(.unseen) .qti-navigator-label');
-            navigableTrees = navigableDomElement.createFromDoms($trees);
+            const skipAheadEnabled = $panel.find('.qti-navigator').is('.skipahead-enabled');
+            const $trees = $navigator.find(skipAheadEnabled ? selectors.allItems : selectors.unseenItems);
+            const navigableTrees = navigableDomElement.createFromDoms($trees);
             if (navigableTrees.length) {
                 //instantiate a key navigator but do not add it to the returned list of navigators as this is not supposed to be reached with tab key
                 itemsNavigator = keyNavigator({

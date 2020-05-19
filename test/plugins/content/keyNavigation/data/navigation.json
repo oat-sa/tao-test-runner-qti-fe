@@ -117,6 +117,13 @@
                 }
             },
             {
+                "label": "Navigation panel Test status",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
                 "label": "Navigation panel All tab",
                 "selector": ".qti-navigator-filter[data-mode=\"all\"]",
                 "key": {
@@ -197,6 +204,14 @@
             {
                 "label": "Navigation panel Unanswered tab",
                 "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Navigation panel Test status + shift key",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
                 "key": {
                     "keyCode": "TAB",
                     "shiftKey": true
@@ -353,6 +368,13 @@
                 }
             },
             {
+                "label": "Navigation panel Test status",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
                 "label": "Navigation panel All tab",
                 "selector": ".qti-navigator-filter[data-mode=\"all\"]",
                 "key": {
@@ -439,6 +461,14 @@
                 }
             },
             {
+                "label": "Navigation panel Test status + shift key",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
                 "label": "Home link",
                 "selector": "#home",
                 "key": {
@@ -478,6 +508,13 @@
             {
                 "label": "Exit link",
                 "selector": "#exit",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel Test status",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
                 "key": {
                     "keyCode": "TAB"
                 }

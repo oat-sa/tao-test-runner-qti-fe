@@ -44,7 +44,7 @@ export default {
      */
     init() {
         const config = this.getConfig();
-        const $jumpLinksBox = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
+        const $jumpLinksBox = $('.jump-links-container');
         const $links = $jumpLinksBox.find('.jump-link');
 
         this.keyNavigators = [];

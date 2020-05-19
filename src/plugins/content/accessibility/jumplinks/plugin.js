@@ -20,6 +20,7 @@
  * @author aliaksandr paliakou <lecosson@gmail.com>
  */
 
+import __ from 'i18n';
 import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';
 import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
@@ -77,15 +78,56 @@ export default pluginFactory({
                         .off('keydown', closeShortcutsHandler)
                         .on('keydown', closeShortcutsHandler);
                 });
+            })
+            .on('update', function update(params) {
+                this.trigger('changeReviewPanel', params.isReviewPanelEnabled);
+                this.trigger('changeQuesitionStatus', params.questionStatus);
+            })
+            .on('changeReviewPanel', function changeReviewPanel (enabled) {
+                const elem = this.getElement();
+                const panelJumplink = elem
+                    .find('[data-jump="teststatus"]')
+                    .parent();
+                if (enabled) {
+                    panelJumplink.removeClass('hidden');
+                } else {
+                    panelJumplink.addClass('hidden');
+                }
+            })
+            .on('changeQuesitionStatus', function changeQuesitionStatus(questionStatus) {
+                const elem = this.getElement();
+                const text = __('Question') + ' - ' + __(questionStatus);
+                elem
+                    .find('[data-jump="question"] > b')
+                    .text(text);
             });
+        
+        testRunner
+            .on('loaditem', () => {
+                const item = testRunner.getCurrentItem();
+                const config = {
+                    isReviewPanelEnabled: isReviewPanelEnabled(testRunner),
+                    questionStatus: getItemStatus(item)
+                }
+
+                this.jumplinks.trigger('update', config);
+            })
+            .on('tool-flagitem', () => {
+                const item = testRunner.getCurrentItem();
+                const questionStatus = getItemStatus({ ...item, flagged: !item.flagged });
+
+                this.jumplinks.trigger('changeQuesitionStatus', questionStatus);
+            })
         this.shortcuts = shortcutsFactory({});
     },
 
     /**
      * Called during the runner's render phase
      */
-    render() {
-        this.jumplinks.render(this.getAreaBroker().getControlArea());
+    render: function render() {
+        const jumplinksContainer = $('<div class="jump-links-container"></div>');
+        $('.content-wrap').prepend(jumplinksContainer);
+        this.jumplinks.render(jumplinksContainer);
         this.shortcuts.render(this.getAreaBroker().getControlArea());
     },
 });

@@ -9,11 +9,9 @@
         <li class="jump-link-item">
             <button data-jump="toolbox" class="jump-link" >{{__ "Jump to:"}} <b>{{__ "Toolbox"}}</b></button>
         </li>
-        {{#if isReviewPanelEnabled}}
-        <li class="jump-link-item">
+        <li class="jump-link-item {{#unless isReviewPanelEnabled}}hiddem{{/unless}}" >
             <button data-jump="teststatus" class="jump-link" >{{__ "Jump to:"}} <b>{{__ "Test Status and Structure"}}</b></button>
         </li>
-        {{/if}}
         <li class="jump-link-item">
             <button data-jump="shortcuts" class="jump-link" >{{__ "Open Keyboard Shortcuts"}}</button>
         </li>

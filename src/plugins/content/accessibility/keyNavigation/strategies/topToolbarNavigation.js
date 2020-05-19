@@ -46,10 +46,7 @@ export default {
     init() {
         const config = this.getConfig();
         const $topToolbar = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
-        const $toolbarElements = $topToolbar.find('.jump-link');
-        if (!isReviewPanelEnabled(this.getTestRunner())) {
-            $.merge($toolbarElements, $topToolbar.find('.timer-toggler'));
-        }
+        const $toolbarElements = $topToolbar.find('.jump-link, .timer-toggler');
 
         const registerTopToolbarNavigator = (id, group, $elements) => {
             const elements = navigableDomElement.createFromDoms($elements);

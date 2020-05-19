@@ -36,8 +36,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import timeEncoder from 'core/encoder/time';
-import pollingFactory from 'core/polling';
-import timerFactory from 'core/timer';
 import component from 'ui/component';
 import countdownTpl from 'taoQtiTest/runner/plugins/controls/timer/component/tpl/countdown';
 import tooltip from 'ui/tooltip';
@@ -51,9 +49,7 @@ var precision = 1000;
  */
 var defaults = {
     showBeforeStart: true,
-    displayWarning: true,
-    polling: true,
-    frequency: 500
+    displayWarning: true
 };
 
 /**
@@ -76,8 +72,6 @@ var warningTimeout = {
  * @param {String} config.label - the text to display above the timer
  * @param {String} config.type - the type of countdown (to categorize them)
  * @param {Number} [config.remainingTime] - the current value of the countdown, in milliseconds
- * @param {Boolean} [config.polling = true] - does the countdown handles the polling itself ?
- * @param {Number} [config.frequency = 500] - polling frequency in ms (if active)
  * @param {Boolean} [config.showBeforeStart = true] - do we show the time before starting
  * @param {Boolean} [config.displayWarning = true] - do we display the warnings or trigger only the event
  * @param {Object[]} [config.warnings] - define warnings thresholds
@@ -203,17 +197,6 @@ export default function countdownFactory($container, config) {
                     this.enable();
                     this.setState('running', true);
 
-                    if (this.polling) {
-                        this.polling.start();
-
-                        if (!this.is('started')) {
-                            this.setState('started', true);
-                            this.timer.start();
-                        } else {
-                            this.timer.resume();
-                        }
-                    }
-
                     /**
                      * The count has started
                      * @event countdown#start
@@ -231,11 +214,6 @@ export default function countdownFactory($container, config) {
             stop: function stop() {
                 if (this.is('rendered') && this.is('running')) {
                     this.setState('running', false);
-
-                    if (this.polling) {
-                        this.timer.pause();
-                        this.polling.stop();
-                    }
 
                     /**
                      * The count is stopped
@@ -273,8 +251,6 @@ export default function countdownFactory($container, config) {
         defaults
     )
         .on('init', function() {
-            var self = this;
-
             this.remainingTime = this.config.remainingTime;
 
             if (this.config.warnings) {
@@ -283,21 +259,6 @@ export default function countdownFactory($container, config) {
 
             if (this.config.warningsForScreenreader) {
                 this.warningsForScreenreader = _.sortBy(this.config.warningsForScreenreader, 'threshold');
-            }
-
-            //if configured, create a polling for the countdown
-            if (this.config.polling === true && this.config.frequency > 0) {
-                this.timer = timerFactory({
-                    autoStart: false
-                });
-                this.polling = pollingFactory({
-                    action: function pollingAction() {
-                        var elapsed = self.timer.tick();
-                        self.update(self.remainingTime - elapsed);
-                    },
-                    interval: this.config.frequency,
-                    autoStart: false
-                });
             }
 
             //auto renders

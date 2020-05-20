@@ -29,17 +29,17 @@ import headerTpl from 'taoQtiTest/runner/plugins/content/accessibility/mainLandm
 
 export default pluginFactory({
     name: 'mainLandmark',
-    init: function init() {
+    init() {
         const testRunner = this.getTestRunner();
 
         const getState = (item) => {
-            let state = 'Unseen';
+            let state = __('Unseen');
             if (item.flagged) {
-                state = 'Flagged'
+                state = __('Flagged');
             } else if (item.answered) {
-                state = 'Answered'
+                state = __('Answered');
             } else if (item.viewed) {
-                state = 'Viewed'
+                state = __('Viewed');
             }
             return state;
         };
@@ -52,7 +52,7 @@ export default pluginFactory({
 
         const updateState = (item) => {
             this.$state
-                .text(`${__(getState(item))}`)
+                .text(`${getState(item)}`)
                 .show();
         };
 
@@ -68,7 +68,7 @@ export default pluginFactory({
                 updateState(item);
             });
     },
-    render: function render() {
+    render() {
         const $container = this.getAreaBroker().getArea('mainLandmark');
         this.$element = $(headerTpl());
         $container.append(this.$element);

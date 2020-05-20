@@ -24,45 +24,48 @@
 import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';
 import headerTpl from 'taoQtiTest/runner/plugins/content/accessibility/mainLandmark/header.tpl';
-import mapHelper from 'taoQtiTest/runner/helpers/map';
 
 
 export default pluginFactory({
     name: 'mainLandmark',
     init: function init() {
         const testRunner = this.getTestRunner();
-        const testMap = testRunner.getTestMap();
 
-        const updateTitles = () => {
-            const testContext = testRunner.getTestContext();
-            const currentItem = mapHelper.getItem(
-                testMap,
-                testContext.itemIdentifier
-            );
-
+        const getState = (item) => {
             let state = 'unseen';
-            if (currentItem.flagged) {
+            if (item.flagged) {
                 state = 'flagged'
-            } else if (currentItem.answered) {
+            } else if (item.answered) {
                 state = 'answered'
-            } else if (currentItem.viewed) {
+            } else if (item.viewed) {
                 state = 'viewed'
             }
+            return state;
+        };
 
-            // update item title
+        const updateTitle = (item) => {
             this.$title
-                .text(`${currentItem.label}`)
-                .show();
-
-            // update item state
-            this.$state
-                .text(`${state}`)
+                .text(`${item.label}`)
                 .show();
         };
 
-        testRunner.after('renderitem', () => {
-            updateTitles();
-        });
+        const updateState = (item) => {
+            this.$state
+                .text(`${getState(item)}`)
+                .show();
+        };
+
+        testRunner
+            .after('renderitem', () => {
+                const item = testRunner.getCurrentItem();
+                updateTitle(item);
+                updateState(item);
+            })
+            .on('tool-flagitem', () => {
+                let item = testRunner.getCurrentItem();
+                item = { ...item, flagged: !item.flagged};
+                updateState(item);
+            });
     },
     render: function render() {
         const $container = this.getAreaBroker().getArea('titleHeader');

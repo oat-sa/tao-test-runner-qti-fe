@@ -44,21 +44,38 @@ export default {
      */
     init() {
         const config = this.getConfig();
+        const $content = this.getTestRunner().getAreaBroker().getContentArea();
+
         this.keyNavigators = [];
 
-        const $content = this.getTestRunner().getAreaBroker().getContentArea();
+        // decorate isEnabled navigableDomElement method to check for dom node height
+        const isEnabledDecorator = element => {
+            const originalIsEnabled = element.isEnabled;
+
+            element.isEnabled = function isEnabled() {
+                if (originalIsEnabled.call(this)) {
+                    const node = this.getElement().get(0);
+
+                    return node.scrollHeight > node.clientHeight;
+                }
+
+                return false;
+            };
+
+            return element;
+        };
+
         $content
             .find('.stimulus-container')
-            // filter out nodes without scrollbar
-            .filter(function () {
-                return this.scrollHeight > this.clientHeight;
-            })
             .addClass('key-navigation-scrollable')
             .each((i, el) => {
                 const $element = $(el);
+                const elements = navigableDomElement.createFromDoms($element)
+                    .map(isEnabledDecorator);
+
                 const navigator = keyNavigator({
                     id: `${groupId}-${i}`,
-                    elements: navigableDomElement.createFromDoms($element),
+                    elements,
                     group: $element,
                     propagateTab: false
                 });

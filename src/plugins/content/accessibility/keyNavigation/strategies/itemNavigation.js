@@ -112,12 +112,9 @@ export default {
             .each((itemPos, itemElement) => {
                 const $itemElement = $(itemElement);
 
-                // expose the type of choices: checkbox or radio
+                // detect the type of choices: checkbox or radio
                 const $choiceInput = $itemElement.find('.qti-choice input');
                 const choiceType = $choiceInput.attr('type');
-                if ($choiceInput.length) {
-                    $itemElement.attr('data-choice-type', choiceType);
-                }
 
                 if ($itemElement.hasClass('qti-interaction')) {
                     //add navigable elements from prompt

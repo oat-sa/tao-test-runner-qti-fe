@@ -22,6 +22,7 @@
  * @author Anastasia Razumovskaya <nastya.razum96@gmail.com>
  */
 import $ from 'jquery';
+import __ from 'i18n';
 import pluginFactory from 'taoTests/runner/plugin';
 import headerTpl from 'taoQtiTest/runner/plugins/content/accessibility/mainLandmark/header.tpl';
 
@@ -32,13 +33,13 @@ export default pluginFactory({
         const testRunner = this.getTestRunner();
 
         const getState = (item) => {
-            let state = 'unseen';
+            let state = 'Unseen';
             if (item.flagged) {
-                state = 'flagged'
+                state = 'Flagged'
             } else if (item.answered) {
-                state = 'answered'
+                state = 'Answered'
             } else if (item.viewed) {
-                state = 'viewed'
+                state = 'Viewed'
             }
             return state;
         };
@@ -51,7 +52,7 @@ export default pluginFactory({
 
         const updateState = (item) => {
             this.$state
-                .text(`${getState(item)}`)
+                .text(`${__(getState(item))}`)
                 .show();
         };
 

@@ -68,7 +68,7 @@ export default pluginFactory({
             });
     },
     render: function render() {
-        const $container = this.getAreaBroker().getArea('titleHeader');
+        const $container = this.getAreaBroker().getArea('mainLandmark');
         this.$element = $(headerTpl());
         $container.append(this.$element);
 

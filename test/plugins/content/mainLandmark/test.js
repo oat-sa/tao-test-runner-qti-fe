@@ -163,7 +163,7 @@ define([
 
                 assert.equal(
                     $container.find('[data-control="qti-test-item-state"]').text(),
-                    'answered',
+                    'Answered',
                     'Add item state'
                 );
 
@@ -196,7 +196,7 @@ define([
             .then(() => {
                 assert.equal(
                     $container.find('[data-control="qti-test-item-state"]').text(),
-                    'flagged',
+                    'Flagged',
                     'Change item state'
                 );
 

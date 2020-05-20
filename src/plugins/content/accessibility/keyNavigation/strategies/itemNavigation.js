@@ -99,19 +99,8 @@ export default {
         // list the navigable areas inside the item. This could be either the interactions choices or the prompts
         const $qtiInteractions = $content
             .find('.key-navigation-focusable,.qti-interaction')
-            .filter((i, node) => {
-                const $node = $(node);
-                // reduce the list to full interactions, each one will get its own keyNavigator
-                if (!$node.parents('.qti-interaction').length) {
-                    const $choiceInput = $node.find('.qti-choice input');
-                    if ($choiceInput.length) {
-                        // expose the type of choices: checkbox or radio
-                        $node.attr('data-choice-type', $choiceInput.attr('type'));
-                    }
-                    return true;
-                }
-                return false;
-            });
+            //filter out interaction as it will be managed separately
+            .filter((i, node) => !$(node).parents('.qti-interaction').length);
 
         // the item focusable body elements are considered scrollable
         $content
@@ -122,6 +111,14 @@ export default {
         $qtiInteractions
             .each((itemPos, itemElement) => {
                 const $itemElement = $(itemElement);
+
+                // expose the type of choices: checkbox or radio
+                const $choiceInput = $itemElement.find('.qti-choice input');
+                const choiceType = $choiceInput.attr('type');
+                if ($choiceInput.length) {
+                    $itemElement.attr('data-choice-type', choiceType);
+                }
+
                 if ($itemElement.hasClass('qti-interaction')) {
                     //add navigable elements from prompt
                     $itemElement
@@ -138,7 +135,7 @@ export default {
 
                     //search for inputs that represent the interaction focusable choices
                     const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
-                    if (config.flatNavigation && itemElement.dataset.choiceType !== 'radio') {
+                    if (config.flatNavigation && choiceType !== 'radio') {
                         $inputs.each((i, input) => addInputsNavigator($(input), $itemElement));
                     } else {
                         const navigator = addInputsNavigator($inputs, $itemElement, () => {

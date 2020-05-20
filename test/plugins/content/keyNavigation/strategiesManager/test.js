@@ -116,7 +116,8 @@ define([
         { title: 'toolbar' },
         { title: 'item' },
         { title: 'linearItem' },
-        { title: 'navigator' }
+        { title: 'navigator' },
+        { title: 'stimulus' }
     ]).test('Navigation strategy ', (data, assert) => {
         const result = strategiesManager(data.title, testRunnerMock);
         assert.equal(typeof result, 'object', `The strategy ${data.title} has been created`);

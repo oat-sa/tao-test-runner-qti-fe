@@ -20,52 +20,69 @@ import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
-    setupItemsNavigator,
-    setupClickableNavigator
+    setupItemsNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
-import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 
 /**
- * The identifier the keyNavigator group
- * @type {String}
- */
-const groupId = 'top-toolbar';
+* The identifier the keyNavigator group
+* @type {String}
+*/
+const groupId = 'stimulus-element-navigation-group';
 
 /**
- * Key navigator strategy applying onto the top toolbar' bar.
+ * Key navigator strategy applying on stimulus items with scrollbar.
+ * Navigable item content are body elements with the special class "stimulus-container".
  * @type {Object} keyNavigationStrategy
  */
 export default {
-    name: 'top-toolbar',
+    name: 'stimulus',
 
     /**
-     * Builds the top toolbar navigation strategy.
+     * Builds the item navigation strategy.
      *
      * @returns {keyNavigationStrategy}
      */
     init() {
         const config = this.getConfig();
-        const $topToolbar = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
-        const $toolbarElements = $topToolbar.find('.jump-link, .timer-toggler');
+        const $content = this.getTestRunner().getAreaBroker().getContentArea();
 
-        const registerTopToolbarNavigator = (id, group, $elements) => {
-            const elements = navigableDomElement.createFromDoms($elements);
-            if (elements.length) {
+        this.keyNavigators = [];
+
+        // decorate isEnabled navigableDomElement method to check for dom node height
+        const isEnabledDecorator = element => {
+            const originalIsEnabled = element.isEnabled;
+
+            element.isEnabled = function isEnabled() {
+                if (originalIsEnabled.call(this)) {
+                    const node = this.getElement().get(0);
+
+                    return node.scrollHeight > node.clientHeight;
+                }
+
+                return false;
+            };
+
+            return element;
+        };
+
+        $content
+            .find('.stimulus-container')
+            .addClass('key-navigation-scrollable')
+            .each((i, el) => {
+                const $element = $(el);
+                const elements = navigableDomElement.createFromDoms($element)
+                    .map(isEnabledDecorator);
+
                 const navigator = keyNavigator({
-                    id,
-                    group,
+                    id: `${groupId}-${i}`,
                     elements,
-                    propagateTab: false,
+                    group: $element,
+                    propagateTab: false
                 });
 
                 setupItemsNavigator(navigator, config);
-                setupClickableNavigator(navigator);
                 this.keyNavigators.push(navigator);
-            }
-        };
-
-        this.keyNavigators = [];
-        $toolbarElements.each((index, element) => registerTopToolbarNavigator(`${groupId}-${index}`, $topToolbar, $(element)));
+            });
 
         return this;
     },

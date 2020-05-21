@@ -38,6 +38,9 @@ import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
 import screenreaderNotificationTpl from 'taoQtiTest/runner/plugins/controls/timer/component/tpl/screenreaderNotification.tpl';
 
+// timeout after which screenreader notifcation should be cleaned up
+const screenreaderNotificationTimeout = 20000;
+
 /**
  * Creates the plugin
  */
@@ -104,6 +107,7 @@ export default pluginFactory({
         const self = this;
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
+        let screenreaderNotifcationTimeoutId;
 
         /**
          * Plugin config,
@@ -242,8 +246,17 @@ export default pluginFactory({
                                     const stats = statsHelper.getInstantStats(scope, testRunner);
                                     const unansweredQuestions = stats && (stats.questions - stats.answered);
 
+                                    if (screenreaderNotifcationTimeoutId) {
+                                        clearTimeout(screenreaderNotifcationTimeoutId);
+                                    }
+
                                     self.$screenreaderWarningContainer.text(
                                         message(remainingTime, unansweredQuestions)
+                                    );
+
+                                    screenreaderNotifcationTimeoutId = setTimeout(
+                                        () => self.$screenreaderWarningContainer.text(''),
+                                        screenreaderNotificationTimeout
                                     );
                                 },
                                 1000,

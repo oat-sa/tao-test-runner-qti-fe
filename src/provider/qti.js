@@ -57,6 +57,7 @@ var qtiProvider = {
             content: $('#qti-content', $layout),
             toolbox: $('.tools-box', $layout),
             navigation: $('.navi-box-list', $layout),
+            mainLandmark: $('#test-title-header', $layout),
             control: $('.top-action-bar .control-box', $layout),
             actionsBar: $('.bottom-action-bar .control-box', $layout),
             panel: $('.test-sidebar-left', $layout),

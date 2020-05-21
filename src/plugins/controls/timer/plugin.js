@@ -179,7 +179,7 @@ export default pluginFactory({
                             self.timerbox.start();
                         }
 
-                        this.$screenreaderWarningContainer.text('');
+                        self.$screenreaderWarningContainer.text('');
                     })
                     .on('disableitem move skip', function() {
                         if (self.timerbox) {

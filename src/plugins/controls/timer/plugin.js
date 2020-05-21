@@ -178,6 +178,8 @@ export default pluginFactory({
                             self.timerbox.getElement().find('timer-wrapper').attr('aria-hidden', isReviewPanelEnabled(testRunner));
                             self.timerbox.start();
                         }
+
+                        this.$screenreaderWarningContainer.text('');
                     })
                     .on('disableitem move skip', function() {
                         if (self.timerbox) {

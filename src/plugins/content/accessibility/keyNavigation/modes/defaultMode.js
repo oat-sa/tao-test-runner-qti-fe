@@ -29,7 +29,7 @@ export default {
      */
     init(config = {}) {
         return {
-            strategies: ['rubrics', 'item', 'toolbar', 'header', 'top-toolbar', 'navigator', 'page'],
+            strategies: ['rubrics', 'stimulus', 'item', 'toolbar', 'header', 'top-toolbar', 'navigator', 'page'],
             config: Object.assign({
                 autoFocus: true,
                 keepState: true,

@@ -62,9 +62,31 @@ export default {
         this.managedNavigators = [];
         this.keyNavigators = [];
 
+        let testStatusNavigation;
         if ($navigator.length && !$navigator.hasClass('disabled')) {
             const $filters = $navigator.find(selectors.filters);
             const navigableFilters = navigableDomElement.createFromDoms($filters);
+            const $testStatusHeader = $navigator.find('.qti-navigator-info.collapsible > .qti-navigator-label');
+            const navigableTestStatus = navigableDomElement.createFromDoms($testStatusHeader);
+
+            if (navigableTestStatus.length) {
+                testStatusNavigation = keyNavigator({
+                    keepState: config.keepState,
+                    id: 'navigator-test-status',
+                    propagateTab: false,
+                    elements: navigableTestStatus,
+                    group: $testStatusHeader,
+                });
+
+                setupItemsNavigator(testStatusNavigation, {
+                    keyNextItem: config.keyNextTab || config.keyNextItem,
+                    keyPrevItem: config.keyPrevTab || config.keyPrevItem
+                });
+
+                this.keyNavigators.push(testStatusNavigation);
+                this.managedNavigators.push(testStatusNavigation);
+            }
+
             if (navigableFilters.length) {
                 filtersNavigator = keyNavigator({
                     keepState: config.keepState,
@@ -175,21 +197,17 @@ export default {
                 }
 
                 if (config.keyNextTab && config.keyPrevTab) {
-                    if (config.keyNextTab) {
-                        itemsNavigator.on(config.keyNextTab, function (elem) {
-                            if (allowedToNavigateFrom(elem) && filtersNavigator) {
-                                filtersNavigator.focus().next();
-                            }
-                        });
-                    }
+                    itemsNavigator.on(config.keyNextTab, function (elem) {
+                        if (allowedToNavigateFrom(elem) && filtersNavigator) {
+                            filtersNavigator.focus().next();
+                        }
+                    });
 
-                    if (config.keyPrevTab) {
-                        itemsNavigator.on(config.keyPrevTab, function (elem) {
-                            if (allowedToNavigateFrom(elem) && filtersNavigator) {
-                                filtersNavigator.focus().previous();
-                            }
-                        });
-                    }
+                    itemsNavigator.on(config.keyPrevTab, function (elem) {
+                        if (allowedToNavigateFrom(elem) && filtersNavigator) {
+                            filtersNavigator.focus().previous();
+                        }
+                    });
                 } else {
                     this.keyNavigators.push(itemsNavigator);
                 }

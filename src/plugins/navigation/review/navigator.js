@@ -696,23 +696,16 @@ function navigatorFactory(config, map, context) {
 
                     // select the button
                     $filters.removeClass(_cssCls.active);
+                    $filters.attr('aria-selected', false);
                     $component.removeClass(_cssCls.collapsed);
                     $btn.addClass(_cssCls.active);
+                    $btn.attr('aria-selected', true);
 
                     // filter the items
                     self.filter(mode);
 
                     //after filtering, ensure that the active item (if exists) is visible
                     self.autoScroll();
-                }
-            });
-
-            // click on a filter button
-            $filterBar.on(`focus${_selectors.component}`, _selectors.filter, function() {
-                if (!self.is('disabled')) {
-                    const $btn = $(this);
-                    $filters.attr('aria-selected', false);
-                    $btn.attr('aria-selected', true);
                 }
             });
 

@@ -13,9 +13,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2020 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
+import __ from 'i18n';
+
+/**
+ * Returns factory-like object.
+ *
+ * @param {AreaBroker} broker
+ *
+ * @returns {Object} - when you access properties it returns the corresponding element and move the focus on it.
+ *  List of availiable properties
+ *      - question
+ *      - navigation
+ *      - toolbox
+ *      - teststatus
+ */
 export const getJumpElementFactory = (broker) => ({
     get question() {
         return broker
@@ -43,18 +57,25 @@ export const getJumpElementFactory = (broker) => ({
     },
 });
 
+/**
+ * Returns testrunner item status.
+ *
+ * @param {Object} item - testrunner item
+ *
+ * @returns {String} - localized string.
+ */
 export const getItemStatus = (item) => {
     if (item.flagged) {
-        return 'Flagged for review';
+        return __('Flagged for review');
     }
 
     if (item.answered) {
-        return 'Answered';
+        return __('Answered');
     }
 
     if (item.viewed) {
-        return 'Not answered';
+        return __('Not answered');
     }
 
-    return 'Not seen';
+    return __('Not seen');
 }

@@ -44,7 +44,7 @@ export default {
      */
     init() {
         const config = this.getConfig();
-        const $jumpLinksBox = $('.jump-links-container');
+        const $jumpLinksBox = $('.content-wrap');
         const $links = $jumpLinksBox.find('.jump-link');
 
         this.keyNavigators = [];

@@ -1,7 +1,7 @@
 <nav class="jump-links-box" aria-label="{{__ "Jump Menu"}}">
     <ul>
         <li class="jump-link-item">
-            <button data-jump="question" class="jump-link" >{{__ "Jump to:"}} <b>{{__ "Question"}} - {{__ questionStatus}}</b></button>
+            <button data-jump="question" class="jump-link" >{{__ "Jump to:"}} <b>{{__ "Question"}} - {{questionStatus}}</b></button>
         </li>
         <li class="jump-link-item">
             <button data-jump="navigation" class="jump-link" >{{__ "Jump to:"}} <b>{{__ "Navigation"}}</b></button>

@@ -27,6 +27,7 @@ import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled
 import { getJumpElementFactory, getItemStatus } from './helpers';
 import jumplinksFactory from './jumplinks';
 import shortcutsFactory from './shortcuts';
+import containerTpl from './container.tpl';
 
 function findFocusable(targetElement) {
     const $elem = $(targetElement)
@@ -96,7 +97,7 @@ export default pluginFactory({
             })
             .on('changeQuesitionStatus', function changeQuesitionStatus(questionStatus) {
                 const elem = this.getElement();
-                const text = __('Question') + ' - ' + __(questionStatus);
+                const text = __('Question') + ' - ' + questionStatus;
                 elem
                     .find('[data-jump="question"] > b')
                     .text(text);
@@ -125,7 +126,7 @@ export default pluginFactory({
      * Called during the runner's render phase
      */
     render: function render() {
-        const jumplinksContainer = $('<div class="jump-links-container"></div>');
+        const jumplinksContainer = $(containerTpl());
         $('.content-wrap').prepend(jumplinksContainer);
         this.jumplinks.render(jumplinksContainer);
         this.shortcuts.render(this.getAreaBroker().getControlArea());

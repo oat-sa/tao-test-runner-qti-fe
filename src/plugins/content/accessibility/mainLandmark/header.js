@@ -26,23 +26,22 @@ import __ from 'i18n';
 import pluginFactory from 'taoTests/runner/plugin';
 import headerTpl from 'taoQtiTest/runner/plugins/content/accessibility/mainLandmark/header.tpl';
 
+function getState(item) {
+    let state = __('Unseen');
+    if (item.flagged) {
+        state = __('Flagged');
+    } else if (item.answered) {
+        state = __('Answered');
+    } else if (item.viewed) {
+        state = __('Viewed');
+    }
+    return state;
+}
 
 export default pluginFactory({
     name: 'mainLandmark',
     init() {
         const testRunner = this.getTestRunner();
-
-        const getState = (item) => {
-            let state = __('Unseen');
-            if (item.flagged) {
-                state = __('Flagged');
-            } else if (item.answered) {
-                state = __('Answered');
-            } else if (item.viewed) {
-                state = __('Viewed');
-            }
-            return state;
-        };
 
         const updateTitle = (item) => {
             this.$title

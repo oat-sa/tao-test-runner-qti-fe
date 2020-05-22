@@ -32,7 +32,7 @@ define(['lodash', 'taoQtiTest/test/runner/mocks/areaBrokerMock'], function(_, ar
 
     QUnit.test('factory', function(assert) {
         var extraArea = 'extra';
-        var areas = ['content', 'toolbox', 'navigation', 'control', 'header', 'panel'];
+        var areas = ['content', 'toolbox', 'navigation', 'mainLandmark', 'control', 'header', 'panel'];
         var broker = areaBrokerMock();
 
         assert.equal(typeof broker, 'object', 'The factory creates an object');
@@ -87,7 +87,7 @@ define(['lodash', 'taoQtiTest/test/runner/mocks/areaBrokerMock'], function(_, ar
     });
 
     QUnit.test('toolbox component', function(assert) {
-        var areas = ['content', 'toolbox', 'navigation', 'control', 'header', 'panel'];
+        var areas = ['content', 'toolbox', 'navigation', 'mainLandmark', 'control', 'header', 'panel'];
         var broker = areaBrokerMock({ areas: areas }),
             component;
 

@@ -30,16 +30,16 @@ export default {
     init(config = {}) {
         return {
             // todo: add access to the page and the rubric blocks
-            strategies: ['jump-links', 'header', 'top-toolbar', 'navigator', 'page', 'rubrics', 'item', 'toolbar'],
+            strategies: ['jump-links', 'header', 'top-toolbar', 'navigator', 'page', 'rubrics', 'stimulus', 'item', 'toolbar'],
             config: Object.assign({
                 autoFocus: false,
                 keepState: false,
                 propagateTab: true,
                 flatNavigation: true,
-                keyNextGroup: '',
-                keyPrevGroup: '',
-                keyNextItem: 'tab',
-                keyPrevItem: 'shift+tab',
+                keyNextGroup: 'tab',
+                keyPrevGroup: 'shift+tab',
+                keyNextItem: 'right down',
+                keyPrevItem: 'left up',
                 keyNextTab: '',
                 keyPrevTab: '',
                 keyNextContent: '',

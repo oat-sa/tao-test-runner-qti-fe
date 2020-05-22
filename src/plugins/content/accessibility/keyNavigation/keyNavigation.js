@@ -74,27 +74,10 @@ export default function keyNavigationFactory(testRunner, config = {}) {
                 propagateTab: navigationConfig.propagateTab
             });
 
-            if (navigationConfig.flatNavigation) {
-                navigators.forEach(navigator => {
-                    navigator
-                        .on('upperbound', () => {
-                            if (allowedToNavigateFrom(navigator)) {
-                                groupNavigator.next();
-                            }
-                        })
-                        .on('lowerbound', () => {
-                            if (allowedToNavigateFrom(navigator)) {
-                                groupNavigator.previous();
-                                groupNavigator.getCursor().navigable.last();
-                            }
-                        });
-                });
-            } else {
-                setupItemsNavigator(groupNavigator, {
-                    keyNextItem: navigationConfig.keyNextGroup,
-                    keyPrevItem: navigationConfig.keyPrevGroup
-                });
-            }
+            setupItemsNavigator(groupNavigator, {
+                keyNextItem: navigationConfig.keyNextGroup,
+                keyPrevItem: navigationConfig.keyPrevGroup
+            });
 
             shortcut
                 .remove(eventNS)

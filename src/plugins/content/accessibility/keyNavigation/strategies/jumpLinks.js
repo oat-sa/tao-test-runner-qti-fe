@@ -23,20 +23,19 @@ import {
     setupItemsNavigator,
     setupClickableNavigator
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
-import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
 
 /**
  * The identifier the keyNavigator group
  * @type {String}
  */
-const groupId = 'top-toolbar';
+const groupId = 'jump-links';
 
 /**
  * Key navigator strategy applying onto the top toolbar' bar.
  * @type {Object} keyNavigationStrategy
  */
 export default {
-    name: 'top-toolbar',
+    name: 'jump-links',
 
     /**
      * Builds the top toolbar navigation strategy.
@@ -45,9 +44,10 @@ export default {
      */
     init() {
         const config = this.getConfig();
-        const $topToolbar = this.getTestRunner().getAreaBroker().getContainer().find('.top-action-bar');
-        const $toolbarElements = $topToolbar.find('.timer-toggler');
+        const $jumpLinksBox = $('.content-wrap');
+        const $links = $jumpLinksBox.find('.jump-link');
 
+        this.keyNavigators = [];
         const registerTopToolbarNavigator = (id, group, $elements) => {
             const elements = navigableDomElement.createFromDoms($elements);
             if (elements.length) {
@@ -64,8 +64,7 @@ export default {
             }
         };
 
-        this.keyNavigators = [];
-        $toolbarElements.each((index, element) => registerTopToolbarNavigator(`${groupId}-${index}`, $topToolbar, $(element)));
+        $links.each((index, element) => registerTopToolbarNavigator(`${groupId}-${index}`, $jumpLinksBox, $(element)));
 
         return this;
     },

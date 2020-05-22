@@ -30,7 +30,7 @@ export default {
     init(config = {}) {
         return {
             // todo: add access to the page and the rubric blocks
-            strategies: ['header', 'top-toolbar', 'navigator', 'page', 'rubrics', 'stimulus', 'item', 'toolbar'],
+            strategies: ['jump-links', 'header', 'top-toolbar', 'navigator', 'page', 'rubrics', 'stimulus', 'item', 'toolbar'],
             config: Object.assign({
                 autoFocus: false,
                 keepState: false,

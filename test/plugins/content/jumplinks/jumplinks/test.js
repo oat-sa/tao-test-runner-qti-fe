@@ -29,11 +29,60 @@ define([
     QUnit.test('visual test', (assert) => {
         const $playgroundContainer = $('#playground-container');
 
+        const config = {
+            isReviewPanelEnabled: true,
+            questionStatus: '',
+        }
+
         const jumplinksComponent = componentFactory({});
 
-        jumplinksComponent.init();
+        jumplinksComponent.init(config);
         jumplinksComponent.render($playgroundContainer[0]);
 
         assert.ok(true);
+    });
+
+    QUnit.test('Test jumplinks review panel link', (assert) => {
+        const $container = $('<div id="jump-container"></div>');
+
+        const config = {
+            isReviewPanelEnabled: false,
+            questionStatus: '',
+        }
+
+        const jumplinksComponent = componentFactory({});
+
+        jumplinksComponent.init(config);
+        jumplinksComponent.render($container[0]);
+
+        const reviewClass = jumplinksComponent
+            .getElement()
+            .find('[data-jump="teststatus"]')
+            .parent()
+            .attr('class');
+
+        assert.equal(reviewClass, 'jump-link-item hidden', 'should be hidden');
+    });
+
+    QUnit.test('Test jumplinks review panel link', (assert) => {
+        const $container = $('<div id="jump-container"></div>');
+
+        const config = {
+            isReviewPanelEnabled: true,
+            questionStatus: '',
+        }
+
+        const jumplinksComponent = componentFactory({});
+
+        jumplinksComponent.init(config);
+        jumplinksComponent.render($container[0]);
+
+        const reviewClass = jumplinksComponent
+            .getElement()
+            .find('[data-jump="teststatus"]')
+            .parent()
+            .attr('class');
+
+        assert.equal(reviewClass, 'jump-link-item ', 'should be visible');
     });
 });

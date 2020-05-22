@@ -1,5 +1,6 @@
 {
     "name": "@oat-sa/tao-test-runner-qti",
+ feature/TCA-549/jump-links-additional-funcs-1
     "version": "2.6.0",
     "description": "TAO Test Runner QTI implementation",
     "files": [

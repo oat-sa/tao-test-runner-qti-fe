@@ -102,6 +102,8 @@ export default pluginFactory({
 
     /**
      * Initializes the plugin (called during runner's init)
+     *
+     * @returns {Promise}
      */
     init: function init() {
         const self = this;
@@ -168,9 +170,25 @@ export default pluginFactory({
                                 .catch(handleError);
                         }
                     })
-                    .on('enableitem', function() {
+                    .on('tick', function(elapsed) {
                         if (self.timerbox) {
-                            self.timerbox.start();
+                            const timers = self.timerbox.getTimers();
+
+                            const updatedTimers = Object.keys(timers).reduce((acc, timerName) => {
+                                acc[timerName] = Object.assign(
+                                    {},
+                                    timers[timerName],
+                                    {
+                                        remainingTime: timers[timerName].remainingTime - elapsed,
+                                    }
+                                );
+
+                                return acc;
+                            }, {});
+
+                            self.timerbox
+                                .update(updatedTimers)
+                                .catch(handleError);
                         }
                     })
                     .after('renderitem', function() {

@@ -111,16 +111,13 @@ define([
 
     QUnit.module('Plugin init');
 
-    QUnit.test('polling', function (assert) {
+    QUnit.test('tick', function (assert) {
         const ready = assert.async();
         const runner = runnerFactory(providerName);
         const plugin = pluginFactory(runner);
         const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
-        const checksCount = 3;
-        let currentCheck = 1;
-        let prevDuration;
 
-        assert.expect(checksCount);
+        assert.expect(1);
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
@@ -131,20 +128,19 @@ define([
                 runner.trigger('renderitem');
 
                 runner.getPluginStore('duration').then((durationStore) => {
-                    pollingFactory({
-                        action: () => {
-                            durationStore.getItem(itemAttemptId).then((duration) => {
-                                assert.notDeepEqual(duration, prevDuration, 'the plugin updates duration every second');
+                    runner.trigger('tick', 10000);
 
-                                if (currentCheck++ === 3) {
-                                    ready();
-                                }
+                    // add timeout to make sure that store has been updated
+                    setTimeout(
+                        () => {
+                            durationStore.getItem(itemAttemptId).then((duration) => {
+                                assert.equal(duration, 10, 'the plugin updates duration every tick');
+
+                                ready();
                             });
                         },
-                        autoStart: true,
-                        interval: 1100,
-                        max: 3
-                    });
+                        1000
+                    );
                 });
             })
             .catch((err) => {
@@ -163,9 +159,10 @@ define([
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
+
         const getDuration = (durationPromise) => {
             durationPromise.then((duration) => {
-                assert.ok(duration, 'the plugin handles plugin-get.duration event');
+                assert.equal(duration, 10, 'the plugin handles plugin-get.duration event');
 
                 ready();
             });
@@ -176,187 +173,18 @@ define([
             .then(() => {
                 runner.trigger('renderitem');
 
+                // add timeout to make sure that store has been updated
+
                 runner.getPluginStore('duration').then(() => {
+                    runner.trigger('tick', 10000);
                     setTimeout(
                         () => {
                             runner.trigger('plugin-get.duration', {}, itemAttemptId, getDuration);
                         },
-                        1100
+                        1000
                     );
                 });
-            })
-            .catch((err) => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
-    });
 
-    /**
-     * Behavior
-     */
-    QUnit.module('Lifecycle');
-
-    QUnit.test('enable', function (assert) {
-        const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner);
-        const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
-
-        assert.expect(1);
-
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
-        plugin
-            .init()
-            .then(() => {
-                plugin.enable();
-
-                runner.getPluginStore('duration').then((durationStore) => {
-                    setTimeout(
-                        () => {
-                            durationStore.getItem(itemAttemptId).then((duration) => {
-                                assert.ok(duration, 'the plugin updates duration when it is enabled');
-
-                                ready();
-                            });
-                        },
-                        1100
-                    );
-                });
-            })
-            .catch((err) => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
-    });
-
-    QUnit.test('enable', function (assert) {
-        const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner);
-        const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
-
-        assert.expect(1);
-
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
-        plugin
-            .init()
-            .then(() => {
-                plugin.enable();
-
-                runner.getPluginStore('duration').then((durationStore) => {
-                    setTimeout(
-                        () => {
-                            durationStore.getItem(itemAttemptId).then((duration) => {
-                                assert.ok(duration, 'the plugin updates duration when it is enabled');
-
-                                ready();
-                            });
-                        },
-                        1100
-                    );
-                });
-            })
-            .catch((err) => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
-    });
-
-    QUnit.test('disable', function (assert) {
-        const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner);
-        const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
-
-        assert.expect(2);
-
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
-        plugin
-            .init()
-            .then(() => {
-                plugin.enable();
-
-                runner.getPluginStore('duration').then((durationStore) => {
-                    setTimeout(
-                        () => {
-                            let updatedDuration;
-
-                            durationStore.getItem(itemAttemptId).then((duration) => {
-                                updatedDuration = duration;
-
-                                assert.ok(duration, 'the plugin updates duration when it is enabled');
-
-                                plugin.disable();
-                            });
-                            setTimeout(
-                                () => {
-                                    durationStore.getItem(itemAttemptId).then((duration) => {
-                                        assert.equal(duration, updatedDuration, 'the plugin stops updating duration after disabling');
-
-                                        ready();
-                                    });
-                                },
-                                1100
-                            );
-                        },
-                        1100
-                    );
-                });
-            })
-            .catch((err) => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
-    });
-
-    QUnit.test('destroy', function (assert) {
-        const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner);
-        const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
-
-        assert.expect(2);
-
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
-        plugin
-            .init()
-            .then(() => {
-                plugin.enable();
-
-                runner.getPluginStore('duration').then((durationStore) => {
-                    setTimeout(
-                        () => {
-                            let updatedDuration;
-
-                            durationStore.getItem(itemAttemptId).then((duration) => {
-                                updatedDuration = duration;
-
-                                assert.ok(duration, 'the plugin updates duration when it is enabled');
-
-                                plugin.destroy();
-                            });
-                            setTimeout(
-                                () => {
-                                    durationStore.getItem(itemAttemptId).then((duration) => {
-                                        assert.equal(duration, updatedDuration, 'the plugin stops updating duration after destroing');
-
-                                        ready();
-                                    });
-                                },
-                                1100
-                            );
-                        },
-                        1100
-                    );
-                });
             })
             .catch((err) => {
                 assert.ok(false, `Unexpected error: ${err}`);

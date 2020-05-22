@@ -88,7 +88,7 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
         var ready = assert.async();
         var $container = $('#qunit-fixture');
 
-        assert.expect(24);
+        assert.expect(20);
 
         countdownFactory($container, {
             id: 'timer-1',
@@ -113,7 +113,6 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
                 this.off('start.first');
 
                 assert.ok(this.is('rendered'), 'The component is still rendered');
-                assert.ok(this.is('started'), 'The component is now  started');
                 assert.ok(this.is('running'), 'The component is now running');
                 assert.ok(!this.is('completed'), 'The component is not yet completed');
 
@@ -123,7 +122,6 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
                 this.off('stop.first');
 
                 assert.ok(this.is('rendered'), 'The component is still rendered');
-                assert.ok(this.is('started'), 'The component is still  started');
                 assert.ok(!this.is('running'), 'The component is not running anymore');
                 assert.ok(!this.is('completed'), 'The component is not yet completed');
 
@@ -131,7 +129,6 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
                     this.off('start.second');
 
                     assert.ok(this.is('rendered'), 'The component is still rendered');
-                    assert.ok(this.is('started'), 'The component is still  started');
                     assert.ok(this.is('running'), 'The component is running again');
                     assert.ok(!this.is('completed'), 'The component is not yet completed');
 
@@ -141,7 +138,6 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
             })
             .on('complete', function() {
                 assert.ok(this.is('rendered'), 'The component is still rendered');
-                assert.ok(this.is('started'), 'The component is still  started');
                 assert.ok(!this.is('running'), 'The component is not running anymore');
                 assert.ok(this.is('completed'), 'The component is now completed');
 
@@ -191,40 +187,6 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
 
             ready();
         });
-    });
-
-    QUnit.test('internal countdown', function(assert) {
-        var ready = assert.async();
-        var $container = $('#qunit-fixture .timer-box');
-        var $time;
-        assert.expect(5);
-
-        countdownFactory($container, {
-            id: 'timer-1',
-            label: 'Timer 01',
-            remainingTime: 3000
-        })
-            .on('render', function() {
-                $time = $('.time', this.getElement());
-                assert.equal($time.text(), '00:00:03', 'The time is displayed');
-
-                this.start();
-            })
-            .on('start', function() {
-                setTimeout(function() {
-                    assert.equal($time.text(), '00:00:02', 'The time is displayed');
-                }, 500);
-                setTimeout(function() {
-                    assert.equal($time.text(), '00:00:01', 'The time is displayed');
-                }, 1500);
-                setTimeout(function() {
-                    assert.equal($time.text(), '00:00:00', 'The time is displayed');
-                }, 2500);
-            })
-            .on('complete', function() {
-                assert.equal($time.text(), '00:00:00', 'The time is displayed');
-                ready();
-            });
     });
 
     QUnit.test('external countdown', function(assert) {
@@ -280,7 +242,6 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
             id: 'timer-2',
             label: 'Timer 02',
             remainingTime: 3000,
-            polling: true,
             warningsForScreenreader: [
                 {
                     level: 'success',
@@ -292,6 +253,9 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
         })
             .on('render', function() {
                 this.start();
+            })
+            .on('start', function() {
+                this.update(2000);
             })
             .on('warnscreenreader', (messageArg, remainingTime, scopeArg) => {
                 assert.equal(messageArg, message, 'the message is provided');
@@ -305,9 +269,10 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
     QUnit.module('Visual test');
 
     QUnit.test('Countdow', function(assert) {
-        var ready = assert.async();
-        var remaining = 10000;
-        var container = document.querySelector('#visual .timer-box');
+        const ready = assert.async();
+        const remaining = 10000;
+        const container = document.querySelector('#visual .timer-box');
+        let ticksCount = 10;
 
         assert.expect(1);
 
@@ -328,8 +293,18 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/countdown'
                 }
             ]
         })
+            .on('start', function() {
+                const self = this;
+
+                this.ticksInterval = setInterval(function() {
+                    self.update(--ticksCount * 1000);
+                }, 1000);
+            })
             .on('complete', function() {
                 assert.ok(true);
+
+                clearInterval(this.ticksInterval);
+
                 ready();
             })
             .on('change', function() {

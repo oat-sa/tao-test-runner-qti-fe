@@ -139,6 +139,22 @@ function canFlag(testRunner) {
 }
 
 /**
+ * Make review panel header visible for screen readers
+ * @param {Object} $header - the panel header element
+ */
+function showHeader($header) {
+    $header.attr('aria-hidden', false);
+}
+
+/**
+ * Make review panel header invisible for screen readers
+ * @param {Object} $header - the panel header element
+ */
+function hideHeader($header) {
+    $header.attr('aria-hidden', true);
+}
+
+/**
  * Creates the timer plugin
  */
 export default pluginFactory({
@@ -250,9 +266,11 @@ export default pluginFactory({
             if (isHidden) {
                 self.explicitlyHidden = false;
                 self.navigator.show();
+                showHeader(self.$header);
             } else {
                 self.explicitlyHidden = true;
                 self.navigator.hide();
+                hideHeader(self.$header);
             }
             updateButton(self.toggleButton, getToggleButtonData(self.navigator));
         }
@@ -278,6 +296,10 @@ export default pluginFactory({
         testRunner.on('alert.notallowed', function() {
             self.navigator.select(previousItemPosition);
         });
+
+        this.$header = this.getAreaBroker()
+            .getPanelArea()
+            .find('#test-sidebar-left-header');
 
         this.explicitlyHidden = false;
 
@@ -454,8 +476,10 @@ export default pluginFactory({
 
         if (!this.explicitlyHidden) {
             this.navigator.show();
+            showHeader(this.$header);
         } else {
             this.navigator.hide();
+            hideHeader(this.$header);
         }
     },
 
@@ -466,5 +490,6 @@ export default pluginFactory({
         this.flagItemButton.hide();
         this.toggleButton.hide();
         this.navigator.hide();
+        hideHeader(this.$header);
     }
 });

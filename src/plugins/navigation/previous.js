@@ -129,7 +129,7 @@ export default pluginFactory({
             var context = testRunner.getTestContext();
 
             function enableNav() {
-                testRunner.trigger('disablenav');
+                testRunner.trigger('enablenav');
             }
 
             function triggerAction() {
@@ -146,7 +146,7 @@ export default pluginFactory({
                             'You are about to go to the previous item. Click OK to continue and go to the previous item.'
                         ),
                         triggerAction, // if the test taker accept
-                        enableNav() // if he refuses
+                        enableNav // if he refuses
                     );
                 } else {
                     triggerAction();

@@ -152,12 +152,15 @@ export default {
                             return position;
                         });
 
-                        navigator.on('focus', cursor => {
-                            const $element = cursor.navigable.getElement();
-                            if (!$element.is(':checked')) {
-                                $element.click();
-                            }
-                        });
+                        // applies WCAG behavior for the radio buttons
+                        if (config.wcagBehavior) {
+                            navigator.on('focus', cursor => {
+                                const $element = cursor.navigable.getElement();
+                                if (!$element.is(':checked')) {
+                                    $element.click();
+                                }
+                            });
+                        }
                     }
                 } else {
                     addNavigator($itemElement, $itemElement);

@@ -15,7 +15,7 @@
         {{#each shortcutsGroups}}
             <div class="shortcuts-group-wrapper">
                 <h4 class="shortcuts-group">{{label}}</h4>
-                <ul>
+                <ul class="shortcuts-group-list">
                     {{#each shortcuts}}
                         <li
                             class="shortcut-item"
@@ -31,7 +31,7 @@
         {{#each shortcutsGroups}}
             <div class="shortcuts-group-wrapper">
                 <h4 class="shortcuts-group">{{label}}</h4>
-                <dl>
+                <dl class="shortcuts-group-list">
                     {{#each shortcuts}}
                         <div
                             aria-labelledby="{{id}}-term {{id}}-definition"

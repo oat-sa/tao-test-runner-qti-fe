@@ -71,6 +71,35 @@
           }
       }
 
+      .shortcuts-group {
+          font-size: 18px;
+          margin-top: 20px;
+
+          &:focus {
+              outline: 3px solid $actionLinkColor;
+              outline-offset: 3px;
+          }
+      }
+      .shortcuts-group-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+
+          .shortcut-item {
+            float: none;
+            display: flex;
+            margin: 0;
+
+            span,
+            dt,
+            dd {
+                flex: 0 1 50%;
+                margin: 0;
+                text-align: center;
+            }
+          }
+      }
+
       .btn-close {
           background-color: transparent;
           box-shadow: none;
@@ -94,5 +123,4 @@
       }
     }
   }
-
 }

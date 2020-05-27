@@ -34,6 +34,7 @@ import * as strategies from 'taoQtiTest/runner/plugins/content/accessibility/key
  * Defines the config structure for the navigation strategies
  * @typedef {Object} keyNavigationStrategyConfig
  * @property {Boolean} autoFocus - auto select the main action when available in a group
+ * @property {Boolean} wcagBehavior - apply WCAG recommended behavior for radio buttons and similar elements
  * @property {Boolean} keepState - for strategies able to keep the state, allow to keep the position of the focused
  * element when moving away from the group and restore it when the group retrieves the focus
  * @property {Boolean} propagateTab - propagate the Tab key to the upper level

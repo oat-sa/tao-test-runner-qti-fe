@@ -139,7 +139,8 @@ export default {
                         $inputs.each((i, input) => addInputsNavigator($(input), $itemElement));
                     } else {
                         const navigator = addInputsNavigator($inputs, $itemElement, true, () => {
-                            let position = 0;
+                            // keep default positioning for now
+                            let position = -1;
 
                             // autofocus the selected radio button if any
                             $inputs.each((index, input) => {

@@ -29,6 +29,69 @@
       color: $textColor !important;
       border: 3px solid $textColor;
       text-shadow: none !important;
+      position: relative;
+
+      .shortcuts-list-title {
+        font-size: 24px;
+        margin-top: 0;
+      }
+
+      .shortcuts-table-wrapper {
+          margin-bottom: 10px;
+
+          .shortcuts-table-title {
+              font-size: 18px;
+              margin-top: 20px;
+
+              &:focus {
+                  outline: 3px solid $actionLinkColor;
+                  outline-offset: 3px;
+              }
+          }
+
+          .shortcuts-table {
+              width: 100%;
+
+              .shortcuts-table-row {
+                  .shortcuts-table-head-cell,
+                  .shortcuts-table-cell {
+                      text-align: center;
+                      width: 50%;
+                  }
+
+                  &:focus {
+                      outline: 3px solid $actionLinkColor;
+                      outline-offset: 3px;
+                  }
+              }
+          }
+
+          &:last-child {
+              margin-bottom: 0;
+          }
+      }
+
+      .btn-close {
+          background-color: transparent;
+          box-shadow: none;
+          height: 20px;
+          padding: 0;
+          position: absolute;
+          right: 12px;
+          top: 10px;
+          width: 20px;
+
+          .icon-close {
+              color: $textColor;
+              font-size: 20px;
+              padding: 0;
+          }
+
+          &:focus {
+              outline: 3px solid $actionLinkColor;
+              outline-offset: 3px;
+          }
+      }
     }
   }
 

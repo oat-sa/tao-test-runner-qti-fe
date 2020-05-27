@@ -21,14 +21,46 @@
  *
  * @author aliaksandr paliakou <lecosson@gmail.com>
  */
+import __ from 'i18n';
 import _ from 'lodash';
 import component from 'ui/component';
+import keyNavigator from 'ui/keyNavigation/navigator';
+import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import shortcutsTpl from 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/shortcuts.tpl';
 
 /**
  * Default config values, see below.
  */
-const defaults = {};
+const defaults = {
+    shortcutsGroups: [
+        {
+            id: 'navigation-shortcuts',
+            label: __('Navigation shortcuts'),
+            shortcuts: [
+                {
+                    id: 'next',
+                    shortcut: 'ALT + Shift + N',
+                    label: __('Go to the next question'),
+                },
+                {
+                    id: 'previous',
+                    shortcut: 'ALT + Shift + P',
+                    label: __('Go to the previous question'),
+                },
+                {
+                    id: 'current',
+                    shortcut: 'ALT + Shift + Q',
+                    label: __('Go to the current question'),
+                },
+                {
+                    id: 'top',
+                    shortcut: 'ALT + Shift + T',
+                    label: __('Go to the top of the page'),
+                },
+            ]
+        },
+    ]
+};
 
 /**
  * Creates and initialize the shortcuts component.
@@ -39,14 +71,67 @@ const defaults = {};
  * @returns {shortcutsBox} the component, initialized and rendered
  */
 export default function shortcutsBoxFactory(config) {
+    const shortcutsBox = component({}, defaults)
+        .on('render', function () {
+            const $element = this.getElement();
+            const $closeBtn = $element.find('.btn-close');
+            const $keyNavigationItems = this.getElement()
+                .find('.shortcuts-list, .shortcuts-group, .shortcut-item, .shortcuts-table-title, .shortcuts-table-head-cell, .shortcuts-table-row, .btn-close');
 
-    const shortcutsBox = component({}, defaults);
+            $closeBtn.on('click', () => this.trigger('close'));
+            $element.on('click', (e) => {
+                if ($element.is(e.target)) {
+                    this.trigger('close');
+                }
+            });
+
+            this.navigator = keyNavigator({
+                elements: navigableDomElement.createFromDoms($keyNavigationItems),
+                propagateTab: false
+            })
+                .on('right down', function () {
+                    this.next();
+                })
+                .on('left up', function () {
+                    this.previous();
+                })
+                .on('tab', function () {
+                    if (this.getCursor().position === $keyNavigationItems.length - 1) {
+                        this.setCursorAt(1);  // Skip container.
+                    } else {
+                        this.next();
+                    }
+                })
+                .on('shift+tab', function () {
+                    if (this.getCursor().position === 1) {  // Skip container.
+                        this.last();
+                    } else {
+                        this.previous();
+                    }
+                })
+                // prevent focus move from shortcuts modal
+                .on('blur', () => {
+                    _.defer(() => {
+                        if (!this.navigator.isFocused()) {
+                            this.navigator.focus();
+                        }
+                    });
+                })
+                .on('activate', function (cursor) {
+                    cursor.navigable.getElement().click();
+                });
+
+            this.navigator.first();
+        })
+        .on('destroy', function () {
+            this.navigator.destroy();
+
+            this.getElement().remove();
+        });
 
     shortcutsBox.setTemplate(shortcutsTpl);
 
-    _.defer(function() {
-        shortcutsBox.init(config);
-    });
+    shortcutsBox.init(config);
 
     return shortcutsBox;
 }

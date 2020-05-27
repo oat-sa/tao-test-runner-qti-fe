@@ -78,4 +78,4 @@ export const getItemStatus = (item) => {
     }
 
     return __('Not seen');
-}
+};

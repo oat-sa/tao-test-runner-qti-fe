@@ -29,21 +29,6 @@ import jumplinksFactory from './jumplinks';
 import shortcutsFactory from './shortcuts';
 import containerTpl from './container.tpl';
 
-function findFocusable(targetElement) {
-    const $elem = $(targetElement)
-        .find(':not(.hidden)[tabindex]').first();
-    return $elem;
-}
-
-/**
- * close shortcuts popup
- */
-function closeShortcuts() {
-    this.shortcuts.hide();
-    this.shortcuts.getElement().off('click', this.closeShortcuts);
-    $(window).off('keydown', this.closeShortcuts);
-}
-
 /**
  * Creates the JumpLinks plugin.
  * adding jumplinks accessibility feature for quick navigation
@@ -60,31 +45,37 @@ export default pluginFactory({
         const config = {
             isReviewPanelEnabled: isReviewPanelEnabled(testRunner),
             questionStatus: getItemStatus(item)
-        }
+        };
 
         this.jumplinks = jumplinksFactory(config)
             .on('render', () => {
-                const closeShortcutsHandler = closeShortcuts.bind(this);
                 this.jumplinks.on('jump', (jumpTo) => {
                     const areaBroker = this.getAreaBroker();
                     const $element = getJumpElementFactory(areaBroker)[jumpTo];
                     $element.focus();
                 });
+
                 this.jumplinks.on('shortcuts', () => {
-                    this.shortcuts.show();
-                    this.shortcuts.getElement()
-                        .off('click', closeShortcutsHandler)
-                        .on('click', closeShortcutsHandler);
-                    $(window)
-                        .off('keydown', closeShortcutsHandler)
-                        .on('keydown', closeShortcutsHandler);
+                    if (this.shortcuts) {
+                        return;
+                    }
+
+                    this.shortcuts = shortcutsFactory({});
+
+                    this.shortcuts.render(this.getAreaBroker().getControlArea());
+
+                    this.shortcuts.on('close', () => {
+                        this.shortcuts.destroy();
+
+                        this.shortcuts = null;
+                    });
                 });
             })
             .on('update', function update(params) {
                 this.trigger('changeReviewPanel', params.isReviewPanelEnabled);
                 this.trigger('changeQuesitionStatus', params.questionStatus);
             })
-            .on('changeReviewPanel', function changeReviewPanel (enabled) {
+            .on('changeReviewPanel', function changeReviewPanel(enabled) {
                 const elem = this.getElement();
                 const panelJumplink = elem
                     .find('[data-jump="teststatus"]')
@@ -97,29 +88,30 @@ export default pluginFactory({
             })
             .on('changeQuesitionStatus', function changeQuesitionStatus(questionStatus) {
                 const elem = this.getElement();
-                const text = __('Question') + ' - ' + questionStatus;
+                const text = `${__('Question')} - ${questionStatus}`;
                 elem
                     .find('[data-jump="question"] > b')
                     .text(text);
             });
-        
+
         testRunner
             .on('loaditem', () => {
-                const item = testRunner.getCurrentItem();
-                const config = {
+                const currentItem = testRunner.getCurrentItem();
+                const updatedConfig = {
                     isReviewPanelEnabled: isReviewPanelEnabled(testRunner),
-                    questionStatus: getItemStatus(item)
-                }
+                    questionStatus: getItemStatus(currentItem)
+                };
 
-                this.jumplinks.trigger('update', config);
+                this.jumplinks.trigger('update', updatedConfig);
             })
             .on('tool-flagitem', () => {
-                const item = testRunner.getCurrentItem();
-                const questionStatus = getItemStatus({ ...item, flagged: !item.flagged });
+                const currentItem = testRunner.getCurrentItem();
+                const questionStatus = getItemStatus(
+                    Object.assign(currentItem, { flagged: !item.flagged })
+                );
 
                 this.jumplinks.trigger('changeQuesitionStatus', questionStatus);
-            })
-        this.shortcuts = shortcutsFactory({});
+            });
     },
 
     /**
@@ -129,6 +121,5 @@ export default pluginFactory({
         const jumplinksContainer = $(containerTpl());
         $('.content-wrap').prepend(jumplinksContainer);
         this.jumplinks.render(jumplinksContainer);
-        this.shortcuts.render(this.getAreaBroker().getControlArea());
     },
 });

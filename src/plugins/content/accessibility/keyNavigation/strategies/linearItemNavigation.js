@@ -40,14 +40,12 @@ export default {
     init() {
         const config = this.getConfig();
         const $content = this.getTestRunner().getAreaBroker().getContentArea();
-        const $qtiIteractionsNodeList = $content
+        const $qtiInteractions = $content
             .find('.key-navigation-focusable,.qti-interaction')
-            .filter(function () {
-                //filter out interaction as it will be managed separately
-                return !$(this).parents('.qti-interaction').length;
-            });
+            //filter out interaction as it will be managed separately
+            .filter((i, node) => !$(node).parents('.qti-interaction').length);
 
-        const $qtiChoiceNodesList = $qtiIteractionsNodeList.find('.qti-choice');
+        const $qtiChoices = $qtiInteractions.find('.qti-choice');
         let $lastParent = null;
         let list = [];
         const setupListNavigator = () => {
@@ -67,9 +65,11 @@ export default {
         this.choicesNavigators = [];
 
         // the item focusable body elements are considered scrollable
-        $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
+        $content
+            .find('.key-navigation-focusable')
+            .addClass('key-navigation-scrollable');
 
-        $qtiChoiceNodesList.each((i, el) => {
+        $qtiChoices.each((i, el) => {
             const $itemElement = $(el);
             const $parent = $itemElement.parent();
             const choiceNavigator = keyNavigator({

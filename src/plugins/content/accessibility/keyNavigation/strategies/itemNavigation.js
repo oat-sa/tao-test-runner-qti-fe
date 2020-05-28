@@ -153,7 +153,7 @@ export default {
                         });
 
                         // applies WCAG behavior for the radio buttons
-                        if (config.wcagBehavior) {
+                        if (navigator && config.wcagBehavior) {
                             navigator.on('focus', cursor => {
                                 const $element = cursor.navigable.getElement();
                                 if (!$element.is(':checked')) {

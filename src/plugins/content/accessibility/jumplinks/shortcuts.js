@@ -90,10 +90,14 @@ export default function shortcutsBoxFactory(config) {
                 propagateTab: false
             })
                 .on('right down', function () {
-                    this.next();
+                    if (this.getCursor().position !== $keyNavigationItems.length - 2) {
+                        this.next();
+                    }
                 })
                 .on('left up', function () {
-                    this.previous();
+                    if (this.getCursor().position !== 1) {
+                        this.previous();
+                    }
                 })
                 .on('tab', function () {
                     if (this.getCursor().position === $keyNavigationItems.length - 1) {

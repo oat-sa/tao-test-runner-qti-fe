@@ -35,9 +35,12 @@
                     {{#each shortcuts}}
                         <li
                             class="shortcut-item"
-                            aria-label="{{__ "Shortcut"}}: {{shortcut}}. {{__ "Action"}}: {{label}}."
                         >
-                            <span aria-hidden="true"><kbd>{{shortcut}}</kbd></span>
+                            <span
+                                aria-label="{{__ "Shortcut"}}: {{shortcut}}. {{__ "Action"}}: {{label}}."
+                            >
+                                <kbd>{{shortcut}}</kbd>
+                            </span>
                             <span aria-hidden="true">{{label}}</span>
                         </li>
                     {{/each}}

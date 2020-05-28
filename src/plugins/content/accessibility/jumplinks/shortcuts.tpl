@@ -20,8 +20,25 @@
                         <li
                             class="shortcut-item"
                         >
-                            <span>{{shortcut}}</span>
+                            <span><kbd>{{shortcut}}</kbd></span>
                             <span>{{label}}</span>
+                        </li>
+                    {{/each}}
+                    <!-- Other terms and descriptions -->
+                </ul>
+            </div>
+        {{/each}}
+        {{#each shortcutsGroups}}
+            <div class="shortcuts-group-wrapper">
+                <h4 class="shortcuts-group">{{label}}</h4>
+                <ul class="shortcuts-group-list">
+                    {{#each shortcuts}}
+                        <li
+                            class="shortcut-item"
+                            aria-label="{{__ "Shortcut"}}: {{shortcut}}. {{__ "Action"}}: {{label}}."
+                        >
+                            <span aria-hidden="true"><kbd>{{shortcut}}</kbd></span>
+                            <span aria-hidden="true">{{label}}</span>
                         </li>
                     {{/each}}
                     <!-- Other terms and descriptions -->
@@ -37,7 +54,7 @@
                             aria-labelledby="{{id}}-term {{id}}-definition"
                             class="shortcut-item"
                         >
-                            <dt id="{{id}}-term">{{shortcut}}</dt>
+                            <dt id="{{id}}-term"><kbd>{{shortcut}}</kbd></dt>
                             <dd id="{{id}}-definition">{{label}}</dd>
                         </div>
                     {{/each}}

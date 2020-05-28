@@ -13,7 +13,7 @@
             <button data-jump="teststatus" class="jump-link" >{{__ "Jump to:"}} <b>{{__ "Test Status and Structure"}}</b></button>
         </li>
         <li class="jump-link-item">
-            <button data-jump="shortcuts" class="jump-link" ><b>{{__ "Open Keyboard Shortcuts"}}</b></button>
+            <button data-jump="shortcuts" class="jump-link" ><b>{{__ "Jump to:"}} {{__ "Open Keyboard Shortcuts"}}</b></button>
         </li>
     </ul>
 </nav>

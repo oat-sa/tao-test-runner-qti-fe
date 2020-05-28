@@ -410,6 +410,9 @@ var menuComponentApi = {
                 this.closeMenu();
             }
             // move to the menu button
+        } else if (this.hoverIndex === 0) {
+            this.hoverIndex--;
+            this.closeMenu();
         }
     },
 

@@ -55,7 +55,8 @@ export default {
                     id,
                     group,
                     elements,
-                    propagateTab: false
+                    propagateTab: false,
+                    defaultPosition: 0
                 });
 
                 setupItemsNavigator(navigator, config);

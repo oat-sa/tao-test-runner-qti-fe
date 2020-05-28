@@ -80,43 +80,29 @@ export default pluginFactory({
                 .show();
         };
 
-        const getTimerMessage = (hours, minutes, unansweredQuestions) => {
+        const getTimerMessage = (hours, minutes, seconds, unansweredQuestions) => {
             let timerMessage;
 
-            if (hours > 0) {
-                timerMessage = typeof unansweredQuestions === 'number'
-                    ? __(
-                        '%s hours %s minutes to answer remaining %s questions.',
-                        hours,
-                        minutes,
-                        unansweredQuestions
-                    )
-                    : timerMessage = __(
-                        '%s hours %s minutes to answer the current question.',
-                        hours,
-                        minutes
-                    );
-            } else if (minutes > 0) {
-                timerMessage = typeof unansweredQuestions === 'number'
-                    ? __(
-                        '%s minutes to answer remaining %s questions.',
-                        minutes,
-                        unansweredQuestions
-                    )
-                    : __(
-                        '%s minutes to answer the current question.',
-                        minutes
-                    );
+            var timeArr = [hours, minutes, seconds];
+            var timeArgArr = [];
+            [__('hours'), __('minutes'), __('seconds')].forEach((unit, idx) => {
+                if (timeArr[idx] > 0) {
+                    timeArgArr.push(`${timeArr[idx]} ${unit}`);
+                }
+            });
+
+            let answeredMessage;
+            if (typeof unansweredQuestions !== 'number') {
+                answeredMessage = __('the current question');
             } else {
-                timerMessage = typeof unansweredQuestions === 'number'
-                    ? __(
-                        'Less than one minute to answer remaining %s questions.',
-                        unansweredQuestions
-                    )
-                    : __(
-                        'Less than one minute to answer the current question.'
-                    );
+                let questionsMessage = __('questions');
+                if (unansweredQuestions === 1) {
+                    questionsMessage = __('question');
+                }
+                answeredMessage = __('remaining %s %s', unansweredQuestions, questionsMessage);
             }
+
+            timerMessage = __('%s to answer %s', timeArgArr.join(', '), answeredMessage);
 
             return timerMessage;
         };
@@ -144,12 +130,14 @@ export default pluginFactory({
                     $timer,
                     hours: currentHours,
                     minutes: currentMinutes,
+                    seconds: currentSeconds,
                     stats,
                     unansweredQuestions: currentUnansweredQuestions,
                 } = this.titles[scope];
                 const time = moment.duration(remainingTime / precision, 'seconds');
                 const hours = time.get('hours');
                 const minutes = time.get('minutes');
+                const seconds = time.get('seconds');
                 const unansweredQuestions = stats && (stats.questions - stats.answered);
 
                 // check if notification should be updated
@@ -159,11 +147,8 @@ export default pluginFactory({
                     || (unansweredQuestions && (unansweredQuestions !== currentUnansweredQuestions))
                 ) {
                     // update current timer state
-                    this.titles[scope].hours = hours;
-                    this.titles[scope].minutes = minutes;
-                    this.titles[scope].unansweredQuestions = unansweredQuestions;
-
-                    $timer.text(getTimerMessage(hours, minutes, unansweredQuestions));
+                    this.titles[scope] = {...this.titles[scope], hours, minutes, seconds, unansweredQuestions};
+                    $timer.text(getTimerMessage(hours, minutes, seconds, unansweredQuestions));
                 }
             })
             .on('unloaditem', () => {

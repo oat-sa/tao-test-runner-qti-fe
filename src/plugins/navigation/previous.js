@@ -161,7 +161,7 @@ export default pluginFactory({
 
         if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
             shortcut.add(
-                namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
+                namespaceHelper.namespaceAll('Alt+Shift+P', this.getName(), true),
                 function() {
                     if (canDoPrevious() && self.getState('enabled') === true) {
                         testRunner.trigger('nav-previous', [true]);

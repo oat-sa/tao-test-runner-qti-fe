@@ -31,6 +31,10 @@ import __ from 'i18n';
  *      - teststatus
  */
 export const getJumpElementFactory = (broker) => ({
+    get container() {
+        return broker
+            .getContainer();
+    },
     get question() {
         return broker
             .getContainer()

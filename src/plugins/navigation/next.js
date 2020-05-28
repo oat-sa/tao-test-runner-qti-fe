@@ -208,7 +208,7 @@ export default pluginFactory({
 
         if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
             shortcut.add(
-                namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true),
+                namespaceHelper.namespaceAll('Alt+Shift+N', this.getName(), true),
                 function() {
                     if (self.getState('enabled') === true) {
                         testRunner.trigger('nav-next', true);

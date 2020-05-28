@@ -27,6 +27,8 @@ import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled
 import { getJumpElementFactory, getItemStatus } from './helpers';
 import jumplinksFactory from './jumplinks';
 import shortcutsFactory from './shortcuts';
+import shortcut from 'util/shortcut';
+import namespaceHelper from 'util/namespace';
 import containerTpl from './container.tpl';
 
 /**
@@ -46,12 +48,39 @@ export default pluginFactory({
             isReviewPanelEnabled: isReviewPanelEnabled(testRunner),
             questionStatus: getItemStatus(item)
         };
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const areaBroker = this.getAreaBroker();
+        const getJumpElement = getJumpElementFactory(areaBroker);
+
+        if (testRunnerOptions.allowShortcuts) {
+            shortcut.add(
+                namespaceHelper.namespaceAll('Alt+Shift+T', this.getName(), true),
+                function() {
+                    getJumpElement.container.focus();
+                },
+                {
+                    avoidInput: true,
+                    prevent: true
+                }
+            );
+
+            shortcut.add(
+                namespaceHelper.namespaceAll('Alt+Shift+Q', this.getName(), true),
+                function() {
+                    getJumpElement.question.focus();
+                },
+                {
+                    avoidInput: true,
+                    prevent: true
+                }
+            );
+        }
 
         this.jumplinks = jumplinksFactory(config)
             .on('render', () => {
                 this.jumplinks.on('jump', (jumpTo) => {
-                    const areaBroker = this.getAreaBroker();
-                    const $element = getJumpElementFactory(areaBroker)[jumpTo];
+                    const $element = getJumpElement[jumpTo];
                     $element.focus();
                 });
 

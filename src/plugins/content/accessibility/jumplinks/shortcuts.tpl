@@ -39,7 +39,7 @@
                             <span
                                 aria-label="{{__ "Shortcut"}}: {{shortcut}}. {{__ "Action"}}: {{label}}."
                             >
-                                <kbd>{{shortcut}}</kbd>
+                                <kbd aria-hidden="true">{{shortcut}}</kbd>
                             </span>
                             <span aria-hidden="true">{{label}}</span>
                         </li>

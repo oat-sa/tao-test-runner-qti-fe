@@ -52,12 +52,44 @@ export default pluginFactory({
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
         const areaBroker = this.getAreaBroker();
         const getJumpElement = getJumpElementFactory(areaBroker);
+        const shortcutsConfig = navigator.appVersion.indexOf("Mac") !== -1
+            ? {
+                shortcutsGroups: [
+                    {
+                        id: 'navigation-shortcuts',
+                        label: __('Navigation shortcuts'),
+                        shortcuts: [
+                            {
+                                id: 'next',
+                                shortcut: 'OPTION + Shift + N',
+                                label: __('Go to the next question'),
+                            },
+                            {
+                                id: 'previous',
+                                shortcut: 'OPTION + Shift + P',
+                                label: __('Go to the previous question'),
+                            },
+                            {
+                                id: 'current',
+                                shortcut: 'OPTION + Shift + Q',
+                                label: __('Go to the current question'),
+                            },
+                            {
+                                id: 'top',
+                                shortcut: 'OPTION + Shift + T',
+                                label: __('Go to the top of the page'),
+                            },
+                        ]
+                    },
+                ]
+            }
+            : {};
 
         if (testRunnerOptions.allowShortcuts) {
             shortcut.add(
                 namespaceHelper.namespaceAll('Alt+Shift+T', this.getName(), true),
                 function() {
-                    getJumpElement.container.focus();
+                    $('body').attr('tabindex', '-1').focus();
                 },
                 {
                     avoidInput: true,
@@ -89,7 +121,7 @@ export default pluginFactory({
                         return;
                     }
 
-                    this.shortcuts = shortcutsFactory({});
+                    this.shortcuts = shortcutsFactory(shortcutsConfig);
 
                     this.shortcuts.render(this.getAreaBroker().getControlArea());
 

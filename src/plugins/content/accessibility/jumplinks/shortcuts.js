@@ -76,7 +76,7 @@ export default function shortcutsBoxFactory(config) {
             const $element = this.getElement();
             const $closeBtn = $element.find('.btn-close');
             const $keyNavigationItems = this.getElement()
-                .find('.shortcuts-list, .shortcuts-group, .shortcut-item, .shortcuts-table-title, .shortcuts-table-head-cell, .shortcuts-table-row, .btn-close');
+                .find('.shortcuts-list, .btn-close, .shortcut-item');
 
             $closeBtn.on('click', () => this.trigger('close'));
             $element.on('click', (e) => {
@@ -90,12 +90,12 @@ export default function shortcutsBoxFactory(config) {
                 propagateTab: false
             })
                 .on('right down', function () {
-                    if (this.getCursor().position !== $keyNavigationItems.length - 2) {
+                    if (this.getCursor().position > 1) {
                         this.next();
                     }
                 })
                 .on('left up', function () {
-                    if (this.getCursor().position !== 1) {
+                    if (this.getCursor().position !== 2) {
                         this.previous();
                     }
                 })

@@ -25,53 +25,22 @@
       height: auto;
       min-height: 300px;
       padding: 30px !important;
-      background: $uiClickableDefaultBg;
       color: $textColor !important;
-      border: 3px solid $textColor;
       text-shadow: none !important;
       position: relative;
+      background-color: $uiGeneralContentBg;
+      border: 1px solid $uiGeneralContentBorder;
+
+      .shortcuts-list-description {
+        width: 450px;
+      }
 
       .shortcuts-list-title {
         font-size: 24px;
         margin-top: 0;
       }
 
-      .shortcuts-table-wrapper {
-          margin-bottom: 10px;
-
-          .shortcuts-table-title {
-              font-size: 18px;
-              margin-top: 20px;
-
-              &:focus {
-                  outline: 3px solid $actionLinkColor;
-                  outline-offset: 3px;
-              }
-          }
-
-          .shortcuts-table {
-              width: 100%;
-
-              .shortcuts-table-row {
-                  .shortcuts-table-head-cell,
-                  .shortcuts-table-cell {
-                      text-align: center;
-                      width: 50%;
-                  }
-
-                  &:focus {
-                      outline: 3px solid $actionLinkColor;
-                      outline-offset: 3px;
-                  }
-              }
-          }
-
-          &:last-child {
-              margin-bottom: 0;
-          }
-      }
-
-      .shortcuts-group {
+      .shortcuts-group-title {
           font-size: 18px;
           margin-top: 20px;
 
@@ -80,22 +49,30 @@
               outline-offset: 3px;
           }
       }
+
       .shortcuts-group-list {
           list-style: none;
           margin: 0;
           padding: 0;
 
           .shortcut-item {
-            float: none;
+            display: -ms-flexbox;
+            display: -webkit-flex;
             display: flex;
+            float: none;
             margin: 0;
 
-            span,
-            dt,
-            dd {
+            .shortcut-item-action,
+            .shortcut-item-shortcut {
+                -ms-flex : 0 1 50%;
+                -webkit-flex: 0 1 50%;
                 flex: 0 1 50%;
                 margin: 0;
                 text-align: center;
+            }
+
+            .shortcut-item-action {
+                text-align: left;
             }
           }
       }

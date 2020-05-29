@@ -244,7 +244,7 @@ var menuComponentApi = {
         this.trigger('closemenu', this);
 
         // Move focus if the menu wasn't disabled before the close action was launched.
-        if (!this.is('disabled') || !this.$component.prop('disabled')) {
+        if (!this.is('disabled') && !this.$component.prop('disabled')) {
             this.$menuButton.parent().focus();  // It needs for screenreaders to correctly read menu button after submenu was closed
         }
     },

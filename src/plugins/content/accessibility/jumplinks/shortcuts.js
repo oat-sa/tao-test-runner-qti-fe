@@ -76,7 +76,7 @@ export default function shortcutsBoxFactory(config) {
             const $element = this.getElement();
             const $closeBtn = $element.find('.btn-close');
             const $keyNavigationItems = this.getElement()
-                .find('.shortcuts-list, .btn-close, .shortcut-item');
+                .find('.shortcuts-list, .btn-close');
 
             $closeBtn.on('click', () => this.trigger('close'));
             $element.on('click', (e) => {
@@ -89,29 +89,12 @@ export default function shortcutsBoxFactory(config) {
                 elements: navigableDomElement.createFromDoms($keyNavigationItems),
                 propagateTab: false
             })
-                .on('right down', function () {
-                    if (this.getCursor().position > 1) {
-                        this.next();
-                    }
-                })
-                .on('left up', function () {
-                    if (this.getCursor().position !== 2) {
-                        this.previous();
-                    }
-                })
+                // keep cursor at close button
                 .on('tab', function () {
-                    if (this.getCursor().position === $keyNavigationItems.length - 1) {
-                        this.setCursorAt(1);  // Skip container.
-                    } else {
-                        this.next();
-                    }
+                    this.setCursorAt(1);
                 })
                 .on('shift+tab', function () {
-                    if (this.getCursor().position === 1) {  // Skip container.
-                        this.last();
-                    } else {
-                        this.previous();
-                    }
+                    this.setCursorAt(1);
                 })
                 // prevent focus move from shortcuts modal
                 .on('blur', () => {

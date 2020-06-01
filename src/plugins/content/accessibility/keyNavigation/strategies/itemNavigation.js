@@ -148,12 +148,14 @@ export default {
                             return position;
                         });
 
-                        navigator.on('focus', cursor => {
-                            const $element = cursor.navigable.getElement();
-                            if (!$element.is(':checked')) {
-                                $element.click();
-                            }
-                        });
+                        if (navigator) {
+                            navigator.on('focus', cursor => {
+                                const $element = cursor.navigable.getElement();
+                                if (!$element.is(':checked')) {
+                                    $element.click();
+                                }
+                            });
+                        }
                     }
                 } else {
                     addNavigator($itemElement, $itemElement);

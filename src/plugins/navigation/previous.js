@@ -129,7 +129,7 @@ export default pluginFactory({
             var context = testRunner.getTestContext();
 
             function enableNav() {
-                testRunner.trigger('disablenav');
+                testRunner.trigger('enablenav');
             }
 
             function triggerAction() {
@@ -146,7 +146,7 @@ export default pluginFactory({
                             'You are about to go to the previous item. Click OK to continue and go to the previous item.'
                         ),
                         triggerAction, // if the test taker accept
-                        enableNav() // if he refuses
+                        enableNav // if he refuses
                     );
                 } else {
                     triggerAction();
@@ -159,20 +159,24 @@ export default pluginFactory({
             testRunner.trigger('nav-previous');
         });
 
-        if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
-            shortcut.add(
-                namespaceHelper.namespaceAll('Alt+Shift+P', this.getName(), true),
-                function() {
-                    if (canDoPrevious() && self.getState('enabled') === true) {
-                        testRunner.trigger('nav-previous', [true]);
+        const registerShortcut = (kbdShortcut) => {
+            if (testRunnerOptions.allowShortcuts && kbdShortcut) {
+                shortcut.add(
+                    namespaceHelper.namespaceAll(kbdShortcut, this.getName(), true),
+                    function() {
+                        if (canDoPrevious() && self.getState('enabled') === true) {
+                            testRunner.trigger('nav-previous', [true]);
+                        }
+                    },
+                    {
+                        avoidInput: true,
+                        prevent: true
                     }
-                },
-                {
-                    avoidInput: true,
-                    prevent: true
-                }
-            );
-        }
+                );
+            }
+        };
+
+        registerShortcut(pluginShortcuts.trigger);
 
         //start disabled
         toggle();
@@ -195,6 +199,17 @@ export default pluginFactory({
             })
             .on('nav-previous', function(previousItemWarning) {
                 doPrevious(previousItemWarning);
+            })
+            .on('enableaccessibilitymode', () => {
+                const kbdShortcut = pluginShortcuts.triggerAccessibility;
+
+                if (kbdShortcut && !this.getState('eaccessibilitymode')) {
+                    shortcut.remove(`.${this.getName()}`);
+
+                    registerShortcut(kbdShortcut);
+
+                    this.setState('eaccessibilitymode');
+                }
             });
     },
 

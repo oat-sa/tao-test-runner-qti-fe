@@ -22,7 +22,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import $ from 'jquery';
-import _ from 'lodash';
 import __ from 'i18n';
 import hider from 'ui/hider';
 import pluginFactory from 'taoTests/runner/plugin';
@@ -206,20 +205,24 @@ export default pluginFactory({
             testRunner.trigger('nav-next');
         });
 
-        if (testRunnerOptions.allowShortcuts && pluginShortcuts.trigger) {
-            shortcut.add(
-                namespaceHelper.namespaceAll('Alt+Shift+N', this.getName(), true),
-                function() {
-                    if (self.getState('enabled') === true) {
-                        testRunner.trigger('nav-next', true);
+        const registerShortcut = (kbdShortcut) => {
+            if (testRunnerOptions.allowShortcuts && kbdShortcut) {
+                shortcut.add(
+                    namespaceHelper.namespaceAll(kbdShortcut, this.getName(), true),
+                    function() {
+                        if (self.getState('enabled') === true) {
+                            testRunner.trigger('nav-next', true);
+                        }
+                    },
+                    {
+                        avoidInput: true,
+                        prevent: true
                     }
-                },
-                {
-                    avoidInput: true,
-                    prevent: true
-                }
-            );
-        }
+                );
+            }
+        };
+
+        registerShortcut(pluginShortcuts.trigger);
 
         //disabled by default
         this.disable();
@@ -243,6 +246,17 @@ export default pluginFactory({
             })
             .on('nav-next', function(nextItemWarning) {
                 doNext(nextItemWarning);
+            })
+            .on('enableaccessibilitymode', () => {
+                const kbdShortcut = pluginShortcuts.triggerAccessibility;
+
+                if (kbdShortcut && !this.getState('eaccessibilitymode')) {
+                    shortcut.remove(`.${this.getName()}`);
+
+                    registerShortcut(kbdShortcut);
+
+                    this.setState('eaccessibilitymode');
+                }
             });
     },
 

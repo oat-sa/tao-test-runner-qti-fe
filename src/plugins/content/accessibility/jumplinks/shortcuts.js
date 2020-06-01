@@ -79,6 +79,7 @@ export default function shortcutsBoxFactory(config) {
                 .find('.shortcuts-list, .btn-close');
 
             $closeBtn.on('click', () => this.trigger('close'));
+            // handle overlay click
             $element.on('click', (e) => {
                 if ($element.is(e.target)) {
                     this.trigger('close');

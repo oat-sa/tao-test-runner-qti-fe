@@ -86,8 +86,8 @@ export default pluginFactory({
             : {};
 
         if (testRunnerOptions.allowShortcuts) {
-            shortcut.add(
-                namespaceHelper.namespaceAll('Alt+Shift+T', this.getName(), true),
+            pluginShortcuts.goToTop && shortcut.add(
+                namespaceHelper.namespaceAll(pluginShortcuts.goToTop, this.getName(), true),
                 function() {
                     $('body').attr('tabindex', '-1').focus();
                 },
@@ -97,8 +97,8 @@ export default pluginFactory({
                 }
             );
 
-            shortcut.add(
-                namespaceHelper.namespaceAll('Alt+Shift+Q', this.getName(), true),
+            pluginShortcuts.goToQuestion && shortcut.add(
+                namespaceHelper.namespaceAll(pluginShortcuts.goToQuestion, this.getName(), true),
                 function() {
                     getJumpElement.question.focus();
                 },

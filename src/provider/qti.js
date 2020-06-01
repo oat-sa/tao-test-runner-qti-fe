@@ -481,11 +481,7 @@ var qtiProvider = {
                                 self.trigger(
                                     'alert.timeout',
                                     __('Time limit reached, this part of the test has ended.'),
-                                    () => {
-                                        self.getProxy().acceptTimeout()
-                                            .then(resolve)
-                                            .catch(resolve);
-                                    }
+                                    resolve
                                 );
                             }
                         })

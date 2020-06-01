@@ -625,16 +625,7 @@ export default _.defaults(
                     deferred
                 );
             });
-        },
-        /**
-         * Discard the stored timeout event.
-         *
-         * @returns {Promise} - Returns a promise. The context object will be provided on resolve.
-         *                      Any error will be provided if rejected.
-         */
-        accceptTimeout: function accceptTimeout() {
-            return this.request(this.configStorage.getTestActionUrl('acceptTimeout'), {}, null, true);
-        },
+        }
     },
     qtiServiceProxy
 );

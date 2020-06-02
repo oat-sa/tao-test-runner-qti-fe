@@ -117,6 +117,7 @@ export default pluginFactory({
                 if (
                     currentHours !== hours
                     || currentMinutes !== minutes
+                    || currentSeconds !== seconds
                     || (unansweredQuestions && (unansweredQuestions !== currentUnansweredQuestions))
                 ) {
                     // update current timer state

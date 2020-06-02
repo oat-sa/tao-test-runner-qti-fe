@@ -236,10 +236,6 @@ export default function timerboxFactory(config) {
              */
             updateTimer: function updateTimer(id, timer) {
                 if (this.is('rendered') && typeof this.timers[id] !== 'undefined') {
-                    console.log('upd')
-                    var $wr = $(this.getElement()).find('.timer-wrapper');
-                   // $wr.attr('aria-hidden', Math.random(0, 5))
-
                     this.timers[id].remainingTime = timer.remainingTime;
                     this.timers[id].extraTime = timer.extraTime;
 

@@ -213,7 +213,8 @@ export default function timerboxFactory(config) {
                             })
                             .on('change', function(value) {
                                 if (self.timers[id]) {
-                                    self.trigger('timertick', this.remainingTime, self.timers[id].scope); // propogate current timer data
+                                    const minValue = Math.min( ... _.toArray(self.timers).map( ctimer => Math.floor(ctimer.remainingTime)));
+                                    self.trigger('timertick', Math.floor(this.remainingTime), self.timers[id].scope, { minValue }); // propogate current timer data
 
                                     //keep the current timer data in sync
                                     self.timers[id].remainingTime = value;

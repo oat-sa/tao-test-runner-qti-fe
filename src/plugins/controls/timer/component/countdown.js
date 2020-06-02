@@ -73,7 +73,7 @@ var warningTimeout = {
  * @param {String} config.id - the timer unique identifier
  * @param {String} config.label - the text to display above the timer
  * @param {String} config.type - the type of countdown (to categorize them)
- * @param {Number} [config.unansweredOptions] - number of unanswered options
+ * @param {Number} [config.unansweredQuestions] - number of unanswered options
  * @param {Number} [config.remainingTime] - the current value of the countdown, in milliseconds
  * @param {Boolean} [config.showBeforeStart = true] - do we show the time before starting
  * @param {Boolean} [config.displayWarning = true] - do we display the warnings or trigger only the event

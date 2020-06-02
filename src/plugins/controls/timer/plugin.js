@@ -113,7 +113,10 @@ export default pluginFactory({
 
         const stats = {};
         ['test', 'testPart', 'section', 'item']
-            .forEach((scope) => Object.assign(stats, {[scope]: statsHelper.getInstantStats(scope, testRunner)}));
+            .forEach((scope) => Object.assign(
+                stats,
+                {[scope]: statsHelper.getInstantStats(scope, testRunner)})
+            );
 
         /**
          * Plugin config,
@@ -202,7 +205,8 @@ export default pluginFactory({
                     })
                     .after('renderitem', function() {
                         if (self.timerbox) {
-                            self.timerbox.getElement().find('timer-wrapper').attr('aria-hidden', isReviewPanelEnabled(testRunner));
+                            $(self.timerbox.getElement()).find('.timer-wrapper')
+                                .attr('aria-hidden', isReviewPanelEnabled(testRunner));
                             self.timerbox.start();
                         }
 

@@ -22,11 +22,11 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import $ from 'jquery';
-import __ from 'i18n';
 import _ from 'lodash';
 import pluginFactory from 'taoTests/runner/plugin';
 import titleTpl from 'taoQtiTest/runner/plugins/controls/title/title.tpl';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
+import getTimerMessage from 'taoQtiTest/runner/helpers/getTimerMessage';
 import moment from 'moment';
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
 
@@ -80,33 +80,6 @@ export default pluginFactory({
                 .show();
         };
 
-        const getTimerMessage = (hours, minutes, seconds, unansweredQuestions) => {
-            let timerMessage;
-
-            var timeArr = [hours, minutes, seconds];
-            var timeArgArr = [];
-            [__('hours'), __('minutes'), __('seconds')].forEach((unit, idx) => {
-                if (timeArr[idx] > 0) {
-                    timeArgArr.push(`${timeArr[idx]} ${unit}`);
-                }
-            });
-
-            let answeredMessage;
-            if (typeof unansweredQuestions !== 'number') {
-                answeredMessage = __('the current question');
-            } else {
-                let questionsMessage = __('questions');
-                if (unansweredQuestions === 1) {
-                    questionsMessage = __('question');
-                }
-                answeredMessage = __('remaining %s %s', unansweredQuestions, questionsMessage);
-            }
-
-            timerMessage = __('%s to answer %s', timeArgArr.join(', '), answeredMessage);
-
-            return timerMessage;
-        };
-
         testRunner
             .after('renderitem', () => {
                 updateTitles();
@@ -147,7 +120,13 @@ export default pluginFactory({
                     || (unansweredQuestions && (unansweredQuestions !== currentUnansweredQuestions))
                 ) {
                     // update current timer state
-                    this.titles[scope] = {...this.titles[scope], hours, minutes, seconds, unansweredQuestions};
+                    this.titles[scope] = {
+                        ...this.titles[scope],
+                        hours,
+                        minutes,
+                        seconds,
+                        unansweredQuestions
+                    };
                     $timer.text(getTimerMessage(hours, minutes, seconds, unansweredQuestions));
                 }
             })

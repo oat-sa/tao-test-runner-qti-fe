@@ -132,7 +132,7 @@ export default function timerboxFactory(config) {
                 });
             },
 
-            /**
+              /**
              * Get the current timers
              * @return {Object[]} the timers
              */
@@ -158,10 +158,12 @@ export default function timerboxFactory(config) {
 
                 if (this.is('rendered') && typeof this.timers[id] === 'undefined') {
                     return new Promise(function(resolve) {
+                        const unansweredQuestions ={};
                         var countdown = countdownFactory(
                             $countdownContainer,
                             _.defaults(timer, {
-                                displayWarning: self.config.displayWarning
+                                displayWarning: self.config.displayWarning,
+                                unansweredQuestions
                             })
                         )
                             .on('render', function() {

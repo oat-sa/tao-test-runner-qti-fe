@@ -205,6 +205,9 @@ export default function getTimers(timeConstraints, isLinear, config) {
             timer.warningsForScreenreader = constraintsWarningsForScreenreader[timer.scope];
         }
 
+        const stats = config.questionsStats[timer.scope];
+        timer.unansweredQuestions = stats && stats.questions - stats.answered;
+
         return timer;
     };
 

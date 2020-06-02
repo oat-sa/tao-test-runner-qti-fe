@@ -111,6 +111,10 @@ export default pluginFactory({
         const testRunnerOptions = testRunner.getOptions();
         let screenreaderNotifcationTimeoutId;
 
+        const stats = {};
+        ['test', 'testPart', 'section', 'item']
+            .forEach((scope) => Object.assign(stats, {[scope]: statsHelper.getInstantStats(scope, testRunner)}));
+
         /**
          * Plugin config,
          */
@@ -138,7 +142,12 @@ export default pluginFactory({
             /**
              * Restore timer from client.
              */
-            restoreTimerFromClient: testRunnerOptions.timer && testRunnerOptions.timer.restoreTimerFromClient
+            restoreTimerFromClient: testRunnerOptions.timer && testRunnerOptions.timer.restoreTimerFromClient,
+
+            /**
+             * Questions stats
+             */
+            questionsStats: stats
         }, this.getConfig());
 
         /**

@@ -237,6 +237,7 @@ export default function timerboxFactory(config) {
             updateTimer: function updateTimer(id, timer) {
                 if (this.is('rendered') && typeof this.timers[id] !== 'undefined') {
                     this.timers[id].remainingTime = timer.remainingTime;
+                    this.timers[id].unansweredQuestions = timer.unansweredQuestions;
                     this.timers[id].extraTime = timer.extraTime;
 
                     if (_.isNumber(timer.remainingWithoutExtraTime)) {
@@ -244,7 +245,7 @@ export default function timerboxFactory(config) {
                     }
 
                     if (this.timers[id].countdown) {
-                        this.timers[id].countdown.update(timer.remainingTime);
+                        this.timers[id].countdown.update(timer.remainingTime, timer.unansweredQuestions);
                     }
 
                     this.trigger('timerchange', 'update', this.timers[id]);

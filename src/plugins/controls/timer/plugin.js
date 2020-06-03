@@ -187,11 +187,14 @@ export default pluginFactory({
                             const timers = self.timerbox.getTimers();
 
                             const updatedTimers = Object.keys(timers).reduce((acc, timerName) => {
+                                const stats = statsHelper.getInstantStats(timers[timerName].scope, testRunner);
+                                const unansweredQuestions = stats && (stats.questions - stats.answered);
                                 acc[timerName] = Object.assign(
                                     {},
                                     timers[timerName],
                                     {
                                         remainingTime: timers[timerName].remainingTime - elapsed,
+                                        unansweredQuestions
                                     }
                                 );
 

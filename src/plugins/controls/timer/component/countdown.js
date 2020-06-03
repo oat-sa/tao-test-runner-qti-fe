@@ -94,11 +94,12 @@ export default function countdownFactory($container, config) {
             /**
              * Update the countdown
              * @param {Number} remainingTime - the time remaining (milliseconds)
+             * @param {Number} unansweredQuestions
              * @returns {countdown} chains
              * @fires countdown#change - when the value has changed
              * @fires countdown#warn - when a threshold is reached
              */
-            update: function udpate(remainingTime) {
+            update: function udpate(remainingTime, unansweredQuestions) {
                 var self = this;
                 var encodedTime;
                 var warningId;
@@ -125,7 +126,7 @@ export default function countdownFactory($container, config) {
                                     hours,
                                     minutes,
                                     seconds,
-                                    this.config.unansweredQuestions
+                                    unansweredQuestions
                                 ));
                         }
 
@@ -266,6 +267,7 @@ export default function countdownFactory($container, config) {
     )
         .on('init', function() {
             this.remainingTime = this.config.remainingTime;
+            this.unansweredQuestions = this.config.unansweredQuestions;
 
             if (this.config.warnings) {
                 this.warnings = _.sortBy(this.config.warnings, 'threshold');

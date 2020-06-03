@@ -16,7 +16,7 @@ function getTimerMessage (hours, minutes, seconds, unansweredQuestions) {
     });
 
     let answeredMessage;
-    if (typeof unansweredQuestions !== 'number') {
+    if (!unansweredQuestions) {
         answeredMessage = __('the current question');
     } else {
         let questionsMessage = __('questions');

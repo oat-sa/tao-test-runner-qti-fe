@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017-2020 (original work) Open Assessment Technologies SA;
  */
 /**
  * This factory creates a component that allows to create a toolbox menu.
@@ -29,7 +29,7 @@
  * });
  * Optional setting: navType - navigation type 
  * navType: 'fromLast' (default behavior) - focus on button (if no active item) and then using UP go to last item, when press DOWN at last item menu will be closed,
- * navType: 'fromFirst' - focus on button (if no active item) and then using DOWN go to first item, when press UP at first item menu will be closed
+ * navType: 'fromFirst' - focus on button (if no active item) and then using DOWN go to first item. When press the DOWN key at the first item menu will be closed
  * toolbox.createMenu({
  *      control: 'menu-id',
  *      title: __('Html title'),
@@ -410,7 +410,7 @@ var menuComponentApi = {
                 this.closeMenu();
             }
             // move to the menu button
-        } else if (this.hoverIndex === 0  && this.navType === 'fromFirst') {
+        } else if (this.hoverIndex === 0) {
             this.hoverIndex--;
             this.closeMenu();
         }
@@ -427,7 +427,7 @@ var menuComponentApi = {
                 this.closeMenu();
             }
             // move to the menu button
-        } else if (this.hoverIndex === this.menuItems.length - 1 && this.navType === 'fromLast') {
+        } else if (this.hoverIndex === this.menuItems.length - 1) {
             this.hoverIndex++;
             this.closeMenu();
         }

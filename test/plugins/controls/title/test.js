@@ -303,28 +303,28 @@ define([
                 runner.trigger('timertick', 60000, 'test');
                 assert.equal(
                     $container.find('[data-control="qti-test-title-timer"]').text(),
-                    '1 minutes to answer remaining 1 questions.',
+                    '1 minutes to answer remaining 1 question',
                     'Update test timer'
                 );
 
                 runner.trigger('timertick', 60000, 'testPart');
                 assert.equal(
                     $container.find('[data-control="qti-test-part-title-timer"]').text(),
-                    '1 minutes to answer remaining 1 questions.',
+                    '1 minutes to answer remaining 1 question',
                     'Update part timer'
                 );
 
                 runner.trigger('timertick', 60000, 'section');
                 assert.equal(
                     $container.find('[data-control="qti-test-position-timer"]').text(),
-                    '1 minutes to answer remaining 1 questions.',
+                    '1 minutes to answer remaining 1 question',
                     'Update section timer'
                 );
 
                 runner.trigger('timertick', 60000, 'item');
                 assert.equal(
                     $container.find('[data-control="qti-test-item-title-timer"]').text(),
-                    '1 minutes to answer the current question.',
+                    '1 minutes to answer the current question',
                     'Update item timer'
                 );
 

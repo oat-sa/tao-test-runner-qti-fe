@@ -101,11 +101,7 @@ export default pluginFactory({
 
                 const {
                     $timer,
-                    hours: currentHours,
-                    minutes: currentMinutes,
-                    seconds: currentSeconds,
-                    stats,
-                    unansweredQuestions: currentUnansweredQuestions,
+                    stats
                 } = this.titles[scope];
                 const time = moment.duration(remainingTime / precision, 'seconds');
                 const hours = time.get('hours');
@@ -114,20 +110,7 @@ export default pluginFactory({
                 const unansweredQuestions = stats && (stats.questions - stats.answered);
 
                 // check if notification should be updated
-                if (
-                    currentHours !== hours
-                    || currentMinutes !== minutes
-                    || currentSeconds !== seconds
-                    || (unansweredQuestions && (unansweredQuestions !== currentUnansweredQuestions))
-                ) {
-                    // update current timer state
-                    this.titles[scope] = {
-                        ...this.titles[scope],
-                        hours,
-                        minutes,
-                        seconds,
-                        unansweredQuestions
-                    };
+                if ($timer) {
                     $timer.text(getTimerMessage(hours, minutes, seconds, unansweredQuestions));
                 }
             })

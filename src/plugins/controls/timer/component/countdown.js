@@ -73,6 +73,7 @@ var warningTimeout = {
  * @param {String} config.id - the timer unique identifier
  * @param {String} config.label - the text to display above the timer
  * @param {String} config.type - the type of countdown (to categorize them)
+ * @param {String} [config.scope] - scope of a timer
  * @param {Number} [config.unansweredQuestions] - number of unanswered options
  * @param {Number} [config.remainingTime] - the current value of the countdown, in milliseconds
  * @param {Boolean} [config.showBeforeStart = true] - do we show the time before starting
@@ -126,7 +127,8 @@ export default function countdownFactory($container, config) {
                                     hours,
                                     minutes,
                                     seconds,
-                                    unansweredQuestions
+                                    unansweredQuestions,
+                                    this.config.scope
                                 ));
                         }
 

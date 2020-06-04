@@ -4,7 +4,7 @@ import __ from 'i18n';
  * Returns timer information string
  * @returns {Boolean}
  */
-function getTimerMessage (hours, minutes, seconds, unansweredQuestions) {
+function getTimerMessage (hours, minutes, seconds, unansweredQuestions, scope) {
     let timerMessage;
 
     const timeArr = [hours, minutes, seconds];
@@ -16,7 +16,7 @@ function getTimerMessage (hours, minutes, seconds, unansweredQuestions) {
     });
 
     let answeredMessage;
-    if (!unansweredQuestions) {
+    if (!unansweredQuestions || scope === 'item') {
         answeredMessage = __('the current question');
     } else {
         let questionsMessage = __('questions');

@@ -169,7 +169,7 @@ $activeApipElementBackgroundColor: yellow;
 .tts-playing.tts-component-container {
     .test-runner-sections {
         .tts-content-node {
-            &.tts-active-content-node {
+            &.tts-active-content-node, &.tts-active-content-node * {
                 color: $textColor !important;
                 background-color: $activeApipElementBackgroundColor !important;
 

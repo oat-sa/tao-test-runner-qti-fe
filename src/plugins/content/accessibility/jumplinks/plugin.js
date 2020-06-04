@@ -27,22 +27,9 @@ import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled
 import { getJumpElementFactory, getItemStatus } from './helpers';
 import jumplinksFactory from './jumplinks';
 import shortcutsFactory from './shortcuts';
+import shortcut from 'util/shortcut';
+import namespaceHelper from 'util/namespace';
 import containerTpl from './container.tpl';
-
-function findFocusable(targetElement) {
-    const $elem = $(targetElement)
-        .find(':not(.hidden)[tabindex]').first();
-    return $elem;
-}
-
-/**
- * close shortcuts popup
- */
-function closeShortcuts() {
-    this.shortcuts.hide();
-    this.shortcuts.getElement().off('click', this.closeShortcuts);
-    $(window).off('keydown', this.closeShortcuts);
-}
 
 /**
  * Creates the JumpLinks plugin.
@@ -60,31 +47,96 @@ export default pluginFactory({
         const config = {
             isReviewPanelEnabled: isReviewPanelEnabled(testRunner),
             questionStatus: getItemStatus(item)
+        };
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const areaBroker = this.getAreaBroker();
+        const getJumpElement = getJumpElementFactory(areaBroker);
+        const shortcutsConfig = navigator.appVersion.indexOf("Mac") !== -1
+            ? {
+                shortcutsGroups: [
+                    {
+                        id: 'navigation-shortcuts',
+                        label: __('Navigation shortcuts'),
+                        shortcuts: [
+                            {
+                                id: 'next',
+                                shortcut: 'OPTION + Shift + N',
+                                label: __('Go to the next question'),
+                            },
+                            {
+                                id: 'previous',
+                                shortcut: 'OPTION + Shift + P',
+                                label: __('Go to the previous question'),
+                            },
+                            {
+                                id: 'current',
+                                shortcut: 'OPTION + Shift + Q',
+                                label: __('Go to the current question'),
+                            },
+                            {
+                                id: 'top',
+                                shortcut: 'OPTION + Shift + T',
+                                label: __('Go to the top of the page'),
+                            },
+                        ]
+                    },
+                ]
+            }
+            : {};
+
+        if (testRunnerOptions.allowShortcuts) {
+            pluginShortcuts.goToTop && shortcut.add(
+                namespaceHelper.namespaceAll(pluginShortcuts.goToTop, this.getName(), true),
+                function() {
+                    $('body').attr('tabindex', '-1').focus();
+                },
+                {
+                    avoidInput: true,
+                    prevent: true
+                }
+            );
+
+            pluginShortcuts.goToQuestion && shortcut.add(
+                namespaceHelper.namespaceAll(pluginShortcuts.goToQuestion, this.getName(), true),
+                function() {
+                    getJumpElement.question.focus();
+                },
+                {
+                    avoidInput: true,
+                    prevent: true
+                }
+            );
         }
 
         this.jumplinks = jumplinksFactory(config)
             .on('render', () => {
-                const closeShortcutsHandler = closeShortcuts.bind(this);
                 this.jumplinks.on('jump', (jumpTo) => {
-                    const areaBroker = this.getAreaBroker();
-                    const $element = getJumpElementFactory(areaBroker)[jumpTo];
+                    const $element = getJumpElement[jumpTo];
                     $element.focus();
                 });
+
                 this.jumplinks.on('shortcuts', () => {
-                    this.shortcuts.show();
-                    this.shortcuts.getElement()
-                        .off('click', closeShortcutsHandler)
-                        .on('click', closeShortcutsHandler);
-                    $(window)
-                        .off('keydown', closeShortcutsHandler)
-                        .on('keydown', closeShortcutsHandler);
+                    if (this.shortcuts) {
+                        return;
+                    }
+
+                    this.shortcuts = shortcutsFactory(shortcutsConfig);
+
+                    this.shortcuts.render(this.getAreaBroker().getControlArea());
+
+                    this.shortcuts.on('close', () => {
+                        this.shortcuts.destroy();
+
+                        this.shortcuts = null;
+                    });
                 });
             })
             .on('update', function update(params) {
                 this.trigger('changeReviewPanel', params.isReviewPanelEnabled);
                 this.trigger('changeQuesitionStatus', params.questionStatus);
             })
-            .on('changeReviewPanel', function changeReviewPanel (enabled) {
+            .on('changeReviewPanel', function changeReviewPanel(enabled) {
                 const elem = this.getElement();
                 const panelJumplink = elem
                     .find('[data-jump="teststatus"]')
@@ -97,29 +149,30 @@ export default pluginFactory({
             })
             .on('changeQuesitionStatus', function changeQuesitionStatus(questionStatus) {
                 const elem = this.getElement();
-                const text = __('Question') + ' - ' + questionStatus;
+                const text = `${__('Question')} - ${questionStatus}`;
                 elem
                     .find('[data-jump="question"] > b')
                     .text(text);
             });
-        
+
         testRunner
             .on('loaditem', () => {
-                const item = testRunner.getCurrentItem();
-                const config = {
+                const currentItem = testRunner.getCurrentItem();
+                const updatedConfig = {
                     isReviewPanelEnabled: isReviewPanelEnabled(testRunner),
-                    questionStatus: getItemStatus(item)
-                }
+                    questionStatus: getItemStatus(currentItem)
+                };
 
-                this.jumplinks.trigger('update', config);
+                this.jumplinks.trigger('update', updatedConfig);
             })
             .on('tool-flagitem', () => {
-                const item = testRunner.getCurrentItem();
-                const questionStatus = getItemStatus({ ...item, flagged: !item.flagged });
+                const currentItem = testRunner.getCurrentItem();
+                const questionStatus = getItemStatus(
+                    Object.assign(currentItem, { flagged: !item.flagged })
+                );
 
                 this.jumplinks.trigger('changeQuesitionStatus', questionStatus);
-            })
-        this.shortcuts = shortcutsFactory({});
+            });
     },
 
     /**
@@ -129,6 +182,5 @@ export default pluginFactory({
         const jumplinksContainer = $(containerTpl());
         $('.content-wrap').prepend(jumplinksContainer);
         this.jumplinks.render(jumplinksContainer);
-        this.shortcuts.render(this.getAreaBroker().getControlArea());
     },
 });

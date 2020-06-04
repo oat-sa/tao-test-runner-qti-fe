@@ -119,6 +119,16 @@ export default pluginFactory({
 
                 this.jumplinks.trigger('changeQuesitionStatus', questionStatus);
             })
+            .on('tool-reviewpanel', () => {
+                const wasHidden = testRunner
+                    .getAreaBroker()
+                    .getPanelArea()
+                    .find('.qti-navigator')
+                    .is('.hidden');
+
+                this.jumplinks.trigger('changeReviewPanel', wasHidden);
+            });
+
         this.shortcuts = shortcutsFactory({});
     },
 

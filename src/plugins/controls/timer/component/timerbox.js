@@ -213,7 +213,12 @@ export default function timerboxFactory(config) {
                             })
                             .on('change', function(value) {
                                 if (self.timers[id]) {
-                                    self.trigger('timertick', this.remainingTime, self.timers[id].scope); // propogate current timer data
+                                    self.trigger(
+                                        'timertick',
+                                        this.remainingTime,
+                                        self.timers[id].scope,
+                                        self.timers[id].unansweredQuestions
+                                    ); // propogate current timer data
 
                                     //keep the current timer data in sync
                                     self.timers[id].remainingTime = value;

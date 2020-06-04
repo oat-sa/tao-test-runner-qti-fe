@@ -38,8 +38,10 @@ import _ from 'lodash';
 import timeEncoder from 'core/encoder/time';
 import component from 'ui/component';
 import countdownTpl from 'taoQtiTest/runner/plugins/controls/timer/component/tpl/countdown';
+import getTimerMessage from 'taoQtiTest/runner/helpers/getTimerMessage';
 import tooltip from 'ui/tooltip';
 import 'taoQtiTest/runner/plugins/controls/timer/component/css/countdown.css';
+import moment from "moment";
 
 //Precision is milliseconds
 var precision = 1000;
@@ -71,6 +73,8 @@ var warningTimeout = {
  * @param {String} config.id - the timer unique identifier
  * @param {String} config.label - the text to display above the timer
  * @param {String} config.type - the type of countdown (to categorize them)
+ * @param {String} [config.scope] - scope of a timer
+ * @param {Number} [config.unansweredQuestions] - number of unanswered options
  * @param {Number} [config.remainingTime] - the current value of the countdown, in milliseconds
  * @param {Boolean} [config.showBeforeStart = true] - do we show the time before starting
  * @param {Boolean} [config.displayWarning = true] - do we display the warnings or trigger only the event
@@ -91,11 +95,12 @@ export default function countdownFactory($container, config) {
             /**
              * Update the countdown
              * @param {Number} remainingTime - the time remaining (milliseconds)
+             * @param {Number} unansweredQuestions
              * @returns {countdown} chains
              * @fires countdown#change - when the value has changed
              * @fires countdown#warn - when a threshold is reached
              */
-            update: function udpate(remainingTime) {
+            update: function udpate(remainingTime, unansweredQuestions) {
                 var self = this;
                 var encodedTime;
                 var warningId;
@@ -111,8 +116,20 @@ export default function countdownFactory($container, config) {
                         encodedTime = timeEncoder.encode(this.remainingTime / precision);
                         if (encodedTime !== this.encodedTime) {
                             this.encodedTime = encodedTime;
+                            const time = moment.duration(this.remainingTime / precision, 'seconds');
+                            const hours = time.get('hours');
+                            const minutes = time.get('minutes');
+                            const seconds = time.get('seconds');
 
                             $time.text(this.encodedTime);
+                            $time.attr('aria-label',
+                                getTimerMessage(
+                                    hours,
+                                    minutes,
+                                    seconds,
+                                    unansweredQuestions,
+                                    this.config.scope
+                                ));
                         }
 
                         if (this.warnings) {
@@ -252,6 +269,7 @@ export default function countdownFactory($container, config) {
     )
         .on('init', function() {
             this.remainingTime = this.config.remainingTime;
+            this.unansweredQuestions = this.config.unansweredQuestions;
 
             if (this.config.warnings) {
                 this.warnings = _.sortBy(this.config.warnings, 'threshold');

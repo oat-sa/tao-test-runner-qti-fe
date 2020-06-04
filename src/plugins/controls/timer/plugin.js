@@ -111,6 +111,13 @@ export default pluginFactory({
         const testRunnerOptions = testRunner.getOptions();
         let screenreaderNotifcationTimeoutId;
 
+        const stats = {};
+        ['test', 'testPart', 'section', 'item']
+            .forEach((scope) => Object.assign(
+                stats,
+                {[scope]: statsHelper.getInstantStats(scope, testRunner)})
+            );
+
         /**
          * Plugin config,
          */
@@ -138,7 +145,12 @@ export default pluginFactory({
             /**
              * Restore timer from client.
              */
-            restoreTimerFromClient: testRunnerOptions.timer && testRunnerOptions.timer.restoreTimerFromClient
+            restoreTimerFromClient: testRunnerOptions.timer && testRunnerOptions.timer.restoreTimerFromClient,
+
+            /**
+             * Questions stats
+             */
+            questionsStats: stats
         }, this.getConfig());
 
         /**
@@ -175,11 +187,14 @@ export default pluginFactory({
                             const timers = self.timerbox.getTimers();
 
                             const updatedTimers = Object.keys(timers).reduce((acc, timerName) => {
+                                const stats = statsHelper.getInstantStats(timers[timerName].scope, testRunner);
+                                const unansweredQuestions = stats && (stats.questions - stats.answered);
                                 acc[timerName] = Object.assign(
                                     {},
                                     timers[timerName],
                                     {
                                         remainingTime: timers[timerName].remainingTime - elapsed,
+                                        unansweredQuestions
                                     }
                                 );
 
@@ -193,7 +208,8 @@ export default pluginFactory({
                     })
                     .after('renderitem', function() {
                         if (self.timerbox) {
-                            self.timerbox.getElement().find('timer-wrapper').attr('aria-hidden', isReviewPanelEnabled(testRunner));
+                            $(self.timerbox.getElement()).find('.timer-wrapper')
+                                .attr('aria-hidden', isReviewPanelEnabled(testRunner));
                             self.timerbox.start();
                         }
 

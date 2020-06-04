@@ -22,11 +22,11 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import $ from 'jquery';
-import __ from 'i18n';
 import _ from 'lodash';
 import pluginFactory from 'taoTests/runner/plugin';
 import titleTpl from 'taoQtiTest/runner/plugins/controls/title/title.tpl';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
+import getTimerMessage from 'taoQtiTest/runner/helpers/getTimerMessage';
 import moment from 'moment';
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
 
@@ -80,47 +80,6 @@ export default pluginFactory({
                 .show();
         };
 
-        const getTimerMessage = (hours, minutes, unansweredQuestions) => {
-            let timerMessage;
-
-            if (hours > 0) {
-                timerMessage = typeof unansweredQuestions === 'number'
-                    ? __(
-                        '%s hours %s minutes to answer remaining %s questions.',
-                        hours,
-                        minutes,
-                        unansweredQuestions
-                    )
-                    : timerMessage = __(
-                        '%s hours %s minutes to answer the current question.',
-                        hours,
-                        minutes
-                    );
-            } else if (minutes > 0) {
-                timerMessage = typeof unansweredQuestions === 'number'
-                    ? __(
-                        '%s minutes to answer remaining %s questions.',
-                        minutes,
-                        unansweredQuestions
-                    )
-                    : __(
-                        '%s minutes to answer the current question.',
-                        minutes
-                    );
-            } else {
-                timerMessage = typeof unansweredQuestions === 'number'
-                    ? __(
-                        'Less than one minute to answer remaining %s questions.',
-                        unansweredQuestions
-                    )
-                    : __(
-                        'Less than one minute to answer the current question.'
-                    );
-            }
-
-            return timerMessage;
-        };
-
         testRunner
             .after('renderitem', () => {
                 updateTitles();
@@ -142,28 +101,17 @@ export default pluginFactory({
 
                 const {
                     $timer,
-                    hours: currentHours,
-                    minutes: currentMinutes,
-                    stats,
-                    unansweredQuestions: currentUnansweredQuestions,
+                    stats
                 } = this.titles[scope];
                 const time = moment.duration(remainingTime / precision, 'seconds');
                 const hours = time.get('hours');
                 const minutes = time.get('minutes');
+                const seconds = time.get('seconds');
                 const unansweredQuestions = stats && (stats.questions - stats.answered);
 
                 // check if notification should be updated
-                if (
-                    currentHours !== hours
-                    || currentMinutes !== minutes
-                    || (unansweredQuestions && (unansweredQuestions !== currentUnansweredQuestions))
-                ) {
-                    // update current timer state
-                    this.titles[scope].hours = hours;
-                    this.titles[scope].minutes = minutes;
-                    this.titles[scope].unansweredQuestions = unansweredQuestions;
-
-                    $timer.text(getTimerMessage(hours, minutes, unansweredQuestions));
+                if ($timer) {
+                    $timer.text(getTimerMessage(hours, minutes, seconds, unansweredQuestions));
                 }
             })
             .on('unloaditem', () => {

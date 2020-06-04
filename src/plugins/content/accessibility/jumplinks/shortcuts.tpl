@@ -1,85 +1,36 @@
-<div class="shortcuts-list-wrapper hidden">
-    <div class="shortcuts-list">
-        <h2 id="keyboard-navigation">Keyboard Navigation</h2>
-        <blockquote>
-            <p>Keyboard shortcuts for the Accessibility Tools are available to the Test-taker.</p>
-        </blockquote>
-        <p>The set of keyboard shortcuts provided is as follows:</p>
-        <table>
-            <thead>
-            <tr>
-                <th><strong>Tool</strong></th>
-                <th>Action</th>
-                <th style="text-align: right;">Shortcut</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td><strong>Next Item</strong></td>
-                <td></td>
-                <td style="text-align: right;">J</td>
-            </tr>
-            <tr>
-                <td><strong>Previous Item</strong></td>
-                <td></td>
-                <td style="text-align: right;">K</td>
-            </tr>
-            <tr>
-                <td><strong>Answer Masking</strong></td>
-                <td>Toggle</td>
-                <td style="text-align: right;">D</td>
-            </tr>
-            <tr>
-                <td><strong>Area Masking</strong></td>
-                <td>Toggle</td>
-                <td style="text-align: right;">Y</td>
-            </tr>
-            <tr>
-                <td><strong>Calculator</strong></td>
-                <td>Toggle</td>
-                <td style="text-align: right;">C</td>
-            </tr>
-            <tr>
-                <td><strong>Highlighter</strong></td>
-                <td>Toggle</td>
-                <td style="text-align: right;">Shift + U</td>
-            </tr>
-            <tr>
-                <td><strong>Line Reader</strong></td>
-                <td>Toggle</td>
-                <td style="text-align: right;">G</td>
-            </tr>
-            <tr>
-                <td><strong>Magnifier</strong></td>
-                <td>Toggle</td>
-                <td style="text-align: right;">L</td>
-            </tr>
-            <tr>
-                <td><strong>Magnifier</strong></td>
-                <td>In</td>
-                <td style="text-align: right;">Shift + I</td>
-            </tr>
-            <tr>
-                <td><strong>Magnifier</strong></td>
-                <td>Out</td>
-                <td style="text-align: right;">Shift + O</td>
-            </tr>
-            <tr>
-                <td><strong>Magnifier</strong></td>
-                <td>Close</td>
-                <td style="text-align: right;">Esc</td>
-            </tr>
-            <tr>
-                <td><strong>Zoom</strong></td>
-                <td>In</td>
-                <td style="text-align: right;">I</td>
-            </tr>
-            <tr>
-                <td><strong>Zoom</strong></td>
-                <td>Out</td>
-                <td style="text-align: right;">O</td>
-            </tr>
-            </tbody>
-        </table>
+<div class="shortcuts-list-wrapper">
+    <div class="shortcuts-list" role="dialog" aria-modal="true" aria-labelledby="jumplinks/shortcuts-heading"
+        aria-describedby="jumplinks/shortcuts-description">
+        <h2 class="shortcuts-list-title" id="jumplinks/shortcuts-heading">
+            {{__ "Keyboard Navigation"}}
+        </h2>
+        <div id="jumplinks/shortcuts-description">
+            <p class="shortcuts-list-description">
+                {{__ "Keyboard shortcuts for the Accessibility Tools are available to the Test-taker."}}
+            </p>
+            <p class="shortcuts-list-description">
+                {{__ "You can magnify the content by op to 200%. Check your browser settings to find out how to do it."}}
+            </p>
+        </div>
+        <button aria-label="Close dialog" class="btn-close small" data-control="close-btn" type="button">
+            <span class="icon-close"></span>
+        </button>
+        {{#each shortcutsGroups}}
+        <div class="shortcuts-group-wrapper">
+            <h3 class="shortcuts-group-title">{{label}}</h3>
+            <ul class="shortcuts-group-list">
+                {{#each shortcuts}}
+                <li class="shortcut-item">
+                    <span class="shortcut-item-shortcut">
+                        <kbd>{{shortcut}}</kbd>
+                    </span>
+                    <span class="shortcut-item-action">
+                        {{label}}
+                    </span>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+        {{/each}}
     </div>
 </div>

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017-2020 (original work) Open Assessment Technologies SA;
  */
 /**
  * This factory creates a component that allows to create a toolbox menu.
@@ -28,8 +28,8 @@
  *      text: __('Displayed label')
  * });
  * Optional setting: navType - navigation type 
- * navType: 'fromLast' (default behavior) - focus on button (if no active item) and then using UP go to last item, when press DOWN at last item menu will be closed,
- * navType: 'fromFirst' - focus on button (if no active item) and then using DOWN go to first item, when press UP at first item menu will be closed
+ * navType: 'fromLast' (default behavior) - focus on button (if no active item) and then using UP go to last item, when press DOWN at last item (or UP at the first) menu will be closed,
+ * navType: 'fromFirst' - focus on button (if no active item) and then using DOWN go to first item. When press the DOWN key at the first item (or UP at the first) menu will be closed
  * toolbox.createMenu({
  *      control: 'menu-id',
  *      title: __('Html title'),
@@ -244,7 +244,7 @@ var menuComponentApi = {
         this.trigger('closemenu', this);
 
         // Move focus if the menu wasn't disabled before the close action was launched.
-        if (!this.is('disabled')) {
+        if (!this.is('disabled') && !this.$component.prop('disabled')) {
             this.$menuButton.parent().focus();  // It needs for screenreaders to correctly read menu button after submenu was closed
         }
     },
@@ -410,7 +410,7 @@ var menuComponentApi = {
                 this.closeMenu();
             }
             // move to the menu button
-        } else if (this.hoverIndex === 0  && this.navType === 'fromFirst') {
+        } else if (this.hoverIndex === 0) {
             this.hoverIndex--;
             this.closeMenu();
         }
@@ -427,7 +427,7 @@ var menuComponentApi = {
                 this.closeMenu();
             }
             // move to the menu button
-        } else if (this.hoverIndex === this.menuItems.length - 1 && this.navType === 'fromLast') {
+        } else if (this.hoverIndex === this.menuItems.length - 1) {
             this.hoverIndex++;
             this.closeMenu();
         }

@@ -45,6 +45,7 @@ define([
             strategies: ['rubrics', 'stimulus', 'item', 'toolbar', 'header', 'top-toolbar', 'navigator', 'page'],
             config: {
                 autoFocus: true,
+                wcagBehavior: false,
                 keepState: true,
                 propagateTab: false,
                 flatNavigation: false,
@@ -69,6 +70,7 @@ define([
             strategies: ['rubrics', 'stimulus', 'linearItem', 'toolbar', 'header', 'top-toolbar', 'navigator', 'page'],
             config: {
                 autoFocus: true,
+                wcagBehavior: false,
                 keepState: true,
                 propagateTab: false,
                 flatNavigation: false,
@@ -93,6 +95,7 @@ define([
             strategies: ['jump-links', 'header', 'top-toolbar', 'navigator', 'page', 'rubrics', 'stimulus', 'item', 'toolbar'],
             config: {
                 autoFocus: false,
+                wcagBehavior: false,
                 keepState: false,
                 propagateTab: true,
                 flatNavigation: true,

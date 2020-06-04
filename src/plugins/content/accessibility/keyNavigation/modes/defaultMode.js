@@ -32,6 +32,7 @@ export default {
             strategies: ['rubrics', 'stimulus', 'item', 'toolbar', 'header', 'top-toolbar', 'navigator', 'page'],
             config: Object.assign({
                 autoFocus: true,
+                wcagBehavior: false,
                 keepState: true,
                 propagateTab: false,
                 flatNavigation: false,

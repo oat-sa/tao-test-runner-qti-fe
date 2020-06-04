@@ -55,15 +55,17 @@ export default {
          * Creates and registers a keyNavigator for the supplied list of elements
          * @param {jQuery} $elements - The list of navigable elements
          * @param {jQuery} group - The group container
-         * @param {Number|Function} [defaultPosition=0] - the default position the group should set the focus on
+         * @param {Boolean} [loop=false] - Allow cycling the list when a boundary is reached
+         * @param {Number|Function} [defaultPosition=0] - The default position the group should set the focus on
          * @returns {keyNavigator} - the created navigator, if the list of element is not empty
          */
-        const addNavigator = ($elements, group, defaultPosition = 0) => {
+        const addNavigator = ($elements, group, loop = false, defaultPosition = 0) => {
             const elements = navigableDomElement.createFromDoms($elements);
             if (elements.length) {
                 const navigator = keyNavigator({
                     elements,
                     group,
+                    loop,
                     defaultPosition,
                     propagateTab: false
                 });
@@ -76,11 +78,12 @@ export default {
          * Creates and setups a keyNavigator for the interaction inputs.
          * @param {jQuery} $elements - The list of navigable elements
          * @param {jQuery} group - The group container
-         * @param {Number|Function} [defaultPosition=0] - the default position the group should set the focus on
+         * @param {Boolean} [loop=false] - Allow cycling the list when a boundary is reached
+         * @param {Number|Function} [defaultPosition=0] - The default position the group should set the focus on
          * @returns {keyNavigator} - The supplied keyNavigator
          */
-        const addInputsNavigator = ($elements, group, defaultPosition = 0) => {
-            const navigator = addNavigator($elements, group, defaultPosition);
+        const addInputsNavigator = ($elements, group, loop, defaultPosition = 0) => {
+            const navigator = addNavigator($elements, group, loop, defaultPosition);
             if (navigator) {
                 setupItemsNavigator(navigator, config);
                 setupClickableNavigator(navigator);
@@ -135,8 +138,9 @@ export default {
                     if (config.flatNavigation && choiceType !== 'radio') {
                         $inputs.each((i, input) => addInputsNavigator($(input), $itemElement));
                     } else {
-                        const navigator = addInputsNavigator($inputs, $itemElement, () => {
-                            let position = 0;
+                        const navigator = addInputsNavigator($inputs, $itemElement, true, () => {
+                            // keep default positioning for now
+                            let position = -1;
 
                             // autofocus the selected radio button if any
                             $inputs.each((index, input) => {
@@ -148,7 +152,8 @@ export default {
                             return position;
                         });
 
-                        if (navigator) {
+                        // applies WCAG behavior for the radio buttons
+                        if (navigator && config.wcagBehavior) {
                             navigator.on('focus', cursor => {
                                 const $element = cursor.navigable.getElement();
                                 if (!$element.is(':checked')) {

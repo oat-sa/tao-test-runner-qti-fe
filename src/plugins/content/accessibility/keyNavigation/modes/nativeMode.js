@@ -33,6 +33,7 @@ export default {
             strategies: ['jump-links', 'header', 'top-toolbar', 'navigator', 'page', 'rubrics', 'stimulus', 'item', 'toolbar'],
             config: Object.assign({
                 autoFocus: false,
+                wcagBehavior: false,
                 keepState: false,
                 propagateTab: true,
                 flatNavigation: true,

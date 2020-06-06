@@ -2,7 +2,6 @@
     data-control="{{control}}"
     class="small btn-info action {{#if className}} {{className}}{{/if}}"
     title="{{title}}"
-    aria-label="{{title}}"
     aria-haspopup="listbox"
     role="button"
 >

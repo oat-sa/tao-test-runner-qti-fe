@@ -387,8 +387,6 @@ var qtiProvider = {
                 // otherwise the state could be partially lost for tools that clean up when disabling
                 var itemResults = getItemResults();
 
-                stopwatch.stop();
-
                 this.trigger('disablenav disabletools');
 
                 computeNext(
@@ -401,8 +399,6 @@ var qtiProvider = {
                 );
             })
             .on('skip', function(scope) {
-                stopwatch.stop();
-
                 this.trigger('disablenav disabletools');
 
                 computeNext('skip', {
@@ -439,8 +435,6 @@ var qtiProvider = {
                     'noAlertTimeout',
                     true
                 );
-
-                stopwatch.stop();
 
                 context.isTimeout = true;
 
@@ -493,8 +487,6 @@ var qtiProvider = {
                 }
             })
             .on('pause', function(data) {
-                stopwatch.stop();
-
                 this.setState('closedOrSuspended', true);
 
                 this.getProxy()
@@ -513,6 +505,9 @@ var qtiProvider = {
                     .catch(function(err) {
                         self.trigger('error', err);
                     });
+            })
+            .before('move skip exit timeout pause', function() {
+                stopwatch.stop();
             })
             .on('loaditem', function() {
                 var context = this.getTestContext();

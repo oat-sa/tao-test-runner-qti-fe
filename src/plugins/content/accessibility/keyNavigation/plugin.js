@@ -53,8 +53,16 @@ export default pluginFactory({
          *  Update plugin state based on changes
          */
         testRunner
-            .after('renderitem', () => keyNavigator.init())
-            .on('unloaditem', () => keyNavigator.destroy())
+            .after('renderitem', () => {
+                if (keyNavigator.isActive()) {
+                    keyNavigator.destroy();
+                }
+
+                keyNavigator.init();
+            })
+            .on('unloaditem', () => {
+                keyNavigator.destroy();
+            })
 
             /**
              * @param {string} type - type of content tab navigation,

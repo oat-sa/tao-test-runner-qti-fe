@@ -137,7 +137,7 @@ export default pluginFactory({
                 _.forEach(themesConfig.available, function(theme) {
                     state.availableThemes.push({
                         id: theme.id,
-                        label: theme.name
+                        label: __(theme.name)
                     });
                 });
             }

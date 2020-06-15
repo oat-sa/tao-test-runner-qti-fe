@@ -408,8 +408,6 @@ var qtiProvider = {
             .on('exit', function(reason) {
                 var context = self.getTestContext();
 
-                stopwatch.stop();
-
                 this.disableItem(context.itemIdentifier);
 
                 this.getProxy()

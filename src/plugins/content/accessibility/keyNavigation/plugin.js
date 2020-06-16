@@ -54,6 +54,8 @@ export default pluginFactory({
          */
         testRunner
             .after('renderitem', () => {
+                // make sure that keyNavigator is destroyed
+                // to preevent multiple instances to be active at the same time
                 if (keyNavigator.isActive()) {
                     keyNavigator.destroy();
                 }

@@ -71,9 +71,9 @@ const defaults = {
  * @returns {shortcutsBox} the component, initialized and rendered
  */
 export default function shortcutsBoxFactory(config) {
+    const ESK_KEY_CODE = 27;
     const shortcutsBox = component({}, defaults)
         .on('render', function () {
-            const ESK_KEY_CODE = 27;
             const $element = this.getElement();
             const $closeBtn = $element.find('.btn-close');
             const $keyNavigationItems = this.getElement()
@@ -86,7 +86,7 @@ export default function shortcutsBoxFactory(config) {
                     this.trigger('close');
                 }
             });
-            $element.on('keydown', (e) => {
+            $element.on('keyup', (e) => {
                 if (e.keyCode === ESK_KEY_CODE) {
                     this.trigger('close');
                 }

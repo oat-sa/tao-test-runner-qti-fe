@@ -120,6 +120,14 @@ export default function keyNavigationFactory(testRunner, config = {}) {
         },
 
         /**
+         * Returns keyNavigation active state
+         * @returns {Boolean}
+         */
+        isActive() {
+            return groupNavigator !== null;
+        },
+
+        /**
          * Tears down the keyNavigator
          * @returns {testRunnerKeyNavigator}
          */

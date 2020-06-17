@@ -84,7 +84,7 @@ var itemComponentApi = {
         this.setState('active', true);
 
         const element = this.getElement()
-        if (!element) {
+        if (!element || (element.attr('role') !== 'option')) { // Not pretty bit quick
             return;
         }
 
@@ -100,7 +100,7 @@ var itemComponentApi = {
         this.setState('active', false);
 
         const element = this.getElement()
-        if (!element) {
+        if (!element || (element.attr('role') !== 'option')) { // Not pretty bit quick
             return;
         }
 

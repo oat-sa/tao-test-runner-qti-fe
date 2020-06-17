@@ -168,7 +168,7 @@ export default pluginFactory({
             .on('tool-flagitem', () => {
                 const currentItem = testRunner.getCurrentItem();
                 const questionStatus = getItemStatus(
-                    Object.assign(currentItem, { flagged: !item.flagged })
+                    Object.assign({}, currentItem, { flagged: !item.flagged })
                 );
 
                 this.jumplinks.trigger('changeQuesitionStatus', questionStatus);

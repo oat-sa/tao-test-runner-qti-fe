@@ -82,15 +82,16 @@ export default pluginFactory({
 
         testRunner
             .after('renderitem', () => {
-                updateTitles();
-
                 _.forOwn(this.titles, (options, scope) => {
-                    if (scope === 'item') {
-                        return;
-                    }
+                    this.titles[scope].$title.text('');
+                    this.titles[scope].$timer.text('');
 
-                    this.titles[scope].stats = statsHelper.getInstantStats(scope, testRunner);
+                    if (scope !== 'item') {
+                        this.titles[scope].stats = statsHelper.getInstantStats(scope, testRunner);
+                    }
                 });
+
+                updateTitles();
             })
             .on('timertick', (remainingTime, scope) => {
                 const title = this.titles[scope];

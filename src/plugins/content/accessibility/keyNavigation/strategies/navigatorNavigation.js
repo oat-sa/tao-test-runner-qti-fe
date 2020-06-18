@@ -69,6 +69,8 @@ export default {
             const $testStatusHeader = $navigator.find('.qti-navigator-info.collapsible > .qti-navigator-label');
             const navigableTestStatus = navigableDomElement.createFromDoms($testStatusHeader);
 
+            $testStatusHeader.addClass('key-navigation-actionable');
+
             if (navigableTestStatus.length) {
                 testStatusNavigation = keyNavigator({
                     keepState: config.keepState,

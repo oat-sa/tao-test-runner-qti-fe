@@ -96,7 +96,7 @@ export default pluginFactory({
                 return currentUpdatePromise;
             };
 
-            const addDuractionToCallActionParams = () => {
+            const addDurationToCallActionParams = () => {
                 const context = testRunner.getTestContext();
                 const itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
@@ -122,9 +122,9 @@ export default pluginFactory({
                 .on('tick', (elapsed) => {
                     updateDuration(elapsed);
                 })
-                .after('move skip exit timeout pause', () => currentUpdatePromise
-                    .then(addDuractionToCallActionParams)
-                    .catch(addDuractionToCallActionParams)
+                .before('move skip exit timeout pause', () => currentUpdatePromise
+                    .then(addDurationToCallActionParams)
+                    .catch(addDurationToCallActionParams)
                 )
                 /**
                  * @event duration.get

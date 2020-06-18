@@ -9,7 +9,7 @@
                 {{__ "Keyboard shortcuts for the Accessibility Tools are available to the Test-taker."}}
             </p>
             <p class="shortcuts-list-description">
-                {{__ "You can magnify the content by op to 200%. Check your browser settings to find out how to do it."}}
+                {{__ "You can magnify the content by up to 200%. Check your browser settings to find out how to do it."}}
             </p>
         </div>
         <button aria-label="Close dialog" class="btn-close small" data-control="close-btn" type="button">

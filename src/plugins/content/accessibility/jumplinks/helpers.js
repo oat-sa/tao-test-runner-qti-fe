@@ -83,3 +83,16 @@ export const getItemStatus = (item) => {
 
     return __('Not seen');
 };
+
+/**
+ * Detects if review panel hidden or not.
+ *
+ * @param {TestRunner} testRunner
+ *
+ * @returns {Boolean}
+ */
+export const isReviewPanelHidden = (testRunner) => testRunner
+    .getAreaBroker()
+    .getPanelArea()
+    .find('.qti-navigator')
+    .is('.hidden');

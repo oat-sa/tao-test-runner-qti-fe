@@ -259,6 +259,7 @@ export default pluginFactory({
      * Called during the runner's destroy phase
      */
     destroy: function destroy() {
+        state.selectedTheme = this.defaultTheme;
         shortcut.remove(`.${this.getName()}`);
     },
 

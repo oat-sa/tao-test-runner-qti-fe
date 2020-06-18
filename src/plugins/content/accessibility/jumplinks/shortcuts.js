@@ -71,6 +71,7 @@ const defaults = {
  * @returns {shortcutsBox} the component, initialized and rendered
  */
 export default function shortcutsBoxFactory(config) {
+    const ESK_KEY_CODE = 27;
     const shortcutsBox = component({}, defaults)
         .on('render', function () {
             const $element = this.getElement();
@@ -82,6 +83,11 @@ export default function shortcutsBoxFactory(config) {
             // handle overlay click
             $element.on('click', (e) => {
                 if ($element.is(e.target)) {
+                    this.trigger('close');
+                }
+            });
+            $element.on('keyup', (e) => {
+                if (e.keyCode === ESK_KEY_CODE) {
                     this.trigger('close');
                 }
             });

@@ -24,7 +24,7 @@ import __ from 'i18n';
 import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';
 import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
-import { getJumpElementFactory, getItemStatus } from './helpers';
+import { getJumpElementFactory, getItemStatus, isReviewPanelHidden } from './helpers';
 import jumplinksFactory from './jumplinks';
 import shortcutsFactory from './shortcuts';
 import shortcut from 'util/shortcut';
@@ -159,7 +159,7 @@ export default pluginFactory({
             .on('loaditem', () => {
                 const currentItem = testRunner.getCurrentItem();
                 const updatedConfig = {
-                    isReviewPanelEnabled: isReviewPanelEnabled(testRunner),
+                    isReviewPanelEnabled: !isReviewPanelHidden(testRunner) && isReviewPanelEnabled(testRunner),
                     questionStatus: getItemStatus(currentItem)
                 };
 
@@ -174,11 +174,7 @@ export default pluginFactory({
                 this.jumplinks.trigger('changeQuesitionStatus', questionStatus);
             })
             .on('tool-reviewpanel', () => {
-                const wasHidden = testRunner
-                    .getAreaBroker()
-                    .getPanelArea()
-                    .find('.qti-navigator')
-                    .is('.hidden');
+                const wasHidden = isReviewPanelHidden(testRunner);
 
                 this.jumplinks.trigger('changeReviewPanel', wasHidden);
             });

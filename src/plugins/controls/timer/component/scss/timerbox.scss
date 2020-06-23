@@ -48,6 +48,9 @@
         &:hover,&:active,&:focus{
             outline: unset;
         }
+        &:active,&:focus{
+            border: 2px solid white;
+        }
         &:hover {
             opacity: .93;
             @include transition(opacity);

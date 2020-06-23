@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -22,16 +22,8 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import pollingFactory from 'core/polling';
-import timerFactory from 'core/timer';
 import pluginFactory from 'taoTests/runner/plugin';
 import promiseQueue from 'core/promiseQueue';
-
-/**
- * Time interval between duration capture in ms
- * @type {Number}
- */
-const refresh = 1000;
 
 /**
  * Creates the timer plugin
@@ -43,7 +35,7 @@ export default pluginFactory({
      * Install step, add behavior before the lifecycle.
      */
     install: function install() {
-        //define the "duration" store as "volatile" (removed on browser change).
+        // define the "duration" store as "volatile" (removed on browser change).
         this.getTestRunner()
             .getTestStore()
             .setVolatile(this.getName());
@@ -51,9 +43,10 @@ export default pluginFactory({
 
     /**
      * Initializes the plugin (called during runner's init)
+     *
+     * @returns {Promise}
      */
     init: function init() {
-        const self = this;
         const testRunner = this.getTestRunner();
 
         /**
@@ -66,6 +59,7 @@ export default pluginFactory({
         return testRunner.getPluginStore(this.getName()).then((durationStore) => {
             /**
              * Gets the duration of a particular item from the store
+             *
              * @param {String} attemptId - the attempt id to get the duration for
              * @returns {Promise}
              */
@@ -80,19 +74,17 @@ export default pluginFactory({
             /**
              * Updates the duration of a particular item
              *
+             * @param {Number} elapsed - time elapsed since previous tick
              * @returns {Promise}
              */
-            const updateDuration = () => {
-                //how many time elapsed from the last tick ?
-
+            const updateDuration = (elapsed) => {
                 const context = testRunner.getTestContext();
 
                 //store by attempt
                 const itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
                 currentUpdatePromise = queue.serie(() => durationStore.getItem(itemAttemptId)
-                    .then(function(duration) {
-                        let elapsed = self.stopwatch.tick();
+                    .then(function (duration) {
                         duration = _.isNumber(duration) ? duration : 0;
                         elapsed = _.isNumber(elapsed) && elapsed > 0 ? elapsed / 1000 : 0;
 
@@ -104,7 +96,7 @@ export default pluginFactory({
                 return currentUpdatePromise;
             };
 
-            const addDuractionToCallActionParams = () => {
+            const addDurationToCallActionParams = () => {
                 const context = testRunner.getTestContext();
                 const itemAttemptId = `${context.itemIdentifier}#${context.attempt}`;
 
@@ -125,34 +117,14 @@ export default pluginFactory({
                     .catch(_.noop);
             };
 
-            //one stopwatch to count the time
-            self.stopwatch = timerFactory({
-                autoStart: false,
-            });
-
-            //update the duration on a regular basis
-            self.polling = pollingFactory({
-                action: updateDuration,
-                interval: refresh,
-                autoStart: false,
-            });
-
             //change plugin state
             testRunner
-                .after('renderitem', () => {
-                    self.enable();
-                })
-                .on('enableitem', () => {
-                    self.enable();
-                })
-                .before('move skip exit timeout error disableitem', () => {
-                    updateDuration()
-                      .then(() => self.disable())
-                      .catch(() => self.disable());
+                .on('tick', (elapsed) => {
+                    updateDuration(elapsed);
                 })
                 .before('move skip exit timeout pause', () => currentUpdatePromise
-                    .then(addDuractionToCallActionParams)
-                    .catch(addDuractionToCallActionParams)
+                    .then(addDurationToCallActionParams)
+                    .catch(addDurationToCallActionParams)
                 )
                 /**
                  * @event duration.get
@@ -165,33 +137,5 @@ export default pluginFactory({
                     }
                 });
         });
-    },
-
-    /**
-     * Called during the runner's destroy phase
-     */
-    destroy: function destroy() {
-        this.polling.stop();
-        this.stopwatch.stop();
-    },
-
-    /**
-     * Enables the duration count
-     */
-    enable: function enable() {
-        if (!this.getState('enabled')) {
-            this.polling.start();
-            this.stopwatch.resume();
-        }
-    },
-
-    /**
-     * Disables the duration count
-     */
-    disable: function disable() {
-        if (this.getState('enabled')) {
-            this.polling.stop();
-            this.stopwatch.pause();
-        }
     }
 });

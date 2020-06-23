@@ -137,7 +137,7 @@ export default pluginFactory({
                 _.forEach(themesConfig.available, function(theme) {
                     state.availableThemes.push({
                         id: theme.id,
-                        label: theme.name
+                        label: __(theme.name)
                     });
                 });
             }
@@ -169,6 +169,7 @@ export default pluginFactory({
                 .getAreaBroker()
                 .getToolbox()
                 .createEntry({
+                    role: 'option',
                     control: theme.id,
                     title: theme.label,
                     icon: 'preview',

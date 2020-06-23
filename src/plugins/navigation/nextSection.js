@@ -46,16 +46,22 @@ export default pluginFactory({
             const testMap = testRunner.getTestMap();
 
             return {
-                nextSection : mapHelper.hasItemCategory(
+                nextSection: mapHelper.hasItemCategory(
                     testMap,
                     testContext.itemIdentifier,
                     'nextSection',
                     true
                 ),
-                nextSectionWarning : mapHelper.hasItemCategory(
+                nextSectionWarning: mapHelper.hasItemCategory(
                     testMap,
                     testContext.itemIdentifier,
                     'nextSectionWarning',
+                    true
+                ),
+                noExitTimedSectionWarning: mapHelper.hasItemCategory(
+                    testMap,
+                    testContext.itemIdentifier,
+                    'noExitTimedSectionWarning',
                     true
                 )
             };
@@ -75,6 +81,21 @@ export default pluginFactory({
             testRunner.next('section');
         }
 
+        /**
+         * Check if warn section leaving dialog enabled to prevent showing double dialogs
+         * @returns {Boolean}
+         */
+        const isWarnSectionLeavingEabled = () => {
+            const testContext = testRunner.getTestContext();
+            const categories = getNextSectionCategories();
+            const timeConstraints = testContext.timeConstraints || [];
+
+
+            return timeConstraints.some(({ source }) => source === testContext.sectionId)
+                && !categories.noExitTimedSectionWarning
+                && !(testRunnerOptions.timer || {}).keepUpToTimeout;
+        };
+
         this.$element = $(
             buttonTpl({
                 control: 'next-section',
@@ -91,7 +112,7 @@ export default pluginFactory({
             if (self.getState('enabled') !== false) {
                 self.disable();
 
-                if (categories.nextSectionWarning) {
+                if (categories.nextSectionWarning && !isWarnSectionLeavingEabled()) {
                     testRunner.trigger(
                         'confirm.nextsection',
                         messages.getExitMessage(

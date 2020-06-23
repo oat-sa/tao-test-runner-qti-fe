@@ -37,6 +37,7 @@ import qtiItemRunner from 'taoQtiItem/runner/qtiItemRunner';
 import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
 import states from 'taoQtiTest/runner/config/states';
+import stopwatchFactory from 'taoQtiTest/runner/provider/stopwatch';
 
 /**
  * A Test runner provider to be registered against the runner
@@ -56,6 +57,7 @@ var qtiProvider = {
             content: $('#qti-content', $layout),
             toolbox: $('.tools-box', $layout),
             navigation: $('.navi-box-list', $layout),
+            mainLandmark: $('#test-title-header', $layout),
             control: $('.top-action-bar .control-box', $layout),
             actionsBar: $('.bottom-action-bar .control-box', $layout),
             panel: $('.test-sidebar-left', $layout),
@@ -250,6 +252,13 @@ var qtiProvider = {
             //catch server errors
             var submitError = function submitError(err) {
                 if (err && err.unrecoverable){
+                    self.trigger(
+                        'alert.error',
+                        __(
+                            'An unrecoverable error occurred. Your test session will be paused.'
+                        )
+                    );
+
                     self.trigger('pause', {message : err.message});
                 } else if (err.code === 200) {
                     //some server errors are valid, so we don't fail (prevent empty responses)
@@ -361,6 +370,11 @@ var qtiProvider = {
         areaBroker.setComponent('toolbox', toolboxFactory());
         areaBroker.getToolbox().init();
 
+        const stopwatch = stopwatchFactory({});
+
+        stopwatch.init();
+        stopwatch.spread(this, 'tick');
+
         /*
          * Install behavior on events
          */
@@ -459,7 +473,11 @@ var qtiProvider = {
                                 self.trigger(
                                     'alert.timeout',
                                     __('Time limit reached, this part of the test has ended.'),
-                                    resolve
+                                    () => {
+                                        self.trigger('timeoutAccepted');
+
+                                        resolve();
+                                    }
                                 );
                             }
                         })
@@ -485,6 +503,9 @@ var qtiProvider = {
                     .catch(function(err) {
                         self.trigger('error', err);
                     });
+            })
+            .before('move skip exit timeout pause', function() {
+                stopwatch.stop();
             })
             .on('loaditem', function() {
                 var context = this.getTestContext();
@@ -524,16 +545,25 @@ var qtiProvider = {
                 }
                 this.trigger('enablenav');
             })
+            .after('renderitem', function(){
+                stopwatch.start();
+            })
             .on('resumeitem', function() {
                 this.trigger('enableitem enablenav');
             })
             .on('disableitem', function() {
+                stopwatch.stop();
+
                 this.trigger('disabletools');
             })
             .on('enableitem', function() {
+                stopwatch.start();
+
                 this.trigger('enabletools');
             })
             .on('error', function() {
+                stopwatch.stop();
+
                 this.trigger('disabletools enablenav');
             })
             .on('finish', function() {
@@ -545,6 +575,8 @@ var qtiProvider = {
             })
             .on('flush', function() {
                 this.destroy();
+
+                stopwatch.destroy();
             });
 
         //starts the event collection
@@ -770,6 +802,9 @@ var qtiProvider = {
                     }
                 })
                 .then(function() {
+                    probeOverseer.stop();
+                })
+                .catch(function() {
                     probeOverseer.stop();
                 });
         } else {

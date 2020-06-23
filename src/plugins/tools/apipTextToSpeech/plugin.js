@@ -66,7 +66,6 @@ export default pluginFactory({
                 id: groupNavigationId,
                 group: $navigationGroupElement,
                 elements: navigableDomElement.createFromDoms($navigationElements.add($navigationGroupElement)),
-                replace: true,
                 propagateTab: false,
                 loop: true,
                 keepState: true,
@@ -100,7 +99,7 @@ export default pluginFactory({
                         0
                     );
                 })
-                .focusPosition($navigationElements.length);
+                .setCursorAt($navigationElements.length);
 
             ttsComponent.on('next finish', () => {
                 if (ttsComponent.is('sfhMode')) {
@@ -205,8 +204,10 @@ export default pluginFactory({
             if (this.getState('enabled')) {
                 if (this.getState('active')) {
                     disablePlugin();
+                    this.setState('sleep', true);
                 } else {
                     enablePlugin();
+                    this.setState('sleep', false);
                 }
             }
         };
@@ -317,6 +318,10 @@ export default pluginFactory({
 
                 getTTSComponent().setMediaContentData(ttsApipData);
                 this.show();
+                if (!this.getState('sleep')) {
+                    this.setState('enabled', true);
+                    toggleTool();
+                }
             });
     },
     /**

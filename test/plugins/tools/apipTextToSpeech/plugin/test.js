@@ -24,9 +24,8 @@ define([
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/tools/apipTextToSpeech/plugin',
-    'ui/keyNavigation/navigator',
     'lib/simulator/jquery.simulate'
-], function (_, hider, runnerFactory, providerMock, pluginFactory, keyNavigatorFactory) {
+], function (_, hider, runnerFactory, providerMock, pluginFactory) {
     'use strict';
 
     const providerName = 'mock';
@@ -148,13 +147,11 @@ define([
             .init()
             .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin is initialised');
-
-                ready();
             })
             .catch((err) => {
                 assert.ok(false, `The init failed: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 
     /**
@@ -166,14 +163,14 @@ define([
         const ready = assert.async();
         const runner = runnerFactory(providerName);
         const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $container = areaBroker.getToolboxArea();
+        const plugin = pluginFactory(runner, areaBroker);
 
         assert.expect(3);
 
         plugin
             .init()
             .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
                 let $button;
 
                 areaBroker.getToolbox().render($container);
@@ -188,52 +185,53 @@ define([
                 $button = $container.find('[data-control="apiptts"]');
 
                 assert.equal($button.length, 0, 'The trigger button has been removed');
-                ready();
             })
             .catch((err) => {
                 assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 
     QUnit.test('enable/disable button', (assert) => {
         const ready = assert.async();
         const runner = runnerFactory(providerName);
         const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $container = areaBroker.getToolboxArea();
+        const plugin = pluginFactory(runner, areaBroker);
 
         assert.expect(2);
 
         plugin
             .init()
             .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
-
                 areaBroker.getToolbox().render($container);
 
-                return plugin.enable().then(() => {
-                    const $button = $container.find('[data-control="apiptts"]');
+                return plugin.enable();
+            })
+            .then(() => {
+                const $button = $container.find('[data-control="apiptts"]');
 
-                    assert.equal($button.hasClass('disabled'), false, 'The trigger button has been enabled');
+                assert.equal($button.hasClass('disabled'), false, 'The trigger button has been enabled');
 
-                    return plugin.disable().then(() => {
-                        assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
+                return plugin.disable();
+            })
+            .then(() => {
+                const $button = $container.find('[data-control="apiptts"]');
 
-                        ready();
-                    });
-                });
+                assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
             })
             .catch((err) => {
                 assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 
     QUnit.test('show/hide button', (assert) => {
         const ready = assert.async();
         const runner = runnerFactory(providerName);
         const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $container = areaBroker.getToolboxArea();
+        const plugin = pluginFactory(runner, areaBroker);
 
         assert.expect(3);
 
@@ -244,37 +242,41 @@ define([
         plugin
             .init()
             .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
-
                 areaBroker.getToolbox().render($container);
 
-                return plugin.hide().then(() => {
-                    const $button = $container.find('[data-control="apiptts"]');
+                return plugin.hide();
+            })
+            .then(() => {
+                const $button = $container.find('[data-control="apiptts"]');
 
-                    assert.equal(hider.isHidden($button), true, 'The trigger button has been hidden');
+                assert.equal(hider.isHidden($button), true, 'The trigger button has been hidden');
 
-                    return plugin.show().then(() => {
-                        assert.equal(hider.isHidden($button), false, 'The trigger button is visible');
+                return plugin.show();
+            })
+            .then(() => {
+                const $button = $container.find('[data-control="apiptts"]');
 
-                        return plugin.hide().then(() => {
-                            assert.equal(hider.isHidden($button), true, 'The trigger button has been hidden again');
+                assert.equal(hider.isHidden($button), false, 'The trigger button is visible');
 
-                            ready();
-                        });
-                    });
-                });
+                return plugin.hide();
+            })
+            .then(() => {
+                const $button = $container.find('[data-control="apiptts"]');
+
+                assert.equal(hider.isHidden($button), true, 'The trigger button has been hidden again');
             })
             .catch((err) => {
                 assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: loaditem / unloaditem', (assert) => {
         const ready = assert.async();
         const runner = runnerFactory(providerName);
         const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $container = areaBroker.getToolboxArea();
+        const plugin = pluginFactory(runner, areaBroker);
 
         assert.expect(3);
 
@@ -285,8 +287,6 @@ define([
         plugin
             .init()
             .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
-
                 areaBroker.getToolbox().render($container);
 
                 const $button = $container.find('[data-control="apiptts"]');
@@ -300,20 +300,19 @@ define([
                 assert.equal(hider.isHidden($button), false, 'The trigger button is still visible');
 
                 assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
-
-                ready();
             })
             .catch((err) => {
                 assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: renderitem', (assert) => {
         const ready = assert.async();
         const runner = runnerFactory(providerName);
         const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $container = areaBroker.getToolboxArea();
+        const plugin = pluginFactory(runner, areaBroker);
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
@@ -324,8 +323,6 @@ define([
         plugin
             .init()
             .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
-
                 areaBroker.getToolbox().render($container);
 
                 const $button = $container.find('[data-control="apiptts"]');
@@ -335,13 +332,11 @@ define([
                 assert.equal(hider.isHidden($button), false, 'The trigger button is visible');
 
                 assert.equal($button.hasClass('disabled'), false, 'The trigger button is not disabled');
-
-                ready();
             })
             .catch((err) => {
                 assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: renderitem with disabled plugin', (assert) => {
@@ -366,7 +361,8 @@ define([
         runner.setTestMap(Object.assign({}, sampleTestMap, testPartWithApipCategory));
 
         const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $container = areaBroker.getToolboxArea();
+        const plugin = pluginFactory(runner, areaBroker);
 
         runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
@@ -375,8 +371,6 @@ define([
         plugin
             .init()
             .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
-
                 areaBroker.getToolbox().render($container);
 
                 const $button = $container.find('[data-control="apiptts"]');
@@ -385,20 +379,19 @@ define([
                 runner.trigger('renderitem');
 
                 assert.equal(hider.isHidden($button), true, 'the button is not visible');
-
-                ready();
             })
             .catch((err) => {
                 assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 
     QUnit.test('Toggle on click', (assert) => {
         const ready = assert.async();
         const runner = runnerFactory(providerName);
         const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $container = areaBroker.getToolboxArea();
+        const plugin = pluginFactory(runner, areaBroker);
 
         assert.expect(3);
 
@@ -408,45 +401,43 @@ define([
 
         plugin
             .init()
-            .then(function () {
-                const $container = areaBroker.getToolboxArea();
-
+            .then(() => {
                 runner.trigger('renderitem');
 
                 areaBroker.getToolbox().render($container);
 
-                return plugin.enable().then(() => {
-                    const $button = $container.find('[data-control="apiptts"]');
-
-                    assert.equal(plugin.getState('active'), false, 'The plugin should not be active by default');
-
-                    $button.click();
-
-                    assert.equal(plugin.getState('active'), true, 'The button should toggle the plugin to active state');
-
-                    $button.click();
-
-                    assert.equal(plugin.getState('active'), false, 'If the plugin is active, the button should toggle the plugin to non active state');
-
-                    ready();
-                });
+                return plugin.enable();
             })
-            .catch(function (err) {
+            .then(() => {
+                const $button = $container.find('[data-control="apiptts"]');
+
+                assert.equal(plugin.getState('active'), true, 'The plugin should be active by default');
+
+                $button.click();
+
+                assert.equal(plugin.getState('active'), false, 'If the plugin is active, the button should toggle the plugin to non active state');
+
+                $button.click();
+
+                assert.equal(plugin.getState('active'), true, 'The button should toggle the plugin to active state');
+            })
+            .catch(err => {
                 assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 
     QUnit.test('Add navigation group', (assert) => {
         const ready = assert.async();
         const runner = runnerFactory(providerName);
         const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const $testContainer = areaBroker.getContainer();
+        const $container = areaBroker.getToolboxArea();
+        const plugin = pluginFactory(runner, areaBroker);
         const pluginName = plugin.getName();
-        const groupNavigationId = `${pluginName}_navigation_group`;
         const actionPrefix = `tool-${pluginName}-`;
 
-        assert.expect(7);
+        assert.expect(8);
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
@@ -454,55 +445,71 @@ define([
 
         plugin
             .init()
-            .then(function () {
-                const $container = areaBroker.getToolboxArea();
-                const $testContainer = areaBroker.getContainer();
+            .then(() => {
                 areaBroker.getToolbox().render($container);
 
                 runner.trigger('renderitem');
+                runner.trigger(`${actionPrefix}toggle`);
 
-                return plugin.enable().then(() => {
-                    const $button = $container.find('[data-control="apiptts"]');
-                    const $sfhButton = $testContainer.find('.tts-control-mode');
-
-                    assert.equal($button.is(document.activeElement), false, 'The focus group is not focused by default');
-
-                    $button.click();
-
-                    const navigationGroup = keyNavigatorFactory.get(groupNavigationId);
-
-                    assert.equal(typeof navigationGroup, 'object', 'The plugin create navigation group after render');
-
-                    assert.equal($button.is(document.activeElement), true, 'The focus group is not focused after plugin activation');
-
-                    $button.click();
-                    $sfhButton.click();
-
-                    assert.equal($button.is(document.activeElement), false, 'The focus group lose focus after plugin disabling');
-
-                    runner.on(`${actionPrefix}next`, () => {
-                        assert.ok(true, 'The next event triggered after tab navigation');
-
-                        runner.on(`${actionPrefix}previous`, () => {
-                            assert.ok(true, 'The previous event triggered after tab+shift navigation');
-
-                            ready();
-                        });
-
-                        navigationGroup.trigger('shift+tab');
-                    });
-
-                    runner.on(`${actionPrefix}togglePlayback`, () => {
-                        assert.ok(true, 'The togglePlayback event triggered on activate navigation event');
-                    });
-
-                    navigationGroup.trigger('tab');
-                    navigationGroup.trigger('activate');
-                });
+                return plugin.enable();
             })
-            .catch(function (err) {
+            .then(() => {
+                const $button = $container.find('[data-control="apiptts"]');
+                const $sfhButton = $testContainer.find('.tts-control-mode');
+
+                assert.equal($button.is(document.activeElement), false, 'The focus group is not focused by default');
+
+                $button.click();
+
+                assert.equal(typeof plugin.navigationGroup, 'object', 'The plugin create navigation group after render');
+
+                assert.equal($button.is(document.activeElement), true, 'The focus group is focused after plugin activation');
+
+                $button.click();
+                $sfhButton.click();
+
+                assert.equal($button.is(document.activeElement), false, 'The focus group lose focus after plugin disabling');
+
+                $button.click();
+
+                assert.equal($button.is(document.activeElement), true, 'The focus group is focused again');
+            })
+            .then(() => new Promise(resolve => {
+                const $button = $container.find('[data-control="apiptts"]');
+
+                runner.on(`${actionPrefix}next`, () => {
+                    assert.ok(true, 'The next event triggered after tab navigation');
+
+                    resolve();
+                });
+
+                $button.simulate('keydown', {keyCode: 9}); //Tab -> navigate next
+            }))
+            .then(() => new Promise(resolve => {
+                const $button = $container.find('[data-control="apiptts"]');
+
+                runner.on(`${actionPrefix}previous`, () => {
+                    assert.ok(true, 'The previous event triggered after tab+shift navigation');
+
+                    resolve();
+                });
+
+                $button.simulate('keydown', {keyCode: 9, shiftKey: true}); //Shift+Tab -> navigate back
+            }))
+            .then(() => new Promise(resolve => {
+                const $button = $container.find('[data-control="apiptts"]');
+
+                runner.on(`${actionPrefix}togglePlayback`, () => {
+                    assert.ok(true, 'The togglePlayback event triggered on activate navigation event');
+
+                    resolve();
+                });
+
+                $button.simulate('keydown', {keyCode: 13}); //Enter -> activate
+            }))
+            .catch(err => {
                 assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+            })
+            .then(ready);
     });
 });

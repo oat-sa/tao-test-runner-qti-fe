@@ -69,7 +69,7 @@
 
             &.top-action-bar > .control-box {
 
-                height: #{(map-get($heights, horizontal-action-bar)) * 1px };
+                height: #{(map-get($heights, horizontal-action-bar) - 2) * 1px };
 
                 display: -ms-flexbox;
                 display: -webkit-flex;
@@ -203,6 +203,7 @@
                             }
                         }
 
+                        &:focus,
                         &.hover,
                         &:hover {
                             background-color: $info;
@@ -253,6 +254,14 @@
                     }
                 }
 
+                .landmark-title--hidden {
+                    position: absolute;
+                    clip: rect(1px, 1px, 1px, 1px);
+                    overflow: hidden;
+                    height: 1px;
+                    width: 1px;
+                    word-wrap: normal;
+                }
             }
         }
     }

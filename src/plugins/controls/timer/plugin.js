@@ -28,11 +28,18 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
+import $ from 'jquery';
 import _ from 'lodash';
 import pluginFactory from 'taoTests/runner/plugin';
 import getStrategyHandler from 'taoQtiTest/runner/plugins/controls/timer/strategy/strategyHandler';
 import timerboxFactory from 'taoQtiTest/runner/plugins/controls/timer/component/timerbox';
 import timersFactory from 'taoQtiTest/runner/plugins/controls/timer/timers';
+import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
+import statsHelper from 'taoQtiTest/runner/helpers/stats';
+import screenreaderNotificationTpl from 'taoQtiTest/runner/plugins/controls/timer/component/tpl/screenreaderNotification.tpl';
+
+// timeout after which screenreader notifcation should be cleaned up
+const screenreaderNotificationTimeout = 20000;
 
 /**
  * Creates the plugin
@@ -95,11 +102,21 @@ export default pluginFactory({
 
     /**
      * Initializes the plugin (called during runner's init)
+     *
+     * @returns {Promise}
      */
     init: function init() {
         const self = this;
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
+        let screenreaderNotifcationTimeoutId;
+
+        const stats = {};
+        ['test', 'testPart', 'section', 'item']
+            .forEach((scope) => Object.assign(
+                stats,
+                {[scope]: statsHelper.getInstantStats(scope, testRunner)})
+            );
 
         /**
          * Plugin config,
@@ -116,6 +133,11 @@ export default pluginFactory({
             warnings: (testRunnerOptions.timerWarning) || {},
 
             /**
+             * The list of configured warnings for screenreaders
+             */
+            warningsForScreenreader: (testRunnerOptions.timerWarningForScreenreader) || {},
+
+            /**
              * The guided navigation option
              */
             guidedNavigation: testRunnerOptions.guidedNavigation,
@@ -123,7 +145,12 @@ export default pluginFactory({
             /**
              * Restore timer from client.
              */
-            restoreTimerFromClient: testRunnerOptions.timer && testRunnerOptions.timer.restoreTimerFromClient
+            restoreTimerFromClient: testRunnerOptions.timer && testRunnerOptions.timer.restoreTimerFromClient,
+
+            /**
+             * Questions stats
+             */
+            questionsStats: stats
         }, this.getConfig());
 
         /**
@@ -155,15 +182,38 @@ export default pluginFactory({
                                 .catch(handleError);
                         }
                     })
-                    .on('enableitem', function() {
+                    .on('tick', function(elapsed) {
                         if (self.timerbox) {
-                            self.timerbox.start();
+                            const timers = self.timerbox.getTimers();
+
+                            const updatedTimers = Object.keys(timers).reduce((acc, timerName) => {
+                                const stats = statsHelper.getInstantStats(timers[timerName].scope, testRunner);
+                                const unansweredQuestions = stats && (stats.questions - stats.answered);
+                                acc[timerName] = Object.assign(
+                                    {},
+                                    timers[timerName],
+                                    {
+                                        remainingTime: timers[timerName].remainingTime - elapsed,
+                                        unansweredQuestions
+                                    }
+                                );
+
+                                return acc;
+                            }, {});
+
+                            self.timerbox
+                                .update(updatedTimers)
+                                .catch(handleError);
                         }
                     })
                     .after('renderitem', function() {
                         if (self.timerbox) {
+                            $(self.timerbox.getElement()).find('.timer-wrapper')
+                                .attr('aria-hidden', isReviewPanelEnabled(testRunner));
                             self.timerbox.start();
                         }
+
+                        self.$screenreaderWarningContainer.text('');
                     })
                     .on('disableitem move skip', function() {
                         if (self.timerbox) {
@@ -177,6 +227,7 @@ export default pluginFactory({
                     .then(function(startZen) {
                         //set up the timerbox
                         self.timerbox = timerboxFactory({
+                            ariaHidden: isReviewPanelEnabled(testRunner),
                             zenMode: {
                                 enabled: true,
                                 startHidden: !!startZen
@@ -215,12 +266,41 @@ export default pluginFactory({
                             .on('init', resolve)
                             .on('error', handleError);
 
+                        // share this timer values to use in other components
+                        self.timerbox.spread(testRunner, 'timertick');
+
                         if (!config.contextualWarnings) {
                             self.timerbox.on('warn', function(message, level) {
                                 if (level && message) {
                                     testRunner.trigger(level, message);
                                 }
                             });
+
+                            // debounce used to prevent multiple invoking at the same time
+                            self.timerbox.on('warnscreenreader', _.debounce(
+                                (message, remainingTime, scope) => {
+                                    const stats = statsHelper.getInstantStats(scope, testRunner);
+                                    const unansweredQuestions = stats && (stats.questions - stats.answered);
+
+                                    if (screenreaderNotifcationTimeoutId) {
+                                        clearTimeout(screenreaderNotifcationTimeoutId);
+                                    }
+
+                                    self.$screenreaderWarningContainer.text(
+                                        message(remainingTime, unansweredQuestions)
+                                    );
+
+                                    screenreaderNotifcationTimeoutId = setTimeout(
+                                        () => self.$screenreaderWarningContainer.text(''),
+                                        screenreaderNotificationTimeout
+                                    );
+                                },
+                                1000,
+                                {
+                                    'leading': true,
+                                    'trailing': false
+                                }
+                            ));
                         }
                     })
                     .catch(handleError);
@@ -232,7 +312,11 @@ export default pluginFactory({
      * Called during the runner's render phase
      */
     render: function render() {
-        this.timerbox.render(this.getAreaBroker().getControlArea());
+        const $container = this.getAreaBroker().getControlArea();
+
+        this.$screenreaderWarningContainer = $(screenreaderNotificationTpl());
+        this.timerbox.render($container);
+        $container.append(this.$screenreaderWarningContainer);
     },
 
     /**

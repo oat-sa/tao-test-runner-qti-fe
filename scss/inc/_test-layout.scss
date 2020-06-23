@@ -18,6 +18,13 @@
 
     height: calc(100vh - #{(map-get($heights, header) + map-get($heights, footer)) * 1px});
 
+    .landmark-title-hidden {
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+    }
+
     .test-runner-sections {
 
         /* flex column value */
@@ -74,6 +81,14 @@
     }
     .test-sidebar-left {
         border-right: 1px $uiGeneralContentBorder solid;
+
+        .landmark-title--hidden {
+            position: absolute;
+            overflow: hidden;
+            height: 1px;
+            width: 1px;
+            word-wrap: normal;
+        }
     }
 
     .test-sidebar-right {
@@ -142,6 +157,14 @@
             display: none;
         }
     }
+
+    .visible-hidden {
+      position: absolute;
+      overflow: hidden;
+      height: 1px;
+      width: 1px;
+      word-wrap: normal;
+  }
 }
 
 .no-controls .test-runner-scope {

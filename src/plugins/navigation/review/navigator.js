@@ -696,8 +696,10 @@ function navigatorFactory(config, map, context) {
 
                     // select the button
                     $filters.removeClass(_cssCls.active);
+                    $filters.attr('aria-selected', false);
                     $component.removeClass(_cssCls.collapsed);
                     $btn.addClass(_cssCls.active);
+                    $btn.attr('aria-selected', true);
 
                     // filter the items
                     self.filter(mode);

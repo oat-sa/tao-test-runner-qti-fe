@@ -21,7 +21,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import keyNavigatorFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigator';
+import keyNavigatorFactory from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/keyNavigation';
 import pluginFactory from 'taoTests/runner/plugin';
 import 'taoQtiTest/runner/plugins/content/accessibility/css/key-navigation.css';
 
@@ -47,14 +47,24 @@ export default pluginFactory({
     init() {
         const testRunner = this.getTestRunner();
         const pluginConfig = _.defaults(this.getConfig(), defaultPluginConfig);
-        const keyNavigator = keyNavigatorFactory(pluginConfig);
+        const keyNavigator = keyNavigatorFactory(testRunner, pluginConfig);
 
         /**
          *  Update plugin state based on changes
          */
         testRunner
-            .after('renderitem', () => keyNavigator.init(testRunner))
-            .on('unloaditem', () => keyNavigator.destroy())
+            .after('renderitem', () => {
+                // make sure that keyNavigator is destroyed
+                // to preevent multiple instances to be active at the same time
+                if (keyNavigator.isActive()) {
+                    keyNavigator.destroy();
+                }
+
+                keyNavigator.init();
+            })
+            .on('unloaditem', () => {
+                keyNavigator.destroy();
+            })
 
             /**
              * @param {string} type - type of content tab navigation,

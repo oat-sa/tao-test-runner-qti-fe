@@ -1,0 +1,712 @@
+[
+    {
+        "title": "Default",
+        "mode": "default",
+        "rubrics": true,
+        "steps": [
+            {
+                "label": "Rubrics block",
+                "selector": ".qti-rubricBlock",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 1",
+                "selector": ".qti-interaction input[value=\"choice_1\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 2",
+                "selector": ".qti-interaction input[value=\"choice_2\"]",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "Item interaction 3",
+                "selector": ".qti-interaction input[value=\"choice_3\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Item interaction 2",
+                "selector": ".qti-interaction input[value=\"choice_2\"]",
+                "key": {
+                    "keyCode": "UP"
+                }
+            },
+            {
+                "label": "Item interaction 1",
+                "selector": ".qti-interaction input[value=\"choice_1\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Hide review button",
+                "selector": "[data-control=\"hide-review\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Logout link",
+                "selector": "#logout",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Exit link",
+                "selector": "#exit",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Logout link",
+                "selector": "#logout",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel Test status",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel Flagged tab",
+                "selector": ".qti-navigator-filter[data-mode=\"flagged\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "Navigation panel previous item",
+                "selector": ".qti-navigator-item[data-id=\"item-2\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "UP"
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "Rubrics block",
+                "selector": ".qti-rubricBlock",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item wrapper",
+                "selector": "section.content-wrapper",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Navigation panel Test status + shift key",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            }
+        ]
+    },
+    {
+        "title": "Linear",
+        "mode": "linear",
+        "rubrics": true,
+        "steps": [
+            {
+                "label": "Rubrics block",
+                "selector": ".qti-rubricBlock",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 1",
+                "selector": ".qti-interaction [data-identifier=\"choice_1\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 2",
+                "selector": ".qti-interaction [data-identifier=\"choice_2\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Item interaction 3",
+                "selector": ".qti-interaction [data-identifier=\"choice_3\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 2",
+                "selector": ".qti-interaction [data-identifier=\"choice_2\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Item interaction 1",
+                "selector": ".qti-interaction [data-identifier=\"choice_1\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Item interaction 2",
+                "selector": ".qti-interaction [data-identifier=\"choice_2\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 3",
+                "selector": ".qti-interaction [data-identifier=\"choice_3\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Hide review button",
+                "selector": "[data-control=\"hide-review\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Logout link",
+                "selector": "#logout",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Exit link",
+                "selector": "#exit",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Logout link",
+                "selector": "#logout",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel Test status",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel Flagged tab",
+                "selector": ".qti-navigator-filter[data-mode=\"flagged\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "Navigation panel previous item",
+                "selector": ".qti-navigator-item[data-id=\"item-2\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "UP"
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "Rubrics block",
+                "selector": ".qti-rubricBlock",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item wrapper",
+                "selector": "section.content-wrapper",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Navigation panel Test status + shift key",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            }
+        ]
+    },
+    {
+        "title": "Native",
+        "mode": "native",
+        "rubrics": true,
+        "steps": [
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Logout link",
+                "selector": "#logout",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Exit link",
+                "selector": "#exit",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel Test status",
+                "selector": ".qti-navigator-info.collapsible > .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel Flagged tab",
+                "selector": ".qti-navigator-filter[data-mode=\"flagged\"]",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel All tab",
+                "selector": ".qti-navigator-filter[data-mode=\"all\"]",
+                "key": {
+                    "keyCode": "UP"
+                }
+            },
+            {
+                "label": "Navigation panel Unanswered tab",
+                "selector": ".qti-navigator-filter[data-mode=\"unanswered\"]",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Navigation panel previous item",
+                "selector": ".qti-navigator-item[data-id=\"item-2\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "LEFT"
+                }
+            },
+            {
+                "label": "Navigation panel current item",
+                "selector": ".qti-navigator-item[data-id=\"item-3\"] .qti-navigator-label",
+                "key": {
+                    "keyCode": "RIGHT"
+                }
+            },
+            {
+                "label": "Item wrapper",
+                "selector": "section.content-wrapper",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Rubrics block",
+                "selector": ".qti-rubricBlock",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 1",
+                "selector": ".qti-interaction input[value=\"choice_1\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 2",
+                "selector": ".qti-interaction input[value=\"choice_2\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 3",
+                "selector": ".qti-interaction input[value=\"choice_3\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 2",
+                "selector": ".qti-interaction input[value=\"choice_2\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Item interaction 1",
+                "selector": ".qti-interaction input[value=\"choice_1\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Item interaction 2",
+                "selector": ".qti-interaction input[value=\"choice_2\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Item interaction 3",
+                "selector": ".qti-interaction input[value=\"choice_3\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Hide review button",
+                "selector": "[data-control=\"hide-review\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Home link",
+                "selector": "#home",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Previous button",
+                "selector": "[data-control=\"move-backward\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Hide review button",
+                "selector": "[data-control=\"hide-review\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            },
+            {
+                "label": "Item interaction 3",
+                "selector": ".qti-interaction input[value=\"choice_3\"]",
+                "key": {
+                    "keyCode": "TAB",
+                    "shiftKey": true
+                }
+            }
+        ]
+    }
+]

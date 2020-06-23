@@ -18,12 +18,13 @@
 
 import path from 'path';
 import glob from 'glob-promise';
-import alias from 'rollup-plugin-alias';
+import alias from '@rollup/plugin-alias';
+import resolve from '@rollup/plugin-node-resolve';
 import clear from 'rollup-plugin-clear';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import cssResolve from './css-resolve';
 import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 import istanbul from 'rollup-plugin-istanbul';
 import { copyFile, mkdirp } from 'fs-extra';
 
@@ -38,11 +39,10 @@ const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
  * Define all modules as external, so rollup won't bundle them together.
  */
 const localExternals = inputs.map(
-    input =>
-        `taoQtiTest/runner/${path
-            .relative(srcDir, input)
-            .replace(/\\/g, '/')
-            .replace(/\.js$/, '')}`
+    input => `taoQtiTest/runner/${path
+        .relative(srcDir, input)
+        .replace(/\\/g, '/')
+        .replace(/\.js$/, '')}`
 );
 
 export default inputs.map(input => {
@@ -78,9 +78,13 @@ export default inputs.map(input => {
             }),
             cssResolve(),
             wildcardExternal(['core/**', 'ui/**', 'util/**', 'lib/**', 'taoTests/**', 'taoItems/**', 'taoQtiItem/**']),
+            resolve({
+                extensions: ['.js', '.tpl']
+            }),
             alias({
-                resolve: ['.js', '.tpl'],
-                ...aliases
+                entries: Object.assign({
+                    resolve: ['.js', '.tpl']
+                }, aliases)
             }),
             handlebarsPlugin({
                 handlebars: {
@@ -102,7 +106,8 @@ export default inputs.map(input => {
                             useBuiltIns: false
                         }
                     ]
-                ]
+                ],
+                babelHelpers: 'bundled'
             })
         ]
     };

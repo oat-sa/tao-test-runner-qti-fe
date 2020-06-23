@@ -201,9 +201,8 @@ define([
 
         assert.expect(4);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.getCurrentItem = () => ({});
         runner.getCurrentPart = () => ({ label: 'part-title' });
 
@@ -252,9 +251,8 @@ define([
 
         assert.expect(1);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.getCurrentItem = () => ({});
         runner.getCurrentPart = () => ({ label: 'part-title' });
 
@@ -286,9 +284,8 @@ define([
 
         assert.expect(5);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.getCurrentItem = () => ({});
         runner.getCurrentPart = () => ({ label: 'part-title' });
 
@@ -351,9 +348,8 @@ define([
 
         assert.expect(1);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.getCurrentItem = () => ({});
         runner.getCurrentPart = () => ({ label: 'part-title' });
 

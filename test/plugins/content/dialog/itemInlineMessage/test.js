@@ -211,8 +211,8 @@ define([
             .render(container);
 
         testRunner = testRunnerFactory(providerName);
-        testRunner.setTestMap(testMap);
-        testRunner.setTestContext(testContext);
+        testRunner.getTestMap = () => testMap;
+        testRunner.getTestContext = () => testContext;
         testRunner.itemRunner = { _item: runner };
     });
 
@@ -249,8 +249,8 @@ define([
             .render(container);
 
         testRunner = testRunnerFactory(providerName);
-        testRunner.setTestMap(testMap);
-        testRunner.setTestContext(testContext);
+        testRunner.getTestMap = () => testMap;
+        testRunner.getTestContext = () => testContext;
         testRunner.itemRunner = { _item: runner };
 
         testRunner

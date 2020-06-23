@@ -233,8 +233,8 @@ define([
             buttonSelector = '[data-control="eliminator"]',
             $button;
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         assert.expect(4);
 
@@ -276,8 +276,8 @@ define([
 
         areaBroker.getContentArea().append(interaction);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         assert.expect(3);
 

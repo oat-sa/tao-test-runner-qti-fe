@@ -28,7 +28,7 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
 
                 /* TEST related */
                 'qunit-parameterize': '/environment/qunit2-parameterize',
-                'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
+                'jquery.simulate': '/lib/simulator/jquery.simulate',
                 qunit: '/node_modules/qunit/qunit',
                 'taoQtiTest/test/runner': '/test',
                 'taoQtiItem/test/samples': '/test/samples',
@@ -47,13 +47,14 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
                 'taoQtiItem/runner': '/node_modules/@oat-sa/tao-item-runner-qti/dist/runner',
                 'taoQtiItem/qtiItem': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiItem',
                 'taoQtiItem/qtiCommonRenderer': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiCommonRenderer',
+                'taoQtiItem/reviewRenderer': '/node_modules/@oat-sa/tao-item-runner-qti/dist/reviewRenderer',
                 'taoQtiItem/qtiRunner': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiRunner',
-                'taoQtiItem/reviewRenderer' : '/node_modules/@oat-sa/tao-item-runner-qti/dist/reviewRenderer',
                 'taoTests/runner': '/node_modules/@oat-sa/tao-test-runner/dist',
 
                 /* LIBS */
                 'lib/simulator': '/lib/simulator',
                 'lib/jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax'
+
                 /* LIBS END */
             },
             libPathDefinition

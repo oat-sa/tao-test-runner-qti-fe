@@ -143,8 +143,8 @@ define([
 
         assert.expect(9);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         runner.on('plugin-maskadd.area-masking', function() {
             assert.equal($('.mask', $container).length, 1, 'A mask has been created');
@@ -193,8 +193,8 @@ define([
 
         assert.expect(12);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         runner
             .on('plugin-maskadd.area-masking', function() {
@@ -252,8 +252,8 @@ define([
 
         assert.expect(17);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         areaMasking
             .init()

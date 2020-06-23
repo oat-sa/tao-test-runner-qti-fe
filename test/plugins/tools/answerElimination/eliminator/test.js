@@ -68,8 +68,8 @@ define([
         var eliminator = eliminatorFactory(runner, areaBroker);
         var interaction = document.querySelector('.qti-choiceInteraction');
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         areaBroker.getContentArea().append(interaction);
         eliminator.init().then(function() {

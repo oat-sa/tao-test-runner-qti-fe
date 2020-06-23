@@ -240,8 +240,8 @@ define([
 
         assert.expect(3);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         plugin
             .init()
@@ -316,8 +316,8 @@ define([
 
         assert.expect(4);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         plugin
             .init()
@@ -350,8 +350,8 @@ define([
 
         assert.expect(8);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         plugin
             .init()
@@ -408,8 +408,8 @@ define([
 
         assert.expect(6);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         plugin
             .init()

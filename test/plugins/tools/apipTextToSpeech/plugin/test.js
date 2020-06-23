@@ -143,6 +143,8 @@ define([
         const runner = runnerFactory(providerName);
         const plugin = pluginFactory(runner, runner.getAreaBroker());
 
+        runner.getTestContext = () => ({});
+
         plugin
             .init()
             .then(() => {
@@ -167,6 +169,8 @@ define([
         const plugin = pluginFactory(runner, areaBroker);
 
         assert.expect(3);
+
+        runner.getTestContext = () => ({});
 
         plugin
             .init()
@@ -200,6 +204,8 @@ define([
         const plugin = pluginFactory(runner, areaBroker);
 
         assert.expect(2);
+
+        runner.getTestContext = () => ({});
 
         plugin
             .init()
@@ -235,8 +241,8 @@ define([
 
         assert.expect(3);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
@@ -280,8 +286,8 @@ define([
 
         assert.expect(3);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
@@ -314,8 +320,8 @@ define([
         const $container = areaBroker.getToolboxArea();
         const plugin = pluginFactory(runner, areaBroker);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         assert.expect(2);
@@ -357,8 +363,8 @@ define([
                 }
             }
         };
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(Object.assign({}, sampleTestMap, testPartWithApipCategory));
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => Object.assign({}, sampleTestMap, testPartWithApipCategory);
 
         const areaBroker = runner.getAreaBroker();
         const $container = areaBroker.getToolboxArea();
@@ -395,8 +401,8 @@ define([
 
         assert.expect(3);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin
@@ -439,8 +445,8 @@ define([
 
         assert.expect(8);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
         runner.itemRunner = { assetManager: { resolve: () => { } }, getData: () => ({ apipAccessibility: apipData }) };
 
         plugin

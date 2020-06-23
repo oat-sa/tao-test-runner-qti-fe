@@ -103,6 +103,8 @@ define([
 
         assert.expect(4);
 
+        runner.getTestContext = () => ({});
+
         magnifier
             .init()
             .then(function() {
@@ -132,6 +134,8 @@ define([
             $button;
 
         assert.expect(4);
+
+        runner.getTestContext = () => ({});
 
         magnifier
             .init()
@@ -163,6 +167,8 @@ define([
             $button;
 
         assert.expect(11);
+
+        runner.getTestContext = () => ({});
 
         magnifier
             .init()
@@ -215,6 +221,8 @@ define([
 
         assert.expect(3);
 
+        runner.getTestContext = () => ({});
+
         magnifier
             .init()
             .then(function() {
@@ -253,8 +261,8 @@ define([
 
         assert.expect(12);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         runner.on('plugin-magnifier-create.magnifier', function() {
             assert.equal($('.magnifier', $container).length, 1, 'A magnifier has been created');
@@ -317,8 +325,8 @@ define([
 
         assert.expect(8);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         runner.on('plugin-magnifier-create.magnifier', function() {
             assert.equal($('.magnifier', $container).length, 1, 'A magnifier has been created');

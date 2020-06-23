@@ -119,8 +119,8 @@ define([
 
         assert.expect(1);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         plugin
             .init()
@@ -157,8 +157,8 @@ define([
 
         assert.expect(1);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         const getDuration = (durationPromise) => {
             durationPromise.then((duration) => {

@@ -299,8 +299,8 @@ define([
 
         assert.expect(6);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         plugin
             .init()
@@ -343,6 +343,8 @@ define([
 
         assert.expect(4);
 
+        runner.getTestContext = () => ({ itemIdentifier : 'item1' });
+
         plugin
             .init()
             .then(function() {
@@ -379,8 +381,8 @@ define([
         var $container, $buttonMain, $buttonRemove;
         var cleanItemHtml = $('#qunit-item').html();
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         // mock stimulus helper
         itemHelper.getStimuliHrefs = function() {

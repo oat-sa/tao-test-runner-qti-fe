@@ -91,13 +91,13 @@ define([
 
         assert.expect(4);
 
-        runner.setTestContext({
+        runner.getTestContext = () => ({
             itemPosition: 3,
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-1'
         });
 
-        runner.setTestMap(testMap);
+        runner.getTestMap = () => testMap;
 
         plugin
             .init()
@@ -137,13 +137,13 @@ define([
 
         assert.expect(7);
 
-        runner.setTestContext({
+        runner.getTestContext = () => ({
             itemPosition: 3,
             testPartId: 'testPart-1',
             sectionId: 'assessmentSection-1'
         });
 
-        runner.setTestMap(testMap);
+        runner.getTestMap = () => testMap;
 
         plugin
             .init()
@@ -204,13 +204,13 @@ define([
 
         assert.expect(5);
 
-        runner.setTestContext({
+        runner.getTestContext = () => ({
             itemPosition: 1,
             testPartId: 'testPart-intro',
             sectionId: 'assessmentSection-intro'
         });
 
-        runner.setTestMap(testMap);
+        runner.getTestMap = () => testMap;
 
         plugin
             .init()

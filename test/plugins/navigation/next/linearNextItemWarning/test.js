@@ -273,8 +273,9 @@ define([
         plugin
             .init()
             .then(function() {
-                runner.setTestContext(caseData.testContext);
-                runner.setTestMap(testMap);
+
+                runner.getTestContext = () => caseData.testContext;
+                runner.getTestMap = () => testMap;
 
                 // dialog would be instantiated *before* move occurs
                 runner.on('move', function() {
@@ -355,8 +356,9 @@ define([
         plugin
             .init()
             .then(function() {
-                runner.setTestContext(caseData.testContext);
-                runner.setTestMap(testMap);
+
+                runner.getTestContext = () => caseData.testContext;
+                runner.getTestMap = () => testMap;
 
                 runner.on('disablenav', function() {
                     assert.ok(true, 'The dialog interrupted the move');

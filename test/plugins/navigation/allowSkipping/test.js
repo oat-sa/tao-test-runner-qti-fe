@@ -196,7 +196,7 @@ define([
             plugin
                 .init()
                 .then(function() {
-                    runner.setTestContext(data.context);
+                    runner.getTestContext = () => data.context;
                     runner.answered = data.answered;
                     runner.responses = data.responses;
 
@@ -246,7 +246,7 @@ define([
             plugin
                 .init()
                 .then(function() {
-                    runner.setTestContext(data.context);
+                    runner.getTestContext = () => data.context;
                     runner.answered = data.answered;
                     runner.responses = data.responses;
 

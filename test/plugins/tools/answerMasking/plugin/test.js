@@ -240,8 +240,8 @@ define([
 
         assert.expect(3);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         areaBroker.getContentArea().append(
             $('<div>', {
@@ -285,8 +285,8 @@ define([
 
         assert.expect(2);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         areaBroker.getContentArea().append(
             $('<div>', {
@@ -343,8 +343,8 @@ define([
 
         assert.expect(5);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         areaBroker.getContentArea().append(
             $('<div>', {
@@ -417,8 +417,8 @@ define([
 
         assert.expect(5);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+        runner.getTestContext = () => sampleTestContext;
+        runner.getTestMap = () => sampleTestMap;
 
         areaBroker.getContentArea().append(
             $('<div>', {

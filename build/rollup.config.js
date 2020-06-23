@@ -79,11 +79,11 @@ export default inputs.map(input => {
             cssResolve(),
             wildcardExternal(['core/**', 'ui/**', 'util/**', 'lib/**', 'taoTests/**', 'taoItems/**', 'taoQtiItem/**']),
             resolve({
-                extensions: ['.js', '.tpl']
+                extensions: ['.js', '.tpl', '.json']
             }),
             alias({
                 entries: Object.assign({
-                    resolve: ['.js', '.tpl']
+                    resolve: ['.js', '.tpl', '.json']
                 }, aliases)
             }),
             handlebarsPlugin({

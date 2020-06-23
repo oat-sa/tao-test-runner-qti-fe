@@ -50,6 +50,7 @@
         "@oat-sa/rollup-plugin-wildcard-external": "^0.1.0",
         "@oat-sa/tao-core-libs": "oat-sa/tao-core-libs-fe#breaking/TDR-10/upgrade-jquery-handlebars",
         "@oat-sa/tao-core-sdk": "oat-sa/tao-core-sdk-fe#breaking/TDR-10/upgrade-jquery-handlebars",
+        "@oat-sa/tao-core-shared-libs": "^1.0.0",
         "@oat-sa/tao-core-ui": "oat-sa/tao-core-ui-fe#breaking/TDR-10/upgrade-jquery-handlebars",
         "@oat-sa/tao-item-runner": "oat-sa/tao-item-runner-fe#breaking/TDR-10/upgrade-jquery-handlebars",
         "@oat-sa/tao-item-runner-qti": "oat-sa/tao-item-runner-qti-fe#breaking/TDR-10/upgrade-jquery-handlebars",

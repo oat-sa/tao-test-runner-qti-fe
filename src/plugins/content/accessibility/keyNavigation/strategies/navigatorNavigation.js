@@ -69,6 +69,8 @@ export default {
             const $testStatusHeader = $navigator.find('.qti-navigator-info.collapsible > .qti-navigator-label');
             const navigableTestStatus = navigableDomElement.createFromDoms($testStatusHeader);
 
+            $testStatusHeader.addClass('key-navigation-actionable');
+
             if (navigableTestStatus.length) {
                 testStatusNavigation = keyNavigator({
                     keepState: config.keepState,
@@ -149,6 +151,10 @@ export default {
             const skipAheadEnabled = $panel.find('.qti-navigator').is('.skipahead-enabled');
             const $trees = $navigator.find(skipAheadEnabled ? selectors.allItems : selectors.unseenItems);
             const navigableTrees = navigableDomElement.createFromDoms($trees);
+
+            $trees.first().addClass('key-navigation-scrollable-up');
+            $trees.last().addClass('key-navigation-scrollable-down');
+
             if (navigableTrees.length) {
                 //instantiate a key navigator but do not add it to the returned list of navigators as this is not supposed to be reached with tab key
                 itemsNavigator = keyNavigator({

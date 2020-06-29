@@ -260,7 +260,7 @@ export default pluginFactory({
      * Called during the runner's destroy phase
      */
     destroy: function destroy() {
-        self.storage.setItem('itemThemeId', '');
+        this.storage.setItem('itemThemeId', '');
         shortcut.remove(`.${this.getName()}`);
     },
 

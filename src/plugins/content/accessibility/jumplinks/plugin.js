@@ -156,7 +156,7 @@ export default pluginFactory({
             });
 
         testRunner
-            .on('loaditem', () => {
+            .on('renderitem', () => {
                 const currentItem = testRunner.getCurrentItem();
                 const updatedConfig = {
                     isReviewPanelEnabled: !isReviewPanelHidden(testRunner) && isReviewPanelEnabled(testRunner),

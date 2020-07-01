@@ -132,6 +132,7 @@ export default pluginFactory({
             if (themesConfig.default) {
                 state.defaultTheme = themesConfig.default;
                 state.selectedTheme = themesConfig.default;
+                changeTheme(themesConfig.default);
             }
             if (themesConfig.available) {
                 _.forEach(themesConfig.available, function(theme) {
@@ -259,6 +260,7 @@ export default pluginFactory({
      * Called during the runner's destroy phase
      */
     destroy: function destroy() {
+        this.storage.setItem('itemThemeId', '');
         shortcut.remove(`.${this.getName()}`);
     },
 

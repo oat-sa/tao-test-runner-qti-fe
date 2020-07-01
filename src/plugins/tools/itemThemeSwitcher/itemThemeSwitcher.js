@@ -261,7 +261,9 @@ export default pluginFactory({
      */
     destroy: function destroy() {
         shortcut.remove(`.${this.getName()}`);
-        return this.storage.setItem('itemThemeId', '');
+        return this.getTestRunner().getPluginStore(this.getName()).then(function(itemThemesStore) {
+            return itemThemesStore.setItem('itemThemeId', '');
+        });
     },
 
     /**

@@ -260,8 +260,10 @@ export default pluginFactory({
      * Called during the runner's destroy phase
      */
     destroy: function destroy() {
-        this.storage.setItem('itemThemeId', '');
         shortcut.remove(`.${this.getName()}`);
+        return this.getTestRunner().getPluginStore(this.getName()).then(function(itemThemesStore) {
+            return itemThemesStore.removeItem('itemThemeId');
+        });
     },
 
     /**

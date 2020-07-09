@@ -123,14 +123,15 @@ export default function countdownFactory($container, config) {
                             const seconds = time.get('seconds');
 
                             $time.text(this.encodedTime);
-                            $timeScreenreader.attr('aria-label',
+                            $timeScreenreader.text(
                                 getTimerMessage(
                                     hours,
                                     minutes,
                                     seconds,
                                     unansweredQuestions,
                                     this.config.scope
-                                ));
+                                )
+                            );
                         }
 
                         if (this.warnings) {

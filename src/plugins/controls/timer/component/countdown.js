@@ -85,7 +85,8 @@ var warningTimeout = {
  * @returns {countdown} the component, initialized and rendered
  */
 export default function countdownFactory($container, config) {
-    var $time;
+    let $time;
+    let $timeScreenreader;
 
     /**
      * @typedef {Object} countdown
@@ -122,7 +123,7 @@ export default function countdownFactory($container, config) {
                             const seconds = time.get('seconds');
 
                             $time.text(this.encodedTime);
-                            $time.attr('aria-label',
+                            $timeScreenreader.attr('aria-label',
                                 getTimerMessage(
                                     hours,
                                     minutes,
@@ -284,6 +285,7 @@ export default function countdownFactory($container, config) {
         })
         .on('render', function() {
             $time = $('.time', this.getElement());
+            $timeScreenreader = $('.time--screenreader', this.getElement());
 
             if (this.config.showBeforeStart === true) {
                 $time.text(timeEncoder.encode(this.remainingTime / precision));

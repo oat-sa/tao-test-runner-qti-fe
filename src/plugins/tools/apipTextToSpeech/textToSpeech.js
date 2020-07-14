@@ -308,9 +308,30 @@ function maskingComponentFactory(container, config) {
          */
         toggleSettings() {
             const isSettings = this.is('settings');
+            // offset from right
+            const offsetFromRight = 10;
 
             this.setState('settings', !isSettings);
+
+            // if settings was enabled make sure that component still inside the container
+            if (!isSettings) {
+                const { x, y } = this.getPosition();
+                const maxXPosition = window.innerWidth - this.getElement().width() - offsetFromRight;
+
+                this.moveTo(x > maxXPosition ? maxXPosition : x, y);
+            }
         },
+        /**
+         * Handle browser resize
+         */
+        handleResize() {
+            // offset from right
+            const offsetFromRight = 10;
+            const { x, y } = this.getPosition();
+            const maxXPosition = window.innerWidth - this.getElement().width() - offsetFromRight;
+
+            this.moveTo(x > maxXPosition ? maxXPosition : x, y);
+        }
     };
 
     const ttsComponent = component(spec, defaultConfig);
@@ -403,6 +424,8 @@ function maskingComponentFactory(container, config) {
                 this.initNextItem();
             });
 
+            window.addEventListener('resize', this.handleResize);
+
             // move to initial position
             this.moveTo(left, top);
         })
@@ -416,6 +439,8 @@ function maskingComponentFactory(container, config) {
             container.removeClass('tts-component-container');
             this.clearAPIPElements();
             this.stop();
+
+            window.removeEventListener('resize', this.handleResize);
         });
 
     ttsComponent.init(config);

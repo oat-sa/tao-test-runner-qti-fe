@@ -156,7 +156,7 @@ export default pluginFactory({
             });
 
         testRunner
-            .on('loaditem', () => {
+            .on('renderitem', () => {
                 const currentItem = testRunner.getCurrentItem();
                 const updatedConfig = {
                     isReviewPanelEnabled: !isReviewPanelHidden(testRunner) && isReviewPanelEnabled(testRunner),
@@ -168,7 +168,7 @@ export default pluginFactory({
             .on('tool-flagitem', () => {
                 const currentItem = testRunner.getCurrentItem();
                 const questionStatus = getItemStatus(
-                    Object.assign({}, currentItem, { flagged: !item.flagged })
+                    Object.assign({}, currentItem, { flagged: !currentItem.flagged })
                 );
 
                 this.jumplinks.trigger('changeQuesitionStatus', questionStatus);

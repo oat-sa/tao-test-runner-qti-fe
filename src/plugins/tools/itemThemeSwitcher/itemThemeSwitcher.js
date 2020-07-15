@@ -132,6 +132,7 @@ export default pluginFactory({
             if (themesConfig.default) {
                 state.defaultTheme = themesConfig.default;
                 state.selectedTheme = themesConfig.default;
+                changeTheme(themesConfig.default);
             }
             if (themesConfig.available) {
                 _.forEach(themesConfig.available, function(theme) {
@@ -260,6 +261,9 @@ export default pluginFactory({
      */
     destroy: function destroy() {
         shortcut.remove(`.${this.getName()}`);
+        return this.getTestRunner().getPluginStore(this.getName()).then(function(itemThemesStore) {
+            return itemThemesStore.removeItem('itemThemeId');
+        });
     },
 
     /**

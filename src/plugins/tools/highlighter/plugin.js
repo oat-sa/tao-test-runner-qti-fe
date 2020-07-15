@@ -85,7 +85,7 @@ export default pluginFactory({
                 control: 'highlight-trigger',
                 aria: {
                     pressed: 'false',
-                    label: __('Highlight Text')
+                    label: __('(Visual) Highlight Text')
                 },
                 text: __('Highlight')
             });
@@ -96,6 +96,9 @@ export default pluginFactory({
                 title: __('Clear all active highlights'),
                 icon: 'result-nok',
                 control: 'highlight-clear',
+                aria: {
+                    label: __('(Visual) Clear all active highlights')
+                },
                 text: __('Clear Highlights')
             });
 

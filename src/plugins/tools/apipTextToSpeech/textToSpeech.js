@@ -308,17 +308,12 @@ function maskingComponentFactory(container, config) {
          */
         toggleSettings() {
             const isSettings = this.is('settings');
-            // offset from right
-            const offsetFromRight = 10;
 
             this.setState('settings', !isSettings);
 
             // if settings was enabled make sure that component still inside the container
             if (!isSettings) {
-                const { x, y } = this.getPosition();
-                const maxXPosition = window.innerWidth - this.getElement().width() - offsetFromRight;
-
-                this.moveTo(x > maxXPosition ? maxXPosition : x, y);
+                this.handleResize();
             }
         },
         /**

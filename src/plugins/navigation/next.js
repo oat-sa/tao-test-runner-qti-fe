@@ -106,7 +106,7 @@ export default pluginFactory({
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
-         * Check if the currrent item is the last item
+         * Check if the current item is the last item
          * @returns {Boolean} true if the last
          */
         function isLastItem(){
@@ -231,6 +231,9 @@ export default pluginFactory({
         testRunner
             .on('loaditem', () => {
                 updateElement(this.$element, isLastItem());
+            })
+            .on('renderitem', () => {
+                $("h2#test-title-header").attr('tabindex', -1).attr('role', 'alert').focus();
             })
             .on('enablenav', function() {
                 self.enable();

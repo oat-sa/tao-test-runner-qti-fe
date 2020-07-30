@@ -9,7 +9,7 @@
             <h2 id="test-sidebar-left-header" class="landmark-title--hidden">{{__ 'Test status and review structure'}}</h2>
         </aside>
 
-        <section class="content-wrapper" role="region" aria-labelledby="test-title-header">
+        <section class="content-wrapper" aria-labelledby="test-title-header">
             <h2 id="test-title-header" class="landmark-title-hidden"></h2>
             <div id="qti-content"></div>
         </section>

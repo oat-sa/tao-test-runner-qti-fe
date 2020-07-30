@@ -75,7 +75,6 @@ export default {
                     .map(isEnabledDecorator);
 
                 // assign aria attributes
-                $element.attr('role', 'region');
                 $element.attr('aria-label', __('Passage'));
 
                 const navigator = keyNavigator({

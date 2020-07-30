@@ -232,9 +232,6 @@ export default pluginFactory({
             .on('loaditem', () => {
                 updateElement(this.$element, isLastItem());
             })
-            .on('renderitem', () => {
-                $("h2#test-title-header").attr('tabindex', -1).attr('role', 'alert').focus();
-            })
             .on('enablenav', function() {
                 self.enable();
             })

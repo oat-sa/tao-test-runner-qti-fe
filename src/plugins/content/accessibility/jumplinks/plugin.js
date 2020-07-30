@@ -162,8 +162,14 @@ export default pluginFactory({
                     isReviewPanelEnabled: !isReviewPanelHidden(testRunner) && isReviewPanelEnabled(testRunner),
                     questionStatus: getItemStatus(currentItem)
                 };
+                const $announce = $("h2#test-title-header").first();
 
                 this.jumplinks.trigger('update', updatedConfig);
+
+                $announce.attr({
+                    'role': 'alert',
+                    'aria-live': 'assertive'
+                });
             })
             .on('tool-flagitem', () => {
                 const currentItem = testRunner.getCurrentItem();

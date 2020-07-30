@@ -163,7 +163,14 @@ export default pluginFactory({
                     unansweredOnly: unansweredOnly
                 });
 
-                if (warningHelper.shouldWarnBeforeEnd()) {
+                if (warningHelper.shouldWarnBeforeEndPart()) {
+                    testRunner.trigger(
+                        'confirm.endTestPart',
+                        __('You are about to go to the next item. Click OK to continue and go to the next item.'),
+                        triggerNextAction, // if the test taker accept
+                        enableNav // if he refuse
+                    );
+                } else if (warningHelper.shouldWarnBeforeEnd()) {
                     testRunner.trigger(
                         'confirm.endTest',
                         messages.getExitMessage(

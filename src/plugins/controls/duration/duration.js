@@ -122,7 +122,11 @@ export default pluginFactory({
                 .on('tick', (elapsed) => {
                     updateDuration(elapsed);
                 })
-                .before('move skip exit timeout pause', () => currentUpdatePromise
+                .after('move skip timeout', () => currentUpdatePromise
+                    .then(addDurationToCallActionParams)
+                    .catch(addDurationToCallActionParams)
+                )
+                .before('pause exit', () => currentUpdatePromise
                     .then(addDurationToCallActionParams)
                     .catch(addDurationToCallActionParams)
                 )

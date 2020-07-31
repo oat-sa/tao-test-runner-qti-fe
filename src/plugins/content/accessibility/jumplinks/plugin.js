@@ -162,6 +162,15 @@ export default pluginFactory({
                     isReviewPanelEnabled: !isReviewPanelHidden(testRunner) && isReviewPanelEnabled(testRunner),
                     questionStatus: getItemStatus(currentItem)
                 };
+                const announcedText = __('%s loaded', currentItem.label);
+                let $announce = $('[aria-live=polite][role=alert]').first();
+
+                if ($announce.length !== 1) {
+                    const $announcedItem = $('h2#test-title-header').first();
+                    $announce = $('<div aria-live="polite" role="alert" class="visible-hidden"></div>');
+                    $announcedItem.append($announce);
+                }
+                $announce.text(announcedText);
 
                 this.jumplinks.trigger('update', updatedConfig);
             })

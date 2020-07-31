@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery';
+import __ from 'i18n';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
@@ -72,6 +73,9 @@ export default {
                 const $element = $(el);
                 const elements = navigableDomElement.createFromDoms($element)
                     .map(isEnabledDecorator);
+
+                // assign aria attributes
+                $element.attr('aria-label', __('Passage'));
 
                 const navigator = keyNavigator({
                     id: `${groupId}-${i}`,

@@ -26,6 +26,32 @@ import {
 } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
 
 /**
+ * Add aria-labelledby attribute to choice interaction
+ *
+ * @param {Navigator} cursor
+ */
+const addLabelledByAttribute = cursor => {
+    const $element = cursor.navigable.getElement();
+    const value = $element.attr('value');
+    const name = $element.attr('name');
+
+    $element.attr(
+        'aria-labelledby',
+        `${name.replace('response-', 'choice-')}-${value}`
+    );
+};
+
+/**
+ * Add aria-labelledby attribute from choice interaction
+ *
+ * @param {Navigator} cursor
+ */
+const removeLabelledByAttribute = cursor => {
+    const $element = cursor.navigable.getElement();
+    $element.removeAttr('aria-labelledby', '');
+};
+
+/**
  * Key navigator strategy applying inside the item.
  * Navigable item content are interaction choices and body element with the special class "key-navigation-focusable".
  * @type {Object} keyNavigationStrategy
@@ -136,7 +162,13 @@ export default {
                     //search for inputs that represent the interaction focusable choices
                     const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
                     if (config.flatNavigation && choiceType !== 'radio') {
-                        $inputs.each((i, input) => addInputsNavigator($(input), $itemElement));
+                        $inputs.each((i, input) => {
+                            const navigator = addInputsNavigator($(input), $itemElement);
+
+                            navigator.on('focus', addLabelledByAttribute);
+
+                            navigator.on('blur', removeLabelledByAttribute);
+                        });
                     } else {
                         const navigator = addInputsNavigator($inputs, $itemElement, true, () => {
                             // keep default positioning for now
@@ -151,6 +183,10 @@ export default {
 
                             return position;
                         });
+
+                        navigator.on('focus', addLabelledByAttribute);
+
+                        navigator.on('blur', removeLabelledByAttribute);
 
                         // applies WCAG behavior for the radio buttons
                         if (navigator && config.wcagBehavior) {

@@ -106,7 +106,7 @@ export default pluginFactory({
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         /**
-         * Check if the currrent item is the last item
+         * Check if the current item is the last item
          * @returns {Boolean} true if the last
          */
         function isLastItem(){

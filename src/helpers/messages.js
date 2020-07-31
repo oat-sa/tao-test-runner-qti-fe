@@ -57,15 +57,12 @@ function getUnansweredItemsWarning(scope, runner, sync) {
     var itemsCountMessage = '';
 
     if (scope === 'section' || scope === 'testSection') {
-        if (unansweredCount === 0) {
-            itemsCountMessage = __('You answered all %s question(s) in this section', stats.questions.toString());
-        } else {
-            itemsCountMessage = __(
-                'You answered only %s of the %s question(s) in this section',
-                stats.answered.toString(),
-                stats.questions.toString()
-            );
-        }
+        itemsCountMessage = `<b>${__('You are about to leave this section.')}</b>`
+        itemsCountMessage += __(
+            'You answered %s of %s question(s) for this section of the test.',
+            stats.answered.toString(),
+            stats.questions.toString()
+        );
         if (flaggedCount) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
         }

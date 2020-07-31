@@ -116,7 +116,6 @@ export default pluginFactory({
                     testRunner.trigger(
                         'confirm.nextsection',
                         messages.getExitMessage(
-                            __('Once you close this section, you cannot return to it or change your answers.'),
                             'section',
                             testRunner
                         ),

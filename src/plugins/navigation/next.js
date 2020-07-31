@@ -166,7 +166,10 @@ export default pluginFactory({
                 if (warningHelper.shouldWarnBeforeEndPart()) {
                     testRunner.trigger(
                         'confirm.endTestPart',
-                        __('You are about to go to the next item. Click OK to continue and go to the next item.'),
+                        messages.getExitMessage(
+                            warningScope,
+                            testRunner
+                        ),
                         triggerNextAction, // if the test taker accept
                         enableNav // if he refuse
                     );
@@ -174,9 +177,6 @@ export default pluginFactory({
                     testRunner.trigger(
                         'confirm.endTest',
                         messages.getExitMessage(
-                            __(
-                                'You are about to submit the test. You will not be able to access this test once submitted. Click OK to continue and submit the test.'
-                            ),
                             warningScope,
                             testRunner
                         ),

@@ -522,7 +522,7 @@ var qtiProvider = {
 
                 //The item is rendered but in a state that prevents us from interacting
                 if (context.isTimeout) {
-                    warning = __('Time limit reached for item "%s".', getItemLabel());
+                    warning = __('The time limit has been reached for this part of the test.');
                 } else if (context.itemSessionState > states.itemSession.interacting) {
                     if (context.remainingAttempts === 0) {
                         warning = __('No more attempts allowed for item "%s".', getItemLabel());

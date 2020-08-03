@@ -124,8 +124,8 @@ export default pluginFactory({
                         {
                             buttons: {
                                 labels: {
-                                    ok: __('Close this Section'),
-                                    cancel: __('Review my Answers')
+                                    ok: __('CONTINUE TO THE NEXT SECTION'),
+                                    cancel: __('CANCEL')
                                 }
                             }
                         }

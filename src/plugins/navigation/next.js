@@ -171,7 +171,15 @@ export default pluginFactory({
                             testRunner
                         ),
                         triggerNextAction, // if the test taker accept
-                        enableNav // if he refuse
+                        enableNav, // if he refuse
+                        {
+                            buttons: {
+                                labels: {
+                                    ok: __('SUBMIT THIS PART'),
+                                    cancel: __('CANCEL')
+                                }
+                            }
+                        }
                     );
                 } else if (warningHelper.shouldWarnBeforeEnd()) {
                     testRunner.trigger(
@@ -181,14 +189,22 @@ export default pluginFactory({
                             testRunner
                         ),
                         triggerNextAction, // if the test taker accept
-                        enableNav // if he refuse
+                        enableNav, // if he refuse
+                        {
+                            buttons: {
+                                labels: {
+                                    ok: __('SUBMIT THE TEST'),
+                                    cancel: __('CANCEL')
+                                }
+                            }
+                        }
                     );
                 } else if (warningHelper.shouldWarnBeforeNext()) {
                     testRunner.trigger(
                         'confirm.next',
                         __('You are about to go to the next item. Click OK to continue and go to the next item.'),
                         triggerNextAction, // if the test taker accept
-                        enableNav // if he refuse
+                        enableNav, // if he refuse
                     );
                 } else {
                     triggerNextAction();

@@ -33,7 +33,7 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
 function getExitMessage(scope, runner, sync) {
     let itemsCountMessage = '';
 
-    const testRunnerOptions = sync.getOptions();
+    const testRunnerOptions = runner.getOptions();
     const messageEnabled = testRunnerOptions.enableUnansweredItemsWarning;
 
     if (messageEnabled) {
@@ -57,7 +57,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
     var itemsCountMessage = '';
 
     if (scope === 'section' || scope === 'testSection') {
-        itemsCountMessage = `<b>${__('You are about to leave this section.')}</b>`
+        itemsCountMessage = `<b>${__('You are about to leave this section.')}</b><br><br>`
         itemsCountMessage += __(
             'You answered %s of %s question(s) for this section of the test.',
             stats.answered.toString(),
@@ -67,11 +67,11 @@ function getUnansweredItemsWarning(scope, runner, sync) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
         }
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
-        itemsCountMessage = `<b>${__('You are about to submit the test.')}</b>`
+        itemsCountMessage = `<b>${__('You are about to submit the test.')}</b><br><br>`
         if (unansweredCount > 1) {
-            itemsCountMessage += __('There are %s unanswered questions. You will not be able to return to this test after you submit your answers.', stats.questions.toString());
+            itemsCountMessage += __('There are %s unanswered questions. You will not be able to return to this test after you submit your answers.', stats.answered.toString());
         } else if (unansweredCount === 1) {
-            itemsCountMessage += __('There is %s unanswered question. You will not be able to return to this test after you submit your answers.', stats.questions.toString());
+            itemsCountMessage += __('There is %s unanswered question. You will not be able to return to this test after you submit your answers.', stats.answered.toString());
         } else if (unansweredCount === 0) {
             itemsCountMessage += __('You will not be able to return to this test after you submit your answers.');
         }
@@ -82,11 +82,11 @@ function getUnansweredItemsWarning(scope, runner, sync) {
             )}`;
         }
     } else if (scope === 'part') {
-        itemsCountMessage = `<b>${__('You are about to submit this test part.')}</b>`
+        itemsCountMessage = `<b>${__('You are about to submit this test part.')}</b><br><br>`
         if (unansweredCount > 1) {
-            itemsCountMessage += __('There are %s unanswered questions in this part of the test.', stats.questions.toString());
+            itemsCountMessage += __('There are %s unanswered questions in this part of the test.', stats.answered.toString());
         } else if (unansweredCount === 1) {
-            itemsCountMessage += __('There is %s unanswered question in this part of the test.', stats.questions.toString());
+            itemsCountMessage += __('There is %s unanswered question in this part of the test.', stats.answered.toString());
         }
         if (flaggedCount) {
             itemsCountMessage += ` ${__(
@@ -96,9 +96,6 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         }
     }
 
-    if (itemsCountMessage) {
-        itemsCountMessage += '.';
-    }
     return itemsCountMessage;
 }
 

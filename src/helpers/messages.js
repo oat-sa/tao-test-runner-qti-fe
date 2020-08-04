@@ -30,7 +30,7 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
  * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox
  * @returns {String} Returns the message text
  */
-function getExitMessage(scope, runner, sync) {
+function getExitMessage(scope, runner, message, sync) {
     let itemsCountMessage = '';
 
     const testRunnerOptions = runner.getOptions();
@@ -40,7 +40,7 @@ function getExitMessage(scope, runner, sync) {
         itemsCountMessage = getUnansweredItemsWarning(scope, runner, sync);
     }
 
-    return itemsCountMessage.trim();
+    return message ? message : itemsCountMessage.trim();
 }
 
 /**

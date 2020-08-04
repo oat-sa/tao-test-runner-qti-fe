@@ -122,11 +122,11 @@ export default pluginFactory({
                     testRunner.trigger(
                         'confirm.endTest',
                         messages.getExitMessage(
+                            'test',
+                            testRunner,
                             __(
                                 'You are about to submit the test. You will not be able to access this test once submitted. Click OK to continue and submit the test.'
-                            ),
-                            'test',
-                            testRunner
+                            )
                         ),
                         doSkip, // if the test taker accept
                         enable // if the test taker refuse

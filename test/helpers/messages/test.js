@@ -96,20 +96,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 2 },
                 currentItemResponse: null,
                 currentItemAnswered: false,
-                testMessage: 'You have 1 unanswered question(s).',
-                partMessage: 'You have 1 unanswered question(s).',
-                sectionMessage: 'You answered only 2 of the 3 question(s) in this section.'
-            },
-            {
-                title: 'current not answered, none flagged',
-                testStats: { answered: 2 },
-                partStats: { answered: 2 },
-                sectionStats: { answered: 2 },
-                currentItemResponse: null,
-                currentItemAnswered: false,
-                testMessage: 'You have 1 unanswered question(s).',
-                partMessage: 'You have 1 unanswered question(s).',
-                sectionMessage: 'You answered only 2 of the 3 question(s) in this section.'
+                testMessage: '<b>You are about to submit the test.</b><br><br>There is 2 unanswered question. You will not be able to return to this test after you submit your answers.',
+                partMessage: '<b>You are about to submit this test part.</b><br><br>There is 2 unanswered question in this part of the test.',
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 2 of 3 question(s) for this section of the test.'
             },
             {
                 title: 'current not answered, one flagged',
@@ -118,9 +107,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 2, flagged: 1 },
                 currentItemResponse: null,
                 currentItemAnswered: false,
-                testMessage: 'You have 1 unanswered question(s) and you flagged 1 item(s) that you can review now.',
-                partMessage: 'You have 1 unanswered question(s) and you flagged 1 item(s) that you can review now.',
-                sectionMessage: 'You answered only 2 of the 3 question(s) in this section, and flagged 1 of them.'
+                testMessage: '<b>You are about to submit the test.</b><br><br>There is 2 unanswered question. You will not be able to return to this test after you submit your answers. and you flagged 1 item(s) that you can review now',
+                partMessage: '<b>You are about to submit this test part.</b><br><br>There is 2 unanswered question in this part of the test. and you flagged 1 item(s) that you can review now',
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 2 of 3 question(s) for this section of the test., and flagged 1 of them'
             },
             {
                 title: 'all answered, one flagged',
@@ -129,10 +118,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 3, flagged: 1 },
                 currentItemResponse: { string: 'test' },
                 currentItemAnswered: true,
-                testMessage:
-                    'You answered all 3 question(s) in this test and you flagged 1 item(s) that you can review now.',
-                partMessage: 'You answered all 3 question(s) and you flagged 1 item(s) that you can review now.',
-                sectionMessage: 'You answered all 3 question(s) in this section, and flagged 1 of them.'
+                testMessage: '<b>You are about to submit the test.</b><br><br>You will not be able to return to this test after you submit your answers. and you flagged 1 item(s) that you can review now',
+                partMessage: '<b>You are about to submit this test part.</b><br><br> and you flagged 1 item(s) that you can review now',
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test., and flagged 1 of them'
             },
             {
                 title: 'one flagged, test taker has just answered to the current item, but without moving from it yet',
@@ -141,9 +129,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 1, flagged: 1 },
                 currentItemResponse: { string: 'test' },
                 currentItemAnswered: false,
-                testMessage: 'You have 1 unanswered question(s) and you flagged 1 item(s) that you can review now.',
-                partMessage: 'You have 1 unanswered question(s) and you flagged 1 item(s) that you can review now.',
-                sectionMessage: 'You answered only 2 of the 3 question(s) in this section, and flagged 1 of them.'
+                testMessage: '<b>You are about to submit the test.</b><br><br>There is 2 unanswered question. You will not be able to return to this test after you submit your answers. and you flagged 1 item(s) that you can review now',
+                partMessage: '<b>You are about to submit this test part.</b><br><br>There is 2 unanswered question in this part of the test. and you flagged 1 item(s) that you can review now',
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 2 of 3 question(s) for this section of the test., and flagged 1 of them'
             },
             {
                 title: 'none flagged, test taker has just answered to the current item, but without moving from it yet',
@@ -152,9 +140,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 1 },
                 currentItemResponse: { string: 'test' },
                 currentItemAnswered: false,
-                testMessage: 'You have 1 unanswered question(s).',
-                partMessage: 'You have 1 unanswered question(s).',
-                sectionMessage: 'You answered only 2 of the 3 question(s) in this section.'
+                testMessage: '<b>You are about to submit the test.</b><br><br>There is 2 unanswered question. You will not be able to return to this test after you submit your answers.',
+                partMessage: '<b>You are about to submit this test part.</b><br><br>There is 2 unanswered question in this part of the test.',
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 2 of 3 question(s) for this section of the test.'
             },
             {
                 title: 'none flagged, all answered, test taker has just moved to an already answered item',
@@ -163,9 +151,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 3 },
                 currentItemResponse: { string: 'test' },
                 currentItemAnswered: true,
-                testMessage: 'You answered all 3 question(s) in this test.',
-                partMessage: 'You answered all 3 question(s).',
-                sectionMessage: 'You answered all 3 question(s) in this section.'
+                testMessage: '<b>You are about to submit the test.</b><br><br>You will not be able to return to this test after you submit your answers.',
+                partMessage: '<b>You are about to submit this test part.</b><br><br>',
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test.'
             },
             {
                 title: 'none flagged, all answered, test taker removes answer from a previously answered item',
@@ -174,9 +162,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 3 },
                 currentItemResponse: null,
                 currentItemAnswered: true,
-                testMessage: 'You have 1 unanswered question(s).',
-                partMessage: 'You have 1 unanswered question(s).',
-                sectionMessage: 'You answered only 2 of the 3 question(s) in this section.'
+                testMessage: '<b>You are about to submit the test.</b><br><br>There is 2 unanswered question. You will not be able to return to this test after you submit your answers.',
+                partMessage: '<b>You are about to submit this test part.</b><br><br>There is 2 unanswered question in this part of the test.',
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 2 of 3 question(s) for this section of the test.'
             }
         ])
         .test('helpers/messages.getExitMessage (enabled)', function(testData, assert) {

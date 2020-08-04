@@ -85,9 +85,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 3 },
                 currentItemResponse: { string: 'test' },
                 currentItemAnswered: true,
-                testMessage: 'You answered all 3 question(s) in this test.',
-                partMessage: 'You answered all 3 question(s).',
-                sectionMessage: 'You answered all 3 question(s) in this section.'
+                testMessage: '<b>You are about to submit the test.</b><br><br>You will not be able to return to this test after you submit your answers.',
+                partMessage: '<b>You are about to submit this test part.</b><br><br>',
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test.'
             },
             {
                 title: 'current not answered, none flagged',
@@ -251,45 +251,45 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 }
             };
             var runner = runnerMock(map, context, data, responses, declarations);
-            var message = 'This is a test.';
+            var message = '';
 
             assert.expect(7);
 
             assert.equal(
-                messagesHelper.getExitMessage(message, 'test', runner),
-                `${testData.testMessage} ${message}`,
+                messagesHelper.getExitMessage('test', runner),
+                `${testData.testMessage}${message}`,
                 'message include the right stats for test scope'
             );
             assert.equal(
-                messagesHelper.getExitMessage(message, 'part', runner),
-                `${testData.partMessage} ${message}`,
+                messagesHelper.getExitMessage('part', runner),
+                `${testData.partMessage}${message}`,
                 'message include the right stats for part scope'
             );
             assert.equal(
-                messagesHelper.getExitMessage(message, 'section', runner),
-                `${testData.sectionMessage} ${message}`,
+                messagesHelper.getExitMessage('section', runner),
+                `${testData.sectionMessage}${message}`,
                 'message include the right stats for section scope'
             );
             assert.equal(
-                messagesHelper.getExitMessage(message, 'testWithoutInaccessibleItems', runner),
-                `${testData.testMessage} ${message}`,
+                messagesHelper.getExitMessage('testWithoutInaccessibleItems', runner),
+                `${testData.testMessage}${message}`,
                 'message include the right stats for testWithoutInaccessibleItems scope'
             );
 
             data.enableUnansweredItemsWarning = false;
 
             assert.equal(
-                messagesHelper.getExitMessage(message, 'test', runner),
+                messagesHelper.getExitMessage('test', runner),
                 message,
                 'no stats in test scope when option is disabled'
             );
             assert.equal(
-                messagesHelper.getExitMessage(message, 'part', runner),
+                messagesHelper.getExitMessage('part', runner),
                 message,
                 'no stats in part scope when option is disabled'
             );
             assert.equal(
-                messagesHelper.getExitMessage(message, 'section', runner),
+                messagesHelper.getExitMessage('section', runner),
                 message,
                 'no stats in session scope when option is disabled'
             );

@@ -278,7 +278,7 @@ export default _.defaults(
              *
              * @returns {Promise} resolves with the action result
              */
-            this.requestNetworkThenOffline = function requestNetworkThenOffline(url, action, actionParams, deferred, noToken = false) {
+            this.requestNetworkThenOffline = function requestNetworkThenOffline(url, action, actionParams, deferred, noToken) {
                 var testContext = this.getDataHolder().get('testContext');
                 var communicationConfig = self.configStorage.getCommunicationConfig();
 
@@ -290,7 +290,7 @@ export default _.defaults(
                     } else {
                         //action is not synchronizable
                         //fallback to direct request
-                        request = self.request(url, actionParams, void 0, noToken);
+                        request = self.request(url, actionParams, void 0, noToken || false);
                         request.then(function(result) {
                             if (self.isOffline()) {
                                 return self.scheduleAction(action, actionParams);

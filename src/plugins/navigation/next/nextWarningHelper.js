@@ -63,7 +63,8 @@ var nextWarningHelper = function nextWarningHelper(options) {
         testPartId = options.testPartId || '',
         unansweredOnly = toBoolean(options.unansweredOnly, false),
         warnBeforeNext = shouldWarnBeforeNext(),
-        warnBeforeEnd = shouldWarnBeforeEnd();
+        warnBeforeEnd = shouldWarnBeforeEnd(),
+        warnBeforeEndPart = shouldWarnBeforeEndPart();
 
     /**
      * Decide if we should display a warning before moving to the next item.
@@ -98,7 +99,14 @@ var nextWarningHelper = function nextWarningHelper(options) {
      * Decide if we should display a warning before ending the test
      */
     function shouldWarnBeforeEnd() {
-        return shouldWarnOnTestEnd() || shouldWarnOnPartChange();
+        return shouldWarnOnTestEnd();
+    }
+
+    /**
+     * Decide if we should display a warning before ending the test part
+     */
+    function shouldWarnBeforeEndPart() {
+        return shouldWarnOnPartChange();
     }
 
     /**
@@ -150,6 +158,9 @@ var nextWarningHelper = function nextWarningHelper(options) {
      * The helper object
      */
     return {
+        shouldWarnBeforeEndPart: function() {
+            return warnBeforeEndPart;
+        },
         shouldWarnBeforeEnd: function() {
             return warnBeforeEnd;
         },

@@ -116,7 +116,6 @@ export default pluginFactory({
                     testRunner.trigger(
                         'confirm.nextsection',
                         messages.getExitMessage(
-                            __('Once you close this section, you cannot return to it or change your answers.'),
                             'section',
                             testRunner
                         ),
@@ -125,8 +124,8 @@ export default pluginFactory({
                         {
                             buttons: {
                                 labels: {
-                                    ok: __('Close this Section'),
-                                    cancel: __('Review my Answers')
+                                    ok: __('CONTINUE TO THE NEXT SECTION'),
+                                    cancel: __('CANCEL')
                                 }
                             }
                         }

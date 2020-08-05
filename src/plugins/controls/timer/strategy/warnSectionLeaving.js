@@ -94,7 +94,7 @@ export default function warnSectionLeavingStrategy(testRunner, timer) {
                             ) {
                                 testRunner.trigger(
                                     'confirm.exittimed',
-                                    messages.getExitMessage(exitMessage, 'section', testRunner),
+                                    messages.getExitMessage('section', testRunner, exitMessage),
                                     resolve,
                                     reject,
                                     {

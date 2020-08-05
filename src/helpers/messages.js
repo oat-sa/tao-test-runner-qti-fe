@@ -73,7 +73,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         } else if (unansweredCount === 1) {
             itemsCountMessage += __('There is %s unanswered question', unansweredCount.toString());
         }
-        if (flaggedCount) {
+        if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(
                 'and you flagged %s item(s) that you can review now',
                 flaggedCount.toString()

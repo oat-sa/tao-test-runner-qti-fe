@@ -30,7 +30,7 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
  * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox
  * @returns {String} Returns the message text
  */
-function getExitMessage(scope, runner, message, sync) {
+function getExitMessage(scope, runner, message = '', sync) {
     let itemsCountMessage = '';
 
     const testRunnerOptions = runner.getOptions();
@@ -69,9 +69,9 @@ function getUnansweredItemsWarning(scope, runner, sync) {
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
         itemsCountMessage = `<b>${__('You are about to submit the test.')}</b><br><br>`
         if (unansweredCount > 1) {
-            itemsCountMessage += __('There are %s unanswered questions.', stats.answered.toString());
+            itemsCountMessage += __('There are %s unanswered questions', unansweredCount.toString());
         } else if (unansweredCount === 1) {
-            itemsCountMessage += __('There is %s unanswered question.', stats.answered.toString());
+            itemsCountMessage += __('There is %s unanswered question', unansweredCount.toString());
         }
         if (flaggedCount) {
             itemsCountMessage += ` ${__(
@@ -82,9 +82,9 @@ function getUnansweredItemsWarning(scope, runner, sync) {
     } else if (scope === 'part') {
         itemsCountMessage = `<b>${__('You are about to submit this test part.')}</b><br><br>`
         if (unansweredCount > 1) {
-            itemsCountMessage += __('There are %s unanswered questions in this part of the test', stats.answered.toString());
+            itemsCountMessage += __('There are %s unanswered questions in this part of the test', unansweredCount.toString());
         } else if (unansweredCount === 1) {
-            itemsCountMessage += __('There is %s unanswered question in this part of the test', stats.answered.toString());
+            itemsCountMessage += __('There is %s unanswered question in this part of the test', unansweredCount.toString());
         }
         if (flaggedCount) {
             itemsCountMessage += ` ${__(
@@ -94,7 +94,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         }
     }
 
-    if (itemsCountMessage) {
+    if (itemsCountMessage && unansweredCount !== 0) {
         itemsCountMessage += '.';
     }
     return itemsCountMessage;

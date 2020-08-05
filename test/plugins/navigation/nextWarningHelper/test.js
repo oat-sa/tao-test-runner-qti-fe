@@ -114,7 +114,7 @@ define(['lodash', 'taoQtiTest/runner/plugins/navigation/next/nextWarningHelper']
                 testPartId: 'CURRENT_PART',
                 nextPart: { id: 'NEXT_PART' }
             },
-            output: { warnNext: false, warnEnd: true }
+            output: { warnNext: false, warnEnd: false }
         },
         {
             title: 'nextPartWarning: next part different, unansweredOnly, no unanswered / flagged',
@@ -136,7 +136,7 @@ define(['lodash', 'taoQtiTest/runner/plugins/navigation/next/nextWarningHelper']
                 nextPart: { id: 'NEXT_PART' },
                 stats: { flagged: 5 }
             },
-            output: { warnNext: false, warnEnd: true }
+            output: { warnNext: false, warnEnd: false }
         },
         {
             title: 'nextPartWarning: next part different, unansweredOnly, unanswered',
@@ -147,7 +147,7 @@ define(['lodash', 'taoQtiTest/runner/plugins/navigation/next/nextWarningHelper']
                 nextPart: { id: 'NEXT_PART' },
                 stats: { questions: 10, answered: 5 }
             },
-            output: { warnNext: false, warnEnd: true }
+            output: { warnNext: false, warnEnd: false }
         },
         {
             title: 'nextPartWarning: next part different, unansweredOnly, unanswered & flagged',
@@ -158,7 +158,7 @@ define(['lodash', 'taoQtiTest/runner/plugins/navigation/next/nextWarningHelper']
                 nextPart: { id: 'NEXT_PART' },
                 stats: { flagged: 1, questions: 10, answered: 5 }
             },
-            output: { warnNext: false, warnEnd: true }
+            output: { warnNext: false, warnEnd: false }
         }
     ];
 

@@ -30,7 +30,7 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
  * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox
  * @returns {String} Returns the message text
  */
-function getExitMessage(message, scope, runner, sync) {
+function getExitMessage(scope, runner, message = '', sync) {
     let itemsCountMessage = '';
 
     const testRunnerOptions = runner.getOptions();
@@ -57,37 +57,36 @@ function getUnansweredItemsWarning(scope, runner, sync) {
     var itemsCountMessage = '';
 
     if (scope === 'section' || scope === 'testSection') {
-        if (unansweredCount === 0) {
-            itemsCountMessage = __('You answered all %s question(s) in this section', stats.questions.toString());
-        } else {
-            itemsCountMessage = __(
-                'You answered only %s of the %s question(s) in this section',
-                stats.answered.toString(),
-                stats.questions.toString()
-            );
-        }
+        itemsCountMessage = `<b>${__('You are about to leave this section.')}</b><br><br>`
+        itemsCountMessage += __(
+            'You answered %s of %s question(s) for this section of the test',
+            stats.answered.toString(),
+            stats.questions.toString()
+        );
         if (flaggedCount) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
         }
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
-        if (unansweredCount === 0) {
-            itemsCountMessage = __('You answered all %s question(s) in this test', stats.questions.toString());
-        } else {
-            itemsCountMessage = __('You have %s unanswered question(s)', unansweredCount.toString());
+        itemsCountMessage = `<b>${__('You are about to submit the test.')}</b><br><br>`
+        if (unansweredCount > 1) {
+            itemsCountMessage += __('There are %s unanswered questions', unansweredCount.toString());
+        } else if (unansweredCount === 1) {
+            itemsCountMessage += __('There is %s unanswered question', unansweredCount.toString());
         }
-        if (flaggedCount) {
+        if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(
                 'and you flagged %s item(s) that you can review now',
                 flaggedCount.toString()
             )}`;
         }
     } else if (scope === 'part') {
-        if (unansweredCount === 0) {
-            itemsCountMessage = __('You answered all %s question(s)', stats.questions.toString());
-        } else {
-            itemsCountMessage = __('You have %s unanswered question(s)', unansweredCount.toString());
+        itemsCountMessage = `<b>${__('You are about to submit this test part.')}</b><br><br>`
+        if (unansweredCount > 1) {
+            itemsCountMessage += __('There are %s unanswered questions in this part of the test', unansweredCount.toString());
+        } else if (unansweredCount === 1) {
+            itemsCountMessage += __('There is %s unanswered question in this part of the test', unansweredCount.toString());
         }
-        if (flaggedCount) {
+        if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(
                 'and you flagged %s item(s) that you can review now',
                 flaggedCount.toString()
@@ -95,7 +94,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         }
     }
 
-    if (itemsCountMessage) {
+    if (itemsCountMessage && unansweredCount !== 0) {
         itemsCountMessage += '.';
     }
     return itemsCountMessage;

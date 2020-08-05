@@ -163,25 +163,49 @@ export default pluginFactory({
                     unansweredOnly: unansweredOnly
                 });
 
-                if (warningHelper.shouldWarnBeforeEnd()) {
+                if (warningHelper.shouldWarnBeforeEndPart()) {
                     testRunner.trigger(
-                        'confirm.endTest',
+                        'confirm.endTestPart',
                         messages.getExitMessage(
-                            __(
-                                'You are about to submit the test. You will not be able to access this test once submitted. Click OK to continue and submit the test.'
-                            ),
                             warningScope,
                             testRunner
                         ),
                         triggerNextAction, // if the test taker accept
-                        enableNav // if he refuse
+                        enableNav, // if he refuse
+                        {
+                            buttons: {
+                                labels: {
+                                    ok: __('SUBMIT THIS PART'),
+                                    cancel: __('CANCEL')
+                                }
+                            }
+                        }
+                    );
+                } else if (warningHelper.shouldWarnBeforeEnd()) {
+                    testRunner.trigger(
+                        'confirm.endTest',
+                        messages.getExitMessage(
+                            warningScope,
+                            testRunner,
+                            __('You will not be able to return to this test after you submit your answers.')
+                        ),
+                        triggerNextAction, // if the test taker accept
+                        enableNav, // if he refuse
+                        {
+                            buttons: {
+                                labels: {
+                                    ok: __('SUBMIT THE TEST'),
+                                    cancel: __('CANCEL')
+                                }
+                            }
+                        }
                     );
                 } else if (warningHelper.shouldWarnBeforeNext()) {
                     testRunner.trigger(
                         'confirm.next',
                         __('You are about to go to the next item. Click OK to continue and go to the next item.'),
                         triggerNextAction, // if the test taker accept
-                        enableNav // if he refuse
+                        enableNav, // if he refuse
                     );
                 } else {
                     triggerNextAction();

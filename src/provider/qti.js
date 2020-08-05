@@ -472,7 +472,7 @@ var qtiProvider = {
                             } else {
                                 self.trigger(
                                     'alert.timeout',
-                                    __('Time limit reached, this part of the test has ended.'),
+                                    __('The time limit has been reached for this part of the test.'),
                                     () => {
                                         self.trigger('timeoutAccepted');
 

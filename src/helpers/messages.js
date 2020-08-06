@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2020 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -40,9 +40,24 @@ function getExitMessage(scope, runner, message = '', sync) {
         itemsCountMessage = getUnansweredItemsWarning(scope, runner, sync);
     }
 
-    return `${itemsCountMessage} ${message}`.trim();
+    return `${getHeader(scope)}${itemsCountMessage} ${message}`.trim();
 }
+/**
+ * Build message if not all items have answers
+ * @param {String} scope - scope to consider for calculating the stats
+ * @returns {String} Returns the message text
+ */
+function getHeader(scope) {
+    if (scope === 'section' || scope === 'testSection') {
+        return `<b>${__('You are about to leave this section.')}</b><br><br>`;
+    } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
+        return `<b>${__('You are about to submit the test.')}</b><br><br>`;
+    } else if (scope === 'part') {
+        return `<b>${__('You are about to submit this test part.')}</b><br><br>`;
+    }
 
+    return '';
+}
 /**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats
@@ -51,14 +66,13 @@ function getExitMessage(scope, runner, message = '', sync) {
  * @returns {String} Returns the message text
  */
 function getUnansweredItemsWarning(scope, runner, sync) {
-    var stats = statsHelper.getInstantStats(scope, runner, sync);
-    var unansweredCount = stats && stats.questions - stats.answered;
-    var flaggedCount = stats && stats.flagged;
-    var itemsCountMessage = '';
+    const stats = statsHelper.getInstantStats(scope, runner, sync);
+    const unansweredCount = stats && stats.questions - stats.answered;
+    const flaggedCount = stats && stats.flagged;
+    let itemsCountMessage = '';
 
     if (scope === 'section' || scope === 'testSection') {
-        itemsCountMessage = `<b>${__('You are about to leave this section.')}</b><br><br>`
-        itemsCountMessage += __(
+        itemsCountMessage = __(
             'You answered %s of %s question(s) for this section of the test',
             stats.answered.toString(),
             stats.questions.toString()
@@ -67,11 +81,10 @@ function getUnansweredItemsWarning(scope, runner, sync) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
         }
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
-        itemsCountMessage = `<b>${__('You are about to submit the test.')}</b><br><br>`
         if (unansweredCount > 1) {
-            itemsCountMessage += __('There are %s unanswered questions', unansweredCount.toString());
+            itemsCountMessage = __('There are %s unanswered questions', unansweredCount.toString());
         } else if (unansweredCount === 1) {
-            itemsCountMessage += __('There is %s unanswered question', unansweredCount.toString());
+            itemsCountMessage = __('There is %s unanswered question', unansweredCount.toString());
         }
         if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(
@@ -80,11 +93,10 @@ function getUnansweredItemsWarning(scope, runner, sync) {
             )}`;
         }
     } else if (scope === 'part') {
-        itemsCountMessage = `<b>${__('You are about to submit this test part.')}</b><br><br>`
         if (unansweredCount > 1) {
-            itemsCountMessage += __('There are %s unanswered questions in this part of the test', unansweredCount.toString());
+            itemsCountMessage = __('There are %s unanswered questions in this part of the test', unansweredCount.toString());
         } else if (unansweredCount === 1) {
-            itemsCountMessage += __('There is %s unanswered question in this part of the test', unansweredCount.toString());
+            itemsCountMessage = __('There is %s unanswered question in this part of the test', unansweredCount.toString());
         }
         if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(

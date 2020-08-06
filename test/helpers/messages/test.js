@@ -240,6 +240,9 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
             };
             var runner = runnerMock(map, context, data, responses, declarations);
             var message = '';
+            var messageEntTestNoStat = '<b>You are about to submit the test.</b><br><br>';
+            var messageEntTestPartNoStat = '<b>You are about to submit this test part.</b><br><br>';
+            var messageEntSectionNoStat = '<b>You are about to leave this section.</b><br><br>';
 
             assert.expect(7);
 
@@ -268,17 +271,17 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
 
             assert.equal(
                 messagesHelper.getExitMessage('test', runner),
-                message,
+                messageEntTestNoStat,
                 'no stats in test scope when option is disabled'
             );
             assert.equal(
                 messagesHelper.getExitMessage('part', runner),
-                message,
+                messageEntTestPartNoStat,
                 'no stats in part scope when option is disabled'
             );
             assert.equal(
                 messagesHelper.getExitMessage('section', runner),
-                message,
+                messageEntSectionNoStat,
                 'no stats in session scope when option is disabled'
             );
         });

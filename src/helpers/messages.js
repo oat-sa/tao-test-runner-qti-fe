@@ -57,6 +57,8 @@ function getHeader(scope) {
     } else if (scope === 'part') {
         return `<b>${__('You are about to submit this test part.')}</b><br><br>`;
     }
+
+    return '';
 }
 /**
  * Build message if not all items have answers

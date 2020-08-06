@@ -45,8 +45,6 @@ function getExitMessage(scope, runner, message = '', sync) {
 /**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats
- * @param {Object} runner - testRunner instance
- * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox. Default false
  * @returns {String} Returns the message text
  */
 function getHeader(scope) {

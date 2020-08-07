@@ -189,9 +189,10 @@ export default _.defaults(
             /**
              * Process action which should be sent using message channel.
              *
-             * @param action
-             * @param actionParams
-             * @param deferred
+             * @param {String} action
+             * @param {Object} actionParams
+             * @param {Boolean} deferred
+             *
              * @returns {Promise} resolves with the action result
              */
             this.processSyncAction = function processSyncAction(action, actionParams, deferred) {
@@ -269,12 +270,15 @@ export default _.defaults(
              *      └─ request fails
              *         └─ run the offline action
              *
+             * @param {String} url
              * @param {String} action - the action name (ie. move, skip, timeout)
              * @param {Object} actionParams - the parameters sent along the action
              * @param {Boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
+             * @param {Boolean} noToken whether the request should be sent with a CSRF token or not
+             *
              * @returns {Promise} resolves with the action result
              */
-            this.requestNetworkThenOffline = function requestNetworkThenOffline(url, action, actionParams, deferred) {
+            this.requestNetworkThenOffline = function requestNetworkThenOffline(url, action, actionParams, deferred, noToken) {
                 var testContext = this.getDataHolder().get('testContext');
                 var communicationConfig = self.configStorage.getCommunicationConfig();
 
@@ -286,7 +290,7 @@ export default _.defaults(
                     } else {
                         //action is not synchronizable
                         //fallback to direct request
-                        request = self.request(url, actionParams);
+                        request = self.request(url, actionParams, void 0, noToken || false);
                         request.then(function(result) {
                             if (self.isOffline()) {
                                 return self.scheduleAction(action, actionParams);
@@ -388,7 +392,7 @@ export default _.defaults(
              * Action to mark as offline will be defined by actionParams.actionId parameter value.
              *
              * @param {Object} actionParams - the action parameters
-             * @return {Promise}
+             * @returns {Promise}
              */
             this.markActionAsOffline = function markActionAsOffline(actionParams) {
                 actionParams.offline = true;
@@ -466,7 +470,6 @@ export default _.defaults(
 
             /**
              * try to load the next items
-             * @returns {Promise} that always resolves
              */
             var loadNextItem = function loadNextItem() {
                 var testMap = self.getDataHolder().get('testMap');
@@ -490,7 +493,8 @@ export default _.defaults(
                             self.configStorage.getTestActionUrl('getNextItemData'),
                             'getNextItemData',
                             { itemDefinition: missing },
-                            false
+                            false,
+                            true
                         )
                             .then(function(response) {
                                 if (response && response.items) {
@@ -514,17 +518,17 @@ export default _.defaults(
                 return this.itemStore.get(itemIdentifier);
             }
 
-            return this.request(this.configStorage.getItemActionUrl(itemIdentifier, 'getItem'), params).then(function(
-                response
-            ) {
-                if (response && response.success) {
-                    self.itemStore.set(itemIdentifier, response);
-                }
+            return this
+                .request(this.configStorage.getItemActionUrl(itemIdentifier, 'getItem'), params, void 0, true)
+                .then(function (response) {
+                    if (response && response.success) {
+                        self.itemStore.set(itemIdentifier, response);
+                    }
 
-                loadNextItem();
+                    loadNextItem();
 
-                return response;
-            });
+                    return response;
+                });
         },
 
         /**

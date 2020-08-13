@@ -424,6 +424,7 @@ $borderColor: $textHighlight;
         background: white();
         &.active {
             background: $info;
+            color: $textHighlight;
         }
         &:hover {
             background: lighten($lightBlueGrey, 3);

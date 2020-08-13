@@ -422,12 +422,9 @@ $borderColor: $textHighlight;
     }
     .qti-navigator-item {
         background: white();
-        &.active {
+        &.active, &:hover {
             background: $info;
             color: $textHighlight;
-        }
-        &:hover {
-            background: lighten($lightBlueGrey, 3);
         }
         &.disabled {
             background-color: mix($textHighlight, $grey, 65%) !important;

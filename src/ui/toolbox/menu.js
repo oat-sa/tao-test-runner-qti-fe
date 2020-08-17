@@ -27,7 +27,7 @@
  *      icon: 'icon',
  *      text: __('Displayed label')
  * });
- * Optional setting: navType - navigation type 
+ * Optional setting: navType - navigation type
  * navType: 'fromLast' (default behavior) - focus on button (if no active item) and then using UP go to last item, when press DOWN at last item (or UP at the first) menu will be closed,
  * navType: 'fromFirst' - focus on button (if no active item) and then using DOWN go to first item. When press the DOWN key at the first item (or UP at the first) menu will be closed
  * toolbox.createMenu({
@@ -149,7 +149,7 @@ var menuComponentApi = {
      * Changes hoverIndex and hover item.
      *
      * @param {Number} index - item index to hover.
-     * 
+     *
      * @returns the menu item.
      */
     hoverByIndex(index) {
@@ -471,9 +471,7 @@ var menuComponentApi = {
             this.closeMenu();
 
             // give back the focus
-            if (document.activeElement) {
-                document.activeElement.blur();
-            }
+            this.$component.focus();
         }
     },
 

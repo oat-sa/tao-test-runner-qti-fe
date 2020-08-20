@@ -52,6 +52,18 @@ const removeLabelledByAttribute = cursor => {
 };
 
 /**
+ * Adds attributes on navigation focus and blur
+ * 
+ * @param {Navigator} navigator 
+ */
+const manageLabelledByAttribute = (navigator) => {
+    if (navigator) {
+        navigator.on('focus', addLabelledByAttribute);
+        navigator.on('blur', removeLabelledByAttribute); // applies WCAG behavior for the radio buttons
+    }
+}
+
+/**
  * Key navigator strategy applying inside the item.
  * Navigable item content are interaction choices and body element with the special class "key-navigation-focusable".
  * @type {Object} keyNavigationStrategy
@@ -165,9 +177,7 @@ export default {
                         $inputs.each((i, input) => {
                             const navigator = addInputsNavigator($(input), $itemElement);
 
-                            navigator.on('focus', addLabelledByAttribute);
-
-                            navigator.on('blur', removeLabelledByAttribute);
+                            manageLabelledByAttribute(navigator);
                         });
                     } else {
                         const navigator = addInputsNavigator($inputs, $itemElement, true, () => {
@@ -184,9 +194,7 @@ export default {
                             return position;
                         });
 
-                        navigator.on('focus', addLabelledByAttribute);
-
-                        navigator.on('blur', removeLabelledByAttribute);
+                        manageLabelledByAttribute(navigator);
 
                         // applies WCAG behavior for the radio buttons
                         if (navigator && config.wcagBehavior) {

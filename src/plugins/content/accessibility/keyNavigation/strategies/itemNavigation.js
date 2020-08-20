@@ -35,10 +35,13 @@ const addLabelledByAttribute = cursor => {
     const value = $element.attr('value');
     const name = $element.attr('name');
 
-    $element.attr(
-        'aria-labelledby',
-        `${name.replace('response-', 'choice-')}-${value}`
-    );
+    if (name) {
+        $element.attr(
+            'aria-labelledby',
+            `${name.replace('response-', 'choice-')}-${value}`
+        );
+    }
+    
 };
 
 /**

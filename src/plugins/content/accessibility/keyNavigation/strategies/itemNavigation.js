@@ -35,10 +35,13 @@ const addLabelledByAttribute = cursor => {
     const value = $element.attr('value');
     const name = $element.attr('name');
 
-    $element.attr(
-        'aria-labelledby',
-        `${name.replace('response-', 'choice-')}-${value}`
-    );
+    if (name) {
+        $element.attr(
+            'aria-labelledby',
+            `${name.replace('response-', 'choice-')}-${value}`
+        );
+    }
+    
 };
 
 /**
@@ -50,6 +53,18 @@ const removeLabelledByAttribute = cursor => {
     const $element = cursor.navigable.getElement();
     $element.removeAttr('aria-labelledby', '');
 };
+
+/**
+ * Adds attributes on navigation focus and blur
+ * 
+ * @param {Navigator} navigator 
+ */
+const manageLabelledByAttribute = (navigator) => {
+    if (navigator) {
+        navigator.on('focus', addLabelledByAttribute);
+        navigator.on('blur', removeLabelledByAttribute); // applies WCAG behavior for the radio buttons
+    }
+}
 
 /**
  * Key navigator strategy applying inside the item.
@@ -165,9 +180,7 @@ export default {
                         $inputs.each((i, input) => {
                             const navigator = addInputsNavigator($(input), $itemElement);
 
-                            navigator.on('focus', addLabelledByAttribute);
-
-                            navigator.on('blur', removeLabelledByAttribute);
+                            manageLabelledByAttribute(navigator);
                         });
                     } else {
                         const navigator = addInputsNavigator($inputs, $itemElement, true, () => {
@@ -184,9 +197,7 @@ export default {
                             return position;
                         });
 
-                        navigator.on('focus', addLabelledByAttribute);
-
-                        navigator.on('blur', removeLabelledByAttribute);
+                        manageLabelledByAttribute(navigator);
 
                         // applies WCAG behavior for the radio buttons
                         if (navigator && config.wcagBehavior) {

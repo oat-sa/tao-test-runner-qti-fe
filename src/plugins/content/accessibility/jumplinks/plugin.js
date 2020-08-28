@@ -89,7 +89,7 @@ export default pluginFactory({
             pluginShortcuts.goToTop && shortcut.add(
                 namespaceHelper.namespaceAll(pluginShortcuts.goToTop, this.getName(), true),
                 function() {
-                    $('body').attr('tabindex', '-1').focus();
+                    $('[tabindex]').first().focus();
                 },
                 {
                     avoidInput: true,

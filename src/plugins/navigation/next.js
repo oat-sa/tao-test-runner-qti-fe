@@ -40,13 +40,13 @@ import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
 var buttonData = {
     next: {
         control: 'move-forward',
-        title: 'Submit and go to the item %s',
+        title: __('Submit and go to the item %s'),
         icon: 'forward',
         text: __('Next')
     },
     end: {
         control: 'move-end',
-        title: 'Submit and go to the end of the test',
+        title: __('Submit and go to the end of the test'),
         icon: 'fast-forward',
         text: __('End test')
     }

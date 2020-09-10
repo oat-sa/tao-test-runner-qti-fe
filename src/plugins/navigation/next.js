@@ -72,9 +72,7 @@ const updateElement = function updateElement($element, testRunner, isLast = fals
     const dataType = isLast ? 'end' : 'next';
     const testContext = testRunner.getTestContext();
     const nextItemPosition = testContext.itemPosition + 1;
-    if (dataType === 'next') {
-        $element.attr('title', __(buttonData[dataType].title, nextItemPosition));
-    }
+    $element.attr('title', __(buttonData[dataType].title, nextItemPosition));
     if ($element.attr('data-control') !== buttonData[dataType].control) {
         $element
             .attr('data-control', buttonData[dataType].control)

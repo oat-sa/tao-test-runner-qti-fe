@@ -30,7 +30,6 @@ import shortcutsFactory from './shortcuts';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import containerTpl from './container.tpl';
-import _ from "lodash";
 
 /**
  * Creates the JumpLinks plugin.

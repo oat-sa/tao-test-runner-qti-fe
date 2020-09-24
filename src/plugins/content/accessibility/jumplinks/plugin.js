@@ -30,6 +30,7 @@ import shortcutsFactory from './shortcuts';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import containerTpl from './container.tpl';
+import _ from "lodash";
 
 /**
  * Creates the JumpLinks plugin.
@@ -186,6 +187,9 @@ export default pluginFactory({
                 const wasHidden = isReviewPanelHidden(testRunner);
 
                 this.jumplinks.trigger('changeReviewPanel', wasHidden);
+            })
+            .after('renderitem', () => {
+                getJumpElement.question.attr('tabindex', '-1').focus();
             });
     },
 

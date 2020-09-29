@@ -40,7 +40,7 @@ import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
 var buttonData = {
     next: {
         control: 'move-forward',
-        title: __('Submit and go to the next item'),
+        title: __('Submit and go to the item %s'),
         icon: 'forward',
         text: __('Next')
     },
@@ -65,14 +65,17 @@ var createElement = function createElement(isLast = false) {
 /**
  * Update the button based on the context
  * @param {jQueryElement} $element - the element to update
+ * @param {TestRunner} [testRunner] - the test runner instance
  * @param {Boolean} [isLast=false] - is the current item the last
  */
-const updateElement = function updateElement($element, isLast = false) {
+const updateElement = function updateElement($element, testRunner, isLast = false) {
     const dataType = isLast ? 'end' : 'next';
+    const testContext = testRunner.getTestContext();
+    const nextItemPosition = testContext.itemPosition + 1;
+    $element.attr('title', __(buttonData[dataType].title, nextItemPosition));
     if ($element.attr('data-control') !== buttonData[dataType].control) {
         $element
             .attr('data-control', buttonData[dataType].control)
-            .attr('title', buttonData[dataType].title)
             .find('.text')
             .text(buttonData[dataType].text);
 
@@ -254,7 +257,7 @@ export default pluginFactory({
         //change plugin state
         testRunner
             .on('loaditem', () => {
-                updateElement(this.$element, isLastItem());
+                updateElement(this.$element, testRunner, isLastItem());
             })
             .on('enablenav', function() {
                 self.enable();

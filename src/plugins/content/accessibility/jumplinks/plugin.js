@@ -166,9 +166,8 @@ export default pluginFactory({
                 let $announce = $('[aria-live=polite][role=alert]').first();
 
                 if ($announce.length !== 1) {
-                    const $announcedItem = $('h2#test-title-header').first();
                     $announce = $('<div aria-live="polite" role="alert" class="visible-hidden"></div>');
-                    $announcedItem.append($announce);
+                    $('main').first().append($announce);
                 }
                 $announce.text(announcedText);
 

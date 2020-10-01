@@ -185,6 +185,9 @@ export default pluginFactory({
                 const wasHidden = isReviewPanelHidden(testRunner);
 
                 this.jumplinks.trigger('changeReviewPanel', wasHidden);
+            })
+            .after('renderitem', () => {
+                getJumpElement.question.attr('tabindex', '-1').focus();
             });
     },
 

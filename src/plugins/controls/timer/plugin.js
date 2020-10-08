@@ -166,20 +166,29 @@ export default pluginFactory({
             testRunner.trigger('error', err);
         };
 
+        function loadSavedTimers(timeStore) {
+            var testContext = testRunner.getTestContext();
+            //update the timers before each item
+            if (self.timerbox && testContext.timeConstraints) {
+                return self
+                    .loadTimers(timeStore, config)
+                    .then(function(timers) {
+                        return self.timerbox.update(timers);
+                    })
+                    .catch(handleError);
+            }
+        }
+
         return new Promise(function(resolve) {
             //load the plugin store
             return testRunner.getPluginStore(self.getName()).then(function(timeStore) {
                 testRunner
-                    .before('renderitem resumeitem', function() {
-                        var testContext = testRunner.getTestContext();
-                        //update the timers before each item
-                        if (self.timerbox && testContext.timeConstraints) {
-                            return self
-                                .loadTimers(timeStore, config)
-                                .then(function(timers) {
-                                    return self.timerbox.update(timers);
-                                })
-                                .catch(handleError);
+                    .before('renderitem', function() {
+                        return loadSavedTimers(timeStore);
+                    })
+                    .before('enableitem', function() {
+                        if (config.restoreTimerFromClient) {
+                            return loadSavedTimers(timeStore);
                         }
                     })
                     .on('tick', function(elapsed) {
@@ -215,9 +224,21 @@ export default pluginFactory({
 
                         self.$screenreaderWarningContainer.text('');
                     })
-                    .on('disableitem move skip', function() {
+                    .after('enableitem', function() {
+                        if (self.timerbox && config.restoreTimerFromClient) {
+                            //this will "resume" the countdowns if timers have client mode
+                            self.timerbox.start();
+                        }
+                    })
+                    .on('move skip', function() {
                         if (self.timerbox) {
                             //this will "pause" the countdowns
+                            self.timerbox.stop();
+                        }
+                    })
+                    .on('disableitem', function() {
+                        if (self.timerbox && config.restoreTimerFromClient) {
+                            //this will "pause" the countdowns if timers have client mode
                             self.timerbox.stop();
                         }
                     });

@@ -156,18 +156,18 @@ export default pluginFactory({
         /**
          * Set up the strategy handler
          */
-        var strategyHandler = getStrategyHandler(testRunner);
+        const strategyHandler = getStrategyHandler(testRunner);
 
         /**
          * dispatch errors to the test runner
          * @param {Error} err - to dispatch
          */
-        var handleError = function handleError(err) {
+        const handleError = err => {
             testRunner.trigger('error', err);
         };
 
         function loadSavedTimers(timeStore) {
-            var testContext = testRunner.getTestContext();
+            const testContext = testRunner.getTestContext();
             //update the timers before each item
             if (self.timerbox && testContext.timeConstraints) {
                 return self
@@ -196,8 +196,8 @@ export default pluginFactory({
                             const timers = self.timerbox.getTimers();
 
                             const updatedTimers = Object.keys(timers).reduce((acc, timerName) => {
-                                const stats = statsHelper.getInstantStats(timers[timerName].scope, testRunner);
-                                const unansweredQuestions = stats && (stats.questions - stats.answered);
+                                const statsScope = statsHelper.getInstantStats(timers[timerName].scope, testRunner);
+                                const unansweredQuestions = statsScope && (statsScope.questions - statsScope.answered);
                                 acc[timerName] = Object.assign(
                                     {},
                                     timers[timerName],
@@ -300,8 +300,8 @@ export default pluginFactory({
                             // debounce used to prevent multiple invoking at the same time
                             self.timerbox.on('warnscreenreader', _.debounce(
                                 (message, remainingTime, scope) => {
-                                    const stats = statsHelper.getInstantStats(scope, testRunner);
-                                    const unansweredQuestions = stats && (stats.questions - stats.answered);
+                                    const statsScope = statsHelper.getInstantStats(scope, testRunner);
+                                    const unansweredQuestions = statsScope && (statsScope.questions - statsScope.answered);
 
                                     if (screenreaderNotifcationTimeoutId) {
                                         clearTimeout(screenreaderNotifcationTimeoutId);

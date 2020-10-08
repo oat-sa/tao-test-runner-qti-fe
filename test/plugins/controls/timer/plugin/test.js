@@ -155,7 +155,7 @@ define([
                 assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has not been inserted yet');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(
                         $container.find('.timer-wrapper').length,
                         1,
@@ -163,7 +163,7 @@ define([
                     );
 
                     // Plugin destroying
-                    return plugin.destroy().then(function() {
+                    return plugin.destroy().then(() => {
                         assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has been removed');
 
                         ready();
@@ -174,9 +174,9 @@ define([
 
     QUnit.module('Options');
 
-    QUnit.test('no timers in item/section', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName, {}, runnerConfig),
+    QUnit.test('no timers in item/section', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, runnerConfig),
             areaBroker = runner.getAreaBroker(),
             plugin = pluginFactory(runner, areaBroker),
             $container = areaBroker.getControlArea();
@@ -197,13 +197,13 @@ define([
         plugin.install();
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has not been inserted yet');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(
                         $container.find('.timer-wrapper').length,
                         1,
@@ -215,22 +215,22 @@ define([
                     }, 50);
 
                     // Plugin destroying
-                    return plugin.destroy().then(function() {
+                    return plugin.destroy().then(() => {
                         assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has been removed');
 
                         ready();
                     });
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${err.message}`);
                 ready();
             });
     });
 
-    QUnit.test('timers set for item/section', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName, {}, runnerConfig),
+    QUnit.test('timers set for item/section', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, runnerConfig),
             areaBroker = runner.getAreaBroker(),
             plugin = pluginFactory(runner, areaBroker),
             $container = areaBroker.getControlArea();
@@ -262,13 +262,13 @@ define([
         plugin.install();
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has not been inserted yet');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(
                         $container.find('.timer-wrapper').length,
                         1,
@@ -282,7 +282,7 @@ define([
                         setTimeout(() => {
                             assert.equal($container.find('.time').text(), '00:01:59', 'The time is displayed 00:01:59');
                             // Plugin destroying
-                            return plugin.destroy().then(function() {
+                            return plugin.destroy().then(() => {
                                 assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has been removed');
 
                                 ready();
@@ -291,15 +291,15 @@ define([
                     }, 50);
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${err.message}`);
                 ready();
             });
     });
 
-    QUnit.test('mode server, timer does not pause on disableitem event', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName, {}, runnerConfig),
+    QUnit.test('mode server, timer does not pause on disableitem event', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, runnerConfig),
             areaBroker = runner.getAreaBroker(),
             plugin = pluginFactory(runner, areaBroker),
             $container = areaBroker.getControlArea();
@@ -331,13 +331,13 @@ define([
         plugin.install();
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has not been inserted yet');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(
                         $container.find('.timer-wrapper').length,
                         1,
@@ -356,7 +356,7 @@ define([
                             setTimeout(() => {
                                 assert.equal($container.find('.time').text(), '00:01:58', 'The time is running, displayed 00:01:58');
                                 // Plugin destroying
-                                return plugin.destroy().then(function() {
+                                return plugin.destroy().then(() => {
                                     assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has been removed');
 
                                     ready();
@@ -366,15 +366,15 @@ define([
                     }, 50);
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${err.message}`);
                 ready();
             });
     });
 
-    QUnit.test('mode client, timer pauses on disableitem event', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName, {}, runnerConfigClientMode),
+    QUnit.test('mode client, timer pauses on disableitem event', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, runnerConfigClientMode),
             areaBroker = runner.getAreaBroker(),
             plugin = pluginFactory(runner, areaBroker),
             $container = areaBroker.getControlArea();
@@ -406,13 +406,13 @@ define([
         plugin.install();
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has not been inserted yet');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(
                         $container.find('.timer-wrapper').length,
                         1,
@@ -431,7 +431,7 @@ define([
                             setTimeout(() => {
                                 assert.equal($container.find('.time').text(), '00:01:59', 'The time paused, displayed 00:01:59');
                                 // Plugin destroying
-                                return plugin.destroy().then(function() {
+                                return plugin.destroy().then(() => {
                                     assert.equal($container.find('.timer-wrapper').length, 0, 'The plugin has been removed');
 
                                     ready();
@@ -441,7 +441,7 @@ define([
                     }, 50);
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${err.message}`);
                 ready();
             });

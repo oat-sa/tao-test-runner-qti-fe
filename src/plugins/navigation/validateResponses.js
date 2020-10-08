@@ -66,10 +66,7 @@ export default pluginFactory({
                 return Promise.resolve();
             }
 
-            testRunner.trigger('disableitem');
-
             if (isInteracting && testRunnerOptions.enableValidateResponses) {
-
                 const currenItem = testRunner.getCurrentItem();
                 //@deprecated use validateResponses from testMap instead of the testContext
                 const validateResponses = typeof currenItem.validateResponses === 'boolean' ?

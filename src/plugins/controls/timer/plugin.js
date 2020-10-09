@@ -156,30 +156,39 @@ export default pluginFactory({
         /**
          * Set up the strategy handler
          */
-        var strategyHandler = getStrategyHandler(testRunner);
+        const strategyHandler = getStrategyHandler(testRunner);
 
         /**
          * dispatch errors to the test runner
          * @param {Error} err - to dispatch
          */
-        var handleError = function handleError(err) {
+        const handleError = err => {
             testRunner.trigger('error', err);
         };
+
+        function loadSavedTimers(timeStore) {
+            const testContext = testRunner.getTestContext();
+            //update the timers before each item
+            if (self.timerbox && testContext.timeConstraints) {
+                return self
+                    .loadTimers(timeStore, config)
+                    .then(function(timers) {
+                        return self.timerbox.update(timers);
+                    })
+                    .catch(handleError);
+            }
+        }
 
         return new Promise(function(resolve) {
             //load the plugin store
             return testRunner.getPluginStore(self.getName()).then(function(timeStore) {
                 testRunner
-                    .before('renderitem resumeitem', function() {
-                        var testContext = testRunner.getTestContext();
-                        //update the timers before each item
-                        if (self.timerbox && testContext.timeConstraints) {
-                            return self
-                                .loadTimers(timeStore, config)
-                                .then(function(timers) {
-                                    return self.timerbox.update(timers);
-                                })
-                                .catch(handleError);
+                    .before('renderitem', function() {
+                        return loadSavedTimers(timeStore);
+                    })
+                    .before('enableitem', function() {
+                        if (config.restoreTimerFromClient) {
+                            return loadSavedTimers(timeStore);
                         }
                     })
                     .on('tick', function(elapsed) {
@@ -187,8 +196,8 @@ export default pluginFactory({
                             const timers = self.timerbox.getTimers();
 
                             const updatedTimers = Object.keys(timers).reduce((acc, timerName) => {
-                                const stats = statsHelper.getInstantStats(timers[timerName].scope, testRunner);
-                                const unansweredQuestions = stats && (stats.questions - stats.answered);
+                                const statsScope = statsHelper.getInstantStats(timers[timerName].scope, testRunner);
+                                const unansweredQuestions = statsScope && (statsScope.questions - statsScope.answered);
                                 acc[timerName] = Object.assign(
                                     {},
                                     timers[timerName],
@@ -215,9 +224,21 @@ export default pluginFactory({
 
                         self.$screenreaderWarningContainer.text('');
                     })
-                    .on('disableitem move skip', function() {
+                    .after('enableitem', function() {
+                        if (self.timerbox && config.restoreTimerFromClient) {
+                            //this will "resume" the countdowns if timers have client mode
+                            self.timerbox.start();
+                        }
+                    })
+                    .on('move skip', function() {
                         if (self.timerbox) {
                             //this will "pause" the countdowns
+                            self.timerbox.stop();
+                        }
+                    })
+                    .on('disableitem', function() {
+                        if (self.timerbox && config.restoreTimerFromClient) {
+                            //this will "pause" the countdowns if timers have client mode
                             self.timerbox.stop();
                         }
                     });
@@ -279,8 +300,8 @@ export default pluginFactory({
                             // debounce used to prevent multiple invoking at the same time
                             self.timerbox.on('warnscreenreader', _.debounce(
                                 (message, remainingTime, scope) => {
-                                    const stats = statsHelper.getInstantStats(scope, testRunner);
-                                    const unansweredQuestions = stats && (stats.questions - stats.answered);
+                                    const statsScope = statsHelper.getInstantStats(scope, testRunner);
+                                    const unansweredQuestions = statsScope && (statsScope.questions - statsScope.answered);
 
                                     if (screenreaderNotifcationTimeoutId) {
                                         clearTimeout(screenreaderNotifcationTimeoutId);

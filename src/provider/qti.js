@@ -375,6 +375,8 @@ var qtiProvider = {
         stopwatch.init();
         stopwatch.spread(this, 'tick');
 
+        const timerClientMode = config.options.timer && config.options.timer.restoreTimerFromClient;
+
         /*
          * Install behavior on events
          */
@@ -504,7 +506,7 @@ var qtiProvider = {
                         self.trigger('error', err);
                     });
             })
-            .before('move skip exit timeout pause', function() {
+            .on('move skip exit timeout pause', function() {
                 stopwatch.stop();
             })
             .on('loaditem', function() {
@@ -552,13 +554,15 @@ var qtiProvider = {
                 this.trigger('enableitem enablenav');
             })
             .on('disableitem', function() {
-                stopwatch.stop();
-
+                if (timerClientMode) {
+                    stopwatch.stop();
+                }
                 this.trigger('disabletools');
             })
             .on('enableitem', function() {
-                stopwatch.start();
-
+                if (timerClientMode) {
+                    stopwatch.start();
+                }
                 this.trigger('enabletools');
             })
             .on('error', function() {

@@ -153,6 +153,11 @@ export default pluginFactory({
                 icon: 'contrast',
                 text: __('Contrast')
             })
+            .after('render', () => {
+                if (!isPluginAllowed()) {
+                    self.hide();
+                }
+            })
             .on('click', function(e) {
                 e.preventDefault();
                 testRunner.trigger('tool-themeswitcher-toggle');
@@ -244,7 +249,7 @@ export default pluginFactory({
             })
             .on('tool-themeswitcher-setnavtype', function(type) {
                 self.menuButton.setNavigationType(type);
-            })
+            });
 
         return testRunner.getPluginStore(this.getName()).then(function(itemThemesStore) {
             self.storage = itemThemesStore;

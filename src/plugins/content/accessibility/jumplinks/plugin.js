@@ -162,7 +162,7 @@ export default pluginFactory({
                     isReviewPanelEnabled: !isReviewPanelHidden(testRunner) && isReviewPanelEnabled(testRunner),
                     questionStatus: getItemStatus(currentItem)
                 };
-                const announcedText = __('%s loaded', currentItem.label);
+                const announcedText = __('Item %s loaded', currentItem.position);
                 let $announce = $('[aria-live=polite][role=alert]').first();
 
                 if ($announce.length !== 1) {

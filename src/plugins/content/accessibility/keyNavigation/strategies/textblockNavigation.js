@@ -31,8 +31,8 @@ import {
 const groupId = 'textblock-element-navigation-group';
 
 /**
- * Key navigator strategy applying on textblock items with scrollbar.
- * Navigable item content are body elements with the special class "textBlock-wrap".
+ * Key navigator strategy applying on textblock and shared stimulus items with enabled scrollbar.
+ * Navigable item content are body elements with the special class "text-block-wrap".
  * @type {Object} keyNavigationStrategy
  */
 export default {
@@ -68,7 +68,7 @@ export default {
     };
 
     $content
-        .find('.textBlock-wrap')
+        .find('.text-block-wrap')
         .addClass('key-navigation-scrollable')
         .each((i, el) => {
           const $element = $(el);

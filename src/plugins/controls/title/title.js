@@ -50,10 +50,12 @@ export default pluginFactory({
             );
 
             // update test title
-            this.titles.test.$title.text(testMap.title).show();
+            if (testMap.title) {
+                this.titles.test.$title.text(testMap.title).show();
+            }
 
             // update part title
-            if (currentPart) {
+            if (currentPart && currentPart.label) {
                 this.titles.testPart.$title
                     .text(` - ${currentPart.label}`)
                     .show();
@@ -75,9 +77,11 @@ export default pluginFactory({
             }
 
             // update item title
-            this.titles.item.$title
-                .text(` - ${currentItem.label}`)
-                .show();
+            if (currentItem.label) {
+                this.titles.item.$title
+                    .text(` - ${currentItem.label}`)
+                    .show();
+            }
         };
 
         testRunner

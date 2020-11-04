@@ -69,6 +69,16 @@ define([
         { name: 'disable', title: 'disable' }
     ];
 
+    QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
+        var runner = runnerFactory(providerName);
+        var timer = pluginFactory(runner);
+        assert.equal(
+            typeof timer[data.name],
+            'function',
+            `The pluginFactory instances expose a "${data.name}" function`
+        );
+    });
+
     QUnit.module('itemScrolling');
 
     QUnit.test('itemScrolling init', function(assert) {
@@ -81,6 +91,7 @@ define([
             const $contentArea = runner
                 .getAreaBroker()
                 .getContentArea();
+            console.log(runner.getAreaBroker())
             const $itemContainer = $contentArea.find('.text-block-wrap[data-scrolling]');
             console.log('ItemContainer: ', $itemContainer);
             $itemContainer.each(function() {

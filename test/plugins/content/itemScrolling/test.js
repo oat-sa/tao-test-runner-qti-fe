@@ -25,30 +25,76 @@ define([
     'jquery',
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
-    'taoQtiTest/test/runner/mocks/areaBrokerMock',
+    'taoQtiItem/runner/qtiItemRunner',
+    'json!taoQtiItem/test/samples/json/inlineModalFeedback.json',
     'taoQtiTest/runner/plugins/content/itemScrolling/itemScrolling'
-], function($, runnerFactory, providerMock, areaBrokerMock, pluginFactory) {
+], function($, runnerFactory, providerMock, qtiItemRunner, itemData, pluginFactory) {
     'use strict';
 
     var pluginApi;
+    var runner;
+    var containerId = 'item-container';
     var providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
-    /**
-     * The following tests applies to all plugins
-     */
-    QUnit.module('pluginFactory');
+    QUnit.module('itemScrolling init', {
+        afterEach: function() {
+            if (runner) {
+                runner.clear();
+            }
+        }
+    });
 
-    QUnit.test('module', function(assert) {
-        var runner = runnerFactory(providerName);
+    QUnit.test('itemScrolling data loading', function(assert) {
+        var ready = assert.async();
+        assert.expect(2);
 
-        assert.equal(typeof pluginFactory, 'function', 'The pluginFactory module exposes a function');
-        assert.equal(typeof pluginFactory(runner), 'object', 'The plugin factory produces an instance');
-        assert.notStrictEqual(
-            pluginFactory(runner),
-            pluginFactory(runner),
-            'The plugin factory provides a different instance on each call'
-        );
+        runner = qtiItemRunner('qti', itemData)
+            .on('init', function() {
+                assert.ok(typeof this._item === 'object', 'The item data is loaded and mapped to an object');
+                assert.ok(typeof this._item.bdy === 'object', 'The item contains a body object');
+
+                ready();
+            })
+            .init();
+    });
+
+    QUnit.module('itemScrolling render', {
+        afterEach: function() {
+            if (runner) {
+                runner.clear();
+            }
+        }
+    });
+
+    QUnit.test('itemScrolling rendering', function(assert) {
+        var ready = assert.async();
+        assert.expect(3);
+
+        const container = document.getElementById(containerId);
+
+        assert.ok(container instanceof HTMLElement, 'the item container exists');
+        assert.equal(container.children.length, 0, 'the container has no children');
+
+        runner = qtiItemRunner('qti', itemData)
+            .on('render', function() {
+                assert.equal(container.children.length, 1, 'the container has children');
+
+                ready();
+            })
+            .init()
+            .render(container);
+    });
+
+    QUnit.module('API', {
+        beforeEach: function setup() {
+            runner = qtiItemRunner('qti', itemData).init();
+        },
+        afterEach: function() {
+            if (runner) {
+                runner.clear();
+            }
+        }
     });
 
     pluginApi = [
@@ -70,16 +116,21 @@ define([
     ];
 
     QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
-        var runner = runnerFactory(providerName);
-        var timer = pluginFactory(runner);
+        var plugin = pluginFactory(runner);
         assert.equal(
-            typeof timer[data.name],
+            typeof plugin[data.name],
             'function',
-            `The pluginFactory instances expose a "${data.name}" function`
+            `The modalDialogFeedback instances expose a "${data.name}" function`
         );
     });
 
-    QUnit.module('itemScrolling');
+    QUnit.module('itemScrolling', {
+        afterEach: function setup() {
+            if (runner) {
+                runner.clear();
+            }
+        }
+    });
 
     QUnit.test('itemScrolling init', function(assert) {
         var ready = assert.async();

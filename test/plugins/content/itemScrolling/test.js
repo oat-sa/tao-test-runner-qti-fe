@@ -25,8 +25,9 @@ define([
     'jquery',
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
+    'taoQtiTest/test/runner/mocks/areaBrokerMock',
     'taoQtiTest/runner/plugins/content/itemScrolling/itemScrolling'
-], function($, runnerFactory, providerMock, pluginFactory) {
+], function($, runnerFactory, providerMock, areaBrokerMock, pluginFactory) {
     'use strict';
 
     var pluginApi;
@@ -68,14 +69,35 @@ define([
         { name: 'disable', title: 'disable' }
     ];
 
-    QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
-        var runner = runnerFactory(providerName);
-        var timer = pluginFactory(runner);
-        assert.equal(
-            typeof timer[data.name],
-            'function',
-            `The pluginFactory instances expose a "${data.name}" function`
-        );
-    });
+    QUnit.module('itemScrolling');
 
+    QUnit.test('itemScrolling init', function(assert) {
+        var ready = assert.async();
+        var runner = runnerFactory(providerName);
+        var plugin = pluginFactory(runner, runner.getAreaBroker());
+        var height = 0;
+
+        runner.on('resize.adaptItemHeight', function() {
+            const $contentArea = runner
+                .getAreaBroker()
+                .getContentArea();
+            const $itemContainer = $contentArea.find('.text-block-wrap[data-scrolling]');
+            console.log('ItemContainer: ', $itemContainer);
+            $itemContainer.each(function() {
+                const $item = $(this);
+                console.log('CSS: ', $item);
+            });
+        });
+
+        plugin
+            .init()
+            .then(function() {
+                runner.trigger('renderitem');
+                runner.trigger('resize.adaptItemHeight');
+            })
+            .catch(function(err) {
+                assert.ok(false, err.message);
+                ready();
+            });
+    });
 });

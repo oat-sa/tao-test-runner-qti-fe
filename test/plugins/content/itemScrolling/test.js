@@ -91,7 +91,6 @@ define([
             const $contentArea = runner
                 .getAreaBroker()
                 .getContentArea();
-            console.log(runner.getAreaBroker())
             const $itemContainer = $contentArea.find('.text-block-wrap[data-scrolling]');
             console.log('ItemContainer: ', $itemContainer);
             $itemContainer.each(function() {

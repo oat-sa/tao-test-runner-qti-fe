@@ -20,6 +20,7 @@
  * @author Oleg Belanovich <oleg.belanovich@taotesting.com>
  */
 
+import $ from 'jquery';
 import typeCaster from 'util/typeCaster';
 import pluginFactory from 'taoTests/runner/plugin';
 

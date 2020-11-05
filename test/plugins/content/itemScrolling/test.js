@@ -25,12 +25,13 @@ define([
     'jquery',
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
+    'taoQtiTest/test/runner/mocks/areaBrokerMock',
     'taoQtiItem/runner/qtiItemRunner',
     'json!taoQtiItem/test/samples/json/inlineModalFeedback.json',
     'taoQtiItem/qtiItem/core/Loader',
     'taoQtiItem/qtiCommonRenderer/renderers/Renderer',
     'taoQtiTest/runner/plugins/content/itemScrolling/itemScrolling',
-], function ($, runnerFactory, providerMock, qtiItemRunner, itemData, QtiLoader, QtiRenderer, pluginFactory) {
+], function ($, runnerFactory, providerMock, areaBrokerMock, qtiItemRunner, itemData, QtiLoader, QtiRenderer, pluginFactory) {
     'use strict';
 
     itemData = {
@@ -241,6 +242,12 @@ define([
                 item = _item;
                 item.setRenderer(this);
 
+                var $container = $(`#rendering`);
+                var areaBroker = areaBrokerMock({
+                    $brokerContainer: $container
+                });
+                runnerFactory.registerProvider(providerName, providerMock({areaBroker: areaBroker}));
+
                 testRunner = runnerFactory(providerName);
                 testRunner.itemRunner = {_item: item};
 
@@ -257,7 +264,7 @@ define([
                 assert.equal($textBlocks.first().length, 1, 'The result contains an text block');
                 assert.equal($textBlocks.first().attr('data-scrolling'), 'true', 'The text block has enabled scroll');
 
-                $(`#${containerId}`).append($result);
+                testRunner.getAreaBroker().getContentArea().append($result);
 
                 var plugin = pluginFactory(testRunner, testRunner.getAreaBroker());
                 testRunner.on('renderitem', function () {

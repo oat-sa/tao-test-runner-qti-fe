@@ -62,6 +62,7 @@ export default pluginFactory({
                 const containerParent = $item.parent().closest('.text-block-wrap[data-scrolling]');
 
                 if ($item.length && isScrollable) {
+                    $item.data('scrollable', true);
                     $item.css({'overflow' : 'auto'});
                     if (containerParent.length > 0) {
                         $item.css('max-height', `${containerParent.height() * (selectedHeight * 0.01)}px`);

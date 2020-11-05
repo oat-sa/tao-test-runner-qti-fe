@@ -25,4 +25,5 @@ export { default as rubricsNavigationStrategy } from './rubricsNavigation';
 export { default as itemNavigationStrategy } from './itemNavigation';
 export { default as linearItemNavigationStrategy } from './linearItemNavigation';
 export { default as stimulusNavigationStrategy } from './stimulusNavigation';
+export { default as textblockNavigationStrategy } from './textblockNavigation';
 export { default as jumpLinksNavigationStrategy } from './jumpLinks';

@@ -52,14 +52,14 @@ export default pluginFactory({
 
 
         function adaptItemHeight() {
-            const $itemContainer = $contentArea.find('.text-block-wrap[data-scrolling]');
+            const $itemContainer = $contentArea.find('.custom-text-box[data-scrolling]');
             const contentHeight = getItemRunnerHeight() - getExtraGridRowHeight() - getSpaceAboveQtiContent() - gridRowBottomMargin - qtiItemPadding;
 
             $itemContainer.each(function() {
                 const $item = $(this);
                 const isScrollable = typeCaster.strToBool($item.attr('data-scrolling') || 'false');
                 const selectedHeight = parseFloat($item.attr('data-scrolling-height')) || 100;
-                const containerParent = $item.parent().closest('.text-block-wrap[data-scrolling]');
+                const containerParent = $item.parent().closest('.custom-text-box[data-scrolling]');
 
                 if ($item.length && isScrollable) {
                     $item.data('scrollable', true);

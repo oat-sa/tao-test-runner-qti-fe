@@ -173,7 +173,7 @@ define([
                 assert.ok(result.length > 0, 'The renderer create some output');
 
                 $result = $(result);
-                $textBlocks = $('.text-block-wrap', $result);
+                $textBlocks = $('.custom-text-box', $result);
 
                 assert.ok($result.hasClass('qti-item'), 'The result is a qti item');
                 assert.equal($('.qti-itemBody', $result).length, 1, 'The result contains an item body');
@@ -187,7 +187,7 @@ define([
                     const $contentArea = testRunner
                         .getAreaBroker()
                         .getContentArea();
-                    const $itemContainer = $contentArea.find('.text-block-wrap[data-scrolling]').first();
+                    const $itemContainer = $contentArea.find('.custom-text-box[data-scrolling]').first();
                     assert.equal($itemContainer[0].dataset.scrolling, 'true', 'Item scrolling plugin running properly');
                     ready();
                 });

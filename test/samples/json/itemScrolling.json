@@ -15,7 +15,7 @@
   },
   "body": {
     "serial": "container_containeritembody_5fa2a1c876775453516340",
-    "body": "\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        <div class=\"text-block-wrap inner\" data-scrolling=\"true\" data-scrolling-height=\"50\">\n          <p>Lorem ipsum dolor sit amet, consectetur adipisicing ...<\/p>\n          <p>\u00a0<\/p>\n          <p>\u00a0<\/p>\n          <div class=\"text-block-wrap outer\" data-scrolling=\"true\" data-scrolling-height=\"50\">\n            {{xinclude_5fa2a1c87b4e9722396069}}\n          <\/div>\n        <\/div>\n      <\/div>\n    <\/div>\n  ",
+    "body": "\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        <div class=\"custom-text-box inner\" data-scrolling=\"true\" data-scrolling-height=\"50\">\n          <p>Lorem ipsum dolor sit amet, consectetur adipisicing ...<\/p>\n          <p>\u00a0<\/p>\n          <p>\u00a0<\/p>\n          <div class=\"custom-text-box outer\" data-scrolling=\"true\" data-scrolling-height=\"50\">\n            {{xinclude_5fa2a1c87b4e9722396069}}\n          <\/div>\n        <\/div>\n      <\/div>\n    <\/div>\n  ",
     "elements": {
       "xinclude_5fa2a1c87b4e9722396069": {
         "serial": "xinclude_5fa2a1c87b4e9722396069",

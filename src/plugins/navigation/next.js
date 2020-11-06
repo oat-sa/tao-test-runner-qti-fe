@@ -37,7 +37,7 @@ import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
 /**
  * The display of the next button
  */
-var buttonData = {
+const buttonData = {
     next: {
         control: 'move-forward',
         title: __('Submit and go to the item %s'),
@@ -57,10 +57,24 @@ var buttonData = {
  * @param {Boolean} [isLast=false] - is the current item the last
  * @returns {jQueryElement} the button
  */
-var createElement = function createElement(isLast = false) {
-    var dataType = isLast ? 'end' : 'next';
+const createElement = (isLast = false) => {
+    const dataType = isLast ? 'end' : 'next';
     return $(buttonTpl(buttonData[dataType]));
 };
+
+/**
+ * Makes an element enabled
+ * @param  {jQuery} $element
+ * @returns {jQuery}
+ */
+const enableElement = $element => $element.removeProp('disabled').removeClass('disabled');
+
+/**
+ * Makes an element disabled
+ * @param  {jQuery} $element
+ * @returns {jQuery}
+ */
+const disableElement = $element => $element.prop('disabled', true).addClass('disabled');
 
 /**
  * Update the button based on the context
@@ -68,7 +82,7 @@ var createElement = function createElement(isLast = false) {
  * @param {TestRunner} [testRunner] - the test runner instance
  * @param {Boolean} [isLast=false] - is the current item the last
  */
-const updateElement = function updateElement($element, testRunner, isLast = false) {
+const updateElement = ($element, testRunner, isLast = false) => {
     const dataType = isLast ? 'end' : 'next';
     const testContext = testRunner.getTestContext();
     const nextItemPosition = testContext.itemPosition + 1;
@@ -103,7 +117,6 @@ export default pluginFactory({
      * Initialize the plugin (called during runner's init)
      */
     init() {
-        const self = this;
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
@@ -112,19 +125,19 @@ export default pluginFactory({
          * Check if the current item is the last item
          * @returns {Boolean} true if the last
          */
-        function isLastItem(){
+        const isLastItem = () => {
             const testContext = testRunner.getTestContext();
             const testMap = testRunner.getTestMap();
             const itemIdentifier = testContext.itemIdentifier;
             return navigationHelper.isLast(testMap, itemIdentifier);
-        }
+        };
 
         //plugin behavior
         /**
          * @param {Boolean} nextItemWarning - enable the display of a warning when going to the next item.
          * Note: the actual display of the warning depends on other conditions (see nextWarningHelper)
          */
-        function doNext(nextItemWarning) {
+        const doNext = nextItemWarning => {
             const testContext = testRunner.getTestContext();
             const testMap = testRunner.getTestMap();
             const testPart = testRunner.getCurrentPart();
@@ -145,13 +158,18 @@ export default pluginFactory({
 
             const warningScope = nextPartWarning ? 'part' : 'test';
 
-            function enableNav() {
-                testRunner.trigger('enablenav');
-            }
+            const enableNav = () => testRunner.trigger('enablenav');
+
+            const triggerNextAction = () => {
+                if (isLastItem()) {
+                    this.trigger('end');
+                }
+                testRunner.next();
+            };
 
             testRunner.trigger('disablenav');
 
-            if (self.getState('enabled') !== false) {
+            if (this.getState('enabled') !== false) {
                 const warningHelper = nextWarningHelper({
                     endTestWarning: endTestWarning,
                     isLast: isLastItem(),
@@ -208,36 +226,30 @@ export default pluginFactory({
                         'confirm.next',
                         __('You are about to go to the next item. Click OK to continue and go to the next item.'),
                         triggerNextAction, // if the test taker accept
-                        enableNav, // if he refuse
+                        enableNav // if he refuse
                     );
                 } else {
                     triggerNextAction();
                 }
             }
-        }
-
-        function triggerNextAction() {
-            if (isLastItem()) {
-                self.trigger('end');
-            }
-            testRunner.next();
-        }
+        };
 
         //create the button (detached)
         this.$element = createElement(isLastItem());
 
         //attach behavior
-        this.$element.on('click', function(e) {
+        this.$element.on('click', e => {
             e.preventDefault();
+            disableElement(this.$element);
             testRunner.trigger('nav-next');
         });
 
-        const registerShortcut = (kbdShortcut) => {
+        const registerShortcut = kbdShortcut => {
             if (testRunnerOptions.allowShortcuts && kbdShortcut) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(kbdShortcut, this.getName(), true),
-                    function() {
-                        if (self.getState('enabled') === true) {
+                    () => {
+                        if (this.getState('enabled') === true) {
                             testRunner.trigger('nav-next', true);
                         }
                     },
@@ -259,21 +271,11 @@ export default pluginFactory({
             .on('loaditem', () => {
                 updateElement(this.$element, testRunner, isLastItem());
             })
-            .on('enablenav', function() {
-                self.enable();
-            })
-            .on('disablenav', function() {
-                self.disable();
-            })
-            .on('hidenav', function() {
-                self.hide();
-            })
-            .on('shownav', function() {
-                self.show();
-            })
-            .on('nav-next', function(nextItemWarning) {
-                doNext(nextItemWarning);
-            })
+            .on('enablenav', () => this.enable())
+            .on('disablenav', () => this.disable())
+            .on('hidenav', () => this.hide())
+            .on('shownav', () => this.show())
+            .on('nav-next', nextItemWarning => doNext(nextItemWarning))
             .on('enableaccessibilitymode', () => {
                 const kbdShortcut = pluginShortcuts.triggerAccessibility;
 
@@ -290,16 +292,16 @@ export default pluginFactory({
     /**
      * Called during the runner's render phase
      */
-    render: function render() {
+    render() {
         //attach the element to the navigation area
-        var $container = this.getAreaBroker().getNavigationArea();
+        const $container = this.getAreaBroker().getNavigationArea();
         $container.append(this.$element);
     },
 
     /**
      * Called during the runner's destroy phase
      */
-    destroy: function destroy() {
+    destroy() {
         shortcut.remove(`.${this.getName()}`);
         this.$element.remove();
     },
@@ -307,28 +309,28 @@ export default pluginFactory({
     /**
      * Enable the button
      */
-    enable: function enable() {
-        this.$element.removeProp('disabled').removeClass('disabled');
+    enable() {
+        enableElement(this.$element);
     },
 
     /**
      * Disable the button
      */
-    disable: function disable() {
-        this.$element.prop('disabled', true).addClass('disabled');
+    disable() {
+        disableElement(this.$element);
     },
 
     /**
      * Show the button
      */
-    show: function show() {
+    show() {
         hider.show(this.$element);
     },
 
     /**
      * Hide the button
      */
-    hide: function hide() {
+    hide() {
         hider.hide(this.$element);
     }
 });

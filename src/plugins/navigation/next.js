@@ -40,7 +40,8 @@ import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
 const buttonData = {
     next: {
         control: 'move-forward',
-        title: __('Submit and go to the item %s'),
+        title: __('Submit and go to the next item'),
+        specificTitle: __('Submit and go to the item %s'),
         icon: 'forward',
         text: __('Next')
     },
@@ -85,8 +86,15 @@ const disableElement = $element => $element.prop('disabled', true).addClass('dis
 const updateElement = ($element, testRunner, isLast = false) => {
     const dataType = isLast ? 'end' : 'next';
     const testContext = testRunner.getTestContext();
-    const nextItemPosition = testContext.itemPosition + 1;
-    $element.attr('title', __(buttonData[dataType].title, nextItemPosition));
+  
+    if (dataType === 'next' && !testContext.isAdaptive && !testContext.isCatAdaptive) {
+        const testMap = testRunner.getTestMap();
+        const nextItem = navigationHelper.getNextItem(testMap, testContext.itemPosition);
+        $element.attr('title', __(buttonData.next.specificTitle, nextItem.position));
+    } else {
+        $element.attr('title', buttonData[dataType].title);
+    }
+
     if ($element.attr('data-control') !== buttonData[dataType].control) {
         $element
             .attr('data-control', buttonData[dataType].control)

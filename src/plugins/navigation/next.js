@@ -90,7 +90,7 @@ const updateElement = ($element, testRunner, isLast = false) => {
     if (dataType === 'next' && !testContext.isAdaptive && !testContext.isCatAdaptive) {
         const testMap = testRunner.getTestMap();
         const nextItem = navigationHelper.getNextItem(testMap, testContext.itemPosition);
-        $element.attr('title', __(buttonData.next.specificTitle, nextItem.position));
+        $element.attr('title', __(buttonData.next.specificTitle, nextItem.label));
     } else {
         $element.attr('title', buttonData[dataType].title);
     }

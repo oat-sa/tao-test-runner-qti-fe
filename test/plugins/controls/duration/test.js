@@ -179,9 +179,9 @@ define([
                     runner.trigger('tick', 10000);
                     setTimeout(
                         () => {
-                            runner.trigger('plugin-get.duration', {}, itemAttemptId, getDuration);
+                            runner.trigger('plugin-get.duration', itemAttemptId, getDuration);
                         },
-                        1000
+                        100
                     );
                 });
 

@@ -52,14 +52,14 @@ export default pluginFactory({
 
 
         function adaptItemHeight() {
-            const $itemContainer = $contentArea.find('.custom-text-box[data-scrolling]');
+            const $itemContainer = $contentArea.find('[data-scrolling="true"]');
             const contentHeight = getItemRunnerHeight() - getExtraGridRowHeight() - getSpaceAboveQtiContent() - gridRowBottomMargin - qtiItemPadding;
 
             $itemContainer.each(function() {
                 const $item = $(this);
                 const isScrollable = typeCaster.strToBool($item.attr('data-scrolling') || 'false');
                 const selectedHeight = parseFloat($item.attr('data-scrolling-height')) || 100;
-                const containerParent = $item.parent().closest('.custom-text-box[data-scrolling]');
+                const containerParent = $item.parent().closest('[data-scrolling="true"]');
 
                 if ($item.length && isScrollable) {
                     $item.data('scrollable', true);
@@ -92,7 +92,7 @@ export default pluginFactory({
 
             $gridRows.each(function() {
                 var $gridRow = $(this),
-                    $itemContainer = $gridRow.find('[data-scrolling]');
+                    $itemContainer = $gridRow.find('[data-scrolling="true"]');
 
                 if (! $itemContainer.length) {
                     extraHeight += $gridRow.outerHeight(true);

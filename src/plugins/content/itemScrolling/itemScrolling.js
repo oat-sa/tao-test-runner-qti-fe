@@ -63,7 +63,7 @@ export default pluginFactory({
 
                 if ($item.length && isScrollable) {
                     $item.data('scrollable', true);
-                    $item.css({'overflow' : 'auto'});
+                    $item.css({'overflow-y' : 'scroll'});
                     if (containerParent.length > 0) {
                         $item.css('max-height', `${containerParent.height() * (selectedHeight * 0.01)}px`);
                     } else {

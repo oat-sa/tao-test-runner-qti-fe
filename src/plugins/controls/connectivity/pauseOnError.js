@@ -26,6 +26,7 @@ const dialogMessage = {
     message: __('Please try reloading the page or pause the test. If you pause, you will be able to resume the test from this page.')
 };
 const dialogConfig = {
+    focus: 'cancel',
     buttons: {
         labels: {
             ok: __('Pause the test'),

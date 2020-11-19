@@ -79,95 +79,62 @@ define([
     QUnit.test('error then reload', assert => {
         const done = assert.async();
         const runner = getRunner();
-        Promise.resolve()
-            .then(() => new Promise((resolve, reject) => {
-                const timeout = window.setTimeout(() => {
-                    reject(new Error('The plugin did not catch the error or did not complete properly!'));
-                }, 200);
-                runner
-                    .on('init', () => {
-                        assert.ok(true, 'Runner has been initialized');
-                        runner.trigger('error');
-                    })
-                    .on('confirm.*', (message, accept, cancel, options) => {
-                        assert.equal(typeof message, 'string', 'String message provided');
-                        assert.equal(typeof accept, 'function', 'Accept callback provided');
-                        assert.equal(typeof cancel, 'function', 'Cancel callback provided');
-                        assert.equal(typeof options, 'object', 'Options provided');
-                        cancel();
-                    })
-                    .before('pause', () => {
-                        assert.ok(false, 'The pause should not be triggered!');
-                        runner.destroy();
-                        return Promise.reject();
-                    })
-                    .before('reloadpage', () => {
-                        assert.ok(true, 'A page reload has been triggered');
-                        runner.destroy();
-                        return Promise.reject();
-                    })
-                    .on('destroy', () => {
-                        window.clearTimeout(timeout);
-                        resolve();
-                    })
-                    .init();
-            }))
-            .catch(err => {
-                assert.pushResult({
-                    result: false,
-                    message: err
-                });
+
+        assert.expect(6);
+        runner
+            .on('init', () => {
+                assert.ok(true, 'Runner has been initialized');
+                runner.trigger('error');
             })
-            .then(done);
-
-
+            .on('confirm.*', (message, accept, cancel, options) => {
+                assert.equal(typeof message, 'string', 'String message provided');
+                assert.equal(typeof accept, 'function', 'Accept callback provided');
+                assert.equal(typeof cancel, 'function', 'Cancel callback provided');
+                assert.equal(typeof options, 'object', 'Options provided');
+                cancel();
+            })
+            .before('pause', () => {
+                assert.ok(false, 'The pause should not be triggered!');
+                runner.destroy();
+                return Promise.reject();
+            })
+            .before('reloadpage', () => {
+                assert.ok(true, 'A page reload has been triggered');
+                runner.destroy();
+                return Promise.reject();
+            })
+            .on('destroy', done)
+            .init();
     });
 
     QUnit.test('error then pause', assert => {
         const done = assert.async();
         const runner = getRunner();
-        Promise.resolve()
-            .then(() => new Promise((resolve, reject) => {
-                const timeout = window.setTimeout(() => {
-                    reject(new Error('The plugin did not catch the error or did not complete properly!'));
-                }, 200);
-                runner
-                    .on('init', () => {
-                        assert.ok(true, 'Runner has been initialized');
-                        runner.trigger('error');
-                    })
-                    .on('confirm.*', (message, accept, cancel, options) => {
-                        assert.equal(typeof message, 'string', 'String message provided');
-                        assert.equal(typeof accept, 'function', 'Accept callback provided');
-                        assert.equal(typeof cancel, 'function', 'Cancel callback provided');
-                        assert.equal(typeof options, 'object', 'Options provided');
-                        accept();
-                    })
-                    .before('pause', context => {
-                        assert.ok(true, 'The pause has been triggered');
-                        assert.equal(typeof context, 'object', 'A context is provided');
-                        runner.destroy();
-                        return Promise.reject();
-                    })
-                    .before('reloadpage', () => {
-                        assert.ok(false, 'A page reload should not be triggered!');
-                        runner.destroy();
-                        return Promise.reject();
-                    })
-                    .on('destroy', () => {
-                        window.clearTimeout(timeout);
-                        resolve();
-                    })
-                    .init();
-            }))
-            .catch(err => {
-                assert.pushResult({
-                    result: false,
-                    message: err
-                });
+
+        assert.expect(6);
+        runner
+            .on('init', () => {
+                assert.ok(true, 'Runner has been initialized');
+                runner.trigger('error');
             })
-            .then(done);
-
-
+            .on('confirm.*', (message, accept, cancel, options) => {
+                assert.equal(typeof message, 'string', 'String message provided');
+                assert.equal(typeof accept, 'function', 'Accept callback provided');
+                assert.equal(typeof cancel, 'function', 'Cancel callback provided');
+                assert.equal(typeof options, 'object', 'Options provided');
+                accept();
+            })
+            .before('pause', context => {
+                assert.equal(typeof context, 'object', 'The pause has been triggered and a context is provided');
+                runner.destroy();
+                return Promise.reject();
+            })
+            .before('reloadpage', () => {
+                assert.ok(false, 'A page reload should not be triggered!');
+                runner.destroy();
+                return Promise.reject();
+            })
+            .on('destroy', done)
+            .init();
     });
 });

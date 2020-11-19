@@ -33,13 +33,11 @@ const dialogConfig = {
         }
     }
 };
-const pauseMessage = __('You encountered an unexpected issue. The test has been suspended.');
 const pauseContext = {
     reasons: {
         category: 'technical',
         subCategory: 'error'
     },
-    message: pauseMessage,
     originalMessage: 'Due to an unexpected issue the test has been suspended.'
 };
 

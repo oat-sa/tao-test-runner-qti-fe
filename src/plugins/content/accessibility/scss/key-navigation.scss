@@ -5,7 +5,7 @@
         p.key-navigation-group, div.key-navigation-group {
             padding: 5px !important;
         }
-        .key-navigation-group:not(.qti-extendedTextInteraction):not(.qti-textEntryInteraction) {
+        .key-navigation-group:not(.qti-extendedTextInteraction):not(.qti-textEntryInteraction):not(.qti-customInteraction) {
             border-width: 1px !important;
             border-style: solid;
             border-color: transparent; //do not mark it as important to allow color overriding

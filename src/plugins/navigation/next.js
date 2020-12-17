@@ -86,7 +86,7 @@ const disableElement = $element => $element.prop('disabled', true).addClass('dis
 const updateElement = ($element, testRunner, isLast = false) => {
     const dataType = isLast ? 'end' : 'next';
     const testContext = testRunner.getTestContext();
-  
+
     if (dataType === 'next' && !testContext.isAdaptive && !testContext.isCatAdaptive) {
         const testMap = testRunner.getTestMap();
         const nextItem = navigationHelper.getNextItem(testMap, testContext.itemPosition);
@@ -223,7 +223,7 @@ export default pluginFactory({
                         {
                             buttons: {
                                 labels: {
-                                    ok: __('SUBMIT THE TEST'),
+                                    ok: __('SUBMIT TEST'),
                                     cancel: __('CANCEL')
                                 }
                             }

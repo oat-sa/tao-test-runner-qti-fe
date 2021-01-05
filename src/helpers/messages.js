@@ -83,7 +83,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         }
 
         itemsCountMessage += `. ${__(
-            'You will not be able to access this test once submitted. Click OK to continue and submit the test'
+            'You will not be able to access this test once submitted. Click OK to continue and submit the test.'
         )}`;
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
         if (unansweredCount > 1) {
@@ -100,7 +100,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         }
 
         if (unansweredCount) {
-            itemsCountMessage += `. ${__('Click OK to continue')}`;
+            itemsCountMessage += `. ${__('Click OK to continue')}.`;
         }
     } else if (scope === 'part') {
         if (unansweredCount > 1) {
@@ -122,13 +122,10 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         }
 
         if (unansweredCount) {
-            itemsCountMessage += `. ${__('Click OK to continue')}`;
+            itemsCountMessage += `. ${__('Click OK to continue')}.`;
         }
     }
 
-    if (itemsCountMessage && unansweredCount !== 0) {
-        itemsCountMessage += '.';
-    }
     return itemsCountMessage;
 }
 

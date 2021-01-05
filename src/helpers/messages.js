@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2020 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -77,32 +77,52 @@ function getUnansweredItemsWarning(scope, runner, sync) {
             stats.answered.toString(),
             stats.questions.toString()
         );
+
         if (flaggedCount) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
         }
+
+        itemsCountMessage += `. ${__(
+            'You will not be able to access this test once submitted. Click OK to continue and submit the test'
+        )}`;
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
         if (unansweredCount > 1) {
             itemsCountMessage = __('There are %s unanswered questions', unansweredCount.toString());
         } else if (unansweredCount === 1) {
             itemsCountMessage = __('There is %s unanswered question', unansweredCount.toString());
         }
+
         if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(
                 'and you flagged %s item(s) that you can review now',
                 flaggedCount.toString()
             )}`;
+        }
+
+        if (unansweredCount) {
+            itemsCountMessage += `. ${__('Click OK to continue')}`;
         }
     } else if (scope === 'part') {
         if (unansweredCount > 1) {
-            itemsCountMessage = __('There are %s unanswered questions in this part of the test', unansweredCount.toString());
+            itemsCountMessage = __(
+                'There are %s unanswered questions in this part of the test',
+                unansweredCount.toString()
+            );
         } else if (unansweredCount === 1) {
-            itemsCountMessage = __('There is %s unanswered question in this part of the test', unansweredCount.toString());
+            itemsCountMessage = __(
+                'There is %s unanswered question in this part of the test',
+                unansweredCount.toString()
+            );
         }
         if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(
                 'and you flagged %s item(s) that you can review now',
                 flaggedCount.toString()
             )}`;
+        }
+
+        if (unansweredCount) {
+            itemsCountMessage += `. ${__('Click OK to continue')}`;
         }
     }
 

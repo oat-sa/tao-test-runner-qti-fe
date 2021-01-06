@@ -92,15 +92,17 @@ export default function warnSectionLeavingStrategy(testRunner, timer) {
                                 !noExitTimedSectionWarning &&
                                 !timerConfig.keepUpToTimeout
                             ) {
+                                const submitButtonLabel = __('Close this Section');
+
                                 testRunner.trigger(
                                     'confirm.exittimed',
-                                    messages.getExitMessage('section', testRunner, exitMessage),
+                                    messages.getExitMessage('section', testRunner, exitMessage, false, submitButtonLabel),
                                     resolve,
                                     reject,
                                     {
                                         buttons: {
                                             labels: {
-                                                ok: __('Close this Section'),
+                                                ok: submitButtonLabel,
                                                 cancel: __('Review my Answers')
                                             }
                                         }

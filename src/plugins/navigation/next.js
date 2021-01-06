@@ -215,8 +215,7 @@ export default pluginFactory({
                         'confirm.endTest',
                         messages.getExitMessage(
                             warningScope,
-                            testRunner,
-                            __('You will not be able to return to this test after you submit your answers.')
+                            testRunner
                         ),
                         triggerNextAction, // if the test taker accept
                         enableNav, // if he refuse

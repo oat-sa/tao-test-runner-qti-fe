@@ -24,9 +24,9 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
 
 /**
  * Completes an exit message
- * @param {String} message - custom message that will be appended to the unanswered stats count
  * @param {String} scope - scope to consider for calculating the stats
  * @param {Object} runner - testRunner instance
+ * @param {String} message - custom message that will be appended to the unanswered stats count
  * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox
  * @returns {String} Returns the message text
  */
@@ -38,9 +38,13 @@ function getExitMessage(scope, runner, message = '', sync) {
 
     if (messageEnabled) {
         itemsCountMessage = getUnansweredItemsWarning(scope, runner, sync);
+
+        if (itemsCountMessage) {
+            itemsCountMessage += '.';
+        }
     }
 
-    return `${getHeader(scope)}${itemsCountMessage} ${message}`.trim();
+    return `${getHeader(scope)}${itemsCountMessage}${getActionMessage(scope)}${message}`.trim();
 }
 /**
  * Build message if not all items have answers
@@ -57,6 +61,27 @@ function getHeader(scope) {
     }
 
     return '';
+}
+
+/**
+ * Generates the message to help users perform the action
+ * @param {String} scope - scope to consider for calculating the stats
+ * @returns {String} Returns the message text
+ */
+function getActionMessage(scope) {
+    switch (scope) {
+        case 'section':
+        case 'testSection':
+        case 'part':
+            return `${__('Click OK to continue')}.`;
+        case 'test':
+        case 'testWithoutInaccessibleItems':
+            return `${__(
+                'You will not be able to access this test once submitted. Click OK to continue and submit the test.'
+            )}`;
+        default:
+            '';
+    }
 }
 /**
  * Build message if not all items have answers
@@ -81,10 +106,6 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         if (flaggedCount) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
         }
-
-        itemsCountMessage += `. ${__(
-            'You will not be able to access this test once submitted. Click OK to continue and submit the test.'
-        )}`;
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
         if (unansweredCount > 1) {
             itemsCountMessage = __('There are %s unanswered questions', unansweredCount.toString());
@@ -97,10 +118,6 @@ function getUnansweredItemsWarning(scope, runner, sync) {
                 'and you flagged %s item(s) that you can review now',
                 flaggedCount.toString()
             )}`;
-        }
-
-        if (unansweredCount) {
-            itemsCountMessage += `. ${__('Click OK to continue')}.`;
         }
     } else if (scope === 'part') {
         if (unansweredCount > 1) {
@@ -120,12 +137,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
                 flaggedCount.toString()
             )}`;
         }
-
-        if (unansweredCount) {
-            itemsCountMessage += `. ${__('Click OK to continue')}.`;
-        }
     }
-
     return itemsCountMessage;
 }
 

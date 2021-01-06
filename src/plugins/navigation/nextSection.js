@@ -113,18 +113,23 @@ export default pluginFactory({
                 self.disable();
 
                 if (categories.nextSectionWarning && !isWarnSectionLeavingEabled()) {
+                    const submitButtonLabel = __('CONTINUE TO THE NEXT SECTION');
+
                     testRunner.trigger(
                         'confirm.nextsection',
                         messages.getExitMessage(
                             'section',
-                            testRunner
+                            testRunner,
+                            '',
+                            false,
+                            submitButtonLabel
                         ),
                         nextSection, // if the test taker accept
                         enable, // if the test taker refuse
                         {
                             buttons: {
                                 labels: {
-                                    ok: __('CONTINUE TO THE NEXT SECTION'),
+                                    ok: submitButtonLabel,
                                     cancel: __('CANCEL')
                                 }
                             }

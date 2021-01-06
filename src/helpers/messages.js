@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2020 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -24,13 +24,14 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
 
 /**
  * Completes an exit message
- * @param {String} message - custom message that will be appended to the unanswered stats count
  * @param {String} scope - scope to consider for calculating the stats
  * @param {Object} runner - testRunner instance
+ * @param {String} message - custom message that will be appended to the unanswered stats count
  * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox
+ * @param {String|undefined} - point the user to the submit button
  * @returns {String} Returns the message text
  */
-function getExitMessage(scope, runner, message = '', sync) {
+function getExitMessage(scope, runner, message = '', sync, submitButtonLabel) {
     let itemsCountMessage = '';
 
     const testRunnerOptions = runner.getOptions();
@@ -38,9 +39,13 @@ function getExitMessage(scope, runner, message = '', sync) {
 
     if (messageEnabled) {
         itemsCountMessage = getUnansweredItemsWarning(scope, runner, sync);
+
+        if (itemsCountMessage) {
+            itemsCountMessage += '.';
+        }
     }
 
-    return `${getHeader(scope)}${itemsCountMessage} ${message}`.trim();
+    return `${getHeader(scope)}${itemsCountMessage} ${getActionMessage(scope, submitButtonLabel)}${message}`.trim();
 }
 /**
  * Build message if not all items have answers
@@ -57,6 +62,29 @@ function getHeader(scope) {
     }
 
     return '';
+}
+
+/**
+ * Generates the message to help users perform the action
+ * @param {String} scope - scope to consider for calculating the stats
+ * @param {String} [submitButtonLabel] - Pointed user perform click on given button
+ * @returns {String} Returns the message text
+ */
+function getActionMessage(scope, submitButtonLabel = __('OK')) {
+    switch (scope) {
+        case 'section':
+        case 'testSection':
+        case 'part':
+            return `${__('Click "%s" to continue', submitButtonLabel)}.`;
+        case 'test':
+        case 'testWithoutInaccessibleItems':
+            return `${__(
+                'You will not be able to access this test once submitted. Click "%s" to continue and submit the test.',
+                submitButtonLabel
+            )}`;
+        default:
+            '';
+    }
 }
 /**
  * Build message if not all items have answers
@@ -77,6 +105,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
             stats.answered.toString(),
             stats.questions.toString()
         );
+
         if (flaggedCount) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
         }
@@ -86,6 +115,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         } else if (unansweredCount === 1) {
             itemsCountMessage = __('There is %s unanswered question', unansweredCount.toString());
         }
+
         if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(
                 'and you flagged %s item(s) that you can review now',
@@ -94,9 +124,15 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         }
     } else if (scope === 'part') {
         if (unansweredCount > 1) {
-            itemsCountMessage = __('There are %s unanswered questions in this part of the test', unansweredCount.toString());
+            itemsCountMessage = __(
+                'There are %s unanswered questions in this part of the test',
+                unansweredCount.toString()
+            );
         } else if (unansweredCount === 1) {
-            itemsCountMessage = __('There is %s unanswered question in this part of the test', unansweredCount.toString());
+            itemsCountMessage = __(
+                'There is %s unanswered question in this part of the test',
+                unansweredCount.toString()
+            );
         }
         if (unansweredCount && flaggedCount) {
             itemsCountMessage += ` ${__(
@@ -104,10 +140,6 @@ function getUnansweredItemsWarning(scope, runner, sync) {
                 flaggedCount.toString()
             )}`;
         }
-    }
-
-    if (itemsCountMessage && unansweredCount !== 0) {
-        itemsCountMessage += '.';
     }
     return itemsCountMessage;
 }

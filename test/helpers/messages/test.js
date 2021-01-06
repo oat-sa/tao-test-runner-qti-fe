@@ -22,6 +22,8 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
     'use strict';
 
     var messagesHelperApi = [{ title: 'getExitMessage' }];
+    var testActionMessage = 'You will not be able to access this test once submitted. Click \"OK\" to continue and submit the test.';
+    var actionMessage = 'Click \"OK\" to continue.';
 
     QUnit.module('helpers/messages');
 
@@ -87,7 +89,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 currentItemAnswered: true,
                 testMessage: '<b>You are about to submit the test.</b><br><br>',
                 partMessage: '<b>You are about to submit this test part.</b><br><br>',
-                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test'
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test.'
             },
             {
                 title: 'current not answered, none flagged',
@@ -120,7 +122,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 currentItemAnswered: true,
                 testMessage: '<b>You are about to submit the test.</b><br><br>',
                 partMessage: '<b>You are about to submit this test part.</b><br><br>',
-                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test, and flagged 1 of them'
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test, and flagged 1 of them.'
             },
             {
                 title: 'one flagged, test taker has just answered to the current item, but without moving from it yet',
@@ -153,7 +155,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 currentItemAnswered: true,
                 testMessage: '<b>You are about to submit the test.</b><br><br>',
                 partMessage: '<b>You are about to submit this test part.</b><br><br>',
-                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test'
+                sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test.'
             },
             {
                 title: 'none flagged, all answered, test taker removes answer from a previously answered item',
@@ -240,30 +242,30 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
             };
             var runner = runnerMock(map, context, data, responses, declarations);
             var message = '';
-            var messageEntTestNoStat = '<b>You are about to submit the test.</b><br><br>';
-            var messageEntTestPartNoStat = '<b>You are about to submit this test part.</b><br><br>';
-            var messageEntSectionNoStat = '<b>You are about to leave this section.</b><br><br>';
+            var messageEntTestNoStat = `<b>You are about to submit the test.</b><br><br> ${testActionMessage}`;
+            var messageEntTestPartNoStat = `<b>You are about to submit this test part.</b><br><br> ${actionMessage}`;
+            var messageEntSectionNoStat = `<b>You are about to leave this section.</b><br><br> ${actionMessage}`;
 
             assert.expect(7);
 
             assert.equal(
                 messagesHelper.getExitMessage('test', runner),
-                `${testData.testMessage}${message}`,
+                `${testData.testMessage} ${testActionMessage}${message}`,
                 'message include the right stats for test scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('part', runner),
-                `${testData.partMessage}${message}`,
+                `${testData.partMessage} ${actionMessage}${message}`,
                 'message include the right stats for part scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('section', runner),
-                `${testData.sectionMessage}${message}`,
+                `${testData.sectionMessage} ${actionMessage}${message}`,
                 'message include the right stats for section scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('testWithoutInaccessibleItems', runner),
-                `${testData.testMessage}${message}`,
+                `${testData.testMessage} ${testActionMessage}${message}`,
                 'message include the right stats for testWithoutInaccessibleItems scope'
             );
 

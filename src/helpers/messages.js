@@ -44,7 +44,7 @@ function getExitMessage(scope, runner, message = '', sync) {
         }
     }
 
-    return `${getHeader(scope)}${itemsCountMessage}${getActionMessage(scope)}${message}`.trim();
+    return `${getHeader(scope)}${itemsCountMessage} ${getActionMessage(scope)}${message}`.trim();
 }
 /**
  * Build message if not all items have answers

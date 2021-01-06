@@ -242,30 +242,30 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
             };
             var runner = runnerMock(map, context, data, responses, declarations);
             var message = '';
-            var messageEntTestNoStat = `<b>You are about to submit the test.</b><br><br>${testActionMessage}`;
-            var messageEntTestPartNoStat = `<b>You are about to submit this test part.</b><br><br>${actionMessage}`;
-            var messageEntSectionNoStat = `<b>You are about to leave this section.</b><br><br>${actionMessage}`;
+            var messageEntTestNoStat = `<b>You are about to submit the test.</b><br><br> ${testActionMessage}`;
+            var messageEntTestPartNoStat = `<b>You are about to submit this test part.</b><br><br> ${actionMessage}`;
+            var messageEntSectionNoStat = `<b>You are about to leave this section.</b><br><br> ${actionMessage}`;
 
             assert.expect(7);
 
             assert.equal(
                 messagesHelper.getExitMessage('test', runner),
-                `${testData.testMessage}${testActionMessage}${message}`,
+                `${testData.testMessage} ${testActionMessage}${message}`,
                 'message include the right stats for test scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('part', runner),
-                `${testData.partMessage}${actionMessage}${message}`,
+                `${testData.partMessage} ${actionMessage}${message}`,
                 'message include the right stats for part scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('section', runner),
-                `${testData.sectionMessage}${actionMessage}${message}`,
+                `${testData.sectionMessage} ${actionMessage}${message}`,
                 'message include the right stats for section scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('testWithoutInaccessibleItems', runner),
-                `${testData.testMessage}${testActionMessage}${message}`,
+                `${testData.testMessage} ${testActionMessage}${message}`,
                 'message include the right stats for testWithoutInaccessibleItems scope'
             );
 

@@ -86,7 +86,7 @@ const disableElement = $element => $element.prop('disabled', true).addClass('dis
 const updateElement = ($element, testRunner, isLast = false) => {
     const dataType = isLast ? 'end' : 'next';
     const testContext = testRunner.getTestContext();
-  
+
     if (dataType === 'next' && !testContext.isAdaptive && !testContext.isCatAdaptive) {
         const testMap = testRunner.getTestMap();
         const nextItem = navigationHelper.getNextItem(testMap, testContext.itemPosition);
@@ -193,37 +193,46 @@ export default pluginFactory({
                 });
 
                 if (warningHelper.shouldWarnBeforeEndPart()) {
+                    const submitButtonLabel = __('SUBMIT THIS PART');
+
                     testRunner.trigger(
                         'confirm.endTestPart',
                         messages.getExitMessage(
                             warningScope,
-                            testRunner
+                            testRunner,
+                            '',
+                            false,
+                            submitButtonLabel
                         ),
                         triggerNextAction, // if the test taker accept
                         enableNav, // if he refuse
                         {
                             buttons: {
                                 labels: {
-                                    ok: __('SUBMIT THIS PART'),
+                                    ok: submitButtonLabel,
                                     cancel: __('CANCEL')
                                 }
                             }
                         }
                     );
                 } else if (warningHelper.shouldWarnBeforeEnd()) {
+                    const submitButtonLabel = __('SUBMIT THE TEST');
+
                     testRunner.trigger(
                         'confirm.endTest',
                         messages.getExitMessage(
                             warningScope,
                             testRunner,
-                            __('You will not be able to return to this test after you submit your answers.')
+                            '',
+                            false,
+                            submitButtonLabel
                         ),
                         triggerNextAction, // if the test taker accept
                         enableNav, // if he refuse
                         {
                             buttons: {
                                 labels: {
-                                    ok: __('SUBMIT THE TEST'),
+                                    ok: submitButtonLabel,
                                     cancel: __('CANCEL')
                                 }
                             }

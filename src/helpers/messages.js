@@ -15,9 +15,6 @@
  *
  * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
-/**
- * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
- */
 
 import __ from 'i18n';
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
@@ -28,7 +25,7 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
  * @param {Object} runner - testRunner instance
  * @param {String} message - custom message that will be appended to the unanswered stats count
  * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox
- * @param {String|undefined} - point the user to the submit button
+ * @param {String|undefined} submitButtonLabel - point the user to the submit button
  * @returns {String} Returns the message text
  */
 function getExitMessage(scope, runner, message = '', sync, submitButtonLabel) {
@@ -47,6 +44,7 @@ function getExitMessage(scope, runner, message = '', sync, submitButtonLabel) {
 
     return `${getHeader(scope)}${itemsCountMessage} ${getActionMessage(scope, submitButtonLabel)}${message}`.trim();
 }
+
 /**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats
@@ -82,10 +80,10 @@ function getActionMessage(scope, submitButtonLabel = __('OK')) {
                 'You will not be able to access this test once submitted. Click "%s" to continue and submit the test.',
                 submitButtonLabel
             )}`;
-        default:
-            '';
     }
+    return '';
 }
+
 /**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats

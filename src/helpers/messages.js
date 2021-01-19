@@ -86,6 +86,26 @@ function getActionMessage(scope, submitButtonLabel = __('OK')) {
 }
 
 /**
+ * Build message for the flagged items if any.
+ * @param {Object} stats - The stats for the current context
+ * @param {String} [message] - The existing message to complete
+ * @returns {string|*}
+ */
+function getFlaggedItemsWarning(stats, message = '') {
+    const flaggedCount = stats && stats.flagged;
+    if (!flaggedCount) {
+        return message;
+    }
+    if (message) {
+        return `${message} ${__(
+            'and you flagged %s item(s) that you can review now',
+            flaggedCount.toString()
+        )}`;
+    }
+    return __('You flagged %s item(s) that you can review now', flaggedCount.toString());
+}
+
+/**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats
  * @param {Object} runner - testRunner instance
@@ -115,11 +135,8 @@ function getUnansweredItemsWarning(scope, runner, sync) {
             itemsCountMessage = __('There is %s unanswered question', unansweredCount.toString());
         }
 
-        if (unansweredCount && flaggedCount) {
-            itemsCountMessage += ` ${__(
-                'and you flagged %s item(s) that you can review now',
-                flaggedCount.toString()
-            )}`;
+        if (flaggedCount) {
+            itemsCountMessage = getFlaggedItemsWarning(stats, itemsCountMessage);
         }
     } else if (scope === 'part') {
         if (unansweredCount > 1) {
@@ -133,11 +150,8 @@ function getUnansweredItemsWarning(scope, runner, sync) {
                 unansweredCount.toString()
             );
         }
-        if (unansweredCount && flaggedCount) {
-            itemsCountMessage += ` ${__(
-                'and you flagged %s item(s) that you can review now',
-                flaggedCount.toString()
-            )}`;
+        if (flaggedCount) {
+            itemsCountMessage = getFlaggedItemsWarning(stats, itemsCountMessage);
         }
     }
     return itemsCountMessage;

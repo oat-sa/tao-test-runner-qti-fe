@@ -18,6 +18,7 @@
 
 import __ from 'i18n';
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
+import messageHeaderTpl from 'taoQtiTest/runner/helpers/templates/messageHeader';
 
 /**
  * Completes an exit message
@@ -47,15 +48,15 @@ function getExitMessage(scope, runner, message = '', sync) {
  * @returns {String} Returns the message text
  */
 function getHeader(scope) {
+    let header = '';
     if (scope === 'section' || scope === 'testSection') {
-        return `<b>${__('You are about to leave this section.')}</b><br><br>`;
+        header = __('You are about to leave this section.');
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
-        return `<b>${__('You are about to submit the test.')}</b><br><br>`;
+        header = __('You are about to submit the test.');
     } else if (scope === 'part') {
-        return `<b>${__('You are about to submit this test part.')}</b><br><br>`;
+        header = __('You are about to submit this test part.');
     }
-
-    return '';
+    return messageHeaderTpl({header});
 }
 
 /**

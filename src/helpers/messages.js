@@ -15,9 +15,6 @@
  *
  * Copyright (c) 2016-2020 (original work) Open Assessment Technologies SA ;
  */
-/**
- * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
- */
 
 import __ from 'i18n';
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
@@ -28,6 +25,7 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
  * @param {String} scope - scope to consider for calculating the stats
  * @param {Object} runner - testRunner instance
  * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox
+ * @param {String|undefined} submitButtonLabel - point the user to the submit button
  * @returns {String} Returns the message text
  */
 function getExitMessage(scope, runner, message = '', sync) {
@@ -42,6 +40,7 @@ function getExitMessage(scope, runner, message = '', sync) {
 
     return `${getHeader(scope)}${itemsCountMessage} ${message}`.trim();
 }
+
 /**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats
@@ -58,6 +57,29 @@ function getHeader(scope) {
 
     return '';
 }
+
+/**
+ * Generates the message to help users perform the action
+ * @param {String} scope - scope to consider for calculating the stats
+ * @param {String} [submitButtonLabel] - Pointed user perform click on given button
+ * @returns {String} Returns the message text
+ */
+function getActionMessage(scope, submitButtonLabel = __('OK')) {
+    switch (scope) {
+        case 'section':
+        case 'testSection':
+        case 'part':
+            return `${__('Click "%s" to continue', submitButtonLabel)}.`;
+        case 'test':
+        case 'testWithoutInaccessibleItems':
+            return `${__(
+                'You will not be able to access this test once submitted. Click "%s" to continue and submit the test.',
+                submitButtonLabel
+            )}`;
+    }
+    return '';
+}
+
 /**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats

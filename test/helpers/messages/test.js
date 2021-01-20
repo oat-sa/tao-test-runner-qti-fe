@@ -120,8 +120,8 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
                 sectionStats: { answered: 3, flagged: 1 },
                 currentItemResponse: { string: 'test' },
                 currentItemAnswered: true,
-                testMessage: '<b>You are about to submit the test.</b><br><br>',
-                partMessage: '<b>You are about to submit this test part.</b><br><br>',
+                testMessage: '<b>You are about to submit the test.</b><br><br>You flagged 1 item(s) that you can review now.',
+                partMessage: '<b>You are about to submit this test part.</b><br><br>You flagged 1 item(s) that you can review now.',
                 sectionMessage: '<b>You are about to leave this section.</b><br><br>You answered 3 of 3 question(s) for this section of the test, and flagged 1 of them.'
             },
             {

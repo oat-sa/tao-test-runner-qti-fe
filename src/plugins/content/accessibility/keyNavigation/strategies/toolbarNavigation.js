@@ -46,7 +46,11 @@ export default {
     init() {
         const config = this.getConfig();
         const $navigationBar = this.getTestRunner().getAreaBroker().getContainer().find('.bottom-action-bar');
-        const $toolbarElements = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
+        let $toolbarElements = $navigationBar.find('.action:not(.btn-group):visible, .action.btn-group .li-inner:visible');
+
+        if (config.reverseBottomToolbar) {
+            $toolbarElements = $($toolbarElements.get().reverse());
+        }
 
         const registerToolbarNavigator = (id, group, $elements) => {
             const elements = navigableDomElement.createFromDoms($elements);

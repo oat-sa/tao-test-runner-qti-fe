@@ -146,7 +146,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
 
     itemsCountMessage = itemsCountMessage.trim();
 
-    if (itemsCountMessage && unansweredCount !== 0) {
+    if (itemsCountMessage && (unansweredCount !== 0 || flaggedCount !== 0) ) {
         itemsCountMessage += '.';
     }
     return itemsCountMessage;

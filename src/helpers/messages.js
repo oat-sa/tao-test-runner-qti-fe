@@ -38,7 +38,7 @@ function getExitMessage(scope, runner, message = '', sync, submitButtonLabel) {
     if (messageEnabled) {
         itemsCountMessage = getUnansweredItemsWarning(scope, runner, sync);
 
-        if (itemsCountMessage) {
+        if (itemsCountMessage.length > 1) {
             itemsCountMessage += '.';
         }
     }
@@ -70,11 +70,16 @@ function getHeader(scope) {
  * @returns {String} Returns the message text
  */
 function getActionMessage(scope, submitButtonLabel = __('OK')) {
+    var msg;
     switch (scope) {
         case 'section':
         case 'testSection':
         case 'part':
-            return `${__('Click "%s" to continue', submitButtonLabel)}.`;
+            msg = __('Click "%s" to continue', submitButtonLabel);
+            if (msg.length > 1) {
+                msg += '.';
+            }
+            return msg;
         case 'test':
         case 'testWithoutInaccessibleItems':
             return `${__(

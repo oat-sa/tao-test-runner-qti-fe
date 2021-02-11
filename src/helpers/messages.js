@@ -36,9 +36,9 @@ function getExitMessage(scope, runner, message = '', sync, submitButtonLabel) {
     const messageEnabled = testRunnerOptions.enableUnansweredItemsWarning;
 
     if (messageEnabled) {
-        itemsCountMessage = getUnansweredItemsWarning(scope, runner, sync);
+        itemsCountMessage = getUnansweredItemsWarning(scope, runner, sync).trim();
 
-        if (itemsCountMessage.length > 1) {
+        if (itemsCountMessage) {
             itemsCountMessage += '.';
         }
     }
@@ -75,8 +75,8 @@ function getActionMessage(scope, submitButtonLabel = __('OK')) {
         case 'section':
         case 'testSection':
         case 'part':
-            msg = __('Click "%s" to continue', submitButtonLabel);
-            if (msg.length > 1) {
+            msg = __('Click "%s" to continue', submitButtonLabel).trim();
+            if (msg) {
                 msg += '.';
             }
             return msg;

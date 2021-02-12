@@ -15,12 +15,10 @@
  *
  * Copyright (c) 2016-2020 (original work) Open Assessment Technologies SA ;
  */
-/**
- * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
- */
 
 import __ from 'i18n';
 import statsHelper from 'taoQtiTest/runner/helpers/stats';
+import messageHeaderTpl from 'taoQtiTest/runner/helpers/templates/messageHeader';
 
 /**
  * Completes an exit message
@@ -28,6 +26,7 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
  * @param {String} scope - scope to consider for calculating the stats
  * @param {Object} runner - testRunner instance
  * @param {Boolean} sync - flag for sync the unanswered stats in exit message and the unanswered stats in the toolbox
+ * @param {String|undefined} submitButtonLabel - point the user to the submit button
  * @returns {String} Returns the message text
  */
 function getExitMessage(scope, runner, message = '', sync) {
@@ -42,22 +41,66 @@ function getExitMessage(scope, runner, message = '', sync) {
 
     return `${getHeader(scope)}${itemsCountMessage} ${message}`.trim();
 }
+
 /**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats
  * @returns {String} Returns the message text
  */
 function getHeader(scope) {
+    let header = '';
     if (scope === 'section' || scope === 'testSection') {
-        return `<b>${__('You are about to leave this section.')}</b><br><br>`;
+        header = __('You are about to leave this section.');
     } else if (scope === 'test' || scope === 'testWithoutInaccessibleItems') {
-        return `<b>${__('You are about to submit the test.')}</b><br><br>`;
+        header = __('You are about to submit the test.');
     } else if (scope === 'part') {
-        return `<b>${__('You are about to submit this test part.')}</b><br><br>`;
+        header = __('You are about to submit this test part.');
     }
+    return messageHeaderTpl({ header: header.trim() });
+}
 
+/**
+ * Generates the message to help users perform the action
+ * @param {String} scope - scope to consider for calculating the stats
+ * @param {String} [submitButtonLabel] - Pointed user perform click on given button
+ * @returns {String} Returns the message text
+ */
+function getActionMessage(scope, submitButtonLabel = __('OK')) {
+    switch (scope) {
+        case 'section':
+        case 'testSection':
+        case 'part':
+            return `${__('Click "%s" to continue', submitButtonLabel)}.`;
+        case 'test':
+        case 'testWithoutInaccessibleItems':
+            return `${__(
+                'You will not be able to access this test once submitted. Click "%s" to continue and submit the test.',
+                submitButtonLabel
+            )}`;
+    }
     return '';
 }
+
+/**
+ * Build message for the flagged items if any.
+ * @param {Object} stats - The stats for the current context
+ * @param {String} [message] - The existing message to complete
+ * @returns {string|*}
+ */
+function getFlaggedItemsWarning(stats, message = '') {
+    const flaggedCount = stats && stats.flagged;
+    if (!flaggedCount) {
+        return message;
+    }
+    if (message) {
+        return `${message} ${__(
+            'and you flagged %s item(s) that you can review now',
+            flaggedCount.toString()
+        )}`;
+    }
+    return __('You flagged %s item(s) that you can review now', flaggedCount.toString());
+}
+
 /**
  * Build message if not all items have answers
  * @param {String} scope - scope to consider for calculating the stats
@@ -86,11 +129,9 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         } else if (unansweredCount === 1) {
             itemsCountMessage = __('There is %s unanswered question', unansweredCount.toString());
         }
-        if (unansweredCount && flaggedCount) {
-            itemsCountMessage += ` ${__(
-                'and you flagged %s item(s) that you can review now',
-                flaggedCount.toString()
-            )}`;
+
+        if (flaggedCount) {
+            itemsCountMessage = getFlaggedItemsWarning(stats, itemsCountMessage);
         }
     } else if (scope === 'part') {
         if (unansweredCount > 1) {
@@ -98,15 +139,14 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         } else if (unansweredCount === 1) {
             itemsCountMessage = __('There is %s unanswered question in this part of the test', unansweredCount.toString());
         }
-        if (unansweredCount && flaggedCount) {
-            itemsCountMessage += ` ${__(
-                'and you flagged %s item(s) that you can review now',
-                flaggedCount.toString()
-            )}`;
+        if (flaggedCount) {
+            itemsCountMessage = getFlaggedItemsWarning(stats, itemsCountMessage);
         }
     }
 
-    if (itemsCountMessage && unansweredCount !== 0) {
+    itemsCountMessage = itemsCountMessage.trim();
+
+    if (itemsCountMessage && (unansweredCount !== 0 || flaggedCount !== 0) ) {
         itemsCountMessage += '.';
     }
     return itemsCountMessage;

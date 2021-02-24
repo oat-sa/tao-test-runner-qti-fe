@@ -16,6 +16,6 @@
  * Copyright (c) 2020 Open Assessment Technologies SA ;
  */
 
-export { default as defaultModeProvider } from './defaultMode';
-export { default as linearModeProvider } from './linearMode';
-export { default as nativeModeProvider } from './nativeMode';
+export { default as defaultModeProvider } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/modes/defaultMode';
+export { default as linearModeProvider } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/modes/linearMode';
+export { default as nativeModeProvider } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/modes/nativeMode';

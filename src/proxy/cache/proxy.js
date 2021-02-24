@@ -352,6 +352,12 @@ export default _.defaults(
                         .then(function(data) {
                             actions = data;
                             if (data && data.length) {
+                                // set start parameter to false during sync
+                                data.forEach(message => {
+                                    if (message.parameters && message.parameters.start) {
+                                        message.parameters.start = false;
+                                    }
+                                });
                                 return self.send('sync', data);
                             }
                         })

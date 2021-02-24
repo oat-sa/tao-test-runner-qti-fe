@@ -48,6 +48,7 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
                 'taoQtiItem/qtiItem': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiItem',
                 'taoQtiItem/qtiCommonRenderer': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiCommonRenderer',
                 'taoQtiItem/qtiRunner': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiRunner',
+                'taoQtiItem/reviewRenderer': '/node_modules/@oat-sa/tao-item-runner-qti/dist/reviewRenderer',
                 'taoTests/runner': '/node_modules/@oat-sa/tao-test-runner/dist',
 
                 /* LIBS */

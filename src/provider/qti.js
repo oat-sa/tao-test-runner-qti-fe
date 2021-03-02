@@ -493,7 +493,7 @@ var qtiProvider = {
 
                 this.getProxy()
                     .callTestAction('pause', {
-                        itemIdentifier: context.itemIdentifier,
+                        itemDefinition: context.itemIdentifier,
                         itemState: self.itemRunner.getState(),
                         reason: {
                             reasons: data && data.reasons,

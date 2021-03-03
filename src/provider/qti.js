@@ -497,7 +497,7 @@ var qtiProvider = {
                         itemState: self.itemRunner.getState(),
                         reason: {
                             reasons: data && data.reasons,
-                            comment: data && (data.originalMessage || data.message),
+                            comment: data && (data.originalMessage || data.message)
                         }
                     })
                     .then(function() {

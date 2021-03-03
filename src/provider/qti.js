@@ -487,7 +487,7 @@ var qtiProvider = {
                 }
             })
             .on('pause', function(data) {
-                var context = self.getTestContext();
+                const context = self.getTestContext();
 
                 this.setState('closedOrSuspended', true);
 

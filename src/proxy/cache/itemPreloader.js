@@ -310,6 +310,8 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
 
                                 loaders[type](url, sourceUrl, item.itemIdentifier);
                             });
+                        } else {
+                            item.itemData.unresolvedAssets = true;
                         }
                     });
                     return true;

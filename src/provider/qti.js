@@ -487,10 +487,14 @@ var qtiProvider = {
                 }
             })
             .on('pause', function(data) {
+                const testContext = self.getTestContext();
+
                 this.setState('closedOrSuspended', true);
 
                 this.getProxy()
                     .callTestAction('pause', {
+                        itemDefinition: testContext.itemIdentifier,
+                        itemState: self.itemRunner.getState(),
                         reason: {
                             reasons: data && data.reasons,
                             comment: data && (data.originalMessage || data.message)

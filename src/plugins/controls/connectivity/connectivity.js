@@ -209,6 +209,15 @@ export default pluginFactory({
                 return false;
             }
         });
+
+        testRunner.before('loaditem.connectivity', function(e, itemRef, item) {
+            if (proxy.isOffline() && item.content.unresolvedAssets) {
+              self.displayWaitingDialog().then(function () {
+                  testRunner.loadItem(itemRef);
+              });
+              return false;
+            }
+        });
     },
 
     /**

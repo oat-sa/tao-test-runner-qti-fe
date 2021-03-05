@@ -665,15 +665,13 @@ var qtiProvider = {
     loadItem: function loadItem(itemIdentifier) {
         return this.getProxy()
             .getItem(itemIdentifier)
-            .then(function(data) {
-                //aggregate the results
-                return {
-                    content: data.itemData,
-                    baseUrl: data.baseUrl,
-                    state: data.itemState,
-                    portableElements: data.portableElements
-                };
-            });
+            .then(({itemData, baseUrl, itemState, portableElements, flags}) => ({
+                content: itemData,
+                baseUrl,
+                state: itemState,
+                portableElements,
+                flags
+            }));
     },
 
     /**

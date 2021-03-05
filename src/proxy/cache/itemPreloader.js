@@ -311,7 +311,7 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
                                 loaders[type](url, sourceUrl, item.itemIdentifier);
                             });
                         } else {
-                            item.itemData.unresolvedAssets = true;
+                            item.flags = Object.assign({}, item.flags, { containsNonPreloadedAssets: true });
                         }
                     });
                     return true;

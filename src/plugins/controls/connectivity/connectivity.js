@@ -211,7 +211,7 @@ export default pluginFactory({
         });
 
         testRunner.before('loaditem.connectivity', function(e, itemRef, item) {
-            if (proxy.isOffline() && item.content.unresolvedAssets) {
+            if (proxy.isOffline() && item.flags && item.flags.containsNonPreloadedAssets) {
               self.displayWaitingDialog().then(function () {
                   testRunner.loadItem(itemRef);
               });

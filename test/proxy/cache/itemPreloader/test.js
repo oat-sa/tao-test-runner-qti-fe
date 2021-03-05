@@ -231,4 +231,24 @@ define([
                 ready();
             });
     });
+
+    QUnit.test('preloader sets containsNonPreloadedAssets flag', function (assert) {
+        const ready = assert.async();
+        assert.expect(1);
+
+        const itemPreloader = itemPreloaderFactory(options);
+
+        const nonPreloadableItem = Object.assign({}, itemData, {
+            itemData: Object.assign({}, itemData.itemData, { assets: { video: { 'foo.mp4': 'foo.mp4' } } })
+        });
+
+        itemPreloader.preload(nonPreloadableItem).then(() => {
+            assert.deepEqual(
+                nonPreloadableItem.flags,
+                { containsNonPreloadedAssets: true },
+                'sets containsNonPreloadedAssets flag'
+            );
+            ready();
+        });
+    });
 });

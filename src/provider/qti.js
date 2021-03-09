@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Test Runner provider for QTI Tests.
@@ -665,15 +665,13 @@ var qtiProvider = {
     loadItem: function loadItem(itemIdentifier) {
         return this.getProxy()
             .getItem(itemIdentifier)
-            .then(function(data) {
-                //aggregate the results
-                return {
-                    content: data.itemData,
-                    baseUrl: data.baseUrl,
-                    state: data.itemState,
-                    portableElements: data.portableElements
-                };
-            });
+            .then(({itemData, baseUrl, itemState, portableElements, flags}) => ({
+                content: itemData,
+                baseUrl,
+                state: itemState,
+                portableElements,
+                flags
+            }));
     },
 
     /**

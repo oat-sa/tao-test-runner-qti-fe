@@ -251,16 +251,7 @@ var qtiProvider = {
 
             //catch server errors
             var submitError = function submitError(err) {
-                if (err && err.unrecoverable){
-                    self.trigger(
-                        'alert.error',
-                        __(
-                            'An unrecoverable error occurred. Your test session will be paused.'
-                        )
-                    );
-
-                    self.trigger('pause', {message : err.message});
-                } else if (err.code === 200) {
+                if (err.code === 200) {
                     //some server errors are valid, so we don't fail (prevent empty responses)
                     self.trigger(
                         'alert.submitError',

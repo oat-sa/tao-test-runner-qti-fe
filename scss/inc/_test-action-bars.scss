@@ -130,6 +130,8 @@
             & > .control-box {
                 color: white(.9);
                 text-shadow: 1px 1px 0 black;
+                display: flex;
+                overflow-x: hidden;
                 .lft, .rgt {
                     padding-left: 20px;
                     &:first-child {
@@ -144,6 +146,12 @@
                 }
                 [class^="btn-"], [class*=" btn-"] {
                     white-space: nowrap;
+                }
+                .tools-box {
+                    margin-right: auto;
+                }
+                .lft UL.tools-box-list, .rgt UL.navi-box-list {
+                    display: flex;
                 }
             }
             .tools-box {

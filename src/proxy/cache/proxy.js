@@ -214,7 +214,7 @@ export default _.defaults(
 
                                                 if (!actionResult.success && self.actionRejectPromises[actionId]) {
                                                     const error = new Error(actionResult.message);
-                                                    error.unrecoverable = actionResult.type !== "TestState";
+                                                    error.unrecoverable = true;
                                                     return reject(error);
                                                 }
 

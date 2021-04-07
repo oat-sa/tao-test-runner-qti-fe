@@ -276,6 +276,7 @@ var qtiProvider = {
             const feedbackPromise = new Promise(resolve => {
 
                 //@deprecated feedbacks from testContext
+                // if ((currentItem.hasFeedbacks || context.hasFeedbacks) && (!_.isNumber(currentItem.remainingAttempts) || currentItem.remainingAttempts>0) ) {
                 if (currentItem.hasFeedbacks || context.hasFeedbacks) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 

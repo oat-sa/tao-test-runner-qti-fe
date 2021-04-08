@@ -276,8 +276,10 @@ var qtiProvider = {
             const feedbackPromise = new Promise(resolve => {
 
                 //@deprecated feedbacks from testContext
-                // if ((currentItem.hasFeedbacks || context.hasFeedbacks) && (!_.isNumber(currentItem.remainingAttempts) || currentItem.remainingAttempts>0) ) {
-                if (currentItem.hasFeedbacks || context.hasFeedbacks) {
+                if (
+                    (currentItem.hasFeedbacks || context.hasFeedbacks) &&
+                    context.remainingAttempts > 0
+                ) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
                     self.getProxy()

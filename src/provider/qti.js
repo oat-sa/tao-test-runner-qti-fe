@@ -278,8 +278,7 @@ var qtiProvider = {
                 //@deprecated feedbacks from testContext
                 if (
                     (currentItem.hasFeedbacks || context.hasFeedbacks) &&
-                    context.remainingAttempts > 0 &&
-                    currentItem.remainingAttempts > 0
+                    context.remainingAttempts !== 0
                 ) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 

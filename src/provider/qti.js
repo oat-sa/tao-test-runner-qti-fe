@@ -38,6 +38,7 @@ import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
 import states from 'taoQtiTest/runner/config/states';
 import stopwatchFactory from 'taoQtiTest/runner/provider/stopwatch';
+import currentItem from "../helpers/currentItem";
 
 /**
  * A Test runner provider to be registered against the runner
@@ -276,7 +277,10 @@ var qtiProvider = {
             const feedbackPromise = new Promise(resolve => {
 
                 //@deprecated feedbacks from testContext
-                if (currentItem.hasFeedbacks || context.hasFeedbacks) {
+                if (
+                    (currentItem.hasFeedbacks || context.hasFeedbacks)
+                    && context.itemSessionState <= states.itemSession.interacting
+                ) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
                     self.getProxy()

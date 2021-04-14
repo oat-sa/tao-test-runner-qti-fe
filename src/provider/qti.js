@@ -279,7 +279,7 @@ var qtiProvider = {
                 //@deprecated feedbacks from testContext
                 if (
                     (currentItem.hasFeedbacks || context.hasFeedbacks)
-                    && !( context.itemSessionState > states.itemSession.interacting )
+                    && context.itemSessionState <= states.itemSession.interacting
                 ) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 

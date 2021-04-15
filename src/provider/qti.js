@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Test Runner provider for QTI Tests.
@@ -276,7 +276,10 @@ var qtiProvider = {
             const feedbackPromise = new Promise(resolve => {
 
                 //@deprecated feedbacks from testContext
-                if (currentItem.hasFeedbacks || context.hasFeedbacks) {
+                if (
+                    (currentItem.hasFeedbacks || context.hasFeedbacks)
+                    && context.itemSessionState <= states.itemSession.interacting
+                ) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
                     self.getProxy()

@@ -38,7 +38,6 @@ import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
 import states from 'taoQtiTest/runner/config/states';
 import stopwatchFactory from 'taoQtiTest/runner/provider/stopwatch';
-import currentItem from "../helpers/currentItem";
 
 /**
  * A Test runner provider to be registered against the runner
@@ -379,8 +378,6 @@ var qtiProvider = {
         stopwatch.init();
         stopwatch.spread(this, 'tick');
 
-        const timerClientMode = config.options.timer && config.options.timer.restoreTimerFromClient;
-
         /*
          * Install behavior on events
          */
@@ -491,14 +488,10 @@ var qtiProvider = {
                 }
             })
             .on('pause', function(data) {
-                const testContext = self.getTestContext();
-
                 this.setState('closedOrSuspended', true);
 
                 this.getProxy()
                     .callTestAction('pause', {
-                        itemDefinition: testContext.itemIdentifier,
-                        itemState: self.itemRunner.getState(),
                         reason: {
                             reasons: data && data.reasons,
                             comment: data && (data.originalMessage || data.message)
@@ -514,7 +507,7 @@ var qtiProvider = {
                         self.trigger('error', err);
                     });
             })
-            .on('move skip exit timeout pause', function() {
+            .before('move skip exit timeout pause', function() {
                 stopwatch.stop();
             })
             .on('loaditem', function() {
@@ -562,15 +555,13 @@ var qtiProvider = {
                 this.trigger('enableitem enablenav');
             })
             .on('disableitem', function() {
-                if (timerClientMode) {
-                    stopwatch.stop();
-                }
+                stopwatch.stop();
+
                 this.trigger('disabletools');
             })
             .on('enableitem', function() {
-                if (timerClientMode) {
-                    stopwatch.start();
-                }
+                stopwatch.start();
+
                 this.trigger('enabletools');
             })
             .on('error', function() {
@@ -669,13 +660,15 @@ var qtiProvider = {
     loadItem: function loadItem(itemIdentifier) {
         return this.getProxy()
             .getItem(itemIdentifier)
-            .then(({itemData, baseUrl, itemState, portableElements, flags}) => ({
-                content: itemData,
-                baseUrl,
-                state: itemState,
-                portableElements,
-                flags
-            }));
+            .then(function(data) {
+                //aggregate the results
+                return {
+                    content: data.itemData,
+                    baseUrl: data.baseUrl,
+                    state: data.itemState,
+                    portableElements: data.portableElements
+                };
+            });
     },
 
     /**

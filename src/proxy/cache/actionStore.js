@@ -59,12 +59,12 @@ export default function actionStoreFatory(id) {
          * @returns {Promise} resolves when the action is stored
          */
         push: function push(action, params, timestamp) {
+            actionQueue.push({
+                action: action,
+                timestamp: timestamp || Date.now(),
+                parameters: params
+            });
             return loadStore().then(function(actionStore) {
-                actionQueue.push({
-                    action: action,
-                    timestamp: timestamp || Date.now(),
-                    parameters: params
-                });
                 return actionStore.setItem(storeKey, actionQueue);
             });
         },

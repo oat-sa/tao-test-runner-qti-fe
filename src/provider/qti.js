@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Test Runner provider for QTI Tests.
@@ -38,6 +38,7 @@ import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
 import states from 'taoQtiTest/runner/config/states';
 import stopwatchFactory from 'taoQtiTest/runner/provider/stopwatch';
+import currentItem from "../helpers/currentItem";
 
 /**
  * A Test runner provider to be registered against the runner
@@ -276,7 +277,10 @@ var qtiProvider = {
             const feedbackPromise = new Promise(resolve => {
 
                 //@deprecated feedbacks from testContext
-                if (currentItem.hasFeedbacks || context.hasFeedbacks) {
+                if (
+                    (currentItem.hasFeedbacks || context.hasFeedbacks)
+                    && context.itemSessionState <= states.itemSession.interacting
+                ) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
                     self.getProxy()
@@ -487,10 +491,14 @@ var qtiProvider = {
                 }
             })
             .on('pause', function(data) {
+                const testContext = self.getTestContext();
+
                 this.setState('closedOrSuspended', true);
 
                 this.getProxy()
                     .callTestAction('pause', {
+                        itemDefinition: testContext.itemIdentifier,
+                        itemState: self.itemRunner.getState(),
                         reason: {
                             reasons: data && data.reasons,
                             comment: data && (data.originalMessage || data.message)
@@ -661,15 +669,13 @@ var qtiProvider = {
     loadItem: function loadItem(itemIdentifier) {
         return this.getProxy()
             .getItem(itemIdentifier)
-            .then(function(data) {
-                //aggregate the results
-                return {
-                    content: data.itemData,
-                    baseUrl: data.baseUrl,
-                    state: data.itemState,
-                    portableElements: data.portableElements
-                };
-            });
+            .then(({itemData, baseUrl, itemState, portableElements, flags}) => ({
+                content: itemData,
+                baseUrl,
+                state: itemState,
+                portableElements,
+                flags
+            }));
     },
 
     /**

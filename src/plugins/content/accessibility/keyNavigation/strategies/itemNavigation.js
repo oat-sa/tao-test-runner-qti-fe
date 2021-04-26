@@ -41,7 +41,7 @@ const addLabelledByAttribute = cursor => {
             `${name.replace('response-', 'choice-')}-${value}`
         );
     }
-    
+
 };
 
 /**
@@ -56,8 +56,8 @@ const removeLabelledByAttribute = cursor => {
 
 /**
  * Adds attributes on navigation focus and blur
- * 
- * @param {Navigator} navigator 
+ *
+ * @param {Navigator} navigator
  */
 const manageLabelledByAttribute = (navigator) => {
     if (navigator) {
@@ -176,7 +176,7 @@ export default {
 
                     //search for inputs that represent the interaction focusable choices
                     const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
-                    if (config.flatNavigation && choiceType !== 'radio') {
+                    if (config.flatNavigation && (config.flatRadioNavigation || choiceType !== 'radio')) {
                         $inputs.each((i, input) => {
                             const navigator = addInputsNavigator($(input), $itemElement);
 

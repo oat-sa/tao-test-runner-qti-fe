@@ -24,12 +24,12 @@ import __ from 'i18n';
 import $ from 'jquery';
 import pluginFactory from 'taoTests/runner/plugin';
 import isReviewPanelEnabled from 'taoQtiTest/runner/helpers/isReviewPanelEnabled';
-import { getJumpElementFactory, getItemStatus, isReviewPanelHidden } from './helpers';
-import jumplinksFactory from './jumplinks';
-import shortcutsFactory from './shortcuts';
+import { getJumpElementFactory, getItemStatus, isReviewPanelHidden } from 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/helpers';
+import jumplinksFactory from 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/jumplinks';
+import shortcutsFactory from 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/shortcuts';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
-import containerTpl from './container.tpl';
+import containerTpl from 'taoQtiTest/runner/plugins/content/accessibility/jumplinks/container.tpl';
 
 /**
  * Creates the JumpLinks plugin.

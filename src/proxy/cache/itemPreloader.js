@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 Open Assessment Technologies SA
+ * Copyright (c) 2017-2021 Open Assessment Technologies SA
  */
 
 /**
@@ -310,6 +310,8 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
 
                                 loaders[type](url, sourceUrl, item.itemIdentifier);
                             });
+                        } else {
+                            item.flags = Object.assign({}, item.flags, { containsNonPreloadedAssets: true });
                         }
                     });
                     return true;

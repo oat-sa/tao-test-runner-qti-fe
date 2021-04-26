@@ -52,7 +52,7 @@
         "@oat-sa/tao-core-sdk": "^1.8.1",
         "@oat-sa/tao-core-ui": "^1.22.1",
         "@oat-sa/tao-item-runner": "^0.7.1",
-        "@oat-sa/tao-item-runner-qti": "^0.17.2",
+        "@oat-sa/tao-item-runner-qti": "0.21.3",
         "@oat-sa/tao-qunit-testrunner": "1.0.3",
         "@oat-sa/tao-test-runner": "^0.8.1",
         "async": "0.2.10",

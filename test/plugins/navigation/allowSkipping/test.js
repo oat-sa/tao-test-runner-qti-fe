@@ -21,30 +21,25 @@ define([
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/navigation/allowSkipping',
     'taoQtiTest/runner/helpers/currentItem'
-], function(runnerFactory, providerMock, pluginFactory, currentItemHelper) {
+], function (runnerFactory, providerMock, pluginFactory, currentItemHelper) {
     'use strict';
 
-    var pluginApi;
-    var providerName = 'mock';
+    const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
     //Mock the isAnswered helper, using testRunner property
-    currentItemHelper.isAnswered = function(testRunner) {
-        return testRunner.answered;
-    };
+    currentItemHelper.isAnswered = testRunner => testRunner.answered;
 
     //Mock the getDeclarations helper, using testRunner property
-    currentItemHelper.getDeclarations = function(testRunner) {
-        return testRunner.responses;
-    };
+    currentItemHelper.getDeclarations = testRunner => testRunner.responses;
 
     /**
      * The following tests applies to all plugins
      */
     QUnit.module('pluginFactory');
 
-    QUnit.test('module', function(assert) {
-        var runner = runnerFactory(providerName);
+    QUnit.test('module', assert => {
+        const runner = runnerFactory(providerName);
 
         assert.equal(typeof pluginFactory, 'function', 'The pluginFactory module exposes a function');
         assert.equal(typeof pluginFactory(runner), 'object', 'The plugin factory produces an instance');
@@ -55,7 +50,7 @@ define([
         );
     });
 
-    pluginApi = [
+    QUnit.cases.init([
         {
             name: 'init',
             title: 'init'
@@ -116,15 +111,13 @@ define([
             name: 'disable',
             title: 'disable'
         }
-    ];
-
-    QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
-        var runner = runnerFactory(providerName);
-        var timer = pluginFactory(runner);
+    ]).test('plugin API ', (data, assert) => {
+        const runner = runnerFactory(providerName);
+        const timer = pluginFactory(runner);
         assert.equal(
             typeof timer[data.name],
             'function',
-            `The pluginFactory instances expose a "${  data.name  }" function`
+            `The pluginFactory instances expose a "${data.name}" function`
         );
     });
 
@@ -137,7 +130,7 @@ define([
                 context: {
                     itemIdentifier: 'item-1'
                 },
-                options : {
+                options: {
                     enableAllowSkipping: false
                 },
                 allowSkipping: false,
@@ -149,7 +142,7 @@ define([
                 context: {
                     itemIdentifier: 'item-1'
                 },
-                options : {
+                options: {
                     enableAllowSkipping: true
                 },
                 allowSkipping: false,
@@ -162,7 +155,7 @@ define([
                     itemIdentifier: 'item-1',
                     allowSkipping: true
                 },
-                options : {
+                options: {
                     enableAllowSkipping: true
                 },
                 allowSkipping: true,
@@ -172,9 +165,9 @@ define([
             {
                 title: 'when the item is answered',
                 context: {
-                    itemIdentifier: 'item-1',
+                    itemIdentifier: 'item-1'
                 },
-                options : {
+                options: {
                     enableAllowSkipping: true
                 },
                 allowSkipping: false,
@@ -182,32 +175,32 @@ define([
                 responses: ['foo']
             }
         ])
-        .test('Moving is allowed ', function(data, assert) {
+        .test('Moving is allowed ', (data, assert) => {
             const ready = assert.async();
             const runner = runnerFactory(providerName, {
-                options : data.options
+                options: data.options
             });
             const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-            runner.getCurrentItem = () => ({ allowSkipping : data.allowSkipping });
+            runner.getCurrentItem = () => ({ allowSkipping: data.allowSkipping });
 
             assert.expect(1);
 
             plugin
                 .init()
-                .then(function() {
+                .then(() => {
                     runner.setTestContext(data.context);
                     runner.answered = data.answered;
                     runner.responses = data.responses;
 
-                    runner.on('move', function() {
+                    runner.on('move', () => {
                         assert.ok(true, 'Move is allowed');
                         ready();
                         return Promise.reject();
                     });
                     runner.trigger('move');
                 })
-                .catch(function(err) {
+                .catch(err => {
                     assert.ok(false, err.message);
                     ready();
                 });
@@ -218,9 +211,9 @@ define([
             {
                 title: 'when the item not answered',
                 context: {
-                    itemIdentifier: 'item-1',
+                    itemIdentifier: 'item-1'
                 },
-                options : {
+                options: {
                     enableAllowSkipping: true
                 },
                 allowSkipping: false,
@@ -237,24 +230,24 @@ define([
             const plugin = pluginFactory(runner, runner.getAreaBroker());
 
             runner.getCurrentItem = () => ({
-                allowSkipping : data.allowSkipping,
-                answered : data.answered
+                allowSkipping: data.allowSkipping,
+                answered: data.answered
             });
 
             assert.expect(2);
 
             plugin
                 .init()
-                .then(function() {
+                .then(() => {
                     runner.setTestContext(data.context);
                     runner.answered = data.answered;
                     runner.responses = data.responses;
 
-                    runner.on('move', function() {
+                    runner.on('move', () => {
                         assert.ok(false, 'Move is denied');
                         ready();
                     });
-                    runner.off('alert.notallowed').on('alert.notallowed', function(message, cb) {
+                    runner.off('alert.notallowed').on('alert.notallowed', (message, cb) => {
                         assert.equal(
                             message,
                             'A response to this item is required.',
@@ -262,13 +255,13 @@ define([
                         );
                         cb();
                     });
-                    runner.on('resumeitem', function() {
+                    runner.on('resumeitem', () => {
                         assert.ok(true, 'Move has been prevented');
                         ready();
                     });
                     runner.trigger('move');
                 })
-                .catch(function(err) {
+                .catch(err => {
                     assert.ok(false, err.message);
                     ready();
                 });

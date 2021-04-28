@@ -61,73 +61,28 @@ define([
     });
 
     QUnit.cases.init([
-        {
-            name: 'init',
-            title: 'init'
-        },
-        {
-            name: 'render',
-            title: 'render'
-        },
-        {
-            name: 'finish',
-            title: 'finish'
-        },
-        {
-            name: 'destroy',
-            title: 'destroy'
-        },
-        {
-            name: 'trigger',
-            title: 'trigger'
-        },
-        {
-            name: 'getTestRunner',
-            title: 'getTestRunner'
-        },
-        {
-            name: 'getAreaBroker',
-            title: 'getAreaBroker'
-        },
-        {
-            name: 'getConfig',
-            title: 'getConfig'
-        },
-        {
-            name: 'setConfig',
-            title: 'setConfig'
-        },
-        {
-            name: 'getState',
-            title: 'getState'
-        },
-        {
-            name: 'setState',
-            title: 'setState'
-        },
-        {
-            name: 'show',
-            title: 'show'
-        },
-        {
-            name: 'hide',
-            title: 'hide'
-        },
-        {
-            name: 'enable',
-            title: 'enable'
-        },
-        {
-            name: 'disable',
-            title: 'disable'
-        }
+        { title: 'init' },
+        { title: 'render' },
+        { title: 'finish' },
+        { title: 'destroy' },
+        { title: 'trigger' },
+        { title: 'getTestRunner' },
+        { title: 'getAreaBroker' },
+        { title: 'getConfig' },
+        { title: 'setConfig' },
+        { title: 'getState' },
+        { title: 'setState' },
+        { title: 'show' },
+        { title: 'hide' },
+        { title: 'enable' },
+        { title: 'disable' }
     ]).test('plugin API ', (data, assert) => {
         const runner = runnerFactory(providerName);
         const timer = pluginFactory(runner);
         assert.equal(
-            typeof timer[data.name],
+            typeof timer[data.title],
             'function',
-            `The pluginFactory instances expose a "${data.name}" function`
+            `The pluginFactory instances expose a "${data.title}" function`
         );
     });
 

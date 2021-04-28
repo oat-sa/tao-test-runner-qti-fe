@@ -27,6 +27,16 @@ define([
     runnerFactory.registerProvider(providerName, providerMock());
 
     /**
+     * Gets a configured instance of the Test Runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        return Promise.resolve(runner);
+    }
+
+    /**
      * The following tests applies to all plugins
      */
     QUnit.module('pluginFactory');
@@ -219,44 +229,53 @@ define([
         isLinear: false
     }]).test('No dialog is triggered ', (data, assert) => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName, {}, {
+        getTestRunner({
             options: data.testConfig
-        });
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        })
+            .then(runner => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        // mock test store init
-        runner.getTestStore = () => {
-            return {
-                setVolatile: () => {
-                }
-            };
-        };
-        runner.getCurrentItem = () => data.item;
-        runner.getCurrentPart = () => Object.assign({
-            isLinear: data.isLinear
-        }, testMap.part);
+                // mock test store init
+                runner.getTestStore = () => {
+                    return {
+                        setVolatile: () => {
+                        }
+                    };
+                };
+                runner.getCurrentItem = () => data.item;
+                runner.getCurrentPart = () => Object.assign({
+                    isLinear: data.isLinear
+                }, testMap.part);
 
-        assert.expect(1);
+                assert.expect(1);
 
-        plugin
-            .init()
-            .then(() => {
-                runner.setTestContext(data.testContext);
-                runner.setTestMap(testMap);
+                return plugin
+                    .init()
+                    .then(() => new Promise(resolve => {
+                        runner.setTestContext(data.testContext);
+                        runner.setTestMap(testMap);
 
-                // dialog would be instantiated *before* move occurs
-                runner.on('move', () => {
-                    assert.ok(true, 'The move took place without interruption');
-                    runner.destroy();
-                    ready();
-                    return Promise.reject();
-                });
-                runner.trigger('move', 'next', data.scope);
+                        // dialog would be instantiated *before* move occurs
+                        runner.on('move', () => {
+                            assert.ok(true, 'The move took place without interruption');
+                            runner.destroy();
+                            resolve();
+                            return Promise.reject();
+                        });
+                        runner.trigger('move', 'next', data.scope);
+                    }))
+                    .catch(err => {
+                        assert.ok(false, err.message);
+                        ready();
+                    });
             })
             .catch(err => {
-                assert.ok(false, err.message);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     // Dialog expected
@@ -298,45 +317,49 @@ define([
         isLinear: true
     }]).test('Dialog will be triggered ', (data, assert) => {
         const ready = assert.async();
-
-        const runner = runnerFactory(providerName, {}, {
+        getTestRunner({
             options: data.testConfig
-        });
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        })
+            .then(runner => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        // mock test store init
-        runner.getTestStore = () => {
-            return {
-                getStore: () => {
-                    return Promise.reject();
-                },
-                setVolatile: () => {
-                }
-            };
-        };
-        runner.getCurrentItem = () => data.item;
-        runner.getCurrentPart = () => Object.assign({
-            isLinear: data.isLinear
-        }, testMap.part);
+                // mock test store init
+                runner.getTestStore = () => {
+                    return {
+                        getStore: () => {
+                            return Promise.reject();
+                        },
+                        setVolatile: () => {
+                        }
+                    };
+                };
+                runner.getCurrentItem = () => data.item;
+                runner.getCurrentPart = () => Object.assign({
+                    isLinear: data.isLinear
+                }, testMap.part);
 
-        assert.expect(1);
+                assert.expect(1);
 
-        plugin
-            .init()
-            .then(() => {
-                runner.setTestContext(data.testContext);
-                runner.setTestMap(testMap);
+                return plugin
+                    .init()
+                    .then(() => new Promise(resolve => {
+                        runner.setTestContext(data.testContext);
+                        runner.setTestMap(testMap);
 
-                runner.on('disablenav', () => {
-                    assert.ok(true, 'The dialog interrupted the move');
-                    runner.destroy();
-                    ready();
-                });
-                runner.trigger('move', data.event);
+                        runner.on('disablenav', () => {
+                            assert.ok(true, 'The dialog interrupted the move');
+                            runner.destroy();
+                            resolve();
+                        });
+                        runner.trigger('move', data.event);
+                    }));
             })
             .catch(err => {
-                assert.ok(false, err.message);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 });

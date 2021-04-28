@@ -34,6 +34,16 @@ define([
     runnerFactory.registerProvider(providerName, providerMock());
 
     /**
+     * Gets a configured instance of the Test Runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner() {
+        const runner = runnerFactory(providerName);
+        runner.getDataHolder();
+        return Promise.resolve(runner);
+    }
+
+    /**
      * The following tests applies to all plugins
      */
     QUnit.module('pluginFactory');
@@ -84,151 +94,175 @@ define([
 
     QUnit.test('render a rubric block', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => new Promise((resolve, reject) => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        assert.expect(2);
+                assert.expect(2);
 
-        runner.on('rubricblock', () => {
-            const $container = runner.getAreaBroker().getContainer();
+                runner.on('rubricblock', () => {
+                    const $container = runner.getAreaBroker().getContainer();
 
-            assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric blocks element is created');
-            assert.equal($('#qti-rubrics', $container).html(), '<p>foo</p>', 'The rubric blocks content is loaded');
-            ready();
-        });
-
-        plugin
-            .init()
-            .then(plugin.render())
-            .then(() => {
-                runner.setTestContext({
-                    rubrics: '<p>foo</p>'
+                    assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric blocks element is created');
+                    assert.equal($('#qti-rubrics', $container).html(), '<p>foo</p>', 'The rubric blocks content is loaded');
+                    resolve();
                 });
-                runner.trigger('loaditem', 'foo');
-                runner.trigger('renderitem');
-            })
+
+                plugin
+                    .init()
+                    .then(plugin.render())
+                    .then(() => {
+                        runner.setTestContext({
+                            rubrics: '<p>foo</p>'
+                        });
+                        runner.trigger('loaditem', 'foo');
+                        runner.trigger('renderitem');
+                    })
+                    .catch(reject);
+            }))
             .catch(err => {
-                assert.ok(false, err.message);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('load / unload a rubric block', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => new Promise((resolve, reject) => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        assert.expect(4);
+                assert.expect(4);
 
-        runner
-            .after('renderitem', () => {
-                const $container = runner.getAreaBroker().getContainer();
+                runner
+                    .after('renderitem', () => {
+                        const $container = runner.getAreaBroker().getContainer();
 
-                assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric block element is created');
-                assert.equal(
-                    $('#qti-rubrics', $container).children().length,
-                    1,
-                    'The rubric block element contains an child'
-                );
-            })
-            .after('unloaditem', () => {
-                const $container = runner.getAreaBroker().getContainer();
+                        assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric block element is created');
+                        assert.equal(
+                            $('#qti-rubrics', $container).children().length,
+                            1,
+                            'The rubric block element contains an child'
+                        );
+                    })
+                    .after('unloaditem', () => {
+                        const $container = runner.getAreaBroker().getContainer();
 
-                assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric block element is created');
-                assert.equal($('#qti-rubrics', $container).children().length, 0, 'The rubric block element is empty');
+                        assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric block element is created');
+                        assert.equal($('#qti-rubrics', $container).children().length, 0, 'The rubric block element is empty');
 
-                ready();
-            });
+                        resolve();
+                    });
 
-        plugin
-            .init()
-            .then(plugin.render())
-            .then(() => {
-                runner.setTestContext({
-                    rubrics: '<p>foo</p>'
-                });
-                runner.trigger('loaditem', 'foo');
-                runner.trigger('renderitem');
+                plugin
+                    .init()
+                    .then(plugin.render())
+                    .then(() => {
+                        runner.setTestContext({
+                            rubrics: '<p>foo</p>'
+                        });
+                        runner.trigger('loaditem', 'foo');
+                        runner.trigger('renderitem');
 
-                setTimeout(() => runner.trigger('unloaditem'), 10);
-            })
+                        setTimeout(() => runner.trigger('unloaditem'), 10);
+                    })
+                    .catch(reject);
+            }))
             .catch(err => {
-                assert.ok(false, err.message);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('render a rubric block with links', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => new Promise((resolve, reject) => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        assert.expect(3);
+                assert.expect(3);
 
-        runner.on('rubricblock', () => {
-            const $container = runner.getAreaBroker().getContainer();
+                runner.on('rubricblock', () => {
+                    const $container = runner.getAreaBroker().getContainer();
 
-            assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric blocks element is created');
-            assert.equal($('#qti-rubrics a', $container).length, 1, 'The link is in the rubric block');
-            assert.equal($('#qti-rubrics a', $container).attr('target'), '_blank', 'The link has now a _blank target');
-            ready();
-        });
-
-        plugin
-            .init()
-            .then(plugin.render())
-            .then(() => {
-                runner.setTestContext({
-                    rubrics: '<p><a href="http://taotesting.com">foo</a></p>'
+                    assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric blocks element is created');
+                    assert.equal($('#qti-rubrics a', $container).length, 1, 'The link is in the rubric block');
+                    assert.equal($('#qti-rubrics a', $container).attr('target'), '_blank', 'The link has now a _blank target');
+                    resolve();
                 });
-                runner.trigger('loaditem', 'foo');
-                runner.trigger('renderitem');
-            })
+
+                plugin
+                    .init()
+                    .then(plugin.render())
+                    .then(() => {
+                        runner.setTestContext({
+                            rubrics: '<p><a href="http://taotesting.com">foo</a></p>'
+                        });
+                        runner.trigger('loaditem', 'foo');
+                        runner.trigger('renderitem');
+                    })
+                    .catch(reject);
+            }))
             .catch(err => {
-                assert.ok(false, err.message);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('render a rubric block with math', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => new Promise((resolve, reject) => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        assert.expect(4);
+                assert.expect(4);
 
-        runner.on('rubricblock', () => {
-            const $container = runner.getAreaBroker().getContainer();
+                runner.on('rubricblock', () => {
+                    const $container = runner.getAreaBroker().getContainer();
 
-            assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric blocks element is created');
+                    assert.equal($('#qti-rubrics', $container).length, 1, 'The rubric blocks element is created');
 
-            //Mathjax is mocked, so we don\'t assert the transformation
-            assert.equal(
-                $('#qti-rubrics', $container).find('math').length,
-                1,
-                'The rubric blocks element contains a math element'
-            );
-            assert.ok(mathJaxMock.called, 'The mathJax mock has been called');
+                    //Mathjax is mocked, so we don\'t assert the transformation
+                    assert.equal(
+                        $('#qti-rubrics', $container).find('math').length,
+                        1,
+                        'The rubric blocks element contains a math element'
+                    );
+                    assert.ok(mathJaxMock.called, 'The mathJax mock has been called');
 
-            ready();
-        });
-
-        assert.ok(mathJaxMock.called === false, 'The mathJax mock has not been called');
-
-        plugin
-            .init()
-            .then(plugin.render())
-            .then(() => {
-                runner.setTestContext({
-                    rubrics:
-                        '<div><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Δ</mi><mo>=</mo><msup><mi>b</mi><mn>2</mn></msup><mo>-</mo><mrow><mn>4</mn><mo>⁢</mo><mi>a</mi><mo>⁢</mo><mi>c</mi></mrow></mro</math></div>'
+                    resolve();
                 });
-                runner.trigger('loaditem', 'foo');
-                runner.trigger('renderitem');
-            })
+
+                assert.ok(mathJaxMock.called === false, 'The mathJax mock has not been called');
+
+                plugin
+                    .init()
+                    .then(plugin.render())
+                    .then(() => {
+                        runner.setTestContext({
+                            rubrics:
+                                '<div><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Δ</mi><mo>=</mo><msup><mi>b</mi><mn>2</mn></msup><mo>-</mo><mrow><mn>4</mn><mo>⁢</mo><mi>a</mi><mo>⁢</mo><mi>c</mi></mrow></mro</math></div>'
+                        });
+                        runner.trigger('loaditem', 'foo');
+                        runner.trigger('renderitem');
+                    })
+                    .catch(reject);
+            }))
             .catch(err => {
-                assert.ok(false, err.message);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 });

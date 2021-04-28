@@ -24,7 +24,7 @@ define([
 ], function(runnerFactory, providerMock, pluginFactory, testMap) {
     'use strict';
 
-    var providerName = 'mock';
+    const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
     /**
@@ -32,8 +32,8 @@ define([
      */
     QUnit.module('pluginFactory');
 
-    QUnit.test('module', function(assert) {
-        var runner = runnerFactory(providerName);
+    QUnit.test('module', assert => {
+        const runner = runnerFactory(providerName);
 
         assert.expect(3);
 
@@ -66,9 +66,9 @@ define([
             { title: 'enable' },
             { title: 'disable' }
         ])
-        .test('plugin API ', function(data, assert) {
-            var runner = runnerFactory(providerName);
-            var plugin = pluginFactory(runner);
+        .test('plugin API ', (data, assert) => {
+            const runner = runnerFactory(providerName);
+            const plugin = pluginFactory(runner);
             assert.expect(1);
             assert.equal(
                 typeof plugin[data.title],
@@ -82,9 +82,9 @@ define([
      */
     QUnit.module('Lifecycle');
 
-    QUnit.test('render/destroy', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
+    QUnit.test('render/destroy', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName),
             areaBroker = runner.getAreaBroker(),
             plugin = pluginFactory(runner, areaBroker, {}),
             $container = areaBroker.getControlArea();
@@ -101,13 +101,13 @@ define([
 
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 assert.equal($container.find('.progress-box').length, 0, 'The plugin has not been inserted yet');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(
                         $container.find('.progress-box').length,
                         1,
@@ -115,22 +115,22 @@ define([
                     );
 
                     // Plugin destroying
-                    return plugin.destroy().then(function() {
+                    return plugin.destroy().then(() => {
                         assert.equal($container.find('.progress-box').length, 0, 'The plugin has been removed');
 
                         ready();
                     });
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${err.message}`);
                 ready();
             });
     });
 
-    QUnit.test('show/hide', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
+    QUnit.test('show/hide', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName),
             areaBroker = runner.getAreaBroker(),
             plugin = pluginFactory(runner, areaBroker),
             $container = areaBroker.getControlArea();
@@ -147,13 +147,13 @@ define([
 
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 assert.equal($container.find('.progress-box').length, 0, 'The plugin has not been inserted yet');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(
                         $container.find('.progress-box').length,
                         1,
@@ -161,10 +161,10 @@ define([
                     );
                     assert.equal($container.find('.progress-box:visible').length, 1, 'The plugin is visible');
 
-                    return plugin.hide().then(function() {
+                    return plugin.hide().then(() => {
                         assert.equal($container.find('.progress-box:visible').length, 0, 'The plugin is now hidden');
 
-                        return plugin.show().then(function() {
+                        return plugin.show().then(() => {
                             assert.equal(
                                 $container.find('.progress-box:visible').length,
                                 1,
@@ -172,7 +172,7 @@ define([
                             );
 
                             // Plugin destroying
-                            return plugin.destroy().then(function() {
+                            return plugin.destroy().then(() => {
                                 assert.equal($container.find('.progress-box').length, 0, 'The plugin has been removed');
 
                                 ready();
@@ -181,7 +181,7 @@ define([
                     });
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${err.message}`);
                 ready();
             });
@@ -189,9 +189,9 @@ define([
 
     QUnit.module('Options');
 
-    QUnit.test('hide on informational', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName, {}, {
+    QUnit.test('hide on informational', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, {
                 options : {
                     progressIndicator: {
                         type: 'questions'
@@ -214,13 +214,13 @@ define([
 
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 assert.equal($container.find('.progress-box').length, 0, 'The plugin has not been inserted yet');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(
                         $container.find('.progress-box').length,
                         1,
@@ -229,14 +229,14 @@ define([
                     assert.equal($container.find('.progress-box:visible').length, 0, 'The plugin is not visible');
 
                     // Plugin destroying
-                    return plugin.destroy().then(function() {
+                    return plugin.destroy().then(() => {
                         assert.equal($container.find('.progress-box').length, 0, 'The plugin has been removed');
 
                         ready();
                     });
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${err.message}`);
                 ready();
             });

@@ -35,6 +35,16 @@ define([
     currentItemHelper.getDeclarations = testRunner => testRunner.responses;
 
     /**
+     * Gets a configured instance of the Test Runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        return Promise.resolve(runner);
+    }
+
+    /**
      * The following tests applies to all plugins
      */
     QUnit.module('pluginFactory');
@@ -132,32 +142,37 @@ define([
         ])
         .test('Moving is allowed ', (data, assert) => {
             const ready = assert.async();
-            const runner = runnerFactory(providerName, {
+            getTestRunner({
                 options: data.options
-            });
-            const plugin = pluginFactory(runner, runner.getAreaBroker());
+            })
+                .then(runner => {
+                    const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-            runner.getCurrentItem = () => ({ validateResponses: data.validateResponses });
+                    runner.getCurrentItem = () => ({ validateResponses: data.validateResponses });
 
-            assert.expect(1);
+                    assert.expect(1);
 
-            plugin
-                .init()
-                .then(() => {
-                    runner.setTestContext(data.context);
-                    runner.answered = data.answered;
-                    runner.responses = data.responses;
+                    return plugin
+                        .init()
+                        .then(() => new Promise(resolve => {
+                            runner.setTestContext(data.context);
+                            runner.answered = data.answered;
+                            runner.responses = data.responses;
 
-                    runner.on('move', () => {
-                        assert.ok(true, 'Move is allowed');
-                        ready();
-                    });
-                    runner.trigger('move');
+                            runner.on('move', () => {
+                                assert.ok(true, 'Move is allowed');
+                                resolve();
+                            });
+                            runner.trigger('move');
+                        }));
                 })
                 .catch(err => {
-                    assert.ok(false, err.message);
-                    ready();
-                });
+                    assert.pushResult({
+                        result: false,
+                        message: err
+                    });
+                })
+                .then(ready);
         });
 
     QUnit.cases
@@ -177,48 +192,52 @@ define([
         ])
         .test('Moving is prevented ', (data, assert) => {
             const ready = assert.async();
-
-            const runner = runnerFactory(providerName, {}, {
+            getTestRunner({
                 options: data.options
-            });
-            const plugin = pluginFactory(runner, runner.getAreaBroker());
+            })
+                .then(runner => {
+                    const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-            runner.getCurrentItem = () => ({
-                validateResponses: data.validateResponses,
-                answered: data.answered
-            });
-
-            assert.expect(2);
-
-            plugin
-                .init()
-                .then(() => {
-                    runner.setTestContext(data.context);
-                    runner.answered = data.answered;
-                    runner.responses = data.responses;
-
-                    runner.on('move', () => {
-                        assert.ok(false, 'Move is denied');
-                        ready();
+                    runner.getCurrentItem = () => ({
+                        validateResponses: data.validateResponses,
+                        answered: data.answered
                     });
-                    runner.off('alert.notallowed').on('alert.notallowed', (message, cb) => {
-                        assert.equal(
-                            message,
-                            'A valid response to this item is required.',
-                            'The user receive the correct message'
-                        );
-                        cb();
-                    });
-                    runner.on('resumeitem', () => {
-                        assert.ok(true, 'Move has been prevented');
-                        ready();
-                    });
-                    runner.trigger('move');
+
+                    assert.expect(2);
+
+                    return plugin
+                        .init()
+                        .then(() => new Promise((resolve, reject) => {
+                            runner.setTestContext(data.context);
+                            runner.answered = data.answered;
+                            runner.responses = data.responses;
+
+                            runner.on('move', () => {
+                                assert.ok(false, 'Move is denied');
+                                reject();
+                            });
+                            runner.off('alert.notallowed').on('alert.notallowed', (message, cb) => {
+                                assert.equal(
+                                    message,
+                                    'A valid response to this item is required.',
+                                    'The user receive the correct message'
+                                );
+                                cb();
+                            });
+                            runner.on('resumeitem', () => {
+                                assert.ok(true, 'Move has been prevented');
+                                resolve();
+                            });
+                            runner.trigger('move');
+                        }));
                 })
                 .catch(err => {
-                    assert.ok(false, err.message);
-                    ready();
-                });
+                    assert.pushResult({
+                        result: false,
+                        message: err
+                    });
+                })
+                .then(ready);
         });
 
     QUnit.cases
@@ -241,31 +260,36 @@ define([
         ])
         .test('Moving backwards is also allowed ', (data, assert) => {
             const ready = assert.async();
-            const runner = runnerFactory(providerName, {}, {
+            getTestRunner({
                 options: data.options
-            });
-            const plugin = pluginFactory(runner, runner.getAreaBroker(), data.pluginConfig);
+            })
+                .then(runner => {
+                    const plugin = pluginFactory(runner, runner.getAreaBroker(), data.pluginConfig);
 
-            runner.getCurrentItem = () => ({ validateResponses: data.validateResponses });
+                    runner.getCurrentItem = () => ({ validateResponses: data.validateResponses });
 
-            assert.expect(1);
+                    assert.expect(1);
 
-            plugin
-                .init()
-                .then(() => {
-                    runner.setTestContext(data.context);
-                    runner.answered = data.answered;
-                    runner.responses = data.responses;
+                    return plugin
+                        .init()
+                        .then(() => new Promise(resolve => {
+                            runner.setTestContext(data.context);
+                            runner.answered = data.answered;
+                            runner.responses = data.responses;
 
-                    runner.on('move', () => {
-                        assert.ok(true, 'Moving is allowed');
-                        ready();
-                    });
-                    runner.previous();
+                            runner.on('move', () => {
+                                assert.ok(true, 'Moving is allowed');
+                                resolve();
+                            });
+                            runner.previous();
+                        }));
                 })
                 .catch(err => {
-                    assert.ok(false, err.message);
-                    ready();
-                });
+                    assert.pushResult({
+                        result: false,
+                        message: err
+                    });
+                })
+                .then(ready);
         });
 });

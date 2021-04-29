@@ -28,8 +28,7 @@ define([
 ], function(_, hider, runnerFactory, providerMock, pluginFactory) {
     'use strict';
 
-    var pluginApi;
-    var providerName = 'mock';
+    const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
     const sampleTestContext = {
@@ -62,8 +61,8 @@ define([
      */
     QUnit.module('pluginFactory');
 
-    QUnit.test('module', function(assert) {
-        var runner = runnerFactory(providerName);
+    QUnit.test('module', assert => {
+        const runner = runnerFactory(providerName);
 
         assert.equal(typeof pluginFactory, 'function', 'The pluginFactory module exposes a function');
         assert.equal(typeof pluginFactory(runner), 'object', 'The plugin factory produces an instance');
@@ -74,47 +73,45 @@ define([
         );
     });
 
-    pluginApi = [
-        { name: 'init', title: 'init' },
-        { name: 'render', title: 'render' },
-        { name: 'finish', title: 'finish' },
-        { name: 'destroy', title: 'destroy' },
-        { name: 'trigger', title: 'trigger' },
-        { name: 'getTestRunner', title: 'getTestRunner' },
-        { name: 'getAreaBroker', title: 'getAreaBroker' },
-        { name: 'getConfig', title: 'getConfig' },
-        { name: 'setConfig', title: 'setConfig' },
-        { name: 'getState', title: 'getState' },
-        { name: 'setState', title: 'setState' },
-        { name: 'show', title: 'show' },
-        { name: 'hide', title: 'hide' },
-        { name: 'enable', title: 'enable' },
-        { name: 'disable', title: 'disable' }
-    ];
-
-    QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
-        var runner = runnerFactory(providerName);
-        var timer = pluginFactory(runner);
+    QUnit.cases.init([
+        { title: 'init' },
+        { title: 'render' },
+        { title: 'finish' },
+        { title: 'destroy' },
+        { title: 'trigger' },
+        { title: 'getTestRunner' },
+        { title: 'getAreaBroker' },
+        { title: 'getConfig' },
+        { title: 'setConfig' },
+        { title: 'getState' },
+        { title: 'setState' },
+        { title: 'show' },
+        { title: 'hide' },
+        { title: 'enable' },
+        { title: 'disable' }
+    ]).test('plugin API ', (data, assert) => {
+        const runner = runnerFactory(providerName);
+        const timer = pluginFactory(runner);
         assert.equal(
-            typeof timer[data.name],
+            typeof timer[data.title],
             'function',
-            `The pluginFactory instances expose a "${data.name}" function`
+            `The pluginFactory instances expose a "${data.title}" function`
         );
     });
 
-    QUnit.test('pluginFactory.init', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('pluginFactory.init', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin is initialised');
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `The init failed: ${err}`);
                 ready();
             });
@@ -125,100 +122,97 @@ define([
      */
     QUnit.module('plugin button');
 
-    QUnit.test('render/destroy button', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('render/destroy button', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         assert.expect(4);
 
         plugin
             .init()
-            .then(function() {
-                var $container = runner.getAreaBroker().getToolboxArea(),
-                    $button;
+            .then(() => {
+                const $container = runner.getAreaBroker().getToolboxArea();
 
                 areaBroker.getToolbox().render($container);
 
-                $button = $container.find('[data-control="line-reader"]');
+                const $buttonBefore = $container.find('[data-control="line-reader"]');
 
-                assert.equal($button.length, 1, 'The trigger button has been inserted');
-                assert.equal($button.hasClass('disabled'), true, 'The trigger button has been rendered disabled');
-                assert.equal($button.hasClass('disabled'), true, 'The remove button has been rendered disabled');
+                assert.equal($buttonBefore.length, 1, 'The trigger button has been inserted');
+                assert.equal($buttonBefore.hasClass('disabled'), true, 'The trigger button has been rendered disabled');
+                assert.equal($buttonBefore.hasClass('disabled'), true, 'The remove button has been rendered disabled');
 
                 areaBroker.getToolbox().destroy();
 
-                $button = $container.find('[data-control="line-reader"]');
+                const $buttonAfter = $container.find('[data-control="line-reader"]');
 
-                assert.equal($button.length, 0, 'The trigger button has been removed');
+                assert.equal($buttonAfter.length, 0, 'The trigger button has been removed');
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Error in init method: ${err}`);
                 ready();
             });
     });
 
-    QUnit.test('enable/disable button', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('enable/disable button', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         assert.expect(2);
 
         plugin
             .init()
-            .then(function() {
-                var $container = runner.getAreaBroker().getToolboxArea(),
-                    $button;
+            .then(() => {
+                const $container = runner.getAreaBroker().getToolboxArea();
 
                 areaBroker.getToolbox().render($container);
 
-                return plugin.enable().then(function() {
-                    $button = $container.find('[data-control="line-reader"]');
+                return plugin.enable().then(() => {
+                    const $button = $container.find('[data-control="line-reader"]');
 
                     assert.equal($button.hasClass('disabled'), false, 'The trigger button has been enabled');
 
-                    return plugin.disable().then(function() {
+                    return plugin.disable().then(() => {
                         assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
 
                         ready();
                     });
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected error: ${err}`);
                 ready();
             });
     });
 
-    QUnit.test('show/hide button', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('show/hide button', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         assert.expect(3);
 
         plugin
             .init()
-            .then(function() {
-                var $container = runner.getAreaBroker().getToolboxArea(),
-                    $button;
+            .then(() => {
+                const $container = runner.getAreaBroker().getToolboxArea();
 
                 areaBroker.getToolbox().render($container);
 
-                return plugin.hide().then(function() {
-                    $button = $container.find('[data-control="line-reader"]');
+                return plugin.hide().then(() => {
+                    const $button = $container.find('[data-control="line-reader"]');
 
                     assert.ok(hider.isHidden($button), 'The trigger button has been hidden');
 
-                    return plugin.show().then(function() {
+                    return plugin.show().then(() => {
                         assert.ok(!hider.isHidden($button), 'The trigger button is visible');
 
-                        return plugin.hide().then(function() {
+                        return plugin.hide().then(() => {
                             assert.ok(hider.isHidden($button), 'The trigger button has been hidden again');
 
                             ready();
@@ -226,17 +220,17 @@ define([
                     });
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected error: ${err}`);
                 ready();
             });
     });
 
-    QUnit.test('runner events: loaditem / unloaditem', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('runner events: loaditem / unloaditem', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         assert.expect(3);
 
@@ -245,13 +239,12 @@ define([
 
         plugin
             .init()
-            .then(function() {
-                var $container = runner.getAreaBroker().getToolboxArea(),
-                    $button;
+            .then(() => {
+                const $container = runner.getAreaBroker().getToolboxArea();
 
                 areaBroker.getToolbox().render($container);
 
-                $button = $container.find('[data-control="line-reader"]');
+                const $button = $container.find('[data-control="line-reader"]');
 
                 runner.trigger('loaditem');
 
@@ -265,29 +258,28 @@ define([
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Error in init method: ${err}`);
                 ready();
             });
     });
 
-    QUnit.test('runner events: renderitem', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('runner events: renderitem', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         assert.expect(2);
 
         plugin
             .init()
-            .then(function() {
-                var $container = runner.getAreaBroker().getToolboxArea(),
-                    $button;
+            .then(() => {
+                const $container = runner.getAreaBroker().getToolboxArea();
 
                 areaBroker.getToolbox().render($container);
 
-                $button = $container.find('[data-control="line-reader"]');
+                const $button = $container.find('[data-control="line-reader"]');
 
                 runner.trigger('renderitem');
 
@@ -297,7 +289,7 @@ define([
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Error in init method: ${err}`);
                 ready();
             });
@@ -308,11 +300,11 @@ define([
      */
     QUnit.module('line reader');
 
-    QUnit.test('Render compound mask', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('Render compound mask', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         assert.expect(4);
 
@@ -321,8 +313,8 @@ define([
 
         plugin
             .init()
-            .then(function() {
-                var $contentContainer = areaBroker.getContentArea().parent(),
+            .then(() => {
+                const $contentContainer = areaBroker.getContentArea().parent(),
                     $masks = $contentContainer.find('.line-reader-mask'),
                     $overlays = $contentContainer.find('.line-reader-overlay');
 
@@ -336,17 +328,17 @@ define([
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected error: ${err}`);
                 ready();
             });
     });
 
-    QUnit.test('Toggle on click', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('Toggle on click', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         assert.expect(8);
 
@@ -355,17 +347,16 @@ define([
 
         plugin
             .init()
-            .then(function() {
-                var $contentContainer = areaBroker.getContentArea().parent(),
+            .then(() => {
+                const $contentContainer = areaBroker.getContentArea().parent(),
                     $toolboxContainer = areaBroker.getToolboxArea(),
                     $masks = $contentContainer.find('.line-reader-mask'),
-                    $overlays = $contentContainer.find('.line-reader-overlay'),
-                    $button;
+                    $overlays = $contentContainer.find('.line-reader-overlay');
 
                 runner.trigger('renderitem');
 
                 areaBroker.getToolbox().render($toolboxContainer);
-                $button = areaBroker.getToolboxArea().find('[data-control="line-reader"]');
+                const $button = areaBroker.getToolboxArea().find('[data-control="line-reader"]');
 
                 assert.equal($masks.length, 8, '8 masks have been rendered');
                 assert.equal($overlays.length, 1, '1 overlay has been rendered');
@@ -385,15 +376,15 @@ define([
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected error: ${err}`);
                 ready();
             });
     });
 
-    QUnit.test('Toggle on keyboard shortcut', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName, {}, {
+    QUnit.test('Toggle on keyboard shortcut', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName, {}, {
             options: {
                 allowShortcuts: true,
                 shortcuts: {
@@ -403,8 +394,8 @@ define([
                 }
             }
         });
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
 
         assert.expect(6);
 
@@ -413,8 +404,8 @@ define([
 
         plugin
             .init()
-            .then(function() {
-                var $contentContainer = areaBroker.getContentArea().parent(),
+            .then(() => {
+                const $contentContainer = areaBroker.getContentArea().parent(),
                     $masks = $contentContainer.find('.line-reader-mask'),
                     $overlays = $contentContainer.find('.line-reader-overlay');
 
@@ -455,7 +446,7 @@ define([
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected error: ${err}`);
                 ready();
             });

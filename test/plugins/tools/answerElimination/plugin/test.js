@@ -52,6 +52,18 @@ define([
     };
 
     /**
+     * Gets a configured instance of the Test Runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        return Promise.resolve(runner);
+    }
+
+    /**
      * Generic tests
      */
     QUnit.module('pluginFactory');
@@ -106,193 +118,215 @@ define([
 
     QUnit.test('render/enable/disable/destroy', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, areaBroker);
-        const toolbox = areaBroker.getToolbox();
-        const $container = areaBroker.getToolboxArea();
-        const buttonSelector = '[data-control="eliminator"]';
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const toolbox = areaBroker.getToolbox();
+                const $container = areaBroker.getToolboxArea();
+                const buttonSelector = '[data-control="eliminator"]';
 
-        assert.expect(12);
+                assert.expect(12);
 
-        plugin
-            .init()
-            .then(() => {
-                assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
+                return plugin
+                    .init()
+                    .then(() => {
+                        assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
-                // Toolbox rendering
-                toolbox.render($container);
+                        // Toolbox rendering
+                        toolbox.render($container);
 
-                const $button = $container.find(buttonSelector);
+                        const $button = $container.find(buttonSelector);
 
-                assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
-                assert.equal($button.hasClass('disabled'), true, 'The button has been rendered disabled');
+                        assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
+                        assert.equal($button.hasClass('disabled'), true, 'The button has been rendered disabled');
 
-                // Plugin rendering
-                return plugin.render().then(() => {
-                    assert.equal(plugin.getState('ready'), true, 'The plugin is ready');
+                        // Plugin rendering
+                        return plugin.render();
+                    })
+                    .then(() => {
+                        assert.equal(plugin.getState('ready'), true, 'The plugin is ready');
 
-                    // Enabling
-                    return plugin.enable().then(() => {
+                        // Enabling
+                        return plugin.enable();
+                    })
+                    .then(() => {
+                        const $button = $container.find(buttonSelector);
+
                         assert.equal(plugin.getState('enabled'), true, 'The plugin is enabled');
                         assert.equal($button.hasClass('disabled'), false, 'The button is not disabled');
 
                         // Disabling
-                        return plugin.disable().then(() => {
-                            assert.equal(plugin.getState('enabled'), false, 'The plugin is disabled');
-                            assert.equal($button.hasClass('disabled'), true, 'The button is disabled');
-                            assert.equal($button.hasClass('active'), false, 'The button is turned off');
+                        return plugin.disable();
+                    })
+                    .then(() => {
+                        const $button = $container.find(buttonSelector);
 
-                            // Plugin destroying
-                            return plugin.destroy().then(() => {
-                                const $buttonBefore = $container.find(buttonSelector);
+                        assert.equal(plugin.getState('enabled'), false, 'The plugin is disabled');
+                        assert.equal($button.hasClass('disabled'), true, 'The button is disabled');
+                        assert.equal($button.hasClass('active'), false, 'The button is turned off');
 
-                                assert.equal(plugin.getState('init'), false, 'The plugin is destroyed');
-                                assert.equal(
-                                    $buttonBefore.length,
-                                    1,
-                                    'The plugin button has not been destroyed by the plugin'
-                                );
+                        // Plugin destroying
+                        return plugin.destroy();
+                    })
+                    .then(() => {
+                        const $buttonBefore = $container.find(buttonSelector);
 
-                                // Toolbox destroying
-                                toolbox.destroy();
+                        assert.equal(plugin.getState('init'), false, 'The plugin is destroyed');
+                        assert.equal(
+                            $buttonBefore.length,
+                            1,
+                            'The plugin button has not been destroyed by the plugin'
+                        );
 
-                                const $buttonAfter = $container.find(buttonSelector);
+                        // Toolbox destroying
+                        toolbox.destroy();
 
-                                assert.equal($buttonAfter.length, 0, 'The button has been removed');
-                                ready();
-                            });
-                        });
+                        const $buttonAfter = $container.find(buttonSelector);
+
+                        assert.equal($buttonAfter.length, 0, 'The button has been removed');
                     });
-                });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected failure : ${  err.message}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('show/hide', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, areaBroker);
-        const toolbox = areaBroker.getToolbox();
-        const $container = areaBroker.getToolboxArea();
-        const buttonSelector = '[data-control="eliminator"]';
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const toolbox = areaBroker.getToolbox();
+                const $container = areaBroker.getToolboxArea();
+                const buttonSelector = '[data-control="eliminator"]';
 
-        assert.expect(7);
+                assert.expect(7);
 
-        plugin
-            .init()
-            .then(() => {
-                assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
+                return plugin
+                    .init()
+                    .then(() => {
+                        assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
-                // Toolbox rendering
-                toolbox.render($container);
+                        // Toolbox rendering
+                        toolbox.render($container);
 
-                const $button = $container.find(buttonSelector);
+                        const $button = $container.find(buttonSelector);
 
-                plugin.setState('visible', true);
+                        plugin.setState('visible', true);
 
-                assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
-                assert.equal(plugin.getState('visible'), true, 'The plugin is visible');
+                        assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
+                        assert.equal(plugin.getState('visible'), true, 'The plugin is visible');
 
-                // Hiding
-                return plugin.hide().then(() => {
-                    assert.equal(plugin.getState('visible'), false, 'The plugin is not visible');
-                    assert.equal($button.css('display'), 'none', 'The plugin element is hidden');
+                        // Hiding
+                        return plugin.hide();
+                    })
+                    .then(() => {
+                        const $button = $container.find(buttonSelector);
 
-                    // Showing
-                    return plugin.show().then(() => {
+                        assert.equal(plugin.getState('visible'), false, 'The plugin is not visible');
+                        assert.equal($button.css('display'), 'none', 'The plugin element is hidden');
+
+                        // Showing
+                        return plugin.show();
+                    })
+                    .then(() => {
+                        const $button = $container.find(buttonSelector);
+
                         assert.equal(plugin.getState('visible'), true, 'The plugin is visible');
                         assert.notEqual($button.css('display'), 'none', 'The plugin element is visible');
-
-                        ready();
                     });
-                });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected failure : ${  err.message}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: loaditem / unloaditem', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
-        const toolbox = areaBroker.getToolbox();
-        const $container = areaBroker.getToolboxArea();
-        const buttonSelector = '[data-control="eliminator"]';
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const toolbox = areaBroker.getToolbox();
+                const $container = areaBroker.getToolboxArea();
+                const buttonSelector = '[data-control="eliminator"]';
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                assert.expect(4);
 
-        assert.expect(4);
+                return plugin
+                    .init()
+                    .then(() => {
+                        toolbox.render($container);
 
-        plugin
-            .init()
-            .then(() => {
-                toolbox.render($container);
+                        const $button = $container.find(buttonSelector);
 
-                const $button = $container.find(buttonSelector);
+                        assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
 
-                assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
+                        runner.trigger('loaditem');
 
-                runner.trigger('loaditem');
+                        assert.notEqual($button.css('display'), 'none', 'The plugin button is visible');
 
-                assert.notEqual($button.css('display'), 'none', 'The plugin button is visible');
+                        runner.trigger('unloaditem');
 
-                runner.trigger('unloaditem');
-
-                assert.notEqual($button.css('display'), 'none', 'The plugin button is still visible');
-                assert.equal($button.hasClass('disabled'), true, 'The button is disabled');
-
-                ready();
+                        assert.notEqual($button.css('display'), 'none', 'The plugin button is still visible');
+                        assert.equal($button.hasClass('disabled'), true, 'The button is disabled');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Error in init method: ${  err}`);
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: renderitem', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
-        const areaBroker = runner.getAreaBroker();
-        const toolbox = areaBroker.getToolbox();
-        const $container = areaBroker.getToolboxArea();
-        const buttonSelector = '[data-control="eliminator"]';
-        const interaction = document.querySelector('.qti-choiceInteraction');
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const toolbox = areaBroker.getToolbox();
+                const $container = areaBroker.getToolboxArea();
+                const buttonSelector = '[data-control="eliminator"]';
+                const interaction = document.querySelector('.qti-choiceInteraction');
 
-        areaBroker.getContentArea().append(interaction);
+                areaBroker.getContentArea().append(interaction);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                assert.expect(3);
 
-        assert.expect(3);
+                return plugin
+                    .init()
+                    .then(() => {
+                        toolbox.render($container);
 
-        plugin
-            .init()
-            .then(() => {
-                toolbox.render($container);
+                        const $button = $container.find(buttonSelector);
 
-                const $button = $container.find(buttonSelector);
+                        assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
 
-                assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
+                        runner.trigger('renderitem');
 
-                runner.trigger('renderitem');
-
-                assert.notEqual($button.css('display'), 'none', 'The plugin button is visible');
-                assert.equal($button.hasClass('disabled'), false, 'The button is not disabled');
-
-                ready();
+                        assert.notEqual($button.css('display'), 'none', 'The plugin button is visible');
+                        assert.equal($button.hasClass('disabled'), false, 'The button is not disabled');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `An error has occurred: ${  err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 });

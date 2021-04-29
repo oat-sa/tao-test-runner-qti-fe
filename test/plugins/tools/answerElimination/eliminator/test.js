@@ -53,6 +53,18 @@ define([
         }]
     };
 
+    /**
+     * Gets a configured instance of the Test Runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        return Promise.resolve(runner);
+    }
+
     QUnit.module('eliminatorFactory');
 
     QUnit.test('module', assert => {
@@ -63,22 +75,28 @@ define([
 
     QUnit.test('Toggle eliminator mode on/off', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const eliminator = eliminatorFactory(runner, areaBroker);
-        const interaction = document.querySelector('.qti-choiceInteraction');
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const eliminator = eliminatorFactory(runner, areaBroker);
+                const interaction = document.querySelector('.qti-choiceInteraction');
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
-        areaBroker.getContentArea().append(interaction);
-        eliminator.init().then(() => {
-            runner.trigger('renderitem');
-            runner.trigger('tool-eliminator-toggle');
-            assert.ok(interaction.classList.contains('eliminable'), 'Class "eliminable" has been added');
-            runner.trigger('tool-eliminator-toggle');
-            assert.ok(!interaction.classList.contains('eliminable'), 'Class "eliminable" has been removed');
-            ready();
-        });
+                areaBroker.getContentArea().append(interaction);
+                return eliminator.init()
+                    .then(() => {
+                        runner.trigger('renderitem');
+                        runner.trigger('tool-eliminator-toggle');
+                        assert.ok(interaction.classList.contains('eliminable'), 'Class "eliminable" has been added');
+                        runner.trigger('tool-eliminator-toggle');
+                        assert.ok(!interaction.classList.contains('eliminable'), 'Class "eliminable" has been removed');
+                    });
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 });

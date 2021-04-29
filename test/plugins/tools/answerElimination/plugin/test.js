@@ -23,8 +23,7 @@ define([
 ], function(runnerFactory, providerMock, pluginFactory) {
     'use strict';
 
-    var pluginApi;
-    var providerName = 'mock';
+    const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
     const sampleTestContext = {
@@ -57,8 +56,8 @@ define([
      */
     QUnit.module('pluginFactory');
 
-    QUnit.test('module', function(assert) {
-        var runner = runnerFactory(providerName);
+    QUnit.test('module', assert => {
+        const runner = runnerFactory(providerName);
 
         assert.expect(3);
 
@@ -71,34 +70,32 @@ define([
         );
     });
 
-    pluginApi = [
-        { name: 'init', title: 'init' },
-        { name: 'render', title: 'render' },
-        { name: 'finish', title: 'finish' },
-        { name: 'destroy', title: 'destroy' },
-        { name: 'trigger', title: 'trigger' },
-        { name: 'getTestRunner', title: 'getTestRunner' },
-        { name: 'getAreaBroker', title: 'getAreaBroker' },
-        { name: 'getConfig', title: 'getConfig' },
-        { name: 'setConfig', title: 'setConfig' },
-        { name: 'getState', title: 'getState' },
-        { name: 'setState', title: 'setState' },
-        { name: 'show', title: 'show' },
-        { name: 'hide', title: 'hide' },
-        { name: 'enable', title: 'enable' },
-        { name: 'disable', title: 'disable' }
-    ];
-
     QUnit.module('Plugin API');
 
-    QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
-        var runner = runnerFactory(providerName);
-        var plugin = pluginFactory(runner);
+    QUnit.cases.init([
+        { title: 'init' },
+        { title: 'render' },
+        { title: 'finish' },
+        { title: 'destroy' },
+        { title: 'trigger' },
+        { title: 'getTestRunner' },
+        { title: 'getAreaBroker' },
+        { title: 'getConfig' },
+        { title: 'setConfig' },
+        { title: 'getState' },
+        { title: 'setState' },
+        { title: 'show' },
+        { title: 'hide' },
+        { title: 'enable' },
+        { title: 'disable' }
+    ]).test('plugin API ', (data, assert) => {
+        const runner = runnerFactory(providerName);
+        const plugin = pluginFactory(runner);
         assert.expect(1);
         assert.equal(
-            typeof plugin[data.name],
+            typeof plugin[data.title],
             'function',
-            `The pluginFactory instances expose a "${  data.name  }" function`
+            `The pluginFactory instances expose a "${  data.title  }" function`
         );
     });
 
@@ -107,53 +104,52 @@ define([
      */
     QUnit.module('Button');
 
-    QUnit.test('render/enable/disable/destroy', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            plugin = pluginFactory(runner, areaBroker),
-            toolbox = areaBroker.getToolbox(),
-            $container = areaBroker.getToolboxArea(),
-            buttonSelector = '[data-control="eliminator"]',
-            $button;
+    QUnit.test('render/enable/disable/destroy', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, areaBroker);
+        const toolbox = areaBroker.getToolbox();
+        const $container = areaBroker.getToolboxArea();
+        const buttonSelector = '[data-control="eliminator"]';
 
         assert.expect(12);
 
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 // Toolbox rendering
                 toolbox.render($container);
 
-                $button = $container.find(buttonSelector);
+                const $button = $container.find(buttonSelector);
 
                 assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
                 assert.equal($button.hasClass('disabled'), true, 'The button has been rendered disabled');
 
                 // Plugin rendering
-                return plugin.render().then(function() {
+                return plugin.render().then(() => {
                     assert.equal(plugin.getState('ready'), true, 'The plugin is ready');
 
                     // Enabling
-                    return plugin.enable().then(function() {
+                    return plugin.enable().then(() => {
                         assert.equal(plugin.getState('enabled'), true, 'The plugin is enabled');
                         assert.equal($button.hasClass('disabled'), false, 'The button is not disabled');
 
                         // Disabling
-                        return plugin.disable().then(function() {
+                        return plugin.disable().then(() => {
                             assert.equal(plugin.getState('enabled'), false, 'The plugin is disabled');
                             assert.equal($button.hasClass('disabled'), true, 'The button is disabled');
                             assert.equal($button.hasClass('active'), false, 'The button is turned off');
 
                             // Plugin destroying
-                            return plugin.destroy().then(function() {
-                                $button = $container.find(buttonSelector);
+                            return plugin.destroy().then(() => {
+                                const $buttonBefore = $container.find(buttonSelector);
 
                                 assert.equal(plugin.getState('init'), false, 'The plugin is destroyed');
                                 assert.equal(
-                                    $button.length,
+                                    $buttonBefore.length,
                                     1,
                                     'The plugin button has not been destroyed by the plugin'
                                 );
@@ -161,42 +157,41 @@ define([
                                 // Toolbox destroying
                                 toolbox.destroy();
 
-                                $button = $container.find(buttonSelector);
+                                const $buttonAfter = $container.find(buttonSelector);
 
-                                assert.equal($button.length, 0, 'The button has been removed');
+                                assert.equal($buttonAfter.length, 0, 'The button has been removed');
                                 ready();
                             });
                         });
                     });
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${  err.message}`);
                 ready();
             });
     });
 
-    QUnit.test('show/hide', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            plugin = pluginFactory(runner, areaBroker),
-            toolbox = areaBroker.getToolbox(),
-            $container = areaBroker.getToolboxArea(),
-            buttonSelector = '[data-control="eliminator"]',
-            $button;
+    QUnit.test('show/hide', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, areaBroker);
+        const toolbox = areaBroker.getToolbox();
+        const $container = areaBroker.getToolboxArea();
+        const buttonSelector = '[data-control="eliminator"]';
 
         assert.expect(7);
 
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 assert.equal(plugin.getState('init'), true, 'The plugin has been initialized');
 
                 // Toolbox rendering
                 toolbox.render($container);
 
-                $button = $container.find(buttonSelector);
+                const $button = $container.find(buttonSelector);
 
                 plugin.setState('visible', true);
 
@@ -204,12 +199,12 @@ define([
                 assert.equal(plugin.getState('visible'), true, 'The plugin is visible');
 
                 // Hiding
-                return plugin.hide().then(function() {
+                return plugin.hide().then(() => {
                     assert.equal(plugin.getState('visible'), false, 'The plugin is not visible');
                     assert.equal($button.css('display'), 'none', 'The plugin element is hidden');
 
                     // Showing
-                    return plugin.show().then(function() {
+                    return plugin.show().then(() => {
                         assert.equal(plugin.getState('visible'), true, 'The plugin is visible');
                         assert.notEqual($button.css('display'), 'none', 'The plugin element is visible');
 
@@ -217,21 +212,20 @@ define([
                     });
                 });
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Unexpected failure : ${  err.message}`);
                 ready();
             });
     });
 
-    QUnit.test('runner events: loaditem / unloaditem', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            plugin = pluginFactory(runner, runner.getAreaBroker()),
-            toolbox = areaBroker.getToolbox(),
-            $container = areaBroker.getToolboxArea(),
-            buttonSelector = '[data-control="eliminator"]',
-            $button;
+    QUnit.test('runner events: loaditem / unloaditem', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const toolbox = areaBroker.getToolbox();
+        const $container = areaBroker.getToolboxArea();
+        const buttonSelector = '[data-control="eliminator"]';
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
@@ -240,10 +234,10 @@ define([
 
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 toolbox.render($container);
 
-                $button = $container.find(buttonSelector);
+                const $button = $container.find(buttonSelector);
 
                 assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
 
@@ -258,21 +252,20 @@ define([
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `Error in init method: ${  err}`);
             });
     });
 
-    QUnit.test('runner events: renderitem', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var plugin = pluginFactory(runner, runner.getAreaBroker()),
-            areaBroker = runner.getAreaBroker(),
-            toolbox = areaBroker.getToolbox(),
-            $container = areaBroker.getToolboxArea(),
-            buttonSelector = '[data-control="eliminator"]',
-            $button,
-            interaction = document.querySelector('.qti-choiceInteraction');
+    QUnit.test('runner events: renderitem', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        const areaBroker = runner.getAreaBroker();
+        const toolbox = areaBroker.getToolbox();
+        const $container = areaBroker.getToolboxArea();
+        const buttonSelector = '[data-control="eliminator"]';
+        const interaction = document.querySelector('.qti-choiceInteraction');
 
         areaBroker.getContentArea().append(interaction);
 
@@ -283,10 +276,10 @@ define([
 
         plugin
             .init()
-            .then(function() {
+            .then(() => {
                 toolbox.render($container);
 
-                $button = $container.find(buttonSelector);
+                const $button = $container.find(buttonSelector);
 
                 assert.equal($button.length, 1, 'The plugin button has been inserted in the right place');
 
@@ -297,7 +290,7 @@ define([
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, `An error has occurred: ${  err}`);
                 ready();
             });

@@ -25,7 +25,7 @@ define([
 ], function(runnerFactory, providerMock, eliminatorFactory) {
     'use strict';
 
-    var providerName = 'mock';
+    const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
     const sampleTestContext = {
@@ -55,24 +55,24 @@ define([
 
     QUnit.module('eliminatorFactory');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', assert => {
         assert.ok(typeof eliminatorFactory === 'function', 'Module exposes a function');
     });
 
     QUnit.module('Eliminator Mode');
 
-    QUnit.test('Toggle eliminator mode on/off', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var eliminator = eliminatorFactory(runner, areaBroker);
-        var interaction = document.querySelector('.qti-choiceInteraction');
+    QUnit.test('Toggle eliminator mode on/off', assert => {
+        const ready = assert.async();
+        const runner = runnerFactory(providerName);
+        const areaBroker = runner.getAreaBroker();
+        const eliminator = eliminatorFactory(runner, areaBroker);
+        const interaction = document.querySelector('.qti-choiceInteraction');
 
         runner.setTestContext(sampleTestContext);
         runner.setTestMap(sampleTestMap);
 
         areaBroker.getContentArea().append(interaction);
-        eliminator.init().then(function() {
+        eliminator.init().then(() => {
             runner.trigger('renderitem');
             runner.trigger('tool-eliminator-toggle');
             assert.ok(interaction.classList.contains('eliminable'), 'Class "eliminable" has been added');

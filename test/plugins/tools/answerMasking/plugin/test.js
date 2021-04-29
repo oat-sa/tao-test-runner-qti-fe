@@ -58,6 +58,18 @@ define([
     };
 
     /**
+     * Gets a configured instance of the Test Runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        return Promise.resolve(runner);
+    }
+
+    /**
      * The following tests applies to all plugins
      */
     QUnit.module('pluginFactory');
@@ -102,20 +114,23 @@ define([
 
     QUnit.test('pluginFactory.init', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        plugin
-            .init()
-            .then(() => {
-                assert.equal(plugin.getState('init'), true, 'The plugin is initialised');
-
-                ready();
+                return plugin
+                    .init()
+                    .then(() => {
+                        assert.equal(plugin.getState('init'), true, 'The plugin is initialised');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `The init failed: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     /**
@@ -125,189 +140,215 @@ define([
 
     QUnit.test('render/destroy button', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(3);
+                assert.expect(3);
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                return plugin
+                    .init()
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
 
-                areaBroker.getToolbox().render($container);
+                        areaBroker.getToolbox().render($container);
 
-                let $button = $container.find('[data-control="answer-masking"]');
+                        const $buttonBefore = $container.find('[data-control="answer-masking"]');
 
-                assert.equal($button.length, 1, 'The button has been inserted');
-                assert.equal($button.hasClass('disabled'), true, 'The button has been rendered disabled');
+                        assert.equal($buttonBefore.length, 1, 'The button has been inserted');
+                        assert.equal($buttonBefore.hasClass('disabled'), true, 'The button has been rendered disabled');
 
-                areaBroker.getToolbox().destroy();
+                        areaBroker.getToolbox().destroy();
 
-                $button = $container.find('[data-control="answer-masking"]');
+                        const $buttonAfter = $container.find('[data-control="answer-masking"]');
 
-                assert.equal($button.length, 0, 'The button has been removed');
-                ready();
+                        assert.equal($buttonAfter.length, 0, 'The button has been removed');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('enable/disable button', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(2);
+                assert.expect(2);
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                return plugin
+                    .init()
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
 
-                areaBroker.getToolbox().render($container);
+                        areaBroker.getToolbox().render($container);
 
-                return plugin.enable().then(() => {
-                    const $button = $container.find('[data-control="answer-masking"]');
+                        return plugin.enable();
+                    })
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
+                        const $button = $container.find('[data-control="answer-masking"]');
 
-                    assert.equal($button.hasClass('disabled'), false, 'The button has been enabled');
+                        assert.equal($button.hasClass('disabled'), false, 'The button has been enabled');
 
-                    return plugin.disable().then(() => {
+                        return plugin.disable();
+                    })
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
+                        const $button = $container.find('[data-control="answer-masking"]');
+
                         assert.equal($button.hasClass('disabled'), true, 'The button has been disabled');
-
-                        ready();
                     });
-                });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('show/hide button', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(3);
+                assert.expect(3);
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                return plugin
+                    .init()
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
 
-                areaBroker.getToolbox().render($container);
+                        areaBroker.getToolbox().render($container);
 
-                return plugin.hide().then(() => {
-                    const $button = $container.find('[data-control="answer-masking"]');
+                        return plugin.hide();
+                    })
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
+                        const $button = $container.find('[data-control="answer-masking"]');
 
-                    assert.ok(hider.isHidden($button), 'The button has been hidden');
+                        assert.ok(hider.isHidden($button), 'The button has been hidden');
 
-                    return plugin.show().then(() => {
+                        return plugin.show();
+                    })
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
+                        const $button = $container.find('[data-control="answer-masking"]');
+
                         assert.ok(!hider.isHidden($button), 'The button is visible');
 
-                        return plugin.hide().then(() => {
-                            assert.ok(hider.isHidden($button), 'The button has been hidden again');
+                        return plugin.hide();
+                    })
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
+                        const $button = $container.find('[data-control="answer-masking"]');
 
-                            ready();
-                        });
+                        assert.ok(hider.isHidden($button), 'The button has been hidden again');
                     });
-                });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: loaditem / unloaditem', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(3);
+                assert.expect(3);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                areaBroker.getContentArea().append(
+                    $('<div>', {
+                        class: 'qti-choiceInteraction'
+                    })
+                );
 
-        areaBroker.getContentArea().append(
-            $('<div>', {
-                class: 'qti-choiceInteraction'
-            })
-        );
+                return plugin
+                    .init()
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
+                        const $button = $container.find('[data-control="answer-masking"]');
 
-                const $button = $container.find('[data-control="answer-masking"]');
+                        runner.trigger('loaditem');
 
-                runner.trigger('loaditem');
+                        assert.ok(!hider.isHidden($button), 'The button is visible');
 
-                assert.ok(!hider.isHidden($button), 'The button is visible');
+                        runner.trigger('unloaditem');
 
-                runner.trigger('unloaditem');
+                        assert.ok(!hider.isHidden($button), 'The button is still visible');
 
-                assert.ok(!hider.isHidden($button), 'The button is still visible');
-
-                assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
-
-                ready();
+                        assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: renderitem', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(2);
+                assert.expect(2);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                areaBroker.getContentArea().append(
+                    $('<div>', {
+                        class: 'qti-choiceInteraction'
+                    })
+                );
 
-        areaBroker.getContentArea().append(
-            $('<div>', {
-                class: 'qti-choiceInteraction'
-            })
-        );
+                return plugin
+                    .init()
+                    .then(() => {
+                        const $container = areaBroker.getToolboxArea();
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
+                        runner.trigger('renderitem');
 
-                runner.trigger('renderitem');
+                        const $button = $container.find('[data-control="answer-masking"]');
 
-                const $button = $container.find('[data-control="answer-masking"]');
+                        assert.ok(!hider.isHidden($button), 'The button is visible');
 
-                assert.ok(!hider.isHidden($button), 'The button is visible');
-
-                assert.equal($button.hasClass('disabled'), false, 'The button is not disabled');
-
-                ready();
+                        assert.equal($button.hasClass('disabled'), false, 'The button is not disabled');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     /**
@@ -317,7 +358,7 @@ define([
 
     QUnit.test('Toggle on keyboard shortcut', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName, {}, {
+        getTestRunner({
             options : {
                 allowShortcuts: true,
                 shortcuts: {
@@ -326,128 +367,147 @@ define([
                     }
                 }
             }
-        });
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
-        const $contentContainer = areaBroker.getContentArea();
-        let toggleCounter = 0;
-        let $button;
+        })
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const $contentContainer = areaBroker.getContentArea();
 
-        assert.expect(5);
+                assert.expect(5);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                areaBroker.getContentArea().append(
+                    $('<div>', {
+                        class: 'qti-choiceInteraction'
+                    })
+                );
 
-        areaBroker.getContentArea().append(
-            $('<div>', {
-                class: 'qti-choiceInteraction'
-            })
-        );
+                return plugin
+                    .init()
+                    .then(() => new Promise(resolve => {
+                        const $toolboxContainer = areaBroker.getToolboxArea();
 
-        runner.after('tool-answer-masking-toggle', () => {
-            toggleCounter++;
+                        areaBroker.getToolbox().render($toolboxContainer);
+                        const $button = areaBroker.getToolboxArea().find('[data-control="answer-masking"]');
 
-            if (toggleCounter === 1) {
-                assert.ok(true, 'first keypressed has triggered the correct event');
-                assert.equal($button.hasClass('active'), true, 'button is turned on');
+                        runner.trigger('renderitem');
 
-                $(document).simulate('keydown', {
-                    charCode: 0,
-                    keyCode: 67,
-                    which: 67,
-                    code: 'KeyC',
-                    key: 'c',
-                    ctrlKey: false,
-                    shiftKey: false,
-                    altKey: false,
-                    metaKey: false
-                });
-            } else if (toggleCounter === 2) {
-                assert.ok(true, 'second keypressed has triggered the correct event');
-                assert.equal($button.hasClass('active'), false, 'button is turned off again');
-                ready();
-            }
-        });
+                        assert.equal($button.hasClass('active'), false, 'button is turned off');
 
-        plugin
-            .init()
-            .then(() => {
-                const $toolboxContainer = areaBroker.getToolboxArea();
+                        runner.after('tool-answer-masking-toggle.test', () => {
+                            runner.off('.test');
 
-                areaBroker.getToolbox().render($toolboxContainer);
-                $button = areaBroker.getToolboxArea().find('[data-control="answer-masking"]');
+                            assert.ok(true, 'first keypressed has triggered the correct event');
+                            assert.equal($button.hasClass('active'), true, 'button is turned on');
 
-                runner.trigger('renderitem');
+                            resolve();
+                        });
 
-                assert.equal($button.hasClass('active'), false, 'button is turned off');
+                        $contentContainer.simulate('keydown', {
+                            charCode: 0,
+                            keyCode: 67,
+                            which: 67,
+                            code: 'KeyC',
+                            key: 'c',
+                            ctrlKey: false,
+                            shiftKey: false,
+                            altKey: false,
+                            metaKey: false
+                        });
+                    }))
+                    .then(() => new Promise(resolve => {
+                        const $button = areaBroker.getToolboxArea().find('[data-control="answer-masking"]');
 
-                $contentContainer.simulate('keydown', {
-                    charCode: 0,
-                    keyCode: 67,
-                    which: 67,
-                    code: 'KeyC',
-                    key: 'c',
-                    ctrlKey: false,
-                    shiftKey: false,
-                    altKey: false,
-                    metaKey: false
-                });
+                        runner.after('tool-answer-masking-toggle.test', () => {
+                            runner.off('.test');
+
+
+                            assert.ok(true, 'second keypressed has triggered the correct event');
+                            assert.equal($button.hasClass('active'), false, 'button is turned off again');
+                            resolve();
+                        });
+
+                        $(document).simulate('keydown', {
+                            charCode: 0,
+                            keyCode: 67,
+                            which: 67,
+                            code: 'KeyC',
+                            key: 'c',
+                            ctrlKey: false,
+                            shiftKey: false,
+                            altKey: false,
+                            metaKey: false
+                        });
+                    }));
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('Toggle on click', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
-        const toggleCounter = 0;
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(5);
+                assert.expect(5);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                areaBroker.getContentArea().append(
+                    $('<div>', {
+                        class: 'qti-choiceInteraction'
+                    })
+                );
 
-        areaBroker.getContentArea().append(
-            $('<div>', {
-                class: 'qti-choiceInteraction'
-            })
-        );
+                return plugin
+                    .init()
+                    .then(() => new Promise(resolve => {
+                        const $toolboxContainer = areaBroker.getToolboxArea();
 
-        runner.after('tool-answer-masking-toggle', () => {
-            toggleCounter++;
+                        areaBroker.getToolbox().render($toolboxContainer);
+                        const $button = areaBroker.getToolboxArea().find('[data-control="answer-masking"]');
 
-            if (toggleCounter === 1) {
-                assert.ok(true, 'first click has triggered the correct event');
-                assert.equal($button.hasClass('active'), true, 'button is turned on');
-                $button.click();
-            } else if (toggleCounter === 2) {
-                assert.ok(true, 'second click has triggered the correct event');
-                assert.equal($button.hasClass('active'), false, 'button is turned off again');
-                ready();
-            }
-        });
+                        runner.trigger('renderitem');
 
-        plugin
-            .init()
-            .then(() => {
-                const $toolboxContainer = areaBroker.getToolboxArea();
+                        assert.equal($button.hasClass('active'), false, 'button is turned off');
 
-                areaBroker.getToolbox().render($toolboxContainer);
-                const $button = areaBroker.getToolboxArea().find('[data-control="answer-masking"]');
+                        runner.after('tool-answer-masking-toggle.test', () => {
+                            runner.off('.test');
 
-                runner.trigger('renderitem');
+                            assert.ok(true, 'first click has triggered the correct event');
+                            assert.equal($button.hasClass('active'), true, 'button is turned on');
 
-                assert.equal($button.hasClass('active'), false, 'button is turned off');
 
-                $button.click();
+                            resolve();
+                        });
+
+                        $button.click();
+                    }))
+                    .then(() => new Promise(resolve => {
+                        const $button = areaBroker.getToolboxArea().find('[data-control="answer-masking"]');
+
+                        runner.after('tool-answer-masking-toggle.test', () => {
+                            runner.off('.test');
+
+                            assert.ok(true, 'second click has triggered the correct event');
+                            assert.equal($button.hasClass('active'), false, 'button is turned off again');
+
+                            resolve();
+                        });
+
+                        $button.click();
+                    }));
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 });

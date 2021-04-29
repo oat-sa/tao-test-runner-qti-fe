@@ -26,7 +26,7 @@ define([
     'taoQtiTest/runner/helpers/currentItem',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/tools/highlighter/plugin'
-], function($, _, hider, runnerFactory, itemHelper, providerMock, pluginFactory) {
+], function ($, _, hider, runnerFactory, itemHelper, providerMock, pluginFactory) {
     'use strict';
 
     const providerName = 'mock';
@@ -46,15 +46,15 @@ define([
     }
 
     const sampleTestContext = {
-        itemIdentifier : 'item-1'
+        itemIdentifier: 'item-1'
     };
     const sampleTestMap = {
         parts: {
-            p1 : {
-                sections : {
-                    s1 : {
-                        items : {
-                            'item-1' : {
+            p1: {
+                sections: {
+                    s1: {
+                        items: {
+                            'item-1': {
                                 categories: ['x-tao-option-highlighter']
                             }
                         }
@@ -62,7 +62,7 @@ define([
                 }
             }
         },
-        jumps : [{
+        jumps: [{
             identifier: 'item-1',
             section: 's1',
             part: 'p1',

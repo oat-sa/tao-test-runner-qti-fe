@@ -25,22 +25,22 @@ define([
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/tools/lineReader/plugin',
     'lib/simulator/jquery.simulate'
-], function(_, hider, runnerFactory, providerMock, pluginFactory) {
+], function (_, hider, runnerFactory, providerMock, pluginFactory) {
     'use strict';
 
     const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
     const sampleTestContext = {
-        itemIdentifier : 'item-1'
+        itemIdentifier: 'item-1'
     };
     const sampleTestMap = {
         parts: {
-            p1 : {
-                sections : {
-                    s1 : {
-                        items : {
-                            'item-1' : {
+            p1: {
+                sections: {
+                    s1: {
+                        items: {
+                            'item-1': {
                                 categories: ['x-tao-option-lineReader']
                             }
                         }
@@ -48,13 +48,25 @@ define([
                 }
             }
         },
-        jumps : [{
+        jumps: [{
             identifier: 'item-1',
             section: 's1',
             part: 'p1',
             position: 0
         }]
     };
+
+    /**
+     * Gets a configured instance of the Test Runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        return Promise.resolve(runner);
+    }
 
     /**
      * The following tests applies to all plugins
@@ -101,20 +113,23 @@ define([
 
     QUnit.test('pluginFactory.init', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        plugin
-            .init()
-            .then(() => {
-                assert.equal(plugin.getState('init'), true, 'The plugin is initialised');
-
-                ready();
+                return plugin
+                    .init()
+                    .then(() => {
+                        assert.equal(plugin.getState('init'), true, 'The plugin is initialised');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `The init failed: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     /**
@@ -124,175 +139,194 @@ define([
 
     QUnit.test('render/destroy button', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const $container = areaBroker.getToolboxArea();
 
-        assert.expect(4);
+                assert.expect(4);
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
+                        const $buttonBefore = $container.find('[data-control="line-reader"]');
 
-                const $buttonBefore = $container.find('[data-control="line-reader"]');
+                        assert.equal($buttonBefore.length, 1, 'The trigger button has been inserted');
+                        assert.equal($buttonBefore.hasClass('disabled'), true, 'The trigger button has been rendered disabled');
+                        assert.equal($buttonBefore.hasClass('disabled'), true, 'The remove button has been rendered disabled');
 
-                assert.equal($buttonBefore.length, 1, 'The trigger button has been inserted');
-                assert.equal($buttonBefore.hasClass('disabled'), true, 'The trigger button has been rendered disabled');
-                assert.equal($buttonBefore.hasClass('disabled'), true, 'The remove button has been rendered disabled');
+                        areaBroker.getToolbox().destroy();
 
-                areaBroker.getToolbox().destroy();
+                        const $buttonAfter = $container.find('[data-control="line-reader"]');
 
-                const $buttonAfter = $container.find('[data-control="line-reader"]');
-
-                assert.equal($buttonAfter.length, 0, 'The trigger button has been removed');
-                ready();
+                        assert.equal($buttonAfter.length, 0, 'The trigger button has been removed');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('enable/disable button', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const $container = areaBroker.getToolboxArea();
 
-        assert.expect(2);
+                assert.expect(2);
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
+                        return plugin.enable();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="line-reader"]');
 
-                return plugin.enable().then(() => {
-                    const $button = $container.find('[data-control="line-reader"]');
+                        assert.equal($button.hasClass('disabled'), false, 'The trigger button has been enabled');
 
-                    assert.equal($button.hasClass('disabled'), false, 'The trigger button has been enabled');
+                        return plugin.disable();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="line-reader"]');
 
-                    return plugin.disable().then(() => {
                         assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
-
-                        ready();
                     });
-                });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('show/hide button', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const $container = areaBroker.getToolboxArea();
 
-        assert.expect(3);
+                assert.expect(3);
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
+                        return plugin.hide();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="line-reader"]');
 
-                return plugin.hide().then(() => {
-                    const $button = $container.find('[data-control="line-reader"]');
+                        assert.ok(hider.isHidden($button), 'The trigger button has been hidden');
 
-                    assert.ok(hider.isHidden($button), 'The trigger button has been hidden');
+                        return plugin.show();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="line-reader"]');
 
-                    return plugin.show().then(() => {
                         assert.ok(!hider.isHidden($button), 'The trigger button is visible');
 
-                        return plugin.hide().then(() => {
-                            assert.ok(hider.isHidden($button), 'The trigger button has been hidden again');
+                        return plugin.hide();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="line-reader"]');
 
-                            ready();
-                        });
+                        assert.ok(hider.isHidden($button), 'The trigger button has been hidden again');
                     });
-                });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: loaditem / unloaditem', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const $container = areaBroker.getToolboxArea();
 
-        assert.expect(3);
+                assert.expect(3);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                        const $button = $container.find('[data-control="line-reader"]');
 
-                areaBroker.getToolbox().render($container);
+                        runner.trigger('loaditem');
 
-                const $button = $container.find('[data-control="line-reader"]');
+                        assert.ok(!hider.isHidden($button), 'The trigger button is visible');
 
-                runner.trigger('loaditem');
+                        runner.trigger('unloaditem');
 
-                assert.ok(!hider.isHidden($button), 'The trigger button is visible');
+                        assert.ok(!hider.isHidden($button), 'The trigger button is still visible');
 
-                runner.trigger('unloaditem');
-
-                assert.ok(!hider.isHidden($button), 'The trigger button is still visible');
-
-                assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
-
-                ready();
+                        assert.equal($button.hasClass('disabled'), true, 'The trigger button has been disabled');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('runner events: renderitem', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
+                const $container = areaBroker.getToolboxArea();
 
-        assert.expect(2);
+                assert.expect(2);
 
-        plugin
-            .init()
-            .then(() => {
-                const $container = runner.getAreaBroker().getToolboxArea();
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
+                        const $button = $container.find('[data-control="line-reader"]');
 
-                const $button = $container.find('[data-control="line-reader"]');
+                        runner.trigger('renderitem');
 
-                runner.trigger('renderitem');
+                        assert.ok(!hider.isHidden($button), 'The trigger button is visible');
 
-                assert.ok(!hider.isHidden($button), 'The trigger button is visible');
-
-                assert.equal($button.hasClass('disabled'), false, 'The trigger button is not disabled');
-
-                ready();
+                        assert.equal($button.hasClass('disabled'), false, 'The trigger button is not disabled');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     /**
@@ -302,89 +336,89 @@ define([
 
     QUnit.test('Render compound mask', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(4);
+                assert.expect(4);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                return plugin
+                    .init()
+                    .then(() => {
+                        const $contentContainer = areaBroker.getContentArea().parent(),
+                            $masks = $contentContainer.find('.line-reader-mask'),
+                            $overlays = $contentContainer.find('.line-reader-overlay');
 
-        plugin
-            .init()
-            .then(() => {
-                const $contentContainer = areaBroker.getContentArea().parent(),
-                    $masks = $contentContainer.find('.line-reader-mask'),
-                    $overlays = $contentContainer.find('.line-reader-overlay');
+                        runner.trigger('renderitem');
 
-                runner.trigger('renderitem');
+                        assert.equal($masks.length, 8, '8 masks have been rendered');
+                        assert.equal($overlays.length, 1, '1 overlay has been rendered');
 
-                assert.equal($masks.length, 8, '8 masks have been rendered');
-                assert.equal($overlays.length, 1, '1 overlay has been rendered');
-
-                assert.ok($masks.hasClass('hidden'), 'masks are hidden by default');
-                assert.ok($overlays.hasClass('hidden'), 'overlays are hidden by default');
-
-                ready();
+                        assert.ok($masks.hasClass('hidden'), 'masks are hidden by default');
+                        assert.ok($overlays.hasClass('hidden'), 'overlays are hidden by default');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('Toggle on click', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(8);
+                assert.expect(8);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                return plugin
+                    .init()
+                    .then(() => {
+                        const $contentContainer = areaBroker.getContentArea().parent();
+                        const $toolboxContainer = areaBroker.getToolboxArea();
+                        const $masks = $contentContainer.find('.line-reader-mask');
+                        const $overlays = $contentContainer.find('.line-reader-overlay');
 
-        plugin
-            .init()
-            .then(() => {
-                const $contentContainer = areaBroker.getContentArea().parent(),
-                    $toolboxContainer = areaBroker.getToolboxArea(),
-                    $masks = $contentContainer.find('.line-reader-mask'),
-                    $overlays = $contentContainer.find('.line-reader-overlay');
+                        runner.trigger('renderitem');
 
-                runner.trigger('renderitem');
+                        areaBroker.getToolbox().render($toolboxContainer);
+                        const $button = areaBroker.getToolboxArea().find('[data-control="line-reader"]');
 
-                areaBroker.getToolbox().render($toolboxContainer);
-                const $button = areaBroker.getToolboxArea().find('[data-control="line-reader"]');
+                        assert.equal($masks.length, 8, '8 masks have been rendered');
+                        assert.equal($overlays.length, 1, '1 overlay has been rendered');
 
-                assert.equal($masks.length, 8, '8 masks have been rendered');
-                assert.equal($overlays.length, 1, '1 overlay has been rendered');
+                        assert.ok($masks.hasClass('hidden'), 'masks are hidden by default');
+                        assert.ok($overlays.hasClass('hidden'), 'overlays are hidden by default');
 
-                assert.ok($masks.hasClass('hidden'), 'masks are hidden by default');
-                assert.ok($overlays.hasClass('hidden'), 'overlays are hidden by default');
+                        $button.click();
 
-                $button.click();
+                        assert.ok(!$masks.hasClass('hidden'), 'masks are now visible on a button mouse click');
+                        assert.ok(!$overlays.hasClass('hidden'), 'overlays are now visible on a button mouse click');
 
-                assert.ok(!$masks.hasClass('hidden'), 'masks are now visible on a button mouse click');
-                assert.ok(!$overlays.hasClass('hidden'), 'overlays are now visible on a button mouse click');
+                        $button.click();
 
-                $button.click();
-
-                assert.ok($masks.hasClass('hidden'), 'masks are hidden again on a button mouse click');
-                assert.ok($overlays.hasClass('hidden'), 'overlays are hidden again on a button mouse click');
-
-                ready();
+                        assert.ok($masks.hasClass('hidden'), 'masks are hidden again on a button mouse click');
+                        assert.ok($overlays.hasClass('hidden'), 'overlays are hidden again on a button mouse click');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('Toggle on keyboard shortcut', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName, {}, {
+        getTestRunner({
             options: {
                 allowShortcuts: true,
                 shortcuts: {
@@ -393,62 +427,62 @@ define([
                     }
                 }
             }
-        });
-        const areaBroker = runner.getAreaBroker();
-        const plugin = pluginFactory(runner, runner.getAreaBroker());
+        })
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(6);
+                assert.expect(6);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                return plugin
+                    .init()
+                    .then(() => {
+                        const $contentContainer = areaBroker.getContentArea().parent();
+                        const $masks = $contentContainer.find('.line-reader-mask');
+                        const $overlays = $contentContainer.find('.line-reader-overlay');
 
-        plugin
-            .init()
-            .then(() => {
-                const $contentContainer = areaBroker.getContentArea().parent(),
-                    $masks = $contentContainer.find('.line-reader-mask'),
-                    $overlays = $contentContainer.find('.line-reader-overlay');
+                        runner.trigger('renderitem');
 
-                runner.trigger('renderitem');
+                        assert.ok($masks.hasClass('hidden'), 'masks are hidden by default');
+                        assert.ok($overlays.hasClass('hidden'), 'overlays are hidden by default');
 
-                assert.ok($masks.hasClass('hidden'), 'masks are hidden by default');
-                assert.ok($overlays.hasClass('hidden'), 'overlays are hidden by default');
+                        $contentContainer.simulate('keydown', {
+                            charCode: 0,
+                            keyCode: 67,
+                            which: 67,
+                            code: 'KeyC',
+                            key: 'c',
+                            ctrlKey: false,
+                            shiftKey: false,
+                            altKey: false,
+                            metaKey: false
+                        });
 
-                $contentContainer.simulate('keydown', {
-                    charCode: 0,
-                    keyCode: 67,
-                    which: 67,
-                    code: 'KeyC',
-                    key: 'c',
-                    ctrlKey: false,
-                    shiftKey: false,
-                    altKey: false,
-                    metaKey: false
-                });
+                        assert.ok(!$masks.hasClass('hidden'), 'masks are now visible on keyboard shortcut');
+                        assert.ok(!$overlays.hasClass('hidden'), 'overlays are now visible on keyboard shortcut');
 
-                assert.ok(!$masks.hasClass('hidden'), 'masks are now visible on keyboard shortcut');
-                assert.ok(!$overlays.hasClass('hidden'), 'overlays are now visible on keyboard shortcut');
+                        $contentContainer.simulate('keydown', {
+                            charCode: 0,
+                            keyCode: 67,
+                            which: 67,
+                            code: 'KeyC',
+                            key: 'c',
+                            ctrlKey: false,
+                            shiftKey: false,
+                            altKey: false,
+                            metaKey: false
+                        });
 
-                $contentContainer.simulate('keydown', {
-                    charCode: 0,
-                    keyCode: 67,
-                    which: 67,
-                    code: 'KeyC',
-                    key: 'c',
-                    ctrlKey: false,
-                    shiftKey: false,
-                    altKey: false,
-                    metaKey: false
-                });
-
-                assert.ok($masks.hasClass('hidden'), 'masks are hidden again on keyboard shortcut');
-                assert.ok($overlays.hasClass('hidden'), 'overlays are hidden again on keyboard shortcut');
-
-                ready();
+                        assert.ok($masks.hasClass('hidden'), 'masks are hidden again on keyboard shortcut');
+                        assert.ok($overlays.hasClass('hidden'), 'overlays are hidden again on keyboard shortcut');
+                    });
             })
             .catch(err => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 });

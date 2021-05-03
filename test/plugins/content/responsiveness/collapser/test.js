@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017-2021 (original work) Open Assessment Technologies SA;
  */
 /**
  * @author Christophe Noël <christophe@taotesting.com>
@@ -484,114 +484,120 @@ define([
 
     //******************   Do not collapse in order   ******************//
 
-    QUnit
-        .cases.init([
-        { title: 'Tools and Nav', collapseTools: true, collapseNavigation: true },
-        { title: 'Tools', collapseTools: true, collapseNavigation: false },
-        { title: 'Nav', collapseTools: false, collapseNavigation: true }
-    ])
-        .test('collapse/expand all at once', (data, assert) => {
-            const ready = assert.async();
-            const $container = $(fixtureId);
+    QUnit.cases.init([{
+        title: 'Tools and Nav',
+        collapseTools: true,
+        collapseNavigation: true
+    }, {
+        title: 'Tools',
+        collapseTools: true,
+        collapseNavigation: false
+    }, {
+        title: 'Nav',
+        collapseTools: false,
+        collapseNavigation: true
+    }]).test('collapse/expand all at once', (data, assert) => {
+        const ready = assert.async();
+        const $container = $(fixtureId);
 
-            let $actionsBar;
-            let $nav;
-            let $toolbox;
-            let resizeCount = 0;
+        let $actionsBar;
+        let $nav;
+        let $toolbox;
+        let resizeCount = 0;
 
-            assert.expect(16);
+        assert.expect(16);
 
-            const areaBroker = areaBrokerMock({
-                $brokerContainer: $container,
-                mapping: {
-                    actionsBar: $container.find('.bottom-action-bar .control-box'),
-                    toolbox: $container.find('.tools-box'),
-                    navigation: $container.find('.navi-box')
-                }
-            });
-
-            runnerFactory.registerProvider(providerName, providerMock({ areaBroker: areaBroker }));
-            const runner = runnerFactory(providerName);
-            const plugin = pluginFactory(runner, areaBroker, {
-                collapseTools: data.collapseTools,
-                collapseNavigation: data.collapseNavigation
-            });
-
-            runner.after('collapseTools', () => {
-                resizeCount++;
-
-                switch (resizeCount) {
-
-                    // Original state
-                    case 1: {
-                        assert.ok(!$nav.hasClass(noLabelCls), 'nav is expanded');
-                        assert.ok(!$toolbox.hasClass(noLabelCls), 'toolbox is expanded');
-
-                        $actionsBar.width(ALL_EXPANDED - 1);
-                        runner.trigger('collapseTools');
-                        break;
-                    }
-                    case 2: {
-
-                        // Collapse all in the applicable containers (tools|navi)
-
-                        if (data.collapseNavigation) {
-                            assert.ok($container.find('[data-control="navi-prev"]').hasClass(noLabelCls), 'navi-prev button has been collapsed');
-                            assert.ok($container.find('[data-control="navi-next"]').hasClass(noLabelCls), 'navi-next button has been collapsed');
-                        } else {
-                            assert.ok(!$container.find('[data-control="navi-prev"]').hasClass(noLabelCls), 'navi-prev button remains expanded');
-                            assert.ok(!$container.find('[data-control="navi-next"]').hasClass(noLabelCls), 'navi-next button remains expanded');
-                        }
-
-                        if (data.collapseTools) {
-                            assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been collapsed');
-                            assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
-                            assert.ok(!$container.find('[data-control="three"]').hasClass(noLabelCls), 'button3 has NOT been collapsed (always collapsed, see markup in test.html)');
-                            assert.ok($container.find('[data-control="four"]').hasClass(noLabelCls), 'button4 has been collapsed');
-                            assert.ok($container.find('[data-control="five"]').hasClass(noLabelCls), 'button5 has been collapsed');
-                        } else {
-                            assert.ok(!$container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 remains expanded');
-                            assert.ok(!$container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 remains expanded');
-                            assert.ok(!$container.find('[data-control="three"]').hasClass(noLabelCls), 'button3 has NOT been collapsed (always collapsed, see markup in test.html)');
-                            assert.ok(!$container.find('[data-control="four"]').hasClass(noLabelCls), 'button4 remains expanded');
-                            assert.ok(!$container.find('[data-control="five"]').hasClass(noLabelCls), 'button5 remains expanded');
-                        }
-
-                        $actionsBar.width(ALL_EXPANDED + 1);
-                        runner.trigger('collapseTools');
-                        break;
-                    }
-                    case 3: {
-
-                        // Expand all
-                        assert.ok(!$container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been expanded');
-                        assert.ok(!$container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been expanded');
-                        assert.ok(!$container.find('[data-control="three"]').hasClass(noLabelCls), 'button3 has NOT been collapsed (always collapsed, see markup in test.html)');
-                        assert.ok(!$container.find('[data-control="four"]').hasClass(noLabelCls), 'button4 has been expanded');
-                        assert.ok(!$container.find('[data-control="five"]').hasClass(noLabelCls), 'button5 has been expanded');
-
-                        assert.ok(!$container.find('[data-control="navi-prev"]').hasClass(noLabelCls), 'navi-prev button has been expanded');
-                        assert.ok(!$container.find('[data-control="navi-next"]').hasClass(noLabelCls), 'navi-next button has been expanded');
-
-                        ready();
-                        break;
-                    }
-                }
-            });
-
-            plugin.init()
-                .then(() => {
-                    $actionsBar = areaBroker.getArea('actionsBar');
-                    $nav = areaBroker.getArea('navigation');
-                    $toolbox = areaBroker.getArea('toolbox');
-
-                    $actionsBar.width(ALL_EXPANDED);
-                    runner.trigger('loaditem');
-                })
-                .catch(err => {
-                    assert.ok(false, `Error in init method: ${err}`);
-                    ready();
-                });
+        const areaBroker = areaBrokerMock({
+            $brokerContainer: $container,
+            mapping: {
+                actionsBar: $container.find('.bottom-action-bar .control-box'),
+                toolbox: $container.find('.tools-box'),
+                navigation: $container.find('.navi-box')
+            }
         });
+
+        runnerFactory.registerProvider(providerName, providerMock({ areaBroker: areaBroker }));
+        const runner = runnerFactory(providerName);
+        const plugin = pluginFactory(runner, areaBroker, {
+            collapseTools: data.collapseTools,
+            collapseNavigation: data.collapseNavigation
+        });
+
+        runner.after('collapseTools', () => {
+            resizeCount++;
+
+            switch (resizeCount) {
+
+                // Original state
+                case 1: {
+                    assert.ok(!$nav.hasClass(noLabelCls), 'nav is expanded');
+                    assert.ok(!$toolbox.hasClass(noLabelCls), 'toolbox is expanded');
+
+                    $actionsBar.width(ALL_EXPANDED - 1);
+                    runner.trigger('collapseTools');
+                    break;
+                }
+                case 2: {
+
+                    // Collapse all in the applicable containers (tools|navi)
+
+                    if (data.collapseNavigation) {
+                        assert.ok($container.find('[data-control="navi-prev"]').hasClass(noLabelCls), 'navi-prev button has been collapsed');
+                        assert.ok($container.find('[data-control="navi-next"]').hasClass(noLabelCls), 'navi-next button has been collapsed');
+                    } else {
+                        assert.ok(!$container.find('[data-control="navi-prev"]').hasClass(noLabelCls), 'navi-prev button remains expanded');
+                        assert.ok(!$container.find('[data-control="navi-next"]').hasClass(noLabelCls), 'navi-next button remains expanded');
+                    }
+
+                    if (data.collapseTools) {
+                        assert.ok($container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been collapsed');
+                        assert.ok($container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been collapsed');
+                        assert.ok(!$container.find('[data-control="three"]').hasClass(noLabelCls), 'button3 has NOT been collapsed (always collapsed, see markup in test.html)');
+                        assert.ok($container.find('[data-control="four"]').hasClass(noLabelCls), 'button4 has been collapsed');
+                        assert.ok($container.find('[data-control="five"]').hasClass(noLabelCls), 'button5 has been collapsed');
+                    } else {
+                        assert.ok(!$container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 remains expanded');
+                        assert.ok(!$container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 remains expanded');
+                        assert.ok(!$container.find('[data-control="three"]').hasClass(noLabelCls), 'button3 has NOT been collapsed (always collapsed, see markup in test.html)');
+                        assert.ok(!$container.find('[data-control="four"]').hasClass(noLabelCls), 'button4 remains expanded');
+                        assert.ok(!$container.find('[data-control="five"]').hasClass(noLabelCls), 'button5 remains expanded');
+                    }
+
+                    $actionsBar.width(ALL_EXPANDED + 1);
+                    runner.trigger('collapseTools');
+                    break;
+                }
+                case 3: {
+
+                    // Expand all
+                    assert.ok(!$container.find('[data-control="prefixed-one"]').hasClass(noLabelCls), 'button1 has been expanded');
+                    assert.ok(!$container.find('[data-control="prefixed-two"]').hasClass(noLabelCls), 'button2 has been expanded');
+                    assert.ok(!$container.find('[data-control="three"]').hasClass(noLabelCls), 'button3 has NOT been collapsed (always collapsed, see markup in test.html)');
+                    assert.ok(!$container.find('[data-control="four"]').hasClass(noLabelCls), 'button4 has been expanded');
+                    assert.ok(!$container.find('[data-control="five"]').hasClass(noLabelCls), 'button5 has been expanded');
+
+                    assert.ok(!$container.find('[data-control="navi-prev"]').hasClass(noLabelCls), 'navi-prev button has been expanded');
+                    assert.ok(!$container.find('[data-control="navi-next"]').hasClass(noLabelCls), 'navi-next button has been expanded');
+
+                    ready();
+                    break;
+                }
+            }
+        });
+
+        plugin.init()
+            .then(() => {
+                $actionsBar = areaBroker.getArea('actionsBar');
+                $nav = areaBroker.getArea('navigation');
+                $toolbox = areaBroker.getArea('toolbox');
+
+                $actionsBar.width(ALL_EXPANDED);
+                runner.trigger('loaditem');
+            })
+            .catch(err => {
+                assert.ok(false, `Error in init method: ${err}`);
+                ready();
+            });
+    });
 
 });

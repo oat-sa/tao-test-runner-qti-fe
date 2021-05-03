@@ -94,6 +94,7 @@ define([
 
     /**
      * Gets a configured instance of the Test Runner
+     * @param {Object} [config] - Optional config to setup the test runner
      * @returns {Promise<runner>}
      */
     function getTestRunner(config) {

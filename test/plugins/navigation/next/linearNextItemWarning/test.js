@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
  */
 
 define([
@@ -28,6 +28,7 @@ define([
 
     /**
      * Gets a configured instance of the Test Runner
+     * @param {Object} [config] - Optional config to setup the test runner
      * @returns {Promise<runner>}
      */
     function getTestRunner(config) {
@@ -68,7 +69,8 @@ define([
         { title: 'show' },
         { title: 'hide' },
         { title: 'enable' },
-        { title: 'disable' }]).test('plugin API ', (data, assert) => {
+        { title: 'disable' }
+    ]).test('plugin API ', (data, assert) => {
         assert.expect(1);
         const runner = runnerFactory(providerName);
         const timer = pluginFactory(runner);
@@ -236,9 +238,9 @@ define([
                 const plugin = pluginFactory(runner, runner.getAreaBroker());
 
                 // mock test store init
-                runner.getTestStore = () => {
+                runner.getTestStore = function getTestStore() {
                     return {
-                        setVolatile: () => {
+                        setVolatile() {
                         }
                     };
                 };
@@ -324,12 +326,12 @@ define([
                 const plugin = pluginFactory(runner, runner.getAreaBroker());
 
                 // mock test store init
-                runner.getTestStore = () => {
+                runner.getTestStore = function getTestStore() {
                     return {
-                        getStore: () => {
+                        getStore() {
                             return Promise.reject();
                         },
-                        setVolatile: () => {
+                        setVolatile() {
                         }
                     };
                 };

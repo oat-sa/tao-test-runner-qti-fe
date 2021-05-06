@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA
+ * Copyright (c) 2020-2021 (original work) Open Assessment Technologies SA
  */
 
 define([
@@ -22,7 +22,7 @@ define([
     'taoQtiTest/runner/plugins/controls/duration/duration',
     'core/polling',
     'taoTests/runner/proxy',
-    'taoQtiTest/test/runner/mocks/proxyMock',
+    'taoQtiTest/test/runner/mocks/proxyMock'
 ], function (runnerFactory, providerMock, pluginFactory, pollingFactory, proxyFactory, providerProxyMock) {
     'use strict';
 
@@ -32,7 +32,7 @@ define([
 
     const sampleTestContext = {
         itemIdentifier: 'item-1',
-        attempt: 1,
+        attempt: 1
     };
 
     const sampleTestMap = {
@@ -56,6 +56,19 @@ define([
             position: 0
         }]
     };
+
+    /**
+     * Gets a configured instance of the Test Runner
+     * @param {Object} [config] - Optional config to setup the test runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        return Promise.resolve(runner);
+    }
 
     /**
      * Generic tests
@@ -111,84 +124,83 @@ define([
 
     QUnit.module('Plugin init');
 
-    QUnit.test('tick', function (assert) {
+    QUnit.test('tick', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner);
-        const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
+        getTestRunner()
+            .then(runner => {
+                const plugin = pluginFactory(runner);
+                const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
 
-        assert.expect(1);
+                assert.expect(1);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                return plugin
+                    .init()
+                    .then(() => {
+                        runner.trigger('renderitem');
 
-        plugin
-            .init()
-            .then(() => {
-                runner.trigger('renderitem');
+                        return runner.getPluginStore('duration');
+                    })
+                    .then(durationStore => new Promise(resolve => {
+                        runner.trigger('tick', 10000);
 
-                runner.getPluginStore('duration').then((durationStore) => {
-                    runner.trigger('tick', 10000);
-
-                    // add timeout to make sure that store has been updated
-                    setTimeout(
-                        () => {
+                        // add timeout to make sure that store has been updated
+                        setTimeout(() => {
                             durationStore.getItem(itemAttemptId).then((duration) => {
                                 assert.equal(duration, 10, 'the plugin updates duration every tick');
 
-                                ready();
+                                resolve();
                             });
-                        },
-                        1000
-                    );
+                        }, 100);
+                    }));
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
             })
-            .catch((err) => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+            .then(ready);
     });
 
-    QUnit.test('plugin-get.duration', function (assert) {
+    QUnit.test('plugin-get.duration', assert => {
         const ready = assert.async();
-        const runner = runnerFactory(providerName);
-        const plugin = pluginFactory(runner);
-        const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
+        getTestRunner()
+            .then(runner => new Promise(resolve => {
+                const plugin = pluginFactory(runner);
+                const itemAttemptId = `${sampleTestContext.itemIdentifier}#${sampleTestContext.attempt}`;
 
-        assert.expect(1);
+                assert.expect(1);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                const getDuration = durationPromise => {
+                    durationPromise.then((duration) => {
+                        assert.equal(duration, 10, 'the plugin handles plugin-get.duration event');
 
-        const getDuration = (durationPromise) => {
-            durationPromise.then((duration) => {
-                assert.equal(duration, 10, 'the plugin handles plugin-get.duration event');
+                        resolve();
+                    });
+                };
 
-                ready();
-            });
-        };
+                plugin
+                    .init()
+                    .then(() => {
+                        runner.trigger('renderitem');
 
-        plugin
-            .init()
-            .then(() => {
-                runner.trigger('renderitem');
+                        // add timeout to make sure that store has been updated
 
-                // add timeout to make sure that store has been updated
+                        runner.getPluginStore('duration').then(() => {
+                            runner.trigger('tick', 10000);
+                            setTimeout(() => {
+                                runner.trigger('plugin-get.duration', itemAttemptId, getDuration);
+                            }, 100);
+                        });
 
-                runner.getPluginStore('duration').then(() => {
-                    runner.trigger('tick', 10000);
-                    setTimeout(
-                        () => {
-                            runner.trigger('plugin-get.duration', itemAttemptId, getDuration);
-                        },
-                        100
-                    );
+                    });
+            }))
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
-
             })
-            .catch((err) => {
-                assert.ok(false, `Unexpected error: ${err}`);
-                ready();
-            });
+            .then(ready);
     });
 });

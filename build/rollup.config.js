@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
  */
 
 import path from 'path';
@@ -79,10 +79,12 @@ export default inputs.map(input => {
         external: [
             ...localExternals,
             'handlebars',
+            'interact',
             'jquery',
             'lodash',
             'moment',
             'module',
+            'nouislider',
             'i18n',
             'ckeditor',
             'layout/loading-bar'

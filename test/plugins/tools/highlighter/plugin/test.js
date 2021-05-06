@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Christophe Noël <christophe@taotesting.com>
@@ -26,33 +26,33 @@ define([
     'taoQtiTest/runner/helpers/currentItem',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/tools/highlighter/plugin'
-], function($, _, hider, runnerFactory, itemHelper, providerMock, pluginFactory) {
+], function ($, _, hider, runnerFactory, itemHelper, providerMock, pluginFactory) {
     'use strict';
 
-    var pluginApi;
-    var providerName = 'mock';
+    const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
+    itemHelper.getStimuliHrefs = () => ['http://include1.xml', 'http://include2.xml'];
+
     function selectText(id) {
-        var sel, range;
-        var el = document.getElementById(id); //get element id
-        sel = window.getSelection();
-        range = document.createRange(); //range object
+        const el = document.getElementById(id); //get element id
+        const sel = window.getSelection();
+        const range = document.createRange(); //range object
         range.selectNodeContents(el); //sets Range
         sel.removeAllRanges(); //remove all ranges from selection
         sel.addRange(range); //add Range to a Selection.
     }
 
     const sampleTestContext = {
-        itemIdentifier : 'item-1'
+        itemIdentifier: 'item-1'
     };
     const sampleTestMap = {
         parts: {
-            p1 : {
-                sections : {
-                    s1 : {
-                        items : {
-                            'item-1' : {
+            p1: {
+                sections: {
+                    s1: {
+                        items: {
+                            'item-1': {
                                 categories: ['x-tao-option-highlighter']
                             }
                         }
@@ -60,7 +60,7 @@ define([
                 }
             }
         },
-        jumps : [{
+        jumps: [{
             identifier: 'item-1',
             section: 's1',
             part: 'p1',
@@ -69,12 +69,25 @@ define([
     };
 
     /**
+     * Gets a configured instance of the Test Runner
+     * @param {Object} [config] - Optional config to setup the test runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        return Promise.resolve(runner);
+    }
+
+    /**
      * The following tests applies to all plugins
      */
     QUnit.module('pluginFactory');
 
-    QUnit.test('module', function(assert) {
-        var runner = runnerFactory(providerName);
+    QUnit.test('module', assert => {
+        const runner = runnerFactory(providerName);
 
         assert.equal(typeof pluginFactory, 'function', 'The pluginFactory module exposes a function');
         assert.equal(typeof pluginFactory(runner), 'object', 'The plugin factory produces an instance');
@@ -85,50 +98,51 @@ define([
         );
     });
 
-    pluginApi = [
-        { name: 'init', title: 'init' },
-        { name: 'render', title: 'render' },
-        { name: 'finish', title: 'finish' },
-        { name: 'destroy', title: 'destroy' },
-        { name: 'trigger', title: 'trigger' },
-        { name: 'getTestRunner', title: 'getTestRunner' },
-        { name: 'getAreaBroker', title: 'getAreaBroker' },
-        { name: 'getConfig', title: 'getConfig' },
-        { name: 'setConfig', title: 'setConfig' },
-        { name: 'getState', title: 'getState' },
-        { name: 'setState', title: 'setState' },
-        { name: 'show', title: 'show' },
-        { name: 'hide', title: 'hide' },
-        { name: 'enable', title: 'enable' },
-        { name: 'disable', title: 'disable' }
-    ];
-
-    QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
-        var runner = runnerFactory(providerName);
-        var timer = pluginFactory(runner);
+    QUnit.cases.init([
+        { title: 'init' },
+        { title: 'render' },
+        { title: 'finish' },
+        { title: 'destroy' },
+        { title: 'trigger' },
+        { title: 'getTestRunner' },
+        { title: 'getAreaBroker' },
+        { title: 'getConfig' },
+        { title: 'setConfig' },
+        { title: 'getState' },
+        { title: 'setState' },
+        { title: 'show' },
+        { title: 'hide' },
+        { title: 'enable' },
+        { title: 'disable' }
+    ]).test('plugin API ', (data, assert) => {
+        const runner = runnerFactory(providerName);
+        const timer = pluginFactory(runner);
         assert.equal(
-            typeof timer[data.name],
+            typeof timer[data.title],
             'function',
-            `The pluginFactory instances expose a "${data.name}" function`
+            `The pluginFactory instances expose a "${data.title}" function`
         );
     });
 
-    QUnit.test('pluginFactory.init', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('pluginFactory.init', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const plugin = pluginFactory(runner, runner.getAreaBroker());
 
-        plugin
-            .init()
-            .then(function() {
-                assert.equal(plugin.getState('init'), true, 'The plugin is initialised');
-
-                ready();
+                return plugin
+                    .init()
+                    .then(() => {
+                        assert.equal(plugin.getState('init'), true, 'The plugin is initialised');
+                    });
             })
-            .catch(function(err) {
-                assert.ok(false, `The init failed: ${err}`);
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     /**
@@ -136,331 +150,303 @@ define([
      */
     QUnit.module('plugin button');
 
-    function getButtonContainer(runner) {
-        return runner.getAreaBroker().getToolboxArea();
-    }
+    QUnit.test('render/destroy button', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const $container = areaBroker.getToolboxArea();
+                const plugin = pluginFactory(runner, areaBroker);
 
-    QUnit.test('render/destroy button', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+                assert.expect(6);
 
-        assert.expect(6);
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-        plugin
-            .init()
-            .then(function() {
-                var $container = getButtonContainer(runner),
-                    $buttonMain,
-                    $buttonRemove;
+                        const $buttonMainBefore = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemoveBefore = $container.find('[data-control="highlight-clear"]');
 
-                areaBroker.getToolbox().render($container);
+                        assert.equal($buttonMainBefore.length, 1, 'The trigger button has been inserted');
+                        assert.equal($buttonMainBefore.hasClass('disabled'), true, 'The trigger button has been rendered disabled');
+                        assert.equal($buttonRemoveBefore.length, 1, 'The remove button has been inserted');
+                        assert.equal($buttonMainBefore.hasClass('disabled'), true, 'The remove button has been rendered disabled');
 
-                $buttonMain = $container.find('[data-control="highlight-trigger"]');
-                $buttonRemove = $container.find('[data-control="highlight-clear"]');
+                        areaBroker.getToolbox().destroy();
 
-                assert.equal($buttonMain.length, 1, 'The trigger button has been inserted');
-                assert.equal($buttonMain.hasClass('disabled'), true, 'The trigger button has been rendered disabled');
-                assert.equal($buttonRemove.length, 1, 'The remove button has been inserted');
-                assert.equal($buttonMain.hasClass('disabled'), true, 'The remove button has been rendered disabled');
+                        const $buttonMainAfter = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemoveAfter = $container.find('[data-control="highlight-clear"]');
 
-                areaBroker.getToolbox().destroy();
-
-                $buttonMain = $container.find('[data-control="highlight-trigger"]');
-                $buttonRemove = $container.find('[data-control="highlight-clear"]');
-
-                assert.equal($buttonMain.length, 0, 'The trigger button has been removed');
-                assert.equal($buttonRemove.length, 0, 'The remove button has been removed');
-                ready();
+                        assert.equal($buttonMainAfter.length, 0, 'The trigger button has been removed');
+                        assert.equal($buttonRemoveAfter.length, 0, 'The remove button has been removed');
+                    });
             })
-            .catch(function(err) {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
-    QUnit.test('enable/disable button', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('enable/disable button', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const $container = areaBroker.getToolboxArea();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(4);
+                assert.expect(4);
 
-        plugin
-            .init()
-            .then(function() {
-                var $container = getButtonContainer(runner),
-                    $buttonMain,
-                    $buttonRemove;
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
-
-                plugin
-                    .enable()
-                    .then(function() {
-                        $buttonMain = $container.find('[data-control="highlight-trigger"]');
-                        $buttonRemove = $container.find('[data-control="highlight-clear"]');
+                        return plugin.enable();
+                    })
+                    .then(() => {
+                        const $buttonMain = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemove = $container.find('[data-control="highlight-clear"]');
 
                         assert.equal($buttonMain.hasClass('disabled'), false, 'The trigger button has been enabled');
                         assert.equal($buttonRemove.hasClass('disabled'), false, 'The remove button has been enabled');
 
-                        plugin
-                            .disable()
-                            .then(function() {
-                                assert.equal(
-                                    $buttonMain.hasClass('disabled'),
-                                    true,
-                                    'The trigger button has been disabled'
-                                );
-                                assert.equal(
-                                    $buttonRemove.hasClass('disabled'),
-                                    true,
-                                    'The remove button has been disabled'
-                                );
-
-                                ready();
-                            })
-                            .catch(function(err) {
-                                assert.ok(false, `error in disable method: ${err}`);
-                                ready();
-                            });
+                        return plugin.disable();
                     })
-                    .catch(function(err) {
-                        assert.ok(false, `error in enable method: ${err}`);
-                        ready();
+                    .then(() => {
+                        const $buttonMain = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemove = $container.find('[data-control="highlight-clear"]');
+
+                        assert.equal(
+                            $buttonMain.hasClass('disabled'),
+                            true,
+                            'The trigger button has been disabled'
+                        );
+                        assert.equal(
+                            $buttonRemove.hasClass('disabled'),
+                            true,
+                            'The remove button has been disabled'
+                        );
                     });
             })
-            .catch(function(err) {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
-    QUnit.test('show/hide button', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('show/hide button', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const $container = areaBroker.getToolboxArea();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(4);
+                assert.expect(4);
 
-        plugin
-            .init()
-            .then(function() {
-                var $container = getButtonContainer(runner),
-                    $buttonMain,
-                    $buttonRemove;
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
-
-                plugin
-                    .hide()
-                    .then(function() {
-                        $buttonMain = $container.find('[data-control="highlight-trigger"]');
-                        $buttonRemove = $container.find('[data-control="highlight-clear"]');
+                        return plugin.hide();
+                    })
+                    .then(() => {
+                        const $buttonMain = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemove = $container.find('[data-control="highlight-clear"]');
 
                         assert.ok(hider.isHidden($buttonMain), 'The trigger button has been hidden');
                         assert.ok(hider.isHidden($buttonRemove), 'The remove button has been hidden');
 
-                        plugin
-                            .show()
-                            .then(function() {
-                                assert.ok(!hider.isHidden($buttonMain), 'The trigger button is visible');
-                                assert.ok(!hider.isHidden($buttonRemove), 'The remove button is visible');
-
-                                ready();
-                            })
-                            .catch(function(err) {
-                                assert.ok(false, `error in disable method: ${err}`);
-                                ready();
-                            });
+                        return plugin.show();
                     })
-                    .catch(function(err) {
-                        assert.ok(false, `error in enable method: ${err}`);
-                        ready();
+                    .then(() => {
+                        const $buttonMain = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemove = $container.find('[data-control="highlight-clear"]');
+
+                        assert.ok(!hider.isHidden($buttonMain), 'The trigger button is visible');
+                        assert.ok(!hider.isHidden($buttonRemove), 'The remove button is visible');
                     });
             })
-            .catch(function(err) {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     /**
      * The following tests applies to this plugin specfically
      */
-    QUnit.test('runner events: loaditem / unloaditem', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('runner events: loaditem / unloaditem', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const $container = areaBroker.getToolboxArea();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(6);
+                assert.expect(6);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-        plugin
-            .init()
-            .then(function() {
-                var $container = getButtonContainer(runner),
-                    $buttonMain,
-                    $buttonRemove;
+                        const $buttonMain = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemove = $container.find('[data-control="highlight-clear"]');
 
-                areaBroker.getToolbox().render($container);
+                        runner.trigger('loaditem');
 
-                $buttonMain = $container.find('[data-control="highlight-trigger"]');
-                $buttonRemove = $container.find('[data-control="highlight-clear"]');
+                        assert.ok(!hider.isHidden($buttonMain), 'The trigger button is visible');
+                        assert.ok(!hider.isHidden($buttonRemove), 'The remove button is visible');
 
-                runner.trigger('loaditem');
+                        runner.trigger('unloaditem');
 
-                assert.ok(!hider.isHidden($buttonMain), 'The trigger button is visible');
-                assert.ok(!hider.isHidden($buttonRemove), 'The remove button is visible');
+                        assert.ok(!hider.isHidden($buttonMain), 'The trigger button is still visible');
+                        assert.ok(!hider.isHidden($buttonRemove), 'The remove button is still visible');
 
-                runner.trigger('unloaditem');
-
-                assert.ok(!hider.isHidden($buttonMain), 'The trigger button is still visible');
-                assert.ok(!hider.isHidden($buttonRemove), 'The remove button is still visible');
-
-                assert.equal($buttonMain.hasClass('disabled'), true, 'The trigger button has been disabled');
-                assert.equal($buttonRemove.hasClass('disabled'), true, 'The remove button has been disabled');
-
-                ready();
+                        assert.equal($buttonMain.hasClass('disabled'), true, 'The trigger button has been disabled');
+                        assert.equal($buttonRemove.hasClass('disabled'), true, 'The remove button has been disabled');
+                    });
             })
-            .catch(function(err) {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
-    QUnit.test('runner events: renderitem', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
+    QUnit.test('runner events: renderitem', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const $container = areaBroker.getToolboxArea();
+                const plugin = pluginFactory(runner, areaBroker);
 
-        assert.expect(4);
+                assert.expect(4);
 
-        plugin
-            .init()
-            .then(function() {
-                var $container = getButtonContainer(runner),
-                    $buttonMain,
-                    $buttonRemove;
+                return plugin
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                areaBroker.getToolbox().render($container);
+                        const $buttonMain = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemove = $container.find('[data-control="highlight-clear"]');
 
-                $buttonMain = $container.find('[data-control="highlight-trigger"]');
-                $buttonRemove = $container.find('[data-control="highlight-clear"]');
+                        runner.trigger('loaditem');
+                        runner.trigger('renderitem');
 
-                runner.trigger('renderitem');
+                        assert.ok(!hider.isHidden($buttonMain), 'The trigger button is visible');
+                        assert.ok(!hider.isHidden($buttonRemove), 'The remove button is visible');
 
-                assert.ok(!hider.isHidden($buttonMain), 'The trigger button is visible');
-                assert.ok(!hider.isHidden($buttonRemove), 'The remove button is visible');
-
-                assert.equal($buttonMain.hasClass('disabled'), false, 'The trigger button is not disabled');
-                assert.equal($buttonRemove.hasClass('disabled'), false, 'The remove button is not disabled');
-
-                ready();
+                        assert.equal($buttonMain.hasClass('disabled'), false, 'The trigger button is not disabled');
+                        assert.equal($buttonRemove.hasClass('disabled'), false, 'The remove button is not disabled');
+                    });
             })
-            .catch(function(err) {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
-    QUnit.test('actions: select item & stimulus texts, unload, reload', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var plugin = pluginFactory(runner, runner.getAreaBroker());
-        var $container, $buttonMain, $buttonRemove;
-        var cleanItemHtml = $('#qunit-item').html();
+    QUnit.test('actions: select item & stimulus texts, unload, reload', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const $container = areaBroker.getToolboxArea();
+                const plugin = pluginFactory(runner, areaBroker);
+                const cleanItemHtml = $('#qunit-item').html();
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                assert.expect(11);
 
-        // mock stimulus helper
-        itemHelper.getStimuliHrefs = function() {
-            return ['http://include1.xml', 'http://include2.xml'];
-        };
+                return plugin
+                    .init()
+                    .then(() => new Promise(resolve => {
+                        areaBroker.getToolbox().render($container);
 
-        assert.expect(11);
+                        runner.trigger('loaditem');
+                        runner.trigger('renderitem');
 
-        plugin
-            .init()
-            .then(function() {
-                $container = getButtonContainer(runner);
-                areaBroker.getToolbox().render($container);
-                $buttonMain = $container.find('[data-control="highlight-trigger"]');
-                $buttonRemove = $container.find('[data-control="highlight-clear"]');
+                        // wait for highlighters to be loaded (async)
+                        setTimeout(resolve, 1000);
+                    }))
+                    .then(() => new Promise(resolve => {
+                        const $buttonMain = $container.find('[data-control="highlight-trigger"]');
 
-                runner.trigger('loaditem');
-                runner.trigger('renderitem');
+                        // do some highlighting
+                        selectText('para1');
+                        $buttonMain.trigger('mousedown');
+                        assert.equal($('#para1 span').length, 1, 'Para 1 was highlighted');
 
-                // wait for highlighters to be loaded (async)
-                return new Promise(function(resolve) {
-                    setTimeout(resolve, 1000);
+                        selectText('para2');
+                        $buttonMain.trigger('mousedown');
+                        assert.equal($('#para2 span').length, 1, 'Para 2 was highlighted');
+
+                        selectText('stim1');
+                        $buttonMain.trigger('mousedown');
+                        assert.equal($('#stim1 span').length, 1, 'Stim 1 was highlighted');
+
+                        selectText('stim2');
+                        $buttonMain.trigger('mousedown');
+                        assert.equal($('#stim2 span').length, 1, 'Stim 2 was highlighted');
+
+                        assert.equal($('.qti-itemBody').find('span').length, 4, '4 highlights exist');
+
+                        // unload the item, reset DOM
+                        runner.trigger('unloaditem'); // saves
+                        $('#qunit-item').empty();
+
+                        // wait for highlighters to be saved (async)
+                        setTimeout(resolve, 1000);
+                    }))
+                    .then(() => new Promise(resolve => {
+                        $('#qunit-item').html(cleanItemHtml);
+
+                        // load item again
+                        runner.trigger('loaditem');
+                        runner.trigger('renderitem'); // loads
+
+                        // wait for highlighters to be loaded (async)
+                        setTimeout(resolve, 1000);
+                    }))
+                    .then(() => {
+                        const $buttonRemove = $container.find('[data-control="highlight-clear"]');
+
+                        // test loaded highlights
+                        assert.equal($('#para1 span').length, 1, 'Para 1 was highlighted');
+                        assert.equal($('#para2 span').length, 1, 'Para 2 was highlighted');
+                        assert.equal($('#stim1 span').length, 1, 'Stim 1 was highlighted');
+                        assert.equal($('#stim2 span').length, 1, 'Stim 2 was highlighted');
+                        assert.equal($('.qti-itemBody').find('span').length, 4, '4 highlights exist');
+
+                        $buttonRemove.trigger('click');
+                        assert.equal($('.qti-itemBody').find('span').length, 0, 'No highlights remain after clear');
+                    });
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
             })
-            .then(function() {
-                // do some highlighting
-                selectText('para1');
-                $buttonMain.trigger('mousedown');
-                assert.equal($('#para1 span').length, 1, 'Para 1 was highlighted');
-
-                selectText('para2');
-                $buttonMain.trigger('mousedown');
-                assert.equal($('#para2 span').length, 1, 'Para 2 was highlighted');
-
-                selectText('stim1');
-                $buttonMain.trigger('mousedown');
-                assert.equal($('#stim1 span').length, 1, 'Stim 1 was highlighted');
-
-                selectText('stim2');
-                $buttonMain.trigger('mousedown');
-                assert.equal($('#stim2 span').length, 1, 'Stim 2 was highlighted');
-
-                assert.equal($('.qti-itemBody').find('span').length, 4, '4 highlights exist');
-
-                // unload the item, reset DOM
-                runner.trigger('unloaditem'); // saves
-                $('#qunit-item').empty();
-
-                // wait for highlighters to be saved (async)
-                return new Promise(function(resolve) {
-                    setTimeout(resolve, 1000);
-                });
-            })
-            .then(function() {
-                $('#qunit-item').html(cleanItemHtml);
-
-                // load item again
-                runner.trigger('loaditem');
-                runner.trigger('renderitem'); // loads
-
-                // wait for highlighters to be loaded (async)
-                return new Promise(function(resolve) {
-                    setTimeout(resolve, 1000);
-                });
-            })
-            .then(function() {
-                // test loaded highlights
-                assert.equal($('#para1 span').length, 1, 'Para 1 was highlighted');
-                assert.equal($('#para2 span').length, 1, 'Para 2 was highlighted');
-                assert.equal($('#stim1 span').length, 1, 'Stim 1 was highlighted');
-                assert.equal($('#stim2 span').length, 1, 'Stim 2 was highlighted');
-                assert.equal($('.qti-itemBody').find('span').length, 4, '4 highlights exist');
-
-                $buttonRemove.trigger('click');
-                assert.equal($('.qti-itemBody').find('span').length, 0, 'No highlights remain after clear');
-                ready();
-            })
-            .catch(function(err) {
-                assert.ok(false, `Error in init method: ${err}`);
-                ready();
-            });
+            .then(ready);
     });
 });

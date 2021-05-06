@@ -21,6 +21,15 @@
                 display: none;
             }
 
+            /*
+                fix: prevent the auto margin to impact the test
+                see: scss/inc/_test-action-bars.scss:151
+                regression added by: https://github.com/oat-sa/tao-test-runner-qti-fe/commit/a6a800bbf839149e70e33310a2a4de699acfdcb7
+            */
+            #qunit-fixture .tools-box {
+                margin: 0;
+            }
+
             [data-control] {
                 float: left;
                 margin-right: 10px;

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA
+ * Copyright (c) 2017-2021 (original work) Open Assessment Technologies SA
  */
 /**
  * @author Dieter Raber <dieter@taotesting.com>
@@ -25,7 +25,7 @@ define([
 ], function(runnerFactory, providerMock, eliminatorFactory) {
     'use strict';
 
-    var providerName = 'mock';
+    const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
     const sampleTestContext = {
@@ -53,32 +53,51 @@ define([
         }]
     };
 
+    /**
+     * Gets a configured instance of the Test Runner
+     * @param {Object} [config] - Optional config to setup the test runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = runnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        return Promise.resolve(runner);
+    }
+
     QUnit.module('eliminatorFactory');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', assert => {
         assert.ok(typeof eliminatorFactory === 'function', 'Module exposes a function');
     });
 
     QUnit.module('Eliminator Mode');
 
-    QUnit.test('Toggle eliminator mode on/off', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName);
-        var areaBroker = runner.getAreaBroker();
-        var eliminator = eliminatorFactory(runner, areaBroker);
-        var interaction = document.querySelector('.qti-choiceInteraction');
+    QUnit.test('Toggle eliminator mode on/off', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const eliminator = eliminatorFactory(runner, areaBroker);
+                const interaction = document.querySelector('.qti-choiceInteraction');
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
-
-        areaBroker.getContentArea().append(interaction);
-        eliminator.init().then(function() {
-            runner.trigger('renderitem');
-            runner.trigger('tool-eliminator-toggle');
-            assert.ok(interaction.classList.contains('eliminable'), 'Class "eliminable" has been added');
-            runner.trigger('tool-eliminator-toggle');
-            assert.ok(!interaction.classList.contains('eliminable'), 'Class "eliminable" has been removed');
-            ready();
-        });
+                areaBroker.getContentArea().append(interaction);
+                return eliminator.init()
+                    .then(() => {
+                        runner.trigger('renderitem');
+                        runner.trigger('tool-eliminator-toggle');
+                        assert.ok(interaction.classList.contains('eliminable'), 'Class "eliminable" has been added');
+                        runner.trigger('tool-eliminator-toggle');
+                        assert.ok(!interaction.classList.contains('eliminable'), 'Class "eliminable" has been removed');
+                    });
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 });

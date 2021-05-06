@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016  (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2016-2021  (original work) Open Assessment Technologies SA;
  *
  * @author Alexander Zagovorichev <zagovorichev@1pt.com>
  */
@@ -26,113 +26,15 @@ define([
     'taoQtiTest/runner/plugins/content/dialog/itemInlineMessage',
     'taoQtiItem/runner/qtiItemRunner',
     'json!taoQtiItem/test/samples/json/inlineModalFeedback.json'
-], function($, _, testRunnerFactory, providerMock, inlineMessage, qtiItemRunner, itemData) {
+], function ($, _, testRunnerFactory, providerMock, inlineMessage, itemRunnerFactory, itemData) {
     'use strict';
 
-    var runner;
-    var containerId = 'item-container';
-
-    QUnit.module('Item init', {
-        afterEach: function() {
-            if (runner) {
-                runner.clear();
-            }
-        }
-    });
-
-    QUnit.test('Item data loading', function(assert) {
-        var ready = assert.async();
-        assert.expect(2);
-
-        runner = qtiItemRunner('qti', itemData)
-            .on('init', function() {
-                assert.ok(typeof this._item === 'object', 'The item data is loaded and mapped to an object');
-                assert.ok(typeof this._item.bdy === 'object', 'The item contains a body object');
-
-                ready();
-            })
-            .init();
-    });
-
-    QUnit.module('Item render', {
-        afterEach: function() {
-            if (runner) {
-                runner.clear();
-            }
-        }
-    });
-
-    QUnit.test('Item rendering', function(assert) {
-        var ready = assert.async();
-        assert.expect(3);
-
-        const container = document.getElementById(containerId);
-
-        assert.ok(container instanceof HTMLElement, 'the item container exists');
-        assert.equal(container.children.length, 0, 'the container has no children');
-
-        runner = qtiItemRunner('qti', itemData)
-            .on('render', function() {
-                assert.equal(container.children.length, 1, 'the container has children');
-
-                ready();
-            })
-            .init()
-            .render(container);
-    });
-
-    QUnit.module('API', {
-        beforeEach: function setup() {
-            runner = qtiItemRunner('qti', itemData).init();
-        },
-        afterEach: function() {
-            if (runner) {
-                runner.clear();
-            }
-        }
-    });
-
-    const pluginApi = [
-        { name: 'init', title: 'init' },
-        { name: 'render', title: 'render' },
-        { name: 'finish', title: 'finish' },
-        { name: 'destroy', title: 'destroy' },
-        { name: 'trigger', title: 'trigger' },
-        { name: 'getTestRunner', title: 'getTestRunner' },
-        { name: 'getAreaBroker', title: 'getAreaBroker' },
-        { name: 'getConfig', title: 'getConfig' },
-        { name: 'setConfig', title: 'setConfig' },
-        { name: 'getState', title: 'getState' },
-        { name: 'setState', title: 'setState' },
-        { name: 'show', title: 'show' },
-        { name: 'hide', title: 'hide' },
-        { name: 'enable', title: 'enable' },
-        { name: 'disable', title: 'disable' }
-    ];
-
-    QUnit.cases.init(pluginApi).test('plugin API ', function(data, assert) {
-        var feedback = inlineMessage(runner);
-        assert.equal(
-            typeof feedback[data.name],
-            'function',
-            `The alertMessage instances expose a "${data.name}" function`
-        );
-    });
-
+    const containerId = 'item-container';
     const providerName = 'mock';
-    let testRunner;
     testRunnerFactory.registerProvider(providerName, providerMock());
 
-    QUnit.module('alertMessage', {
-        afterEach: function setup() {
-            if (runner) {
-                runner.clear();
-            }
-        }
-    });
-
     const testMap = {
-        identifier: "Test",
+        identifier: 'Test',
         parts: {
             'Part1': {
                 id: 'Part1',
@@ -156,14 +58,14 @@ define([
             }
         },
         jumps: [{
-            identifier: "FirstItem",
-            section: "Section1",
-            part: "Part1",
+            identifier: 'FirstItem',
+            section: 'Section1',
+            part: 'Part1',
             position: 0
         }, {
-            identifier: "LastItem",
-            section: "Section1",
-            part: "Part1",
+            identifier: 'LastItem',
+            section: 'Section1',
+            part: 'Part1',
             position: 1
         }]
     };
@@ -174,112 +76,245 @@ define([
         itemPosition: 0
     };
 
-    QUnit.test('init', function(assert) {
-        var ready = assert.async();
+    /**
+     * Gets a configured instance of the Item Runner
+     * @returns {Promise<runner>}
+     */
+    function getItemRunner() {
+        return new Promise(resolve => {
+            const runner = itemRunnerFactory('qti', itemData)
+                .on('init', () => resolve(runner))
+                .init();
+        });
+    }
 
-        var container = document.getElementById(containerId);
+    /**
+     * Gets a configured instance of the Test Runner
+     * @param {Object} [config] - Optional config to setup the test runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner(config) {
+        const runner = testRunnerFactory(providerName, [], config);
+        runner.getDataHolder();
+        runner.setTestContext(testContext);
+        runner.setTestMap(testMap);
+        return Promise.resolve(runner);
+    }
 
-        assert.ok(container instanceof HTMLElement, 'the item container exists');
-        assert.equal(container.children.length, 0, 'the container has no children');
-        if (runner) {
-            runner.clear();
-        }
-        runner = qtiItemRunner('qti', itemData)
-            .on('render', function() {
-                assert.equal(container.children.length, 1, 'the container has children');
+    QUnit.module('Item init');
 
-                const feedback = inlineMessage(testRunner, testRunner.getAreaBroker());
+    QUnit.test('Item data loading', assert => {
+        const ready = assert.async();
+        getItemRunner()
+            .then(itemRunner => {
+                assert.expect(2);
 
-                feedback
-                    .init({ dom: '<div>text with message for user</div>' })
-                    .then(function() {
-                        assert.equal(feedback.getState('init'), true, 'The feedback is initialised');
-                        assert.equal(
-                            feedback.$element.text(),
-                            'text with message for user',
-                            'The message was appended'
-                        );
-                        assert.equal(feedback.$button.length, 1, 'The button was created');
-                        ready();
-                    })
-                    .catch(function() {
-                        assert.ok(false, 'The init method must not fail');
-                        ready();
-                    });
+                assert.ok(typeof itemRunner._item === 'object', 'The item data is loaded and mapped to an object');
+                assert.ok(typeof itemRunner._item.bdy === 'object', 'The item contains a body object');
+
+                itemRunner.clear();
             })
-            .init()
-            .render(container);
-
-        testRunner = testRunnerFactory(providerName);
-        testRunner.setTestMap(testMap);
-        testRunner.setTestContext(testContext);
-        testRunner.itemRunner = { _item: runner };
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
-    QUnit.test('render', function(assert) {
-        var ready = assert.async();
+    QUnit.module('Item render');
 
-        assert.expect(10);
+    QUnit.test('Item rendering', assert => {
+        const ready = assert.async();
 
-        let mFeedback;
+        assert.expect(3);
+
         const container = document.getElementById(containerId);
 
         assert.ok(container instanceof HTMLElement, 'the item container exists');
         assert.equal(container.children.length, 0, 'the container has no children');
-        if (runner) {
-            runner.clear();
-        }
-        runner = qtiItemRunner('qti', itemData)
-            .on('render', function() {
-                assert.equal(container.children.length, 1, 'the container has children');
-                assert.equal(
-                    $('li.action', testRunner.getAreaBroker().getNavigationArea()).length,
-                    0,
-                    'Navigation has no children'
-                );
 
-                mFeedback = inlineMessage(testRunner, testRunner.getAreaBroker());
-                mFeedback.init({ dom: '<div id="qUnitTestMessage">text with message for user</div>' });
-                mFeedback.render().catch(function() {
-                    assert.ok(false, 'The render method must not fail');
-                    ready();
+        getItemRunner()
+            .then(itemRunner => new Promise(resolve => {
+                itemRunner.on('render', () => {
+                    assert.equal(container.children.length, 1, 'the container has children');
+
+                    itemRunner.clear();
+                    resolve();
+                })
+                    .init()
+                    .render(container);
+            }))
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
             })
-            .init()
-            .render(container);
+            .then(ready);
+    });
 
-        testRunner = testRunnerFactory(providerName);
-        testRunner.setTestMap(testMap);
-        testRunner.setTestContext(testContext);
-        testRunner.itemRunner = { _item: runner };
+    QUnit.module('API');
 
-        testRunner
-            .on('plugin-render.itemInlineMessage', function(feedback) {
-                assert.equal(feedback.getState('ready'), true, 'The feedback is rendered');
-                const $navContainer = testRunner.getAreaBroker().getNavigationArea();
+    QUnit.cases.init([
+        { title: 'init' },
+        { title: 'render' },
+        { title: 'finish' },
+        { title: 'destroy' },
+        { title: 'trigger' },
+        { title: 'getTestRunner' },
+        { title: 'getAreaBroker' },
+        { title: 'getConfig' },
+        { title: 'setConfig' },
+        { title: 'getState' },
+        { title: 'setState' },
+        { title: 'show' },
+        { title: 'hide' },
+        { title: 'enable' },
+        { title: 'disable' }
+    ]).test('plugin API ', (data, assert) => {
+        const ready = assert.async();
+        getItemRunner()
+            .then(itemRunner => {
+                const feedback = inlineMessage(itemRunner);
                 assert.equal(
-                    $navContainer.find(feedback.$button).length,
-                    1,
-                    'The inline message plugin has changed navigation button'
-                );
-                assert.equal($('li.action', $navContainer).length, 1, 'Navigation has 1 children');
-
-                assert.equal(feedback.$element.text(), 'text with message for user', 'The content was attached');
-                assert.equal(
-                    $('#qUnitTestMessage', testRunner.itemRunner.container).length,
-                    1,
-                    'The message is created'
+                    typeof feedback[data.title],
+                    'function',
+                    `The alertMessage instances expose a "${data.title}" function`
                 );
 
-                feedback.$button.click();
+                itemRunner.clear();
             })
-            .on('plugin-resume.itemInlineMessage', function() {
-                assert.equal(
-                    $('#qUnitTestMessage', testRunner.itemRunner.container).length,
-                    0,
-                    'The message is deleted'
-                );
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
+    });
+
+    QUnit.module('alertMessage');
+
+    QUnit.test('init', assert => {
+        const ready = assert.async();
+        const container = document.getElementById(containerId);
+
+        assert.ok(container instanceof HTMLElement, 'the item container exists');
+        assert.equal(container.children.length, 0, 'the container has no children');
+
+        Promise.all([
+            getItemRunner(),
+            getTestRunner()
+        ])
+            .then(([itemRunner, testRunner]) => new Promise((resolve, reject) => {
+                itemRunner
+                    .on('render', () => {
+                        assert.equal(container.children.length, 1, 'the container has children');
+
+                        const feedback = inlineMessage(testRunner, testRunner.getAreaBroker());
+
+                        feedback
+                            .init({ dom: '<div>text with message for user</div>' })
+                            .then(() => {
+                                assert.equal(feedback.getState('init'), true, 'The feedback is initialised');
+                                assert.equal(
+                                    feedback.$element.text(),
+                                    'text with message for user',
+                                    'The message was appended'
+                                );
+                                assert.equal(feedback.$button.length, 1, 'The button was created');
+
+                                itemRunner.clear();
+                                resolve();
+                            })
+                            .catch(reject);
+                    })
+                    .render(container);
+
+                testRunner.itemRunner = { _item: itemRunner };
+            }))
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
+    });
+
+    QUnit.test('render', assert => {
+        const ready = assert.async();
+        const container = document.getElementById(containerId);
+
+        assert.expect(10);
+
+        assert.ok(container instanceof HTMLElement, 'the item container exists');
+        assert.equal(container.children.length, 0, 'the container has no children');
+
+        Promise.all([
+            getItemRunner(),
+            getTestRunner()
+        ])
+            .then(([itemRunner, testRunner]) => new Promise((resolve, reject) => {
+                testRunner
+                    .on('plugin-render.itemInlineMessage', feedback => {
+                        assert.equal(feedback.getState('ready'), true, 'The feedback is rendered');
+                        const $navContainer = testRunner.getAreaBroker().getNavigationArea();
+                        assert.equal(
+                            $navContainer.find(feedback.$button).length,
+                            1,
+                            'The inline message plugin has changed navigation button'
+                        );
+                        assert.equal($('li.action', $navContainer).length, 1, 'Navigation has 1 children');
+
+                        assert.equal(feedback.$element.text(), 'text with message for user', 'The content was attached');
+                        assert.equal(
+                            $('#qUnitTestMessage', testRunner.itemRunner.container).length,
+                            1,
+                            'The message is created'
+                        );
+
+                        feedback.$button.click();
+                    })
+                    .on('plugin-resume.itemInlineMessage', () => {
+                        assert.equal(
+                            $('#qUnitTestMessage', testRunner.itemRunner.container).length,
+                            0,
+                            'The message is deleted'
+                        );
+
+                        itemRunner.clear();
+                        resolve();
+                    });
+
+                itemRunner
+                    .on('render', () => {
+                        assert.equal(container.children.length, 1, 'the container has children');
+                        assert.equal(
+                            $('li.action', testRunner.getAreaBroker().getNavigationArea()).length,
+                            0,
+                            'Navigation has no children'
+                        );
+
+                        const feedback = inlineMessage(testRunner, testRunner.getAreaBroker());
+
+                        feedback
+                            .init({ dom: '<div id="qUnitTestMessage">text with message for user</div>' })
+                            .then(() => feedback.render())
+                            .catch(reject);
+                    })
+                    .render(container);
+
+                testRunner.itemRunner = { _item: itemRunner };
+            }))
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 });

@@ -21,6 +21,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import dialogTpl from 'taoQtiTest/runner/plugins/controls/connectivity/pauseOnError.tpl';
 
 const name = 'pauseOnError';
+const preventReloadState = 'preventReasonablePageReload';
 const dialogMessage = {
     title: __('Something unexpected happened.'),
     message: __('Please try reloading the page or pause the test. If you pause, you will be able to resume the test from this page.')
@@ -50,7 +51,10 @@ export default pluginFactory({
      */
     init() {
         const testRunner = this.getTestRunner();
-        const returnToHome = () => testRunner.trigger('pause', pauseContext);
+        const returnToHome = () => {
+            testRunner.setState(preventReloadState, false);
+            testRunner.trigger('pause', pauseContext);
+        };
         const reloadPage = () => testRunner.trigger('reloadpage');
         const processError = () => {
             testRunner
@@ -59,6 +63,7 @@ export default pluginFactory({
                 .trigger(`confirm.${name}`, dialogTpl(dialogMessage), returnToHome, reloadPage, dialogConfig);
         };
 
+        testRunner.setState(preventReloadState, true);
         testRunner.on('error', processError);
     }
 });

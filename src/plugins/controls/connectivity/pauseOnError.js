@@ -56,14 +56,17 @@ export default pluginFactory({
             testRunner.trigger('pause', pauseContext);
         };
         const reloadPage = () => testRunner.trigger('reloadpage');
-        const processError = () => {
+        const processError = err => {
             testRunner
                 .on('reloadpage', () => window.location.reload())
                 .trigger('disablenav disabletools hidenav')
                 .trigger(`confirm.${name}`, dialogTpl(dialogMessage), returnToHome, reloadPage, dialogConfig);
+            if (err.code === 500) {
+                err.originalCode = err.code;
+                delete err.code;
+            }
         };
 
-        testRunner.setState(preventReloadState, true);
-        testRunner.on('error', processError);
+        testRunner.before('error', (e, err) => processError(err));
     }
 });

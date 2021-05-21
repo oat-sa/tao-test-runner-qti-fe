@@ -52,7 +52,7 @@ export default pluginFactory({
         const testRunner = this.getTestRunner();
         const returnToHome = () => testRunner.trigger('pause', pauseContext);
         const reloadPage = () => testRunner.trigger('reloadpage');
-        const processError = (error) => {
+        const processError = error => {
             testRunner
                 .on('reloadpage', () => window.location.reload())
                 .trigger('disablenav disabletools hidenav')

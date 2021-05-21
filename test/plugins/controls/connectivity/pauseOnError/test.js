@@ -84,7 +84,7 @@ define([
         runner
             .on('init', () => {
                 assert.ok(true, 'Runner has been initialized');
-                runner.trigger('error');
+                runner.trigger('error', new Error('test'));
             })
             .on('confirm.*', (message, accept, cancel, options) => {
                 assert.equal(typeof message, 'string', 'String message provided');
@@ -115,7 +115,7 @@ define([
         runner
             .on('init', () => {
                 assert.ok(true, 'Runner has been initialized');
-                runner.trigger('error');
+                runner.trigger('error', new Error('test'));
             })
             .on('confirm.*', (message, accept, cancel, options) => {
                 assert.equal(typeof message, 'string', 'String message provided');

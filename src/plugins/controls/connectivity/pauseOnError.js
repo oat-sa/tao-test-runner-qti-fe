@@ -52,13 +52,17 @@ export default pluginFactory({
         const testRunner = this.getTestRunner();
         const returnToHome = () => testRunner.trigger('pause', pauseContext);
         const reloadPage = () => testRunner.trigger('reloadpage');
-        const processError = () => {
+        const processError = error => {
             testRunner
                 .on('reloadpage', () => window.location.reload())
                 .trigger('disablenav disabletools hidenav')
                 .trigger(`confirm.${name}`, dialogTpl(dialogMessage), returnToHome, reloadPage, dialogConfig);
+            if (error.code === 500) {
+                error.originalCode = error.code;
+                delete error.code;
+            }
         };
 
-        testRunner.on('error', processError);
+        testRunner.before('error', (e, error) => processError(error));
     }
 });

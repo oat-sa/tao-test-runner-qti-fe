@@ -63,6 +63,9 @@ export default pluginFactory({
             }
         };
 
-        testRunner.before('error', (e, error) => processError(error));
+        testRunner.before('error', (e, error) => {
+            testRunner.trigger(`disablefeedbackalerts`);
+            processError(error);
+        });
     }
 });

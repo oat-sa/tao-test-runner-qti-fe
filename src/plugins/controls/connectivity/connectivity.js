@@ -26,6 +26,7 @@ import pollingFactory from 'core/polling';
 import waitingDialog from 'ui/waitingDialog/waitingDialog';
 import pluginFactory from 'taoTests/runner/plugin';
 import connectivityTpl from 'taoQtiTest/runner/plugins/controls/connectivity/connectivity.tpl';
+import namespaceHelper from 'util/namespace';
 
 /**
  * The plugin default configuration
@@ -67,10 +68,10 @@ export default pluginFactory({
             );
 
             testRunner
-                .on('disconnect', function() {
+                .on('disconnect', function () {
                     self.$element.removeClass('connected').addClass('disconnected');
                 })
-                .on('reconnect', function() {
+                .on('reconnect', function () {
                     self.$element.removeClass('disconnected').addClass('connected');
                 });
         }
@@ -100,14 +101,14 @@ export default pluginFactory({
          */
         this.displayWaitingDialog = function displayWaitingDialog(message = '') {
             var dialog;
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 if (!waiting) {
                     waiting = true;
 
                     //if a pause event occurs while waiting,
                     //we also wait the connection to be back
-                    testRunner.before('pause.waiting', function() {
-                        return new Promise(function(pauseResolve) {
+                    testRunner.before('pause.waiting', function () {
+                        return new Promise(function (pauseResolve) {
                             proxy.off('reconnect.pausing').after('reconnect.pausing', pauseResolve);
                         });
                     });
@@ -118,11 +119,11 @@ export default pluginFactory({
                         waitContent: __('Please wait while we try to restore the connection.'),
                         proceedContent: __('The connection seems to be back, please proceed')
                     })
-                        .on('proceed', function() {
+                        .on('proceed', function () {
                             resolve();
                         })
-                        .on('render', function() {
-                            proxy.off('reconnect.waiting').after('reconnect.waiting', function() {
+                        .on('render', function () {
+                            proxy.off('reconnect.waiting').after('reconnect.waiting', function () {
                                 testRunner.off('pause.waiting');
                                 waiting = false;
                                 dialog.endWait();
@@ -166,13 +167,13 @@ export default pluginFactory({
         //this could be caused by pauses for example.
         //If caused by an action like exitTest it will be handled
         //by navigation errors (see below)
-        testRunner.before('leave', function(e, data) {
+        testRunner.before('leave', function (e, data) {
             if (proxy.isOffline()) {
                 self.displayWaitingDialog(data.message)
-                    .then(function() {
+                    .then(function () {
                         testRunner.trigger('leave', data);
                     })
-                    .catch(function(generalErr) {
+                    .catch(function (generalErr) {
                         testRunner.trigger('error', generalErr);
                     });
 
@@ -181,7 +182,7 @@ export default pluginFactory({
         });
 
         //intercept offline navigation errors
-        testRunner.before('error.connectivity', function(e, err) {
+        testRunner.before('error.connectivity', function (e, err) {
             // detect and prevent connectivity errors
             if (proxy.isConnectivityError(err)) {
                 return false;
@@ -189,7 +190,7 @@ export default pluginFactory({
 
             if (proxy.isOffline()) {
                 self.displayWaitingDialog()
-                    .then(function() {
+                    .then(function () {
                         if (err.type === 'nav') {
                             testRunner.loadItem(testRunner.getTestContext().itemIdentifier);
                         }
@@ -203,21 +204,42 @@ export default pluginFactory({
                             });
                         }
                     })
-                    .catch(function(generalErr) {
+                    .catch(function (generalErr) {
                         testRunner.trigger('error', generalErr);
                     });
                 return false;
             }
         });
 
-        testRunner.before('loaditem.connectivity', function(e, itemRef, item) {
+        testRunner.before('loaditem.connectivity', function (e, itemRef, item) {
+            const testContext = testRunner.getTestContext();
+            if (item.flags && item.flags.hasFeedbacks) {
+                testContext.hasFeedbacks = true;
+            }
+
             if (proxy.isOffline() && item.flags && item.flags.containsNonPreloadedAssets) {
-              self.displayWaitingDialog().then(function () {
-                  testRunner.loadItem(itemRef);
-              });
-              return false;
+                self.displayWaitingDialog().then(function () {
+                    testRunner.loadItem(itemRef);
+                });
+                return false;
             }
         });
+
+        testRunner.before(namespaceHelper.namespaceAll('move skip timeout', 'connectivity'), function (e, ...args) {
+            var testContext = testRunner.getTestContext();
+            var currentItem = testRunner.getCurrentItem();
+
+            if (proxy.isOffline() && (currentItem.hasFeedbacks || testContext.hasFeedbacks)) {
+                self.displayWaitingDialog().then(function () {
+                    testRunner.trigger(e.name, ...args);
+                });
+                return false;
+            }
+        });
+    },
+
+    destroy() {
+        this.getTestRunner().off('.connectivity');
     },
 
     /**

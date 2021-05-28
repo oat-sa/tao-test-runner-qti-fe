@@ -2,31 +2,14 @@
  * Copyright (c) 2021 Open Assessment Technologies SA
 */
 
-@mixin mirror {
-  transform: scaleX(-1);
-}
-@mixin no-mirror {
-  transform: scaleX(1);
-}
-
 .runner {
   .test-runner-scope {
     .action-bar.content-action-bar.horizontal-action-bar.top-action-bar {
       .control-box {
-        @include mirror;
-
-        & > * {
-          @include mirror;
-        }
 
         & > .timer-box {
-          @include no-mirror;
-          .timer-toggler {
-            @include mirror;
-          }
           .timer-wrapper {
             .countdown {
-              @include mirror;
               &:first-child {
                 &::before {
                   content: ' ';
@@ -35,16 +18,10 @@
               &:last-child {
                 &::before {
                   content: none;
+
                 }
               }
             }
-          }
-        }
-
-        & > .progress-box {
-          @include no-mirror;
-          [data-control=progress-label] {
-            @include mirror;
           }
         }
 

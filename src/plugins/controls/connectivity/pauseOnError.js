@@ -60,6 +60,12 @@ export default pluginFactory({
             if (error.code === 500) {
                 error.originalCode = error.code;
                 delete error.code;
+
+                testRunner.trigger(`disablefeedbackalerts`);
+                testRunner.after('error.pauseOnError', () => {
+                    testRunner.off('error.pauseOnError');
+                    testRunner.trigger(`enablefeedbackalerts`);
+                });
             }
         };
 

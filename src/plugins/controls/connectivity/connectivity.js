@@ -230,8 +230,11 @@ export default pluginFactory({
             var currentItem = testRunner.getCurrentItem();
 
             if (proxy.isOffline() && (currentItem.hasFeedbacks || testContext.hasFeedbacks)) {
+                testRunner.trigger('disableitem');
                 self.displayWaitingDialog().then(function () {
-                    testRunner.trigger(e.name, ...args);
+                    testRunner
+                        .trigger('enableitem')
+                        .trigger(e.name, ...args);
                 });
                 return false;
             }

@@ -185,8 +185,8 @@
                         border-bottom: 1px solid blacken($canvas, 0.2);
                         margin: 0;
                         @include border-radius(0);
-                        height: 32px;
-                        padding: 6px 15px;
+                        height: auto;
+                        padding: 8px 15px 9px;
                         line-height: 1;
                         border-left: solid 3px transparent;
 

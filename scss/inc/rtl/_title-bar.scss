@@ -7,6 +7,24 @@
     .action-bar.content-action-bar.horizontal-action-bar.top-action-bar {
       .control-box {
 
+        & > .connectivity-box {
+          margin-left: 0px;
+          margin-right: 40px;
+          &.with-message {
+            .message-connect {
+              margin-left: 3px;
+              margin-right: 0px;
+            }
+          }
+        }
+
+        & > .progress-box {
+          & > * {
+            margin-left: 0px;
+            margin-right: 20px;
+          }
+        }
+
         & > .timer-box {
           .timer-wrapper {
             .countdown {

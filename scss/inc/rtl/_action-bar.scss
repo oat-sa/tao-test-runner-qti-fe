@@ -1,0 +1,42 @@
+/**
+ * Copyright (c) 2021 Open Assessment Technologies SA
+*/
+
+.runner {
+  .test-runner-scope {
+    .action-bar.content-action-bar.horizontal-action-bar.bottom-action-bar {
+      .control-box {
+
+        & > .lft {
+          float: right;
+          margin: 2px 10px 0 0;
+        }
+        & > .rgt {
+          float: left;
+        }
+        & > .navi-box {
+
+        }
+        & > .tool-box {
+
+        }
+        .action {
+          float: right;
+          .icon {
+            padding: 0 0 0 9px;
+            &.icon-forward:before {
+              content: "\e68d";
+            }
+            &.icon-backward:before {
+              content: "\e691";
+            }
+          }
+          .action {
+            text-align: right;
+          }
+        }
+
+      }
+    }
+  }
+}

@@ -19,13 +19,16 @@
         }
 
         & > .progress-box {
-          & > * {
+          & > .qti-controls {
             margin-left: 0px;
             margin-right: 20px;
           }
         }
 
         & > .timer-box {
+          .timer-toggler {
+            right: 20px;
+          }
           .timer-wrapper {
             .countdown {
               &:first-child {

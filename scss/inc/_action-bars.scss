@@ -21,6 +21,8 @@
             text-decoration: none !important;
             text-shadow: none;
             outline: 0;
+            -webkit-touch-callout: none;
+
             &:hover {
                 color: white;
             }

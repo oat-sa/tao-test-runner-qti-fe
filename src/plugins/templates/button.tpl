@@ -7,8 +7,8 @@
         aria-{{@key}}="{{this}}"
     {{/each}}
 >
-    <span class="li-inner" aria-hidden="true">
+    <a class="li-inner" href="#" onclick="return false" aria-hidden="true" >
         {{#if icon}}<span class="icon icon-{{icon}}{{#unless text}} no-label{{/unless}}"></span>{{/if}}
         {{#if text}}<span class="text">{{text}}</span>{{/if}}
-    </span>
+    </a>
 </li>

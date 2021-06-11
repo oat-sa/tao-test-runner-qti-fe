@@ -6,6 +6,7 @@ body {
   &.delivery-scope {
     &[dir=rtl] {
       @import 'rtl/title-bar';
+      @import 'rtl/header-bar';
     }
   }
 }

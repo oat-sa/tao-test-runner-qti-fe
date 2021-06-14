@@ -6,8 +6,8 @@
         role="{{role}}"
     {{/if}}
 >
-    <span class="li-inner menu-inner">
+    <a class="li-inner menu-inner">
         <span class="icon icon-checkbox"></span><span class="icon icon-checkbox-checked"></span>
         <span class="label">{{text}}</span>
-    </span>
+    </a>
 </li>

@@ -11,24 +11,55 @@
           float: right;
           margin: 2px 10px 0 0;
         }
-        & > .rgt {
+        .rgt {
           float: left;
         }
-        .action {
-          float: right;
-          .icon {
-            padding: 0 0 0 9px;
-            &.icon-forward:before {
-              @include icon-backward;
+
+        .tools-box-list, .navi-box-list {
+          //for first level only
+          & > .action {
+            & > .li-inner > .icon {
+              display: inline-block;
             }
-            &.icon-backward:before {
-              @include icon-forward;
+            // for nested menus
+            .action {
+              text-align: right;
+              &.active {
+                .icon.icon-checkbox-checked {
+                  display: inline-block;
+                }
+              }
+              &:not(.active) {
+                .icon.icon-checkbox {
+                  display: inline-block;
+                }
+                &:hover {
+                  .icon.icon-checkbox {
+                    display: none;
+                  }
+                  .icon.icon-checkbox-checked {
+                    display: inline-block;
+                  }
+                }
+              }
             }
           }
+
           .action {
-            text-align: right;
+            float: right;
+            .icon {
+              padding: 0 0 0 9px;
+              &.icon-forward:before {
+                @include icon-backward;
+              }
+              &.icon-backward:before {
+                @include icon-forward;
+              }
+            }
           }
+
         }
+
 
       }
     }

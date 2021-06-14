@@ -4,7 +4,7 @@
 
 .runner {
   .test-runner-scope {
-    .action-bar.content-action-bar.horizontal-action-bar.bottom-action-bar {
+    .bottom-action-bar {
       .control-box {
 
         & > .lft {
@@ -19,10 +19,10 @@
           .icon {
             padding: 0 0 0 9px;
             &.icon-forward:before {
-              content: "\e68d";
+              @include icon-backward;
             }
             &.icon-backward:before {
-              content: "\e691";
+              @include icon-forward;
             }
           }
           .action {

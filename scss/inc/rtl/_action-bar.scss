@@ -18,11 +18,18 @@
           float: right;
           .icon {
             padding: 0 0 0 9px;
-            &.icon-forward:before {
-              content: "\e68d";
-            }
-            &.icon-backward:before {
-              content: "\e691";
+            &.icon-right,
+            &.icon-left,
+            &.icon-fast-forward,
+            &.icon-step-forward,
+            &.icon-forward,
+            &.icon-fast-backward,
+            &.icon-step-backward,
+            &.icon-backward {
+              &:before {
+                display: inline-block;
+                transform: scaleX(-1);
+              }
             }
           }
           .action {

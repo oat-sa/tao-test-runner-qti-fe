@@ -49,17 +49,26 @@
             float: right;
             .icon {
               padding: 0 0 0 9px;
-              &.icon-forward:before {
-                @include icon-backward;
+              &.icon-right,
+              &.icon-left,
+              &.icon-fast-forward,
+              &.icon-step-forward,
+              &.icon-forward,
+              &.icon-fast-backward,
+              &.icon-step-backward,
+              &.icon-backward {
+                &:before {
+                  display: inline-block;
+                  transform: scaleX(-1);
+                }
               }
-              &.icon-backward:before {
-                @include icon-forward;
-              }
+            }
+            .action {
+              text-align: right;
             }
           }
 
         }
-
 
       }
     }

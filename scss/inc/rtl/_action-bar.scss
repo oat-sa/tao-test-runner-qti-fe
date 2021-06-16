@@ -14,6 +14,37 @@
         & > .rgt {
           float: left;
         }
+
+        .tools-box-list, .navi-box-list {
+          //for first level only
+          & > .action {
+            & > .li-inner > .icon {
+              display: inline-block;
+            }
+            // for nested menus
+            .action {
+              text-align: right;
+              &.active {
+                .icon.icon-checkbox-checked {
+                  display: inline-block;
+                }
+              }
+              &:not(.active) {
+                .icon.icon-checkbox {
+                  display: inline-block;
+                }
+                &:hover {
+                  .icon.icon-checkbox {
+                    display: none;
+                  }
+                  .icon.icon-checkbox-checked {
+                    display: inline-block;
+                  }
+                }
+              }
+            }
+          }
+
         .action {
           float: right;
           .icon {

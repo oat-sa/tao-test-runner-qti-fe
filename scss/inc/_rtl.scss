@@ -6,7 +6,12 @@ body {
   &.delivery-scope {
     &[dir=rtl] {
       @import 'rtl/title-bar';
-      @import 'rtl/feedback';
+
+      & .qti-item {
+            & {
+              @import 'rtl/feedback';
+          }
+      }
     }
   }
 }

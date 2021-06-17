@@ -238,7 +238,7 @@ export default pluginFactory({
         } else {
             this.$element.prop('disabled', true).addClass('disabled');
         }
-    }, 100);
+    }, 100),
 
     /**
      * Enable the button

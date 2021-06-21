@@ -209,16 +209,16 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
      * @returns {Promise<Object>} assets with URLs resolved
      */
     var resolveAssets = function resolveAssets(baseUrl, assets) {
-        return new Promise(function(resolve) {
+        return new Promise(function (resolve) {
             preloadAssetManager.setData('baseUrl', baseUrl);
             preloadAssetManager.setData('assets', assets);
 
             return resolve(
                 _.reduce(
                     assets,
-                    function(acc, assetList, type) {
+                    function (acc, assetList, type) {
                         var resolved = {};
-                        _.forEach(assetList, function(url) {
+                        _.forEach(assetList, function (url) {
                             //filter base64 (also it seems sometimes we just have base64 data, without the protocol...)
                             if (!urlUtil.isBase64(url)) {
                                 resolved[url] = preloadAssetManager.resolve(url);
@@ -283,12 +283,12 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
              */
             var itemLoad = function itemLoad() {
                 logger.debug(`Start preloading of item ${item.itemIdentifier}`);
-                return new Promise(function(resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     qtiItemRunner(item.itemData.type, item.itemData.data, {
                         assetManager: preloadAssetManager,
                         preload: true
                     })
-                        .on('init', function() {
+                        .on('init', function () {
                             logger.debug(`Preloading of item ${item.itemIdentifier} done`);
                             resolve(true);
                         })
@@ -302,10 +302,10 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
              * @returns {Promise}
              */
             var assetLoad = function assetLoad() {
-                return resolveAssets(item.baseUrl, item.itemData.assets).then(function(resolved) {
-                    _.forEach(resolved, function(assets, type) {
+                return resolveAssets(item.baseUrl, item.itemData.assets).then(function (resolved) {
+                    _.forEach(resolved, function (assets, type) {
                         if (_.isFunction(loaders[type])) {
-                            _.forEach(assets, function(url, sourceUrl) {
+                            _.forEach(assets, function (url, sourceUrl) {
                                 logger.debug(`Loading asset ${sourceUrl}(${type}) for item ${item.itemIdentifier}`);
 
                                 loaders[type](url, sourceUrl, item.itemIdentifier);
@@ -321,11 +321,15 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
             if (isItemObjectValid(item)) {
                 loading.push(itemLoad());
 
+                if (_.size(item.itemData.data.feedbacks)) {
+                    item.flags = Object.assign({}, item.flags, { hasFeedbacks: true });
+                }
+
                 if (_.size(item.itemData.assets) > 0) {
                     loading.push(assetLoad());
                 }
             }
-            return Promise.all(loading).then(function(results) {
+            return Promise.all(loading).then(function (results) {
                 return results.length > 0 && _.all(results, _.isTrue);
             });
         },
@@ -342,10 +346,10 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
          */
         unload: function unload(item) {
             if (isItemObjectValid(item) && _.size(item.itemData.assets) > 0) {
-                return resolveAssets(item.baseUrl, item.itemData.assets).then(function(resolved) {
-                    _.forEach(resolved, function(assets, type) {
+                return resolveAssets(item.baseUrl, item.itemData.assets).then(function (resolved) {
+                    _.forEach(resolved, function (assets, type) {
                         if (_.isFunction(unloaders[type])) {
-                            _.forEach(assets, function(url, sourceUrl) {
+                            _.forEach(assets, function (url, sourceUrl) {
                                 logger.debug(`Unloading asset ${sourceUrl}(${type}) for item ${item.itemIdentifier}`);
 
                                 unloaders[type](url, sourceUrl, item.itemIdentifier);

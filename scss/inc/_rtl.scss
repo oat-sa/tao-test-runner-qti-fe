@@ -5,9 +5,10 @@
 body {
   &.delivery-scope {
     &[dir=rtl] {
-      @import 'rtl/title-bar';
+      @import 'rtl/action-bar';
       @import 'rtl/review-panel';
       @import 'rtl/feedback';
+      @import 'rtl/title-bar';
     }
   }
 }

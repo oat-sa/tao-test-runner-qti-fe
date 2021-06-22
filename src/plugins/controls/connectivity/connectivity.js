@@ -223,6 +223,13 @@ export default pluginFactory({
                 });
                 return false;
             }
+
+            if (proxy.isOffline() && item.flags && item.flags.hasPci) {
+                self.displayWaitingDialog().then(function () {
+                    testRunner.loadItem(itemRef);
+                });
+                return false;
+            }
         });
 
         testRunner.before(namespaceHelper.namespaceAll('move skip timeout', 'connectivity'), function (e, ...args) {

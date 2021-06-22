@@ -325,6 +325,10 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
                     item.flags = Object.assign({}, item.flags, { hasFeedbacks: true });
                 }
 
+                if (_.size(item.portableElements.pci)) {
+                    item.flags = Object.assign({}, item.flags, { hasPci: true });
+                }
+
                 if (_.size(item.itemData.assets) > 0) {
                     loading.push(assetLoad());
                 }

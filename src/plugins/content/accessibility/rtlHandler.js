@@ -32,14 +32,14 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var testRunner = this.getTestRunner();
+        const testRunner = this.getTestRunner();
         testRunner
             .on('renderitem', function applyRtlLayout() {
-                var $item = testRunner
+                const $item = testRunner
                     .getAreaBroker()
                     .getContentArea()
                     .find('.qti-item');
-                var itemLang = $item.attr('lang');
+                const itemLang = $item.attr('lang');
                 $item
                     .find('.grid-row')
                     .attr('dir', locale.getLanguageDirection(itemLang));

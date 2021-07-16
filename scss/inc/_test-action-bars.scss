@@ -66,6 +66,7 @@
         &.horizontal-action-bar {
             opacity: 1;
             height: #{(map-get($heights, horizontal-action-bar)) * 1px };
+            flex-basis: #{(map-get($heights, horizontal-action-bar)) * 1px }; //IE11 touch
 
             &.top-action-bar > .control-box {
 

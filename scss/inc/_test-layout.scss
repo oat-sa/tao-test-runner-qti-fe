@@ -81,13 +81,6 @@
     }
     .test-sidebar-left {
         border-right: 1px $uiGeneralContentBorder solid;
-
-        .landmark-title-hidden {
-            position: absolute;
-            overflow: hidden;
-            height: 1px;
-            width: 1px;
-        }
     }
 
     .test-sidebar-right {

@@ -27,17 +27,22 @@ import qtiItemRunner from 'taoQtiItem/runner/qtiItemRunner';
 import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import urlUtil from 'util/url';
 
-var logger = loggerFactory('taoQtiTest/runner/proxy/cache/itemPreloader');
+/**
+ * @type {logger}
+ * @private
+ */
+const logger = loggerFactory('taoQtiTest/runner/proxy/cache/itemPreloader');
 
 /**
  * Test the support of possible `<link rel>` values.
- * @param {String} feature - the value to test
- * @returns {Boolean}
+ * @param {string} feature - the value to test
+ * @returns {boolean}
+ * @private
  */
-var relSupport = function relSupport(feature) {
-    var fakeLink = document.createElement('link');
+const relSupport = feature => {
+    const fakeLink = document.createElement('link');
     try {
-        if (fakeLink.relList && _.isFunction(fakeLink.relList.supports)) {
+        if (fakeLink.relList && 'function' === typeof fakeLink.relList.supports) {
             return fakeLink.relList.supports(feature);
         }
     } catch (err) {
@@ -47,23 +52,28 @@ var relSupport = function relSupport(feature) {
 
 /**
  * Does the current env supports `<link ref="preload">`
+ * @type {boolean}
+ * @private
  */
-var supportPreload = relSupport('preload');
+const supportPreload = relSupport('preload');
 
 /**
  * Does the current env supports `<link ref="prefetch">`
+ * @type {boolean}
+ * @private
  */
-var supportPrefetch = relSupport('prefetch');
+const supportPrefetch = relSupport('prefetch');
 
 /**
  * Check if the given item object matches the expectations
- * @param {Object} item
- * @param {String} item.itemIdentifier - the item identifier
- * @param {String} item.baseUrl - item baseUrl
- * @param {Object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
- * @returns {Boolean}
+ * @param {object} item
+ * @param {string} item.itemIdentifier - the item identifier
+ * @param {string} item.baseUrl - item baseUrl
+ * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
+ * @returns {boolean}
+ * @private
  */
-var isItemObjectValid = function isItemObjectValid(item) {
+const isItemObjectValid = item => {
     return (
         _.isPlainObject(item) &&
         _.isString(item.baseUrl) &&
@@ -75,37 +85,35 @@ var isItemObjectValid = function isItemObjectValid(item) {
 
 /**
  * Create an instance of an item preloader
- * @param {Object} options
- * @param {String} options.testId - the unique identifier of the test instance, required to get the asset manager
+ * @param {object} options
+ * @param {string} options.testId - the unique identifier of the test instance, required to get the asset manager
  * @returns {itemPreloader}
  * @throws {TypeError} if the testId is not defined
  */
-var itemPreloaderFactory = function itemPreloaderFactory(options) {
-    //this is the test asset manager, referenced under options.testId
-    var testAssetManager;
-
+function itemPreloaderFactory(options) {
     //we also have a specific instance of the asset manager to
     //resolve assets of a next item (we can't use the test asset manager).
-    var preloadAssetManager = getAssetManager('item-preloader');
+    const preloadAssetManager = getAssetManager('item-preloader');
 
     //keep references to preloaded images attached
     //in order to prevent garbage collection of cached images
-    var images = {};
+    const images = {};
 
     //keep references to preloaded audio blobs
-    var audioBlobs = {};
+    const audioBlobs = {};
 
     /**
      * Asset loaders per supported asset types
      */
-    var loaders = {
+    const loaders = {
         /**
          * Preload images, using the in memory Image object
-         * @param {String} url - the url of the image to preload
-         * @param {String} sourceUrl - the unresolved URL (used to index)
-         * @param {String} itemIdentifier - the id of the item the asset belongs to
+         * @param {string} url - the url of the image to preload
+         * @param {string} sourceUrl - the unresolved URL (used to index)
+         * @param {string} itemIdentifier - the id of the item the asset belongs to
+         * @private
          */
-        img: function preloadImage(url, sourceUrl, itemIdentifier) {
+        img(url, sourceUrl, itemIdentifier) {
             images[itemIdentifier] = images[itemIdentifier] || {};
             if ('Image' in window && !images[itemIdentifier][sourceUrl]) {
                 images[itemIdentifier][sourceUrl] = new Image();
@@ -115,10 +123,11 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
 
         /**
          * Preload stylesheets
-         * @param {String} url - the url of the css to preload
+         * @param {string} url - the url of the css to preload
+         * @private
          */
-        css: function preloadCss(url) {
-            var link = document.createElement('link');
+        css(url) {
+            const link = document.createElement('link');
             if (supportPreload) {
                 link.setAttribute('rel', 'preload');
                 link.setAttribute('as', 'style');
@@ -138,16 +147,16 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
 
         /**
          * Preload audio files : save the blobs for later use in the asset manager
-         * @param {String} url - the url of the audio file to preload
-         * @param {String} sourceUrl - the unresolved URL (used to index)
-         * @param {String} itemIdentifier - the id of the item the asset belongs to
+         * @param {string} url - the url of the audio file to preload
+         * @param {string} sourceUrl - the unresolved URL (used to index)
+         * @param {string} itemIdentifier - the id of the item the asset belongs to
+         * @private
          */
-        audio: function preloadAudio(url, sourceUrl, itemIdentifier) {
-            var request;
+        audio(url, sourceUrl, itemIdentifier) {
             audioBlobs[itemIdentifier] = audioBlobs[itemIdentifier] || {};
             if (typeof audioBlobs[itemIdentifier][sourceUrl] === 'undefined') {
                 //direct XHR to benefit from the "blob" response type
-                request = new XMLHttpRequest();
+                const request = new XMLHttpRequest();
                 request.open('GET', url, true);
                 request.responseType = 'blob';
                 request.onload = function onRequestLoad() {
@@ -165,14 +174,15 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
     /**
      * Asset unloaders per supported asset types
      */
-    var unloaders = {
+    const unloaders = {
         /**
          * Remove images ref so they can be garbage collected
-         * @param {String} url - the url of the image to unload
-         * @param {String} sourceUrl - the unresolved URL (used to index)
-         * @param {String} itemIdentifier - the id of the item the asset belongs to
+         * @param {string} url - the url of the image to unload
+         * @param {string} sourceUrl - the unresolved URL (used to index)
+         * @param {string} itemIdentifier - the id of the item the asset belongs to
+         * @private
          */
-        img: function unloadImage(url, sourceUrl, itemIdentifier) {
+        img(url, sourceUrl, itemIdentifier) {
             if (images[itemIdentifier]) {
                 images[itemIdentifier] = _.omit(images[itemIdentifier], sourceUrl);
             }
@@ -180,10 +190,11 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
 
         /**
          * Remove prefteched CSS link tag
-         * @param {String} url - the url of the css to unload
+         * @param {string} url - the url of the css to unload
+         * @private
          */
-        css: function unloadCss(url) {
-            var link = document.querySelector(`head link[data-preload][href="${url}"]`);
+        css(url) {
+            const link = document.querySelector(`head link[data-preload][href="${url}"]`);
             if (link) {
                 document.querySelector('head').removeChild(link);
             }
@@ -191,11 +202,12 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
 
         /**
          * Remove loaded audio files
-         * @param {String} url - the url of the css to unload
-         * @param {String} sourceUrl - the unresolved URL
-         * @param {String} itemIdentifier - the id of the item the asset belongs to
+         * @param {string} url - the url of the css to unload
+         * @param {string} sourceUrl - the unresolved URL
+         * @param {string} itemIdentifier - the id of the item the asset belongs to
+         * @private
          */
-        audio: function unloadAudio(url, sourceUrl, itemIdentifier) {
+        audio(url, sourceUrl, itemIdentifier) {
             if (audioBlobs[itemIdentifier]) {
                 audioBlobs[itemIdentifier] = _.omit(audioBlobs[itemIdentifier], sourceUrl);
             }
@@ -204,21 +216,22 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
 
     /**
      * Resolves assets URLS using the assetManager
-     * @param {String} baseUrl
-     * @param {Object} assets - as  [ type : [urls] ]
+     * @param {string} baseUrl
+     * @param {object} assets - as  [ type : [urls] ]
      * @returns {Promise<Object>} assets with URLs resolved
+     * @private
      */
-    var resolveAssets = function resolveAssets(baseUrl, assets) {
-        return new Promise(function (resolve) {
+    const resolveAssets = (baseUrl, assets) => {
+        return new Promise(resolve => {
             preloadAssetManager.setData('baseUrl', baseUrl);
             preloadAssetManager.setData('assets', assets);
 
             return resolve(
                 _.reduce(
                     assets,
-                    function (acc, assetList, type) {
-                        var resolved = {};
-                        _.forEach(assetList, function (url) {
+                    (acc, assetList, type) => {
+                        const resolved = {};
+                        _.forEach(assetList, url => {
                             //filter base64 (also it seems sometimes we just have base64 data, without the protocol...)
                             if (!urlUtil.isBase64(url)) {
                                 resolved[url] = preloadAssetManager.resolve(url);
@@ -239,15 +252,16 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
         throw new TypeError('The test identifier is mandatory to start the item preloader');
     }
 
-    testAssetManager = getAssetManager(options.testId);
+    //this is the test asset manager, referenced under options.testId
+    const testAssetManager = getAssetManager(options.testId);
 
     /**
      * Prepend a strategy to resolves cached assets
      */
     testAssetManager.prependStrategy({
         name: 'precaching',
-        handle: function handlePrecache(url, data) {
-            var sourceUrl = url.toString();
+        handle(url, data) {
+            const sourceUrl = url.toString();
 
             //resolves precached audio files
             if (
@@ -262,33 +276,33 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
     });
 
     /**
-     * @typedef {Object} itemPreloader
+     * @typedef {object} itemPreloader
      */
     return {
         /**
          * Preload the given item (runtime and assets)
          *
-         * @param {Object} item
-         * @param {String} item.itemIdentifier - the item identifier
-         * @param {String} item.baseUrl - item baseUrl
-         * @param {Object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
+         * @param {object} item
+         * @param {string} item.itemIdentifier - the item identifier
+         * @param {string} item.baseUrl - item baseUrl
+         * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
          * @returns {Promise<Boolean>} resolves with true if the item is loaded
          */
-        preload: function preload(item) {
-            var loading = [];
+        preload(item) {
+            const loading = [];
 
             /**
              * Preload the item runner
              * @returns {Promise}
              */
-            var itemLoad = function itemLoad() {
+            const itemLoad = () => {
                 logger.debug(`Start preloading of item ${item.itemIdentifier}`);
-                return new Promise(function (resolve, reject) {
+                return new Promise((resolve, reject) => {
                     qtiItemRunner(item.itemData.type, item.itemData.data, {
                         assetManager: preloadAssetManager,
                         preload: true
                     })
-                        .on('init', function () {
+                        .on('init', () => {
                             logger.debug(`Preloading of item ${item.itemIdentifier} done`);
                             resolve(true);
                         })
@@ -301,11 +315,11 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
              * Preload the item assets
              * @returns {Promise}
              */
-            var assetLoad = function assetLoad() {
-                return resolveAssets(item.baseUrl, item.itemData.assets).then(function (resolved) {
-                    _.forEach(resolved, function (assets, type) {
-                        if (_.isFunction(loaders[type])) {
-                            _.forEach(assets, function (url, sourceUrl) {
+            const assetLoad = () => {
+                return resolveAssets(item.baseUrl, item.itemData.assets).then(resolved => {
+                    _.forEach(resolved, (assets, type) => {
+                        if ('function' === typeof loaders[type]) {
+                            _.forEach(assets, (url, sourceUrl) => {
                                 logger.debug(`Loading asset ${sourceUrl}(${type}) for item ${item.itemIdentifier}`);
 
                                 loaders[type](url, sourceUrl, item.itemIdentifier);
@@ -329,7 +343,7 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
                     loading.push(assetLoad());
                 }
             }
-            return Promise.all(loading).then(function (results) {
+            return Promise.all(loading).then(results => {
                 return results.length > 0 && _.all(results, _.isTrue);
             });
         },
@@ -337,19 +351,19 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
         /**
          * Unload the assets for the given item
          *
-         * @param {Object} item
-         * @param {String} item.itemIdentifier - the item identifier
-         * @param {String} item.baseUrl - item baseUrl
-         * @param {Object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
-         * @param {String} itemIdentifier - the item identifier
+         * @param {object} item
+         * @param {string} item.itemIdentifier - the item identifier
+         * @param {string} item.baseUrl - item baseUrl
+         * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
+         * @param {string} itemIdentifier - the item identifier
          * @returns {Promise}
          */
-        unload: function unload(item) {
+        unload(item) {
             if (isItemObjectValid(item) && _.size(item.itemData.assets) > 0) {
-                return resolveAssets(item.baseUrl, item.itemData.assets).then(function (resolved) {
-                    _.forEach(resolved, function (assets, type) {
-                        if (_.isFunction(unloaders[type])) {
-                            _.forEach(assets, function (url, sourceUrl) {
+                return resolveAssets(item.baseUrl, item.itemData.assets).then(resolved => {
+                    _.forEach(resolved, (assets, type) => {
+                        if ('function' === typeof unloaders[type]) {
+                            _.forEach(assets, (url, sourceUrl) => {
                                 logger.debug(`Unloading asset ${sourceUrl}(${type}) for item ${item.itemIdentifier}`);
 
                                 unloaders[type](url, sourceUrl, item.itemIdentifier);
@@ -362,6 +376,6 @@ var itemPreloaderFactory = function itemPreloaderFactory(options) {
             return Promise.resolve(false);
         }
     };
-};
+}
 
 export default itemPreloaderFactory;

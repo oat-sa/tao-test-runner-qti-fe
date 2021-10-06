@@ -26,6 +26,7 @@ import loggerFactory from 'core/logger';
 import qtiItemRunner from 'taoQtiItem/runner/qtiItemRunner';
 import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import assetPreloaderFactory from 'taoQtiTest/runner/proxy/cache/assetPreloader';
+import interactionPreloaderFactory from 'taoQtiTest/runner/proxy/cache/interactionPreloader';
 import urlUtil from 'util/url';
 
 /**
@@ -61,6 +62,19 @@ const isItemObjectValid = item => {
 const setItemFlag = (item, flag) => {
     item.flags = item.flags || {};
     item.flags[flag] = true;
+};
+
+/**
+ * Extracts the list of interactions from the item
+ * @param {object} itemData
+ * @returns {object[]}
+ */
+const getItemInteractions = itemData => {
+    const interactions = [];
+    if (itemData.data && itemData.data.body && itemData.data.body.elements) {
+        _.forEach(itemData.data.body.elements, elements => interactions.push(elements));
+    }
+    return interactions;
 };
 
 /**
@@ -120,7 +134,10 @@ function itemPreloaderFactory(options) {
 
     //this is the test asset manager, referenced under options.testId
     const testAssetManager = getAssetManager(options.testId);
+
+    //mechanisms to preload assets and runtimes
     const assetPreloader = assetPreloaderFactory(testAssetManager);
+    const interactionPreloader = interactionPreloaderFactory();
 
     /**
      * Preload the item runner
@@ -147,6 +164,42 @@ function itemPreloaderFactory(options) {
                 .on('error', reject)
                 .init();
         });
+    };
+
+    /**
+     * Preload the interactions
+     * @param {object} item
+     * @param {string} item.itemIdentifier - the item identifier
+     * @param {object} item.itemData.data - item data
+     * @returns {Promise}
+     * @private
+     */
+    const interactionLoad = item => {
+        return Promise.all(getItemInteractions(item.itemData).map(interaction => {
+            if (interactionPreloader.has(interaction.qtiClass)) {
+                logger.debug(`Loading interaction ${interaction.serial}(${interaction.qtiClass}) for item ${item.itemIdentifier}`);
+                return interactionPreloader.load(interaction.qtiClass, interaction, item.itemData, item.itemIdentifier);
+            }
+            return Promise.resolve();
+        }));
+    };
+
+    /**
+     * Unload the interactions
+     * @param {object} item
+     * @param {string} item.itemIdentifier - the item identifier
+     * @param {object} item.itemData.data - item data
+     * @returns {Promise}
+     * @private
+     */
+    const interactionUnload = item => {
+        return Promise.all(getItemInteractions(item.itemData).map(interaction => {
+            if (interactionPreloader.has(interaction.qtiClass)) {
+                logger.debug(`Unloading interaction ${interaction.serial}(${interaction.qtiClass}) for item ${item.itemIdentifier}`);
+                return interactionPreloader.unload(interaction.qtiClass, interaction, item.itemData, item.itemIdentifier);
+            }
+            return Promise.resolve();
+        }));
     };
 
     /**
@@ -221,6 +274,7 @@ function itemPreloaderFactory(options) {
 
             if (isItemObjectValid(item)) {
                 loading.push(itemLoad(item));
+                loading.push(interactionLoad(item));
 
                 if (_.size(item.itemData.data && item.itemData.data.feedbacks)) {
                     setItemFlag(item, 'hasFeedbacks');
@@ -245,10 +299,17 @@ function itemPreloaderFactory(options) {
          * @returns {Promise}
          */
         unload(item) {
-            if (isItemObjectValid(item) && _.size(item.itemData.assets) > 0) {
-                return assetUnload(item);
+            const loading = [];
+
+            if (isItemObjectValid(item)) {
+                loading.push(interactionUnload(item));
+
+                if (_.size(item.itemData.assets) > 0) {
+                    loading.push(assetUnload(item));
+                }
             }
-            return Promise.resolve(false);
+
+            return Promise.all(loading).then(results => results.length > 0 && _.all(results, _.isTrue));
         }
     };
 }

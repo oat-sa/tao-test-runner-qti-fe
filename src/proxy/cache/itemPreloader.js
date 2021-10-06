@@ -25,6 +25,7 @@ import _ from 'lodash';
 import loggerFactory from 'core/logger';
 import qtiItemRunner from 'taoQtiItem/runner/qtiItemRunner';
 import getAssetManager from 'taoQtiTest/runner/config/assetManager';
+import assetPreloaderFactory from 'taoQtiTest/runner/proxy/cache/assetPreloader';
 import urlUtil from 'util/url';
 
 /**
@@ -32,37 +33,6 @@ import urlUtil from 'util/url';
  * @private
  */
 const logger = loggerFactory('taoQtiTest/runner/proxy/cache/itemPreloader');
-
-/**
- * Test the support of possible `<link rel>` values.
- * @param {string} feature - the value to test
- * @returns {boolean}
- * @private
- */
-const relSupport = feature => {
-    const fakeLink = document.createElement('link');
-    try {
-        if (fakeLink.relList && 'function' === typeof fakeLink.relList.supports) {
-            return fakeLink.relList.supports(feature);
-        }
-    } catch (err) {
-        return false;
-    }
-};
-
-/**
- * Does the current env supports `<link ref="preload">`
- * @type {boolean}
- * @private
- */
-const supportPreload = relSupport('preload');
-
-/**
- * Does the current env supports `<link ref="prefetch">`
- * @type {boolean}
- * @private
- */
-const supportPrefetch = relSupport('prefetch');
 
 /**
  * Check if the given item object matches the expectations
@@ -84,6 +54,16 @@ const isItemObjectValid = item => {
 };
 
 /**
+ * Sets a flag onto an item
+ * @param {object} item - The item to flag
+ * @param {string} flag - The flag name to set
+ */
+const setItemFlag = (item, flag) => {
+    item.flags = item.flags || {};
+    item.flags[flag] = true;
+};
+
+/**
  * Create an instance of an item preloader
  * @param {object} options
  * @param {string} options.testId - the unique identifier of the test instance, required to get the asset manager
@@ -95,135 +75,21 @@ function itemPreloaderFactory(options) {
     //resolve assets of a next item (we can't use the test asset manager).
     const preloadAssetManager = getAssetManager('item-preloader');
 
-    //keep references to preloaded images attached
-    //in order to prevent garbage collection of cached images
-    const images = {};
-
-    //keep references to preloaded audio blobs
-    const audioBlobs = {};
-
-    /**
-     * Asset loaders per supported asset types
-     */
-    const loaders = {
-        /**
-         * Preload images, using the in memory Image object
-         * @param {string} url - the url of the image to preload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @private
-         */
-        img(url, sourceUrl, itemIdentifier) {
-            images[itemIdentifier] = images[itemIdentifier] || {};
-            if ('Image' in window && !images[itemIdentifier][sourceUrl]) {
-                images[itemIdentifier][sourceUrl] = new Image();
-                images[itemIdentifier][sourceUrl].src = url;
-            }
-        },
-
-        /**
-         * Preload stylesheets
-         * @param {string} url - the url of the css to preload
-         * @private
-         */
-        css(url) {
-            const link = document.createElement('link');
-            if (supportPreload) {
-                link.setAttribute('rel', 'preload');
-                link.setAttribute('as', 'style');
-            } else if (supportPrefetch) {
-                link.setAttribute('rel', 'prefetch');
-                link.setAttribute('as', 'style');
-            } else {
-                link.disabled = true;
-                link.setAttribute('rel', 'stylesheet');
-                link.setAttribute('type', 'text/css');
-            }
-            link.setAttribute('data-preload', true);
-            link.setAttribute('href', url);
-
-            document.querySelector('head').appendChild(link);
-        },
-
-        /**
-         * Preload audio files : save the blobs for later use in the asset manager
-         * @param {string} url - the url of the audio file to preload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @private
-         */
-        audio(url, sourceUrl, itemIdentifier) {
-            audioBlobs[itemIdentifier] = audioBlobs[itemIdentifier] || {};
-            if (typeof audioBlobs[itemIdentifier][sourceUrl] === 'undefined') {
-                //direct XHR to benefit from the "blob" response type
-                const request = new XMLHttpRequest();
-                request.open('GET', url, true);
-                request.responseType = 'blob';
-                request.onload = function onRequestLoad() {
-                    if (this.status === 200) {
-                        //save the blob, directly
-                        audioBlobs[itemIdentifier][sourceUrl] = this.response;
-                    }
-                };
-                //ignore failed requests, best effort only
-                request.send();
-            }
-        }
-    };
-
-    /**
-     * Asset unloaders per supported asset types
-     */
-    const unloaders = {
-        /**
-         * Remove images ref so they can be garbage collected
-         * @param {string} url - the url of the image to unload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @private
-         */
-        img(url, sourceUrl, itemIdentifier) {
-            if (images[itemIdentifier]) {
-                images[itemIdentifier] = _.omit(images[itemIdentifier], sourceUrl);
-            }
-        },
-
-        /**
-         * Remove prefteched CSS link tag
-         * @param {string} url - the url of the css to unload
-         * @private
-         */
-        css(url) {
-            const link = document.querySelector(`head link[data-preload][href="${url}"]`);
-            if (link) {
-                document.querySelector('head').removeChild(link);
-            }
-        },
-
-        /**
-         * Remove loaded audio files
-         * @param {string} url - the url of the css to unload
-         * @param {string} sourceUrl - the unresolved URL
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @private
-         */
-        audio(url, sourceUrl, itemIdentifier) {
-            if (audioBlobs[itemIdentifier]) {
-                audioBlobs[itemIdentifier] = _.omit(audioBlobs[itemIdentifier], sourceUrl);
-            }
-        }
-    };
-
     /**
      * Resolves assets URLS using the assetManager
-     * @param {string} baseUrl
-     * @param {object} assets - as  [ type : [urls] ]
+     * @param {object} item
+     * @param {string} item.itemIdentifier - the item identifier
+     * @param {string} item.baseUrl - item baseUrl
+     * @param {string} item.itemData.type - type of item
+     * @param {object} item.itemData.data - item data
+     * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
      * @returns {Promise<Object>} assets with URLs resolved
      * @private
      */
-    const resolveAssets = (baseUrl, assets) => {
+    const resolveAssets = item => {
         return new Promise(resolve => {
-            preloadAssetManager.setData('baseUrl', baseUrl);
+            const { assets } = item.itemData;
+            preloadAssetManager.setData('baseUrl', item.baseUrl);
             preloadAssetManager.setData('assets', assets);
 
             return resolve(
@@ -254,26 +120,86 @@ function itemPreloaderFactory(options) {
 
     //this is the test asset manager, referenced under options.testId
     const testAssetManager = getAssetManager(options.testId);
+    const assetPreloader = assetPreloaderFactory(testAssetManager);
 
     /**
-     * Prepend a strategy to resolves cached assets
+     * Preload the item runner
+     * @param {object} item
+     * @param {string} item.itemIdentifier - the item identifier
+     * @param {string} item.baseUrl - item baseUrl
+     * @param {string} item.itemData.type - type of item
+     * @param {object} item.itemData.data - item data
+     * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
+     * @returns {Promise}
+     * @private
      */
-    testAssetManager.prependStrategy({
-        name: 'precaching',
-        handle(url, data) {
-            const sourceUrl = url.toString();
+    const itemLoad = item => {
+        logger.debug(`Start preloading of item ${item.itemIdentifier}`);
+        return new Promise((resolve, reject) => {
+            qtiItemRunner(item.itemData.type, item.itemData.data, {
+                assetManager: preloadAssetManager,
+                preload: true
+            })
+                .on('init', () => {
+                    logger.debug(`Preloading of item ${item.itemIdentifier} done`);
+                    resolve(true);
+                })
+                .on('error', reject)
+                .init();
+        });
+    };
 
-            //resolves precached audio files
-            if (
-                data.itemIdentifier &&
-                audioBlobs[data.itemIdentifier] &&
-                typeof audioBlobs[data.itemIdentifier][sourceUrl] !== 'undefined'
-            ) {
-                //creates an internal URL to link the audio blob
-                return URL.createObjectURL(audioBlobs[data.itemIdentifier][sourceUrl]);
-            }
-        }
-    });
+    /**
+     * Preload the item assets
+     * @param {object} item
+     * @param {string} item.itemIdentifier - the item identifier
+     * @param {string} item.baseUrl - item baseUrl
+     * @param {string} item.itemData.type - type of item
+     * @param {object} item.itemData.data - item data
+     * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
+     * @returns {Promise}
+     * @private
+     */
+    const assetLoad = item => {
+        return resolveAssets(item).then(resolved => {
+            _.forEach(resolved, (assets, type) => {
+                if (assetPreloader.has(type)) {
+                    _.forEach(assets, (url, sourceUrl) => {
+                        logger.debug(`Loading asset ${sourceUrl}(${type}) for item ${item.itemIdentifier}`);
+                        assetPreloader.load(type, url, sourceUrl, item.itemIdentifier);
+                    });
+                } else {
+                    setItemFlag(item, 'containsNonPreloadedAssets');
+                }
+            });
+            return true;
+        });
+    };
+
+    /**
+     * Unload the item assets
+     * @param {object} item
+     * @param {string} item.itemIdentifier - the item identifier
+     * @param {string} item.baseUrl - item baseUrl
+     * @param {string} item.itemData.type - type of item
+     * @param {object} item.itemData.data - item data
+     * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
+     * @returns {Promise}
+     * @private
+     */
+    const assetUnload = item => {
+        return resolveAssets(item).then(resolved => {
+            _.forEach(resolved, (assets, type) => {
+                if (assetPreloader.has(type)) {
+                    _.forEach(assets, (url, sourceUrl) => {
+                        logger.debug(`Unloading asset ${sourceUrl}(${type}) for item ${item.itemIdentifier}`);
+                        assetPreloader.unload(type, url, sourceUrl, item.itemIdentifier);
+                    });
+                }
+            });
+            return true;
+        });
+    };
 
     /**
      * @typedef {object} itemPreloader
@@ -285,67 +211,26 @@ function itemPreloaderFactory(options) {
          * @param {object} item
          * @param {string} item.itemIdentifier - the item identifier
          * @param {string} item.baseUrl - item baseUrl
+         * @param {string} item.itemData.type - type of item
+         * @param {object} item.itemData.data - item data
          * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
          * @returns {Promise<Boolean>} resolves with true if the item is loaded
          */
         preload(item) {
             const loading = [];
 
-            /**
-             * Preload the item runner
-             * @returns {Promise}
-             */
-            const itemLoad = () => {
-                logger.debug(`Start preloading of item ${item.itemIdentifier}`);
-                return new Promise((resolve, reject) => {
-                    qtiItemRunner(item.itemData.type, item.itemData.data, {
-                        assetManager: preloadAssetManager,
-                        preload: true
-                    })
-                        .on('init', () => {
-                            logger.debug(`Preloading of item ${item.itemIdentifier} done`);
-                            resolve(true);
-                        })
-                        .on('error', reject)
-                        .init();
-                });
-            };
-
-            /**
-             * Preload the item assets
-             * @returns {Promise}
-             */
-            const assetLoad = () => {
-                return resolveAssets(item.baseUrl, item.itemData.assets).then(resolved => {
-                    _.forEach(resolved, (assets, type) => {
-                        if ('function' === typeof loaders[type]) {
-                            _.forEach(assets, (url, sourceUrl) => {
-                                logger.debug(`Loading asset ${sourceUrl}(${type}) for item ${item.itemIdentifier}`);
-
-                                loaders[type](url, sourceUrl, item.itemIdentifier);
-                            });
-                        } else {
-                            item.flags = Object.assign({}, item.flags, { containsNonPreloadedAssets: true });
-                        }
-                    });
-                    return true;
-                });
-            };
-
             if (isItemObjectValid(item)) {
-                loading.push(itemLoad());
+                loading.push(itemLoad(item));
 
-                if (_.size(item.itemData.data.feedbacks)) {
-                    item.flags = Object.assign({}, item.flags, { hasFeedbacks: true });
+                if (_.size(item.itemData.data && item.itemData.data.feedbacks)) {
+                    setItemFlag(item, 'hasFeedbacks');
                 }
 
                 if (_.size(item.itemData.assets) > 0) {
-                    loading.push(assetLoad());
+                    loading.push(assetLoad(item));
                 }
             }
-            return Promise.all(loading).then(results => {
-                return results.length > 0 && _.all(results, _.isTrue);
-            });
+            return Promise.all(loading).then(results => results.length > 0 && _.all(results, _.isTrue));
         },
 
         /**
@@ -354,24 +239,14 @@ function itemPreloaderFactory(options) {
          * @param {object} item
          * @param {string} item.itemIdentifier - the item identifier
          * @param {string} item.baseUrl - item baseUrl
+         * @param {string} item.itemData.type - type of item
+         * @param {object} item.itemData.data - item data
          * @param {object} item.itemData.assets - assets per types :  img : ['url1', 'url2' ]
-         * @param {string} itemIdentifier - the item identifier
          * @returns {Promise}
          */
         unload(item) {
             if (isItemObjectValid(item) && _.size(item.itemData.assets) > 0) {
-                return resolveAssets(item.baseUrl, item.itemData.assets).then(resolved => {
-                    _.forEach(resolved, (assets, type) => {
-                        if ('function' === typeof unloaders[type]) {
-                            _.forEach(assets, (url, sourceUrl) => {
-                                logger.debug(`Unloading asset ${sourceUrl}(${type}) for item ${item.itemIdentifier}`);
-
-                                unloaders[type](url, sourceUrl, item.itemIdentifier);
-                            });
-                        }
-                    });
-                    return true;
-                });
+                return assetUnload(item);
             }
             return Promise.resolve(false);
         }

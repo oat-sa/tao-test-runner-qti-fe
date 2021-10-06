@@ -75,7 +75,7 @@ export default function assetPreloaderFactory(assetManager) {
 
         /**
          * Unloads an asset with respect to it type
-         * @param {string} type - The type of asset to preload
+         * @param {string} type - The type of asset to unload
          * @param {string} url - the url of the asset to unload
          * @param {string} sourceUrl - the unresolved URL
          * @param {string} itemIdentifier - the id of the item the asset belongs to

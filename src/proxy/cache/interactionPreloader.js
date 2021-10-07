@@ -17,6 +17,15 @@
  */
 
 import preloaders from 'taoQtiTest/runner/proxy/cache/preloaders/interactions/preloaders';
+import preloaderManagerFactory from 'taoQtiTest/runner/proxy/cache/preloaderManager';
+
+/**
+ * @callback interactionPreloaderManagerAction
+ * @param {string} type - The type of asset to preload
+ * @param {object} interaction - The interaction
+ * @param {object} itemData - The item data
+ * @param {string} itemIdentifier - the id of the item the interaction belongs to
+ */
 
 /**
  * @callback interactionPreloaderAction
@@ -26,67 +35,28 @@ import preloaders from 'taoQtiTest/runner/proxy/cache/preloaders/interactions/pr
  */
 
 /**
+ * @typedef {object} interactionPreloaderManager
+ * @property {string} name - The name of the preloader
+ * @property {interactionPreloaderManagerAction} loaded - Tells whether an interaction is loaded or not
+ * @property {interactionPreloaderManagerAction} load - Preload an interaction
+ * @property {interactionPreloaderManagerAction} unload - Unload an interaction
+ */
+
+/**
  * @typedef {object} interactionPreloader
  * @property {string} name - The name of the preloader
+ * @property {interactionPreloaderAction} loaded - Tells whether an interaction is loaded or not
  * @property {interactionPreloaderAction} load - Preload an interaction
  * @property {interactionPreloaderAction} unload - Unload an interaction
  */
 
-
 /**
- * Manages the preloading of interaction runtimes
- * @return {interactionPreloaderManager}
+ * Manages the preloading of assets
+ * @function assetPreloaderFactory
+ * @param assetManager - A reference to the assetManager
+ * @return {assetPreloaderManager}
  */
-export default function interactionPreloaderFactory() {
-    const interactionPreloaders = preloaders.reduce((map, factory) => {
-        const preloader = factory();
-        map[preloader.name] = preloader;
-        return map;
-    }, {});
+const interactionPreloaderFactory = preloaderManagerFactory();
+preloaders.forEach(preloader => interactionPreloaderFactory.registerProvider(preloader.name, preloader));
 
-    /**
-     * @typedef interactionPreloaderManager
-     */
-    return {
-        /**
-         * Checks whether or not an interaction preloader exists for a particular type
-         * @param {string} type
-         * @returns {boolean}
-         */
-        has(type) {
-            return !!interactionPreloaders[type];
-        },
-
-        /**
-         * Preloads an interaction with respect to it type
-         * @param {string} type - The type of interaction to preload
-         * @param {object} interaction - The interaction
-         * @param {object} itemData - The item data
-         * @param {string} itemIdentifier - the id of the item the interaction belongs to
-         * @returns {Promise}
-         */
-        load(type, interaction, itemData, itemIdentifier) {
-            const preloader = interactionPreloaders[type];
-            if (preloader) {
-                return preloader.load(interaction, itemData, itemIdentifier);
-            }
-            return Promise.resolve();
-        },
-
-        /**
-         * Unloads an interaction with respect to it type
-         * @param {string} type - The type of interaction to unload
-         * @param {object} interaction - The interaction
-         * @param {object} itemData - The item data
-         * @param {string} itemIdentifier - the id of the item the interaction belongs to
-         * @returns {Promise}
-         */
-        unload(type, interaction, itemData, itemIdentifier) {
-            const preloader = interactionPreloaders[type];
-            if (preloader) {
-                return preloader.unload(interaction, itemData, itemIdentifier);
-            }
-            return Promise.resolve();
-        }
-    };
-}
+export default interactionPreloaderFactory;

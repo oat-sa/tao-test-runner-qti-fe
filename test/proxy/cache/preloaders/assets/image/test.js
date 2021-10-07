@@ -19,29 +19,23 @@
 /**
  * Test of taoQtiTest/runner/proxy/cache/preloaders/assets/image
  */
-define(['taoQtiTest/runner/proxy/cache/preloaders/assets/image'], function (imagePreloaderFactory) {
+define(['taoQtiTest/runner/proxy/cache/preloaders/assets/image'], function (imagePreloader) {
     'use strict';
 
     QUnit.module('API');
 
     QUnit.test('module', assert => {
-        assert.expect(3);
-
-        assert.equal(typeof imagePreloaderFactory, 'function', 'The module exposes a function');
-        assert.equal(typeof imagePreloaderFactory(), 'object', 'The module is a factory');
-        assert.notDeepEqual(imagePreloaderFactory(), imagePreloaderFactory(), 'The factory creates new instances');
-    });
-
-    QUnit.test('property [name]', assert => {
-        assert.expect(1);
-        const preloader = imagePreloaderFactory();
-
-        assert.strictEqual(preloader.name, 'img', 'The preloader has the name "img"');
+        assert.expect(5);
+        assert.equal(typeof imagePreloader, 'object', 'The module exposes an object');
+        assert.equal(imagePreloader.name, 'img', 'The preloader has a name');
+        assert.equal(typeof imagePreloader.init, 'function', 'The preloader has an init method');
+        assert.equal(typeof imagePreloader.init(), 'object', 'The preloaded has a factory');
+        assert.notDeepEqual(imagePreloader.init(), imagePreloader.init(), 'The factory creates new instances');
     });
 
     QUnit.cases.init([{ title: 'loaded' }, { title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
         assert.expect(1);
-        const preloader = imagePreloaderFactory();
+        const preloader = imagePreloader.init();
 
         assert.equal(typeof preloader[data.title], 'function', `The preloader has the method ${data.title}`);
     });
@@ -51,7 +45,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/image'], function (imag
     QUnit.test('load/unload', assert => {
         assert.expect(4);
         const ready = assert.async();
-        const preloader = imagePreloaderFactory();
+        const preloader = imagePreloader.init();
         const data = {
             asset: 'sample.jpg',
             itemIdentifier: 'item-1'

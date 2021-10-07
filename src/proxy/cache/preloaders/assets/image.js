@@ -16,69 +16,70 @@
  * Copyright (c) 2017-2021 Open Assessment Technologies SA
  */
 
+import _ from 'lodash';
+
 /**
  * (Pre)load images.
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
+export default {
+    /**
+     * The name of the preloader
+     * @type {string}
+     */
+    name: 'img',
 
-import _ from 'lodash';
+    /**
+     * Manages the preloading of images
+     * @returns {assetPreloader}
+     */
+    init() {
+        //keep references to preloaded images attached
+        //in order to prevent garbage collection of cached images
+        const images = {};
 
-/**
- * Manages the preloading of images
- * @returns {assetPreloader}
- */
-export default function imagePreloaderFactory() {
-    //keep references to preloaded images attached
-    //in order to prevent garbage collection of cached images
-    const images = {};
+        return {
+            /**
+             * Tells whether an image was preloaded or not
+             * @param {string} url - the url of the image to preload
+             * @param {string} sourceUrl - the unresolved URL (used to index)
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {boolean}
+             */
+            loaded(url, sourceUrl, itemIdentifier) {
+                return !!(images[itemIdentifier] && images[itemIdentifier][sourceUrl]);
+            },
 
-    return {
-        /**
-         * The name of the preloader
-         * @type {string}
-         */
-        name: 'img',
+            /**
+             * Preloads an image, using the in memory Image object
+             * @param {string} url - the url of the image to preload
+             * @param {string} sourceUrl - the unresolved URL (used to index)
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {Promise}
+             */
+            load(url, sourceUrl, itemIdentifier) {
+                images[itemIdentifier] = images[itemIdentifier] || {};
+                if ('Image' in window && !images[itemIdentifier][sourceUrl]) {
+                    images[itemIdentifier][sourceUrl] = new Image();
+                    images[itemIdentifier][sourceUrl].src = url;
+                }
+                return Promise.resolve();
+            },
 
-        /**
-         * Tells whether an image was preloaded or not
-         * @param {string} url - the url of the image to preload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {boolean}
-         */
-        loaded(url, sourceUrl, itemIdentifier) {
-            return !!(images[itemIdentifier] && images[itemIdentifier][sourceUrl]);
-        },
-
-        /**
-         * Preloads an image, using the in memory Image object
-         * @param {string} url - the url of the image to preload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {Promise}
-         */
-        load(url, sourceUrl, itemIdentifier) {
-            images[itemIdentifier] = images[itemIdentifier] || {};
-            if ('Image' in window && !images[itemIdentifier][sourceUrl]) {
-                images[itemIdentifier][sourceUrl] = new Image();
-                images[itemIdentifier][sourceUrl].src = url;
+            /**
+             * Removes images ref so they can be garbage collected
+             * @param {string} url - the url of the image to unload
+             * @param {string} sourceUrl - the unresolved URL (used to index)
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {Promise}
+             */
+            unload(url, sourceUrl, itemIdentifier) {
+                if (images[itemIdentifier]) {
+                    images[itemIdentifier] = _.omit(images[itemIdentifier], sourceUrl);
+                }
+                return Promise.resolve();
             }
-            return Promise.resolve();
-        },
-
-        /**
-         * Removes images ref so they can be garbage collected
-         * @param {string} url - the url of the image to unload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {Promise}
-         */
-        unload(url, sourceUrl, itemIdentifier) {
-            if (images[itemIdentifier]) {
-                images[itemIdentifier] = _.omit(images[itemIdentifier], sourceUrl);
-            }
-            return Promise.resolve();
-        }
-    };
-}
+        };
+    }
+};

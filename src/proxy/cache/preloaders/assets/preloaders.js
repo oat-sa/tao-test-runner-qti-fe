@@ -16,12 +16,12 @@
  * Copyright (c) 2021 Open Assessment Technologies SA
  */
 
-import audioPreloaderFactory from 'taoQtiTest/runner/proxy/cache/preloaders/assets/audio';
-import imagePreloaderFactory from 'taoQtiTest/runner/proxy/cache/preloaders/assets/image';
-import stylesheetPreloaderFactory from 'taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet';
+import audioPreloader from 'taoQtiTest/runner/proxy/cache/preloaders/assets/audio';
+import imagePreloader from 'taoQtiTest/runner/proxy/cache/preloaders/assets/image';
+import stylesheetPreloader from 'taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet';
 
 /**
  * The list of asset loader factories
  * @type {Function[]}
  */
-export default [audioPreloaderFactory, imagePreloaderFactory, stylesheetPreloaderFactory];
+export default [audioPreloader, imagePreloader, stylesheetPreloader];

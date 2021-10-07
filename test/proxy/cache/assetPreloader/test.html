@@ -7,9 +7,6 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
-                    define('taoQtiTest/runner/proxy/cache/preloaders/assets/preloaders', function () {
-                        return [];
-                    });
                     require(['taoQtiTest/test/runner/proxy/cache/assetPreloader/test'], function() {
                         QUnit.start();
                     });

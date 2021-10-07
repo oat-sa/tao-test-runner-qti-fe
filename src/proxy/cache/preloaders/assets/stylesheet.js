@@ -16,12 +16,6 @@
  * Copyright (c) 2017-2021 Open Assessment Technologies SA
  */
 
-/**
- * (Pre)load stylesheets.
- *
- * @author Bertrand Chevrier <bertrand@taotesting.com>
- */
-
 import _ from 'lodash';
 
 /**
@@ -56,81 +50,88 @@ const supportPreload = relSupport('preload');
 const supportPrefetch = relSupport('prefetch');
 
 /**
- * Manages the preloading of stylesheets
- * @returns {assetPreloader}
+ * (Pre)load stylesheets.
+ *
+ * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-export default function stylesheetPreloaderFactory() {
-    //keep references to preloaded CSS files
-    const stylesheets = {};
+export default {
+    /**
+     * The name of the preloader
+     * @type {string}
+     */
+    name: 'css',
 
-    return {
-        /**
-         * The name of the preloader
-         * @type {string}
-         */
-        name: 'css',
+    /**
+     * Manages the preloading of stylesheets
+     * @returns {assetPreloader}
+     */
+    init() {
+        //keep references to preloaded CSS files
+        const stylesheets = {};
 
-        /**
-         * Tells whether a stylesheet was preloaded or not
-         * @param {string} url - the url of the stylesheet to preload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {boolean}
-         */
-        loaded(url, sourceUrl, itemIdentifier) {
-            return !!(stylesheets[itemIdentifier] && stylesheets[itemIdentifier][sourceUrl]);
-        },
+        return {
+            /**
+             * Tells whether a stylesheet was preloaded or not
+             * @param {string} url - the url of the stylesheet to preload
+             * @param {string} sourceUrl - the unresolved URL (used to index)
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {boolean}
+             */
+            loaded(url, sourceUrl, itemIdentifier) {
+                return !!(stylesheets[itemIdentifier] && stylesheets[itemIdentifier][sourceUrl]);
+            },
 
-        /**
-         * Preloads a stylesheet
-         * @param {string} url - the url of the stylesheet to preload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {Promise}
-         */
-        load(url, sourceUrl, itemIdentifier) {
-            stylesheets[itemIdentifier] = stylesheets[itemIdentifier] || {};
+            /**
+             * Preloads a stylesheet
+             * @param {string} url - the url of the stylesheet to preload
+             * @param {string} sourceUrl - the unresolved URL (used to index)
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {Promise}
+             */
+            load(url, sourceUrl, itemIdentifier) {
+                stylesheets[itemIdentifier] = stylesheets[itemIdentifier] || {};
 
-            if (!stylesheets[itemIdentifier][sourceUrl]) {
-                const link = document.createElement('link');
-                if (supportPreload) {
-                    link.setAttribute('rel', 'preload');
-                    link.setAttribute('as', 'style');
-                } else if (supportPrefetch) {
-                    link.setAttribute('rel', 'prefetch');
-                    link.setAttribute('as', 'style');
-                } else {
-                    link.disabled = true;
-                    link.setAttribute('rel', 'stylesheet');
-                    link.setAttribute('type', 'text/css');
+                if (!stylesheets[itemIdentifier][sourceUrl]) {
+                    const link = document.createElement('link');
+                    if (supportPreload) {
+                        link.setAttribute('rel', 'preload');
+                        link.setAttribute('as', 'style');
+                    } else if (supportPrefetch) {
+                        link.setAttribute('rel', 'prefetch');
+                        link.setAttribute('as', 'style');
+                    } else {
+                        link.disabled = true;
+                        link.setAttribute('rel', 'stylesheet');
+                        link.setAttribute('type', 'text/css');
+                    }
+                    link.setAttribute('data-preload', true);
+                    link.setAttribute('href', url);
+
+                    document.querySelector('head').appendChild(link);
+                    stylesheets[itemIdentifier][sourceUrl] = link;
                 }
-                link.setAttribute('data-preload', true);
-                link.setAttribute('href', url);
+                return Promise.resolve();
+            },
 
-                document.querySelector('head').appendChild(link);
-                stylesheets[itemIdentifier][sourceUrl] = link;
-            }
-            return Promise.resolve();
-        },
-
-        /**
-         * Removes the prefetched stylesheet
-         * @param {string} url - the url of the stylesheet to unload
-         * * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {Promise}
-         */
-        unload(url, sourceUrl, itemIdentifier) {
-            if (stylesheets[itemIdentifier]) {
-                const link =
-                    stylesheets[itemIdentifier][sourceUrl] ||
-                    document.querySelector(`head link[data-preload][href="${url}"]`);
-                if (link) {
-                    document.querySelector('head').removeChild(link);
+            /**
+             * Removes the prefetched stylesheet
+             * @param {string} url - the url of the stylesheet to unload
+             * * @param {string} sourceUrl - the unresolved URL (used to index)
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {Promise}
+             */
+            unload(url, sourceUrl, itemIdentifier) {
+                if (stylesheets[itemIdentifier]) {
+                    const link =
+                        stylesheets[itemIdentifier][sourceUrl] ||
+                        document.querySelector(`head link[data-preload][href="${url}"]`);
+                    if (link) {
+                        document.querySelector('head').removeChild(link);
+                    }
+                    stylesheets[itemIdentifier] = _.omit(stylesheets[itemIdentifier], sourceUrl);
                 }
-                stylesheets[itemIdentifier] = _.omit(stylesheets[itemIdentifier], sourceUrl);
+                return Promise.resolve();
             }
-            return Promise.resolve();
-        }
-    };
-}
+        };
+    }
+};

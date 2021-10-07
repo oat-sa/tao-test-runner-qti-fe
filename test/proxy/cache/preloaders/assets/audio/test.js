@@ -19,7 +19,7 @@
 /**
  * Test of taoQtiTest/runner/proxy/cache/preloaders/assets/audio
  */
-define(['taoQtiTest/runner/proxy/cache/preloaders/assets/audio'], function (audioPreloaderFactory) {
+define(['taoQtiTest/runner/proxy/cache/preloaders/assets/audio'], function (audioPreloader) {
     'use strict';
 
     function assetManagerFactory() {
@@ -43,27 +43,21 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/audio'], function (audi
     QUnit.module('API');
 
     QUnit.test('module', assert => {
-        assert.expect(3);
-
-        assert.equal(typeof audioPreloaderFactory, 'function', 'The module exposes a function');
-        assert.equal(typeof audioPreloaderFactory(assetManagerFactory()), 'object', 'The module is a factory');
+        assert.expect(5);
+        assert.equal(typeof audioPreloader, 'object', 'The module exposes an object');
+        assert.equal(audioPreloader.name, 'audio', 'The preloader has a name');
+        assert.equal(typeof audioPreloader.init, 'function', 'The preloader has an init method');
+        assert.equal(typeof audioPreloader.init(assetManagerFactory()), 'object', 'The preloaded has a factory');
         assert.notDeepEqual(
-            audioPreloaderFactory(assetManagerFactory()),
-            audioPreloaderFactory(assetManagerFactory()),
+            audioPreloader.init(assetManagerFactory()),
+            audioPreloader.init(assetManagerFactory()),
             'The factory creates new instances'
         );
     });
 
-    QUnit.test('property [name]', assert => {
-        assert.expect(1);
-        const preloader = audioPreloaderFactory(assetManagerFactory());
-
-        assert.strictEqual(preloader.name, 'audio', 'The preloader has the name "audio"');
-    });
-
     QUnit.cases.init([{ title: 'loaded' }, { title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
         assert.expect(1);
-        const preloader = audioPreloaderFactory(assetManagerFactory());
+        const preloader = audioPreloader.init(assetManagerFactory());
 
         assert.equal(typeof preloader[data.title], 'function', `The preloader has the method ${data.title}`);
     });
@@ -74,7 +68,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/audio'], function (audi
         assert.expect(5);
         const ready = assert.async();
         const assetManager = assetManagerFactory();
-        const preloader = audioPreloaderFactory(assetManager);
+        const preloader = audioPreloader.init(assetManager);
         const data = {
             asset: 'sample.mp3',
             itemIdentifier: 'item-1'

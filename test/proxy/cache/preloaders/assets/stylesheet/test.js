@@ -19,33 +19,27 @@
 /**
  * Test of taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet
  */
-define(['taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet'], function (stylesheetPreloaderFactory) {
+define(['taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet'], function (stylesheetPreloader) {
     'use strict';
 
     QUnit.module('API');
 
     QUnit.test('module', assert => {
-        assert.expect(3);
-
-        assert.equal(typeof stylesheetPreloaderFactory, 'function', 'The module exposes a function');
-        assert.equal(typeof stylesheetPreloaderFactory(), 'object', 'The module is a factory');
+        assert.expect(5);
+        assert.equal(typeof stylesheetPreloader, 'object', 'The module exposes an object');
+        assert.equal(stylesheetPreloader.name, 'css', 'The preloader has a name');
+        assert.equal(typeof stylesheetPreloader.init, 'function', 'The preloader has an init method');
+        assert.equal(typeof stylesheetPreloader.init(), 'object', 'The preloaded has a factory');
         assert.notDeepEqual(
-            stylesheetPreloaderFactory(),
-            stylesheetPreloaderFactory(),
+            stylesheetPreloader.init(),
+            stylesheetPreloader.init(),
             'The factory creates new instances'
         );
     });
 
-    QUnit.test('property [name]', assert => {
-        assert.expect(1);
-        const preloader = stylesheetPreloaderFactory();
-
-        assert.strictEqual(preloader.name, 'css', 'The preloader has the name "css"');
-    });
-
     QUnit.cases.init([{ title: 'loaded' }, { title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
         assert.expect(1);
-        const preloader = stylesheetPreloaderFactory();
+        const preloader = stylesheetPreloader.init();
 
         assert.equal(typeof preloader[data.title], 'function', `The preloader has the method ${data.title}`);
     });
@@ -55,7 +49,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet'], function 
     QUnit.test('load/unload', assert => {
         assert.expect(5);
         const ready = assert.async();
-        const preloader = stylesheetPreloaderFactory();
+        const preloader = stylesheetPreloader.init();
         const data = {
             asset: 'sample.css',
             itemIdentifier: 'item-1'

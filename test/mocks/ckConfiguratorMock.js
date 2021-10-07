@@ -1,4 +1,4 @@
-/*
+/**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -13,13 +13,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2021 Open Assessment Technologies SA
+ * Copyright (c) 2021 (original work) Open Assessment Technologies SA ;
  */
-
-import extendedTextPreloader from 'taoQtiTest/runner/proxy/cache/preloaders/interactions/extendedText';
-
-/**
- * The list of asset loader factories
- * @type {Function[]}
- */
-export default [extendedTextPreloader];
+define(function () {
+    return function (editor, toolbarType, options) {
+        return Object.assign({}, editor.config, options);
+    };
+});

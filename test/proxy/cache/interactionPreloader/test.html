@@ -7,8 +7,11 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
-                    define('taoQtiTest/runner/proxy/cache/preloaders/interactions/preloaders', function () {
-                        return [];
+                    requirejs.config({
+                        paths: {
+                            'ckeditor': '/test/mocks/ckeditorMock',
+                            'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator': '/test/mocks/ckConfiguratorMock'
+                        }
                     });
                     require(['taoQtiTest/test/runner/proxy/cache/interactionPreloader/test'], function() {
                         QUnit.start();

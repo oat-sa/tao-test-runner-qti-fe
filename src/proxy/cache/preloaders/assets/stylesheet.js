@@ -71,6 +71,17 @@ export default function stylesheetPreloaderFactory() {
         name: 'css',
 
         /**
+         * Tells whether a stylesheet was preloaded or not
+         * @param {string} url - the url of the stylesheet to preload
+         * @param {string} sourceUrl - the unresolved URL (used to index)
+         * @param {string} itemIdentifier - the id of the item the asset belongs to
+         * @returns {boolean}
+         */
+        loaded(url, sourceUrl, itemIdentifier) {
+            return !!(stylesheets[itemIdentifier] && stylesheets[itemIdentifier][sourceUrl]);
+        },
+
+        /**
          * Preloads a stylesheet
          * @param {string} url - the url of the stylesheet to preload
          * @param {string} sourceUrl - the unresolved URL (used to index)

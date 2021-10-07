@@ -41,6 +41,17 @@ export default function imagePreloaderFactory() {
         name: 'img',
 
         /**
+         * Tells whether an image was preloaded or not
+         * @param {string} url - the url of the image to preload
+         * @param {string} sourceUrl - the unresolved URL (used to index)
+         * @param {string} itemIdentifier - the id of the item the asset belongs to
+         * @returns {boolean}
+         */
+        loaded(url, sourceUrl, itemIdentifier) {
+            return !!(images[itemIdentifier] && images[itemIdentifier][sourceUrl]);
+        },
+
+        /**
          * Preloads an image, using the in memory Image object
          * @param {string} url - the url of the image to preload
          * @param {string} sourceUrl - the unresolved URL (used to index)

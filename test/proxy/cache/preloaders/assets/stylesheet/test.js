@@ -43,7 +43,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet'], function 
         assert.strictEqual(preloader.name, 'css', 'The preloader has the name "css"');
     });
 
-    QUnit.cases.init([{ title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
+    QUnit.cases.init([{ title: 'loaded' }, { title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
         assert.expect(1);
         const preloader = stylesheetPreloaderFactory();
 
@@ -53,7 +53,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet'], function 
     QUnit.module('behavior');
 
     QUnit.test('load/unload', assert => {
-        assert.expect(3);
+        assert.expect(5);
         const ready = assert.async();
         const preloader = stylesheetPreloaderFactory();
         const data = {
@@ -75,6 +75,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet'], function 
                     document.querySelector(`head link[href="${assetUrl}"]`) instanceof HTMLLinkElement,
                     'The asset has been preloaded'
                 );
+                assert.ok(preloader.loaded(assetUrl, data.asset, data.itemIdentifier), 'The asset has been preloaded');
             })
             .then(() => preloader.unload(assetUrl, data.asset, data.itemIdentifier))
             .then(() => {
@@ -83,6 +84,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/stylesheet'], function 
                     null,
                     'The asset has been unloaded'
                 );
+                assert.ok(!preloader.loaded(assetUrl, data.asset, data.itemIdentifier), 'The asset has been unloaded');
             })
             .catch(err => assert.ok(false, err))
             .then(ready);

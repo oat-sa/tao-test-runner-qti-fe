@@ -61,7 +61,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/audio'], function (audi
         assert.strictEqual(preloader.name, 'audio', 'The preloader has the name "audio"');
     });
 
-    QUnit.cases.init([{ title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
+    QUnit.cases.init([{ title: 'loaded' }, { title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
         assert.expect(1);
         const preloader = audioPreloaderFactory(assetManagerFactory());
 
@@ -71,7 +71,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/audio'], function (audi
     QUnit.module('behavior');
 
     QUnit.test('load/unload', assert => {
-        assert.expect(3);
+        assert.expect(5);
         const ready = assert.async();
         const assetManager = assetManagerFactory();
         const preloader = audioPreloaderFactory(assetManager);
@@ -88,6 +88,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/audio'], function (audi
                     /^blob/.test(assetManager.resolve(data.asset, data)),
                     'The mp3 sample was resolved as a blob'
                 );
+                assert.ok(preloader.loaded(assetUrl, data.asset, data.itemIdentifier), 'The asset has been preloaded');
             })
             .then(() => preloader.load(assetUrl, data.asset, data.itemIdentifier))
             .then(() => {
@@ -103,6 +104,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/audio'], function (audi
                     false,
                     'The mp3 sample is not resolved anymore'
                 );
+                assert.ok(!preloader.loaded(assetUrl, data.asset, data.itemIdentifier), 'The asset has been unloaded');
             })
             .catch(err => assert.ok(false, err))
             .then(ready);

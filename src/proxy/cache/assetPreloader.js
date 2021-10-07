@@ -28,6 +28,7 @@ import preloaders from 'taoQtiTest/runner/proxy/cache/preloaders/assets/preloade
 /**
  * @typedef {object} assetPreloader
  * @property {string} name - The name of the preloader
+ * @property {assetPreloaderAction} loaded - Tells whether an asset is loaded or not
  * @property {assetPreloaderAction} load - Preload an asset
  * @property {assetPreloaderAction} unload - Unload an asset
  */
@@ -55,6 +56,22 @@ export default function assetPreloaderFactory(assetManager) {
          */
         has(type) {
             return !!assetPreloaders[type];
+        },
+
+        /**
+         * Tells whether an asset was preloaded or not
+         * @param {string} type - The type of asset to preload
+         * @param {string} url - the url of the asset to preload
+         * @param {string} sourceUrl - the unresolved URL (used to index)
+         * @param {string} itemIdentifier - the id of the item the asset belongs to
+         * @returns {boolean}
+         */
+        loaded(type, url, sourceUrl, itemIdentifier) {
+            const preloader = assetPreloaders[type];
+            if (preloader) {
+                return !!preloader.loaded(url, sourceUrl, itemIdentifier);
+            }
+            return false;
         },
 
         /**

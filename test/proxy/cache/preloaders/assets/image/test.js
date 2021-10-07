@@ -39,7 +39,7 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/image'], function (imag
         assert.strictEqual(preloader.name, 'img', 'The preloader has the name "img"');
     });
 
-    QUnit.cases.init([{ title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
+    QUnit.cases.init([{ title: 'loaded' }, { title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
         assert.expect(1);
         const preloader = imagePreloaderFactory();
 
@@ -71,11 +71,11 @@ define(['taoQtiTest/runner/proxy/cache/preloaders/assets/image'], function (imag
         preloader
             .load(assetUrl, data.asset, data.itemIdentifier)
             .then(() => {
-                assert.ok(true, 'The asset has been preloaded');
+                assert.ok(preloader.loaded(assetUrl, data.asset, data.itemIdentifier), 'The asset has been preloaded');
             })
             .then(() => preloader.unload(assetUrl, data.asset, data.itemIdentifier))
             .then(() => {
-                assert.ok(true, 'The asset has been unloaded');
+                assert.ok(!preloader.loaded(assetUrl, data.asset, data.itemIdentifier), 'The asset has been unloaded');
             })
             .catch(err => assert.ok(false, err))
             .then(ready);

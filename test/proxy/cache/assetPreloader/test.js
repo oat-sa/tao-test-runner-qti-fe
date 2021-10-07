@@ -35,12 +35,14 @@ define([
         assert.notDeepEqual(assetPreloaderFactory(), assetPreloaderFactory(), 'The factory creates new instances');
     });
 
-    QUnit.cases.init([{ title: 'has' }, { title: 'load' }, { title: 'unload' }]).test('method ', (data, assert) => {
-        assert.expect(1);
-        const preloader = assetPreloaderFactory();
+    QUnit.cases
+        .init([{ title: 'has' }, { title: 'loaded' }, { title: 'load' }, { title: 'unload' }])
+        .test('method ', (data, assert) => {
+            assert.expect(1);
+            const preloader = assetPreloaderFactory();
 
-        assert.equal(typeof preloader[data.title], 'function', `The assets preloader has the method ${data.title}`);
-    });
+            assert.equal(typeof preloader[data.title], 'function', `The assets preloader has the method ${data.title}`);
+        });
 
     QUnit.module('behavior', {
         beforeEach() {
@@ -51,11 +53,14 @@ define([
     QUnit.test('has', assert => {
         assert.expect(4);
         const expectedAssetManager = {};
-        const cssPreloaderFactory = assetManager => {
-            assert.ok(true, 'CSS preloader created');
+        const preloaderFactory = assetManager => {
+            assert.ok(true, 'Asset preloader created');
             assert.strictEqual(assetManager, expectedAssetManager, 'The expected assetManager has been given');
             return {
-                name: 'css',
+                name: 'asset',
+                loaded() {
+                    return false;
+                },
                 load() {
                     assert.ok(false, 'The asset should not be loaded');
                 },
@@ -64,11 +69,48 @@ define([
                 }
             };
         };
-        preloaders.push(cssPreloaderFactory);
+        preloaders.push(preloaderFactory);
         const preloader = assetPreloaderFactory(expectedAssetManager);
 
-        assert.ok(preloader.has('css'), 'The asset preloader has a CSS preloader');
+        assert.ok(preloader.has('asset'), 'The asset preloader has a Asset preloader');
         assert.ok(!preloader.has('dummy'), 'The asset preloader does not have a dummy preloader');
+    });
+
+    QUnit.test('loaded', assert => {
+        assert.expect(10);
+        const expectedAssetManager = {};
+        const expectedUrl = 'sample.css';
+        const expectedSourceUrl = 'http://test.com/sample.css';
+        const expectedItemIdentifier = 'item-1';
+        let loadedStatus = null;
+        const preloaderFactory = assetManager => {
+            assert.ok(true, 'Asset preloader created');
+            assert.strictEqual(assetManager, expectedAssetManager, 'The expected assetManager has been given');
+            return {
+                name: 'asset',
+                loaded(url, sourceUrl, itemIdentifier) {
+                    assert.strictEqual(url, expectedUrl, 'The expected url has been given');
+                    assert.strictEqual(sourceUrl, expectedSourceUrl, 'The expected source url has been given');
+                    assert.strictEqual(
+                        itemIdentifier,
+                        expectedItemIdentifier,
+                        'The expected item identifier has been given'
+                    );
+                    return loadedStatus;
+                },
+                load() {
+                    assert.ok(false, 'The asset should not be loaded');
+                },
+                unload() {
+                    assert.ok(false, 'The asset should not be unloaded');
+                }
+            };
+        };
+        preloaders.push(preloaderFactory);
+        const preloader = assetPreloaderFactory(expectedAssetManager);
+        assert.strictEqual(preloader.loaded('asset', expectedUrl, expectedSourceUrl, expectedItemIdentifier), false);
+        loadedStatus = 1;
+        assert.strictEqual(preloader.loaded('asset', expectedUrl, expectedSourceUrl, expectedItemIdentifier), true);
     });
 
     QUnit.test('load', assert => {
@@ -78,11 +120,14 @@ define([
         const expectedUrl = 'sample.css';
         const expectedSourceUrl = 'http://test.com/sample.css';
         const expectedItemIdentifier = 'item-1';
-        const cssPreloaderFactory = assetManager => {
-            assert.ok(true, 'CSS preloader created');
+        const preloaderFactory = assetManager => {
+            assert.ok(true, 'Asset preloader created');
             assert.strictEqual(assetManager, expectedAssetManager, 'The expected assetManager has been given');
             return {
-                name: 'css',
+                name: 'asset',
+                loaded() {
+                    return true;
+                },
                 load(url, sourceUrl, itemIdentifier) {
                     assert.strictEqual(url, expectedUrl, 'The expected url has been given');
                     assert.strictEqual(sourceUrl, expectedSourceUrl, 'The expected source url has been given');
@@ -99,10 +144,10 @@ define([
                 }
             };
         };
-        preloaders.push(cssPreloaderFactory);
+        preloaders.push(preloaderFactory);
         const preloader = assetPreloaderFactory(expectedAssetManager);
         preloader
-            .load('css', expectedUrl, expectedSourceUrl, expectedItemIdentifier)
+            .load('asset', expectedUrl, expectedSourceUrl, expectedItemIdentifier)
             .then(() => {
                 assert.ok(true, 'The asset preloader loaded asset');
             })
@@ -121,11 +166,14 @@ define([
         const expectedUrl = 'sample.css';
         const expectedSourceUrl = 'http://test.com/sample.css';
         const expectedItemIdentifier = 'item-1';
-        const cssPreloaderFactory = assetManager => {
-            assert.ok(true, 'CSS preloader created');
+        const preloaderFactory = assetManager => {
+            assert.ok(true, 'Asset preloader created');
             assert.strictEqual(assetManager, expectedAssetManager, 'The expected assetManager has been given');
             return {
-                name: 'css',
+                name: 'asset',
+                loaded() {
+                    return true;
+                },
                 load() {
                     assert.ok(false, 'The asset should not be loaded');
                 },
@@ -142,10 +190,10 @@ define([
                 }
             };
         };
-        preloaders.push(cssPreloaderFactory);
+        preloaders.push(preloaderFactory);
         const preloader = assetPreloaderFactory(expectedAssetManager);
         preloader
-            .unload('css', expectedUrl, expectedSourceUrl, expectedItemIdentifier)
+            .unload('asset', expectedUrl, expectedSourceUrl, expectedItemIdentifier)
             .then(() => {
                 assert.ok(true, 'The asset preloader unloaded asset');
             })

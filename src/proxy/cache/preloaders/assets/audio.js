@@ -16,108 +16,104 @@
  * Copyright (c) 2017-2021 Open Assessment Technologies SA
  */
 
+import _ from 'lodash';
+
 /**
  * (Pre)load audio content.
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
+export default {
+    /**
+     * The name of the preloader
+     * @type {string}
+     */
+    name: 'audio',
 
-/**
- * (Pre)load an item and it's assets.
- *
- * @author Bertrand Chevrier <bertrand@taotesting.com>
- */
-import _ from 'lodash';
+    /**
+     * Manages the preloading of audio files
+     * @param assetManager - A reference to the assetManager
+     * @returns {assetPreloader}
+     */
+    init(assetManager) {
+        //keep references to preloaded audio blobs
+        const audioBlobs = {};
 
-/**
- * Manages the preloading of audio files
- * @param assetManager - A reference to the assetManager
- * @returns {assetPreloader}
- */
-export default function audioPreloaderFactory(assetManager) {
-    //keep references to preloaded audio blobs
-    const audioBlobs = {};
+        //prepend a strategy to resolves cached assets
+        assetManager.prependStrategy({
+            name: 'precaching-audio',
+            handle(url, data) {
+                const sourceUrl = url.toString();
 
-    //prepend a strategy to resolves cached assets
-    assetManager.prependStrategy({
-        name: 'precaching-audio',
-        handle(url, data) {
-            const sourceUrl = url.toString();
-
-            //resolves precached audio files
-            if (
-                data.itemIdentifier &&
-                audioBlobs[data.itemIdentifier] &&
-                'undefined' !== typeof audioBlobs[data.itemIdentifier][sourceUrl]
-            ) {
-                //creates an internal URL to link the audio blob
-                return URL.createObjectURL(audioBlobs[data.itemIdentifier][sourceUrl]);
-            }
-        }
-    });
-
-    return {
-        /**
-         * The name of the preloader
-         * @type {string}
-         */
-        name: 'audio',
-
-        /**
-         * Tells whether an audio file was preloaded or not
-         * @param {string} url - the url of the  audio file to preload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {boolean}
-         */
-        loaded(url, sourceUrl, itemIdentifier) {
-            return !!(audioBlobs[itemIdentifier] && audioBlobs[itemIdentifier][sourceUrl]);
-        },
-
-        /**
-         * Preloads audio files : save the blobs for later use in the asset manager
-         * @param {string} url - the url of the audio file to preload
-         * @param {string} sourceUrl - the unresolved URL (used to index)
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {Promise}
-         */
-        load(url, sourceUrl, itemIdentifier) {
-            return new Promise(resolve => {
-                audioBlobs[itemIdentifier] = audioBlobs[itemIdentifier] || {};
-                if ('undefined' === typeof audioBlobs[itemIdentifier][sourceUrl]) {
-                    //direct XHR to benefit from the "blob" response type
-                    const request = new XMLHttpRequest();
-                    request.open('GET', url, true);
-                    request.responseType = 'blob';
-                    request.onerror = resolve;
-                    request.onabort = resolve;
-                    request.onload = () => {
-                        if (request.status === 200) {
-                            //save the blob, directly
-                            audioBlobs[itemIdentifier][sourceUrl] = request.response;
-                        }
-                        resolve();
-                    };
-                    //ignore failed requests, best effort only
-                    request.send();
-                } else {
-                    resolve();
+                //resolves precached audio files
+                if (
+                    data.itemIdentifier &&
+                    audioBlobs[data.itemIdentifier] &&
+                    'undefined' !== typeof audioBlobs[data.itemIdentifier][sourceUrl]
+                ) {
+                    //creates an internal URL to link the audio blob
+                    return URL.createObjectURL(audioBlobs[data.itemIdentifier][sourceUrl]);
                 }
-            });
-        },
-
-        /**
-         * Removes loaded audio files
-         * @param {string} url - the url of the audio file to unload
-         * @param {string} sourceUrl - the unresolved URL
-         * @param {string} itemIdentifier - the id of the item the asset belongs to
-         * @returns {Promise}
-         */
-        unload(url, sourceUrl, itemIdentifier) {
-            if (audioBlobs[itemIdentifier]) {
-                audioBlobs[itemIdentifier] = _.omit(audioBlobs[itemIdentifier], sourceUrl);
             }
-            return Promise.resolve();
-        }
-    };
-}
+        });
+
+        return {
+            /**
+             * Tells whether an audio file was preloaded or not
+             * @param {string} url - the url of the  audio file to preload
+             * @param {string} sourceUrl - the unresolved URL (used to index)
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {boolean}
+             */
+            loaded(url, sourceUrl, itemIdentifier) {
+                return !!(audioBlobs[itemIdentifier] && audioBlobs[itemIdentifier][sourceUrl]);
+            },
+
+            /**
+             * Preloads audio files : save the blobs for later use in the asset manager
+             * @param {string} url - the url of the audio file to preload
+             * @param {string} sourceUrl - the unresolved URL (used to index)
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {Promise}
+             */
+            load(url, sourceUrl, itemIdentifier) {
+                return new Promise(resolve => {
+                    audioBlobs[itemIdentifier] = audioBlobs[itemIdentifier] || {};
+                    if ('undefined' === typeof audioBlobs[itemIdentifier][sourceUrl]) {
+                        //direct XHR to benefit from the "blob" response type
+                        const request = new XMLHttpRequest();
+                        request.open('GET', url, true);
+                        request.responseType = 'blob';
+                        request.onerror = resolve;
+                        request.onabort = resolve;
+                        request.onload = () => {
+                            if (request.status === 200) {
+                                //save the blob, directly
+                                audioBlobs[itemIdentifier][sourceUrl] = request.response;
+                            }
+                            resolve();
+                        };
+                        //ignore failed requests, best effort only
+                        request.send();
+                    } else {
+                        resolve();
+                    }
+                });
+            },
+
+            /**
+             * Removes loaded audio files
+             * @param {string} url - the url of the audio file to unload
+             * @param {string} sourceUrl - the unresolved URL
+             * @param {string} itemIdentifier - the id of the item the asset belongs to
+             * @returns {Promise}
+             */
+            unload(url, sourceUrl, itemIdentifier) {
+                if (audioBlobs[itemIdentifier]) {
+                    audioBlobs[itemIdentifier] = _.omit(audioBlobs[itemIdentifier], sourceUrl);
+                }
+                return Promise.resolve();
+            }
+        };
+    }
+};

@@ -379,7 +379,7 @@ var qtiProvider = {
         stopwatch.init();
         stopwatch.spread(this, 'tick');
 
-        const timerClientMode = config.options.timer && config.options.timer.restoreTimerFromClient;
+        const isTimerClientMode = () => config.options.timer && config.options.timer.restoreTimerFromClient;
 
         /*
          * Install behavior on events
@@ -562,13 +562,13 @@ var qtiProvider = {
                 this.trigger('enableitem enablenav');
             })
             .on('disableitem', function() {
-                if (timerClientMode) {
+                if (isTimerClientMode()) {
                     stopwatch.stop();
                 }
                 this.trigger('disabletools');
             })
             .on('enableitem', function() {
-                if (timerClientMode) {
+                if (isTimerClientMode()) {
                     stopwatch.start();
                 }
                 this.trigger('enabletools');

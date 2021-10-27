@@ -29,6 +29,7 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
+import Navigator from './Navigator.svelte';
 import navigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigator';
 
 /**
@@ -257,22 +258,14 @@ export default pluginFactory({
             updateButton(self.toggleButton, getToggleButtonData(self.navigator));
         }
 
-        this.navigator = navigatorFactory(navigatorConfig, testMap, testContext)
-            .on('selected', function(position, previousPosition) {
-                previousItemPosition = previousPosition;
-            })
-            .on('jump', function(position) {
-                if (self.getState('enabled') !== false) {
-                    self.disable();
-                    testRunner.jump(position, 'item');
-                }
-            })
-            .on('flag', function(position, flag) {
-                if (self.getState('enabled') !== false) {
-                    flagItem(position, flag);
-                }
-            })
-            .render();
+        this.navigator = new Navigator({
+            target: areaBroker.getNavigationArea(),
+            props: {
+                serviceCallId: testConfig.serviceCallId,
+                liteMode: !!testOptions.liteMode,
+                disabled: true
+            }
+        });
 
         // restore current item in the navigator if movement not allowed
         testRunner.on('alert.notallowed', function() {

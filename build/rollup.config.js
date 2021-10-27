@@ -26,9 +26,20 @@ import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
 import babel from 'rollup-plugin-babel';
 import istanbul from 'rollup-plugin-istanbul';
 import { copyFile, mkdirp } from 'fs-extra';
+import svelte from 'rollup-plugin-svelte';
+import babelSvelte from '@rollup/plugin-babel';
+import json from '@rollup/plugin-json';
+import postcss from 'rollup-plugin-postcss';
+import commonJs from '@rollup/plugin-commonjs';
+import dynamicImportVariables from '@rollup/plugin-dynamic-import-vars';
+import { terser } from 'rollup-plugin-terser';
+import svg from 'rollup-plugin-svg';
 
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
+
+const svelteConfig = require('./svelte.config.js');
+const postCssConfig = require('./postcssSvelte.config.js');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -100,6 +111,8 @@ export default inputs.map(input => {
                 resolve: ['.js', '.tpl'],
                 ...aliases
             }),
+            commonJs(),
+            postcss(postCssConfig),
             handlebarsPlugin({
                 handlebars: {
                     id: 'handlebars',
@@ -111,6 +124,17 @@ export default inputs.map(input => {
                 // helpers: ['build/tpl.js'],
                 templateExtension: '.tpl'
             }),
+            svelte(svelteConfig),
+            babelSvelte({
+                extensions: ['.svelte'],
+                exclude: /node_modules[/\\](?!(svelte|@ckeditor|@oat-sa|@oat-sa-private)[/\\]).*/,
+                babelHelpers: 'bundled'
+            }),
+            json({
+                namedExports: false
+            }),
+            svg(),
+            dynamicImportVariables(),
             ...(process.env.COVERAGE ? [istanbul()] : []),
             babel({
                 presets: [

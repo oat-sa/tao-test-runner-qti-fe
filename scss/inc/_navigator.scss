@@ -152,16 +152,12 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             right: 0;
             top: unset;
             left: 0;
-            bottom: -1.75rem;
+            bottom: -1.5rem;
             margin: 0 auto;
 
             & > :global(svg) {
                 display: block;
             }
-        }
-
-        &.active .icon-indicator:before {
-            content: '\e610';
         }
 
         &.active.focus-visible .indicator {

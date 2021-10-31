@@ -135,6 +135,13 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             color: $colorTextInverted;
             border-color: $colorBgInverted;
         }
+        &.flagged .bookmark{
+            height: 2.5rem;
+            min-width: 1.5rem;
+        }
+        &.flagged .bookmark:before{
+            @include icon-bookmark;
+        }
 
         [class^='icon-'] {
             padding: 0;

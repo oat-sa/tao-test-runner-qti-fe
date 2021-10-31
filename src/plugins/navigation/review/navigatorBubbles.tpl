@@ -9,7 +9,7 @@
                 </span>
                 <ul aria-label="{{label}}" class="qti-navigator-items collapsible-panel plain">
                     {{#each items}}
-                        {{>treeButton}}
+                        {{>bubbleButton}}
                     {{/each}}
                 </ul>
             </li>

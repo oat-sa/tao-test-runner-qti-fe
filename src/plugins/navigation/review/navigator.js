@@ -24,9 +24,9 @@ import component from 'ui/component';
 import autoscroll from 'ui/autoscroll';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import Handlebars from 'handlebars';
-import navigatorTpl from './navigatorSimple.tpl';
-import navigatorTreeTpl from './navigatorSimpleTree.tpl';
-import treeButton from './navigatorSimpleButton.tpl';
+import navigatorTpl from './navigatorFizzy.tpl';
+import navigatorTreeTpl from './navigatorBubbles.tpl';
+import bubbleButton from './bubble.tpl';
 // import navigatorTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
 // import navigatorTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
 
@@ -723,6 +723,6 @@ function navigatorFactory(config, map, context) {
     return navigator.init(config);
 }
 
-Handlebars.registerPartial('treeButton', treeButton);
+Handlebars.registerPartial('bubbleButton', bubbleButton);
 
 export default navigatorFactory;

@@ -272,6 +272,9 @@ export default pluginFactory({
                     flagItem(position, flag);
                 }
             })
+            .on('close', function() {
+                testRunner.trigger('tool-reviewpanel');
+            })
             .render();
 
         // restore current item in the navigator if movement not allowed

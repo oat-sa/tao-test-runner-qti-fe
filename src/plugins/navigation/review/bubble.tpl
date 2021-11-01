@@ -6,8 +6,8 @@
         {{#if active}}aria-current='location'{{/if}}
         role="link"
         aria-label="{{index}} of {{../stats.total}} {{icon}}">
-        {{#if active}} <span class="{{#if active}}icon-indicator {{/if}}indicator" aria-hidden="true"></span> {{/if}}
-        <span class="bookmark" aria-hidden="true"></span>
-        <span class="step-label" aria-hidden="true">{{position}}</span>
+        {{#if active}}<span class="{{#if active}}icon-indicator {{/if}}indicator" aria-hidden="true"></span>{{/if}}
+        {{#if flagged}}<span class="icon-bookmark bookmark" aria-hidden="true"></span>{{/if}}
+        {{#unless flagged}}<span class="step-label" aria-hidden="true">{{position}}</span>{{/unless}}
     </button>
 </li>

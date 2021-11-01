@@ -116,7 +116,8 @@ var _selectors = {
     notInformational: ':not(.info)',
     informational: '.info',
     hidden: '.hidden',
-    disabled: '.disabled'
+    disabled: '.disabled',
+    closeButton: '.icon-close'
 };
 
 /**
@@ -578,6 +579,7 @@ function navigatorFactory(config, map, context) {
             var $filterBar = $component.find(_selectors.filterBar);
             var $filters = $filterBar.find('li');
             var $tree = $component.find(_selectors.tree);
+            var $closeButton = $component.find(_selectors.closeButton);
 
             // links the component to the underlying DOM elements
             this.controls = {
@@ -713,7 +715,15 @@ function navigatorFactory(config, map, context) {
                 }
             });
 
-            this.update(map, context);
+            //click on close button
+            $closeButton.on('click', function (e) {
+                e.preventDefault();
+                /**
+                 * Review screen should be closed
+                 * @event navigator#close
+                 */
+                navigator.trigger('close');
+            });
         });
 
     // set default filter

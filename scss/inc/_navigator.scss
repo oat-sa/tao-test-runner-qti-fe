@@ -50,6 +50,13 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
         .icon-close {
             @include font-size(28);
             line-height: $lineHeight;
+            color: $colorTextDefault;
+
+            &:hover {
+                color: $colorTextDefault;
+                text-decoration: none;
+                cursor: pointer;
+            }
         }
     }
 
@@ -102,7 +109,6 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
         border-radius: $radiusCircular;
         border-width: $borderThin;
         border-color: $colorTextDefault;
-        font-family: 'Nunito Sans', 'Source Sans Pro', Arial, sans-serif !important;
 
         /*Fixes firefox button jumps*/
         padding: 0;
@@ -135,16 +141,11 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             color: $colorTextInverted;
             border-color: $colorBgInverted;
         }
-        &.flagged .bookmark{
-            height: 2.5rem;
-            min-width: 1.5rem;
-        }
-        &.flagged .bookmark:before{
-            @include icon-bookmark;
-        }
 
-        [class^='icon-'] {
+        & [class^='icon-'] {
             padding: 0;
+            top: 0;
+            left: 0;
         }
 
         &.active .indicator {
@@ -180,6 +181,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
         }
 
         & span.step-label {
+            font-family: 'Nunito Sans', 'Source Sans Pro', Arial, sans-serif !important;
             max-width: 3.75rem;
             overflow: hidden;
             white-space: nowrap;

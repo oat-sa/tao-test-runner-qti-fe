@@ -147,6 +147,9 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             top: 0;
             left: 0;
         }
+        & .indicator{
+            display: none;
+        }
 
         &.active .indicator {
             position: absolute;
@@ -185,6 +188,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             max-width: 3.75rem;
             overflow: hidden;
             white-space: nowrap;
+            line-height: initial;
         }
     }
 }

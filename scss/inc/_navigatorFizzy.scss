@@ -1,0 +1,219 @@
+@import 'inc/bootstrap';
+
+$lineHeight: 3rem;
+$borderWidth: 1px;
+$backgroundColor: #f2f2f2;
+$radiusCircular: 50%;
+$sizeDefault: 4rem;
+$hitboxSize: 6.25rem;
+$borderThin: 0.125rem;
+$colorTextDisabled: hsl(0, 0%, 45%);
+$colorBgDefault: white;
+$borderMedium: 0.25rem;
+$borderMediumPlus: 0.375rem;
+$colorTextDefault: hsl(0, 0%, 12%);
+$colorBgInverted: $colorTextDefault;
+$colorTextInverted: white;
+$colorPrimaryHighlight: hsl(208, 100%, 32%);
+$colorSuccess: hsl(164, 54%, 25%);
+$colorWarning: hsl(356, 65%, 40%);
+$offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
+
+
+.qti-navigator.fizzy {
+    .qti-navigator-tree.key-navigation-group.focusin {
+        background: none;
+    }
+}
+.qti-navigator.fizzy {
+    @include disableSelect();
+    @include flex-container();
+    @include vendor-prefix(flex-direction, column, property);
+    padding: 0;
+    cursor: default;
+    height: 100%;
+    position: relative;
+    background-color: $backgroundColor !important;
+    width: 29rem;
+
+    /* reset parent style */
+    button [class*=" icon-"]{
+        padding: 0;
+    }
+    /* reset parent styles */
+    .qti-navigator-filters.key-navigation-group.focusin.focusin{
+        background: $backgroundColor;
+    }
+
+    /* header */
+    & > .qti-navigator-label {
+        display: flex;
+        justify-content: space-between;
+        margin: 12px 10px 0 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ccc;
+
+        .qti-navigator-text {
+            @include font-size(20);
+            font-weight: bold;
+        }
+
+        .icon-close {
+            @include font-size(28);
+            line-height: $lineHeight;
+            color: $colorTextDefault;
+
+            &:hover {
+                color: $colorTextDefault;
+                text-decoration: none;
+                cursor: pointer;
+            }
+        }
+    }
+
+    /* tree */
+    .qti-navigator-tree {
+        padding: 0 10px;
+        background: none;
+
+        .qti-navigator-label {
+            margin: 13px 0 10px 0;
+            display: block;
+            @include font-size(15);
+        }
+    }
+
+    .qti-navigator-item {
+        height: $hitboxSize;
+        width: $hitboxSize;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* reset parent style */
+        padding: 0 !important; /* instead of rewriting 6-classes selector */
+        border: none !important; /* instead of rewriting 6-classes selector */
+
+        &.disabled {
+            background-color: unset !important;
+            color: $colorTextDisabled !important;
+            border-color: $colorTextDisabled !important;
+            opacity: 1 !important;
+            text-shadow: none !important;
+        }
+        &.key-navigation-highlight .step::after {
+                content: '';
+                display: block;
+                position: absolute;
+                top: -0.75rem;
+                left: -0.75rem;
+                right: -0.75rem;
+                bottom: -0.75rem;
+                border-width: $borderMedium;
+                border-color: $colorPrimaryHighlight;
+                border-style: dotted;
+                border-radius: $radiusCircular;
+        }
+        &.key-navigation-highlight .step .indicator {
+            color: $colorPrimaryHighlight;
+        }
+    }
+
+    .qti-navigator-items {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .step {
+        &:not([disabled]) {
+            cursor: pointer;
+        }
+        &:not([disabled]):hover {
+            background-color: hsl(208, 100%, 95%);
+            color: $colorPrimaryHighlight;
+            border-color: $colorPrimaryHighlight;
+        }
+
+        position: relative;
+        height: $sizeDefault;
+        width: $sizeDefault;
+        border-style: solid;
+        border-radius: $radiusCircular;
+        border-width: $borderThin;
+        border-color: $colorTextDefault;
+
+        /*Fixes firefox button jumps*/
+        padding: 0;
+
+        font-weight: bold;
+        font-size: 1.6rem !important;
+
+        background-color: $colorBgDefault;
+        color: $colorTextDefault;
+
+        &.viewed {
+            border-width: $borderMedium;
+            color: $colorTextDefault;
+            border-color: $colorTextDefault;
+        }
+
+        /* reset parent styles */
+        &.disabled {
+            background-color: $colorBgDefault !important;
+            border-style: solid !important;
+            border-radius: $radiusCircular !important;
+            border-width: $borderMedium !important;
+            color: $colorTextDisabled !important;
+            border-color: $colorTextDisabled !important;
+            opacity: 1 !important;
+            text-shadow: none !important;
+        }
+
+        &.answered {
+            background-color: $colorBgInverted;
+            color: $colorTextInverted;
+            border-color: $colorBgInverted;
+        }
+
+        & .icon-flagged:after{
+            @include icon-bookmark;
+        }
+        & .icon-flagged{
+            padding: 0;
+            top: 0;
+            left: 0;
+        }
+
+        & .indicator{
+            display: none;
+        }
+
+        &.active .indicator {
+            position: absolute;
+            display: block;
+            z-index: 1;
+            color: $colorTextDefault;
+            height: 1.4rem;
+            min-width: 1.6rem;
+            background-color: $backgroundColor;
+            top: unset;
+            bottom: -1.6rem;
+            transform: translateX(50%);
+
+            & > :global(svg) {
+                display: block;
+            }
+        }
+
+        &.active:hover:not([disabled]) .indicator {
+            color: $colorPrimaryHighlight;
+        }
+
+        & span.step-label {
+            font-family: 'Nunito Sans', 'Source Sans Pro', Arial, sans-serif !important;
+            max-width: 3.75rem;
+            overflow: hidden;
+            white-space: nowrap;
+            line-height: initial;
+        }
+    }
+}

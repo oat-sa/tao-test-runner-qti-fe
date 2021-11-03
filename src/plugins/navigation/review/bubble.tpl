@@ -1,5 +1,4 @@
 <li class="qti-navigator-item {{cls}}" data-id="{{id}}" data-position="{{position}}">
-    {{debug}}
     <button
         class="qti-navigator-label step {{cls}} icon-{{icon}}"
         {{#if active}}class="current"{{/if}}

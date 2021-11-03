@@ -1,4 +1,4 @@
-<div class="qti-panel qti-navigator{{#if hidden}} hidden{{/if}}">
+<div class="qti-panel qti-navigator{{#if hidden}} hidden{{/if}} fizzy">
     <span class="qti-navigator-label" title="{{__ 'Test review'}}">
             <span class="qti-navigator-text">{{__ 'Test review'}}</span>
             <a class="icon-close" href="#" onclick="return false" aria-hidden="true"></a>

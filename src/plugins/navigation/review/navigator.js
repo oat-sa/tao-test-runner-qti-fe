@@ -24,12 +24,14 @@ import component from 'ui/component';
 import autoscroll from 'ui/autoscroll';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import Handlebars from 'handlebars';
-import navigatorTpl from './navigatorFizzy.tpl';
-import navigatorTreeTpl from './navigatorBubbles.tpl';
+import fizzyTpl from './navigatorFizzy.tpl';
+import fizzyTreeTpl from './navigatorBubbles.tpl';
 import bubbleButton from './bubble.tpl';
-// import navigatorTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
-// import navigatorTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
+import accordionTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
+import accordionTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
 
+let navigatorTpl = accordionTpl;
+let navigatorTreeTpl = accordionTreeTpl;
 /**
  * Some default values
  * @type {Object}
@@ -557,6 +559,11 @@ function navigatorFactory(config, map, context) {
         navigator.trigger('jump', position);
     }
 
+    if (config["reviewLayout"] === 'fizzy') {
+        navigatorTpl = fizzyTpl;
+        navigatorTreeTpl = fizzyTreeTpl;
+    }
+
     navigator = component(navigatorApi, _defaults)
         .setTemplate(navigatorTpl)
 
@@ -734,16 +741,5 @@ function navigatorFactory(config, map, context) {
 }
 
 Handlebars.registerPartial('bubbleButton', bubbleButton);
-Handlebars.registerHelper("debug", function(optionalValue) {
-    console.log("Current Context");
-    console.log("====================");
-    console.log(this);
-
-    if (optionalValue) {
-        console.log("Value");
-        console.log("====================");
-        console.log(optionalValue);
-    }
-});
 
 export default navigatorFactory;

@@ -156,9 +156,11 @@ export default pluginFactory({
 
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
-        const navigatorConfig = testRunnerOptions.review || {
+        const pluginConfig = this.getConfig();
+        let navigatorConfig = testRunnerOptions.review || {
             defaultOpen : false
         };
+        navigatorConfig = Object.assign({}, navigatorConfig, pluginConfig)
         let previousItemPosition;
 
         /**

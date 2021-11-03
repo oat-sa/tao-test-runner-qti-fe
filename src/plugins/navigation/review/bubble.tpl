@@ -8,6 +8,6 @@
         aria-label="{{index}} of {{../stats.total}} {{icon}}">
         {{#if active}}<span class="{{#if active}}icon-indicator {{/if}}indicator" aria-hidden="true"></span>{{/if}}
         <span class="qti-navigator-icon icon-{{icon}}"></span>
-        {{#unless flagged}}<span class="step-label" aria-hidden="true">{{position}}</span>{{/unless}}
+        <span class="step-label" aria-hidden="true">{{position}}</span>
     </button>
 </li>

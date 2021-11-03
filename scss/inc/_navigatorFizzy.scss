@@ -127,6 +127,10 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             color: $colorPrimaryHighlight;
             border-color: $colorPrimaryHighlight;
         }
+        /* remove number from item button if item was marked for review */
+        &.flagged span.step-label {
+            display: none;
+        }
     }
 
     .qti-navigator-items {

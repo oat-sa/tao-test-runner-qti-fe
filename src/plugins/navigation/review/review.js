@@ -37,15 +37,15 @@ import navigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/naviga
 var buttonData = {
     setFlag: {
         control: 'set-item-flag',
-        title: __('Flag the current item for later review'),
-        icon: 'anchor',
-        text: __('Flag for Review')
+        title: __('Bookmark the current question for later review'),
+        icon: 'bookmark',
+        text: __('Bookmark question')
     },
     unsetFlag: {
         control: 'unset-item-flag',
-        title: __('Do not flag the current item for later review'),
-        icon: 'anchor',
-        text: __('Unflag for Review')
+        title: __('Do not bookmark the current question for later review'),
+        icon: 'bookmark-outline',
+        text: __('Bookmark question')
     },
     showReview: {
         control: 'show-review',

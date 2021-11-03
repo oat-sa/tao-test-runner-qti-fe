@@ -165,6 +165,15 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             border-color: $colorBgInverted;
         }
 
+        & .icon-flagged:after{
+            @include icon-bookmark;
+        }
+        & .icon-flagged{
+            padding: 0;
+            top: 0;
+            left: 0;
+        }
+
         & [class^='icon-'] {
             padding: 0;
             top: 0;

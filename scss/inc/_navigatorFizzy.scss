@@ -100,6 +100,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             opacity: 1 !important;
             text-shadow: none !important;
         }
+        /* keyboard focusing */
         &.key-navigation-highlight .step::after {
                 content: '';
                 display: block;
@@ -115,6 +116,16 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
         }
         &.key-navigation-highlight .step .indicator {
             color: $colorPrimaryHighlight;
+        }
+        &.key-navigation-highlight > .answered {
+            background-color: $colorPrimaryHighlight;
+            color: $colorTextInverted;
+            border-color: $colorPrimaryHighlight;
+        }
+        &.key-navigation-highlight > .viewed:not(.answered) {
+            border-width: $borderMedium;
+            color: $colorPrimaryHighlight;
+            border-color: $colorPrimaryHighlight;
         }
     }
 

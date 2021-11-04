@@ -40,6 +40,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
     button [class*=" icon-"]{
         padding: 0;
     }
+
     /* reset parent styles */
     .qti-navigator-filters.key-navigation-group.focusin.focusin{
         background: $backgroundColor;
@@ -76,7 +77,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
         padding: 0 10px;
         background: none;
 
-        .qti-navigator-label {
+        span.qti-navigator-label {
             margin: 13px 0 10px 0;
             display: block;
             @include font-size(15);
@@ -90,8 +91,8 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
         justify-content: center;
         align-items: center;
         /* reset parent style */
-        padding: 0 !important; /* instead of rewriting 6-classes selector */
-        border: none !important; /* instead of rewriting 6-classes selector */
+        padding: 0 !important; /* instead of rewriting 6-classes selector on focusing */
+        border: none !important; /* instead of rewriting 6-classes selector on focusing */
 
         &.disabled {
             background-color: unset !important;
@@ -100,79 +101,9 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             opacity: 1 !important;
             text-shadow: none !important;
         }
-        /* keyboard focusing */
-        &.key-navigation-highlight .step::after {
-                content: '';
-                display: block;
-                position: absolute;
-                top: -0.75rem;
-                left: -0.75rem;
-                right: -0.75rem;
-                bottom: -0.75rem;
-                border-width: $borderMedium;
-                border-color: $colorPrimaryHighlight;
-                border-style: dotted;
-                border-radius: $radiusCircular;
-        }
-        &.key-navigation-highlight .step .indicator {
-            color: $colorPrimaryHighlight;
-        }
-        &.key-navigation-highlight > .answered {
-            background-color: $colorPrimaryHighlight;
-            color: $colorTextInverted;
-            border-color: $colorPrimaryHighlight;
-        }
-        &.key-navigation-highlight > .viewed:not(.answered) {
-            border-width: $borderMedium;
-            color: $colorPrimaryHighlight;
-            border-color: $colorPrimaryHighlight;
-        }
-        /* remove number from item button if item was marked for review */
-        &.flagged span.step-label {
-            display: none;
-        }
-    }
-
-    .qti-navigator-items {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .step {
-        &:not([disabled]) {
-            cursor: pointer;
-        }
-        &:not([disabled]):hover {
-            background-color: hsl(208, 100%, 95%);
-            color: $colorPrimaryHighlight;
-            border-color: $colorPrimaryHighlight;
-        }
-
-        position: relative;
-        height: $sizeDefault;
-        width: $sizeDefault;
-        border-style: solid;
-        border-radius: $radiusCircular;
-        border-width: $borderThin;
-        border-color: $colorTextDefault;
-
-        /*Fixes firefox button jumps*/
-        padding: 0;
-
-        font-weight: bold;
-        font-size: 1.6rem !important;
-
-        background-color: $colorBgDefault;
-        color: $colorTextDefault;
-
-        &.viewed {
-            border-width: $borderMedium;
-            color: $colorTextDefault;
-            border-color: $colorTextDefault;
-        }
 
         /* reset parent styles */
-        &.disabled {
+        &.disabled .step{
             background-color: $colorBgDefault !important;
             border-style: solid !important;
             border-radius: $radiusCircular !important;
@@ -183,19 +114,21 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             text-shadow: none !important;
         }
 
-        &.answered {
+        /* remove number from item button if item was marked for review */
+        &.flagged span.step-label {
+            display: none;
+        }
+
+        &.viewed .step{
+            border-width: $borderMedium;
+            color: $colorTextDefault;
+            border-color: $colorTextDefault;
+        }
+
+        &.answered .step{
             background-color: $colorBgInverted;
             color: $colorTextInverted;
             border-color: $colorBgInverted;
-        }
-
-        & .icon-flagged:after{
-            @include icon-bookmark;
-        }
-        & .icon-flagged{
-            padding: 0;
-            top: 0;
-            left: 0;
         }
 
         & .indicator{
@@ -213,15 +146,96 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             top: unset;
             bottom: -1.6rem;
             transform: translateX(50%);
+            padding: 0;
+            left: 0;
 
             & > :global(svg) {
                 display: block;
             }
         }
 
-        &.active:hover:not([disabled]) .indicator {
+        & .icon-flagged::before{
+            @include icon-bookmark;
+        }
+        & .icon-flagged{
+            display: none;
+
+        }
+        &.flagged .icon-flagged{
+            padding: 0;
+            top: 0;
+            left: 0;
+            display: block;
+        }
+
+        &:not([disabled]) .step{
+            cursor: pointer;
+        }
+
+        &:not([disabled]) .step:hover {
+            background-color: hsl(208, 100%, 95%);
+            color: $colorPrimaryHighlight;
+            border-color: $colorPrimaryHighlight;
+        }
+
+        /* keyboard focusing */
+        &.key-navigation-highlight .step::before {
+                content: '';
+                display: block;
+                position: absolute;
+                top: -0.75rem;
+                left: -0.75rem;
+                right: -0.75rem;
+                bottom: -0.75rem;
+                border-width: $borderMedium;
+                border-color: $colorPrimaryHighlight;
+                border-style: dotted;
+                border-radius: $radiusCircular;
+        }
+
+        &.key-navigation-highlight.active .step .indicator {
             color: $colorPrimaryHighlight;
         }
+
+        &.key-navigation-highlight.answered > .step {
+            background-color: $colorPrimaryHighlight;
+            color: $colorTextInverted;
+            border-color: $colorPrimaryHighlight;
+        }
+
+        &.key-navigation-highlight.viewed:not(.answered) > .step {
+            border-width: $borderMedium;
+            color: $colorPrimaryHighlight;
+            border-color: $colorPrimaryHighlight;
+        }
+    }
+
+    .qti-navigator-items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: start;
+    }
+
+    .step {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: $sizeDefault;
+        width: $sizeDefault;
+        border-style: solid;
+        border-radius: $radiusCircular;
+        border-width: $borderThin;
+        border-color: $colorTextDefault;
+
+        /*Fixes firefox button jumps*/
+        padding: 0;
+
+        font-weight: bold;
+        font-size: 1.6rem !important;
+        background-color: $colorBgDefault;
+        color: $colorTextDefault;
+        text-shadow: none;
 
         & span.step-label {
             font-family: 'Nunito Sans', 'Source Sans Pro', Arial, sans-serif !important;
@@ -231,4 +245,66 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             line-height: initial;
         }
     }
+}
+
+/* reset default template styles */
+.qti-navigator .qti-navigator-label{
+    padding: 0;
+    line-height: initial;
+    min-width: auto;
+    align-items: center;
+    display: block;
+}
+.qti-navigator .qti-navigator-filters{
+    padding: 0;
+    margin: 0;
+    width: auto;
+    height: 100%;
+    text-align: initial;
+}
+.qti-navigator .qti-navigator-filters .qti-navigator-filter{
+    height: 100%;
+}
+.qti-navigator .qti-navigator-filters ul{
+    display: block;
+}
+.qti-navigator .qti-navigator-section.active > .qti-navigator-label{
+    background-color: initial;
+    border: none;
+    padding: 0;
+}
+.qti-navigator .qti-navigator-tree{
+    height: 100%;
+    display: block;
+}
+.qti-navigator .qti-navigator-item{
+    padding: 0;
+    margin: 0;
+    background: $backgroundColor;
+}
+.qti-navigator .qti-navigator-item:hover{
+    background: inherit;
+    color: inherit;
+}
+.qti-navigator .qti-navigator-item.active{
+    background: inherit;
+    color: inherit;
+}
+.qti-navigator span.icon-viewed{
+    display: none;
+}
+.qti-navigator .icon-viewed::before {
+    content: "";
+}
+.qti-navigator span.icon-unseen{
+    display: none;
+}
+.qti-navigator .icon-unseen::before {
+    content: "";
+}
+.qti-navigator span.icon-answered{
+    display: none;
+}
+.qti-navigator .icon-answered::before {
+    content: "";
 }

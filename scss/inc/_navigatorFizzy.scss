@@ -19,7 +19,6 @@ $colorSuccess: hsl(164, 54%, 25%);
 $colorWarning: hsl(356, 65%, 40%);
 $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
 
-
 .qti-navigator.fizzy {
     .qti-navigator-tree.key-navigation-group.focusin {
         background: none;
@@ -37,12 +36,12 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
     width: 29rem;
 
     /* reset parent style */
-    button [class*=" icon-"]{
+    button [class*=' icon-'] {
         padding: 0;
     }
 
     /* reset parent styles */
-    .qti-navigator-filters.key-navigation-group.focusin.focusin{
+    .qti-navigator-filters.key-navigation-group.focusin.focusin {
         background: $backgroundColor;
     }
 
@@ -103,7 +102,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
         }
 
         /* reset parent styles */
-        &.disabled .step{
+        &.disabled .step {
             background-color: $colorBgDefault !important;
             border-style: solid !important;
             border-radius: $radiusCircular !important;
@@ -119,19 +118,19 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             display: none;
         }
 
-        &.viewed .step{
+        &.viewed .step {
             border-width: $borderMedium;
             color: $colorTextDefault;
             border-color: $colorTextDefault;
         }
 
-        &.answered .step{
+        &.answered .step {
             background-color: $colorBgInverted;
             color: $colorTextInverted;
             border-color: $colorBgInverted;
         }
 
-        & .indicator{
+        & .indicator {
             display: none;
         }
 
@@ -145,30 +144,32 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             background-color: $backgroundColor;
             top: unset;
             bottom: -1.6rem;
-            transform: translateX(50%);
             padding: 0;
-            left: 0;
+            /* centering horizontally */
+            left: 50%;
+            transform: translateX(-50%);
 
             & > :global(svg) {
                 display: block;
             }
         }
 
-        & .icon-flagged::before{
+        & .icon-flagged::before {
             @include icon-bookmark;
         }
-        & .icon-flagged{
-            display: none;
 
+        & .icon-flagged {
+            display: none;
         }
-        &.flagged .icon-flagged{
+
+        &.flagged .icon-flagged {
             padding: 0;
             top: 0;
             left: 0;
             display: block;
         }
 
-        &:not([disabled]) .step{
+        &:not([disabled]) .step {
             cursor: pointer;
         }
 
@@ -180,17 +181,18 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
 
         /* keyboard focusing */
         &.key-navigation-highlight .step::before {
-                content: '';
-                display: block;
-                position: absolute;
-                top: -0.75rem;
-                left: -0.75rem;
-                right: -0.75rem;
-                bottom: -0.75rem;
-                border-width: $borderMedium;
-                border-color: $colorPrimaryHighlight;
-                border-style: dotted;
-                border-radius: $radiusCircular;
+            content: '';
+            display: block;
+            position: absolute;
+            width: 5.2rem;
+            height: 5.2rem;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-width: $borderMedium;
+            border-color: $colorPrimaryHighlight;
+            border-style: dotted;
+            border-radius: $radiusCircular;
         }
 
         &.key-navigation-highlight.active .step .indicator {
@@ -248,63 +250,63 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
 }
 
 /* reset default template styles */
-.qti-navigator .qti-navigator-label{
+.qti-navigator .qti-navigator-label {
     padding: 0;
     line-height: initial;
     min-width: auto;
     align-items: center;
     display: block;
 }
-.qti-navigator .qti-navigator-filters{
+.qti-navigator .qti-navigator-filters {
     padding: 0;
     margin: 0;
     width: auto;
     height: 100%;
     text-align: initial;
 }
-.qti-navigator .qti-navigator-filters .qti-navigator-filter{
+.qti-navigator .qti-navigator-filters .qti-navigator-filter {
     height: 100%;
 }
-.qti-navigator .qti-navigator-filters ul{
+.qti-navigator .qti-navigator-filters ul {
     display: block;
 }
-.qti-navigator .qti-navigator-section.active > .qti-navigator-label{
+.qti-navigator .qti-navigator-section.active > .qti-navigator-label {
     background-color: initial;
     border: none;
     padding: 0;
 }
-.qti-navigator .qti-navigator-tree{
+.qti-navigator .qti-navigator-tree {
     height: 100%;
     display: block;
 }
-.qti-navigator .qti-navigator-item{
+.qti-navigator .qti-navigator-item {
     padding: 0;
     margin: 0;
     background: $backgroundColor;
 }
-.qti-navigator .qti-navigator-item:hover{
+.qti-navigator .qti-navigator-item:hover {
     background: inherit;
     color: inherit;
 }
-.qti-navigator .qti-navigator-item.active{
+.qti-navigator .qti-navigator-item.active {
     background: inherit;
     color: inherit;
 }
-.qti-navigator span.icon-viewed{
+.qti-navigator span.icon-viewed {
     display: none;
 }
 .qti-navigator .icon-viewed::before {
-    content: "";
+    content: '';
 }
-.qti-navigator span.icon-unseen{
+.qti-navigator span.icon-unseen {
     display: none;
 }
 .qti-navigator .icon-unseen::before {
-    content: "";
+    content: '';
 }
-.qti-navigator span.icon-answered{
+.qti-navigator span.icon-answered {
     display: none;
 }
 .qti-navigator .icon-answered::before {
-    content: "";
+    content: '';
 }

@@ -7,7 +7,7 @@
                 <span class="qti-navigator-label" title="{{label}}">
                     <span class="qti-navigator-text">{{label}}</span>
                 </span>
-                <ul aria-label="{{label}}" class="qti-navigator-items collapsible-panel plain">
+                <ul aria-label="{{label}}" class="qti-navigator-items plain">
                     {{#each items}}
                         {{>bubbleButton}}
                     {{/each}}

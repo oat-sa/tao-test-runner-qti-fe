@@ -562,6 +562,9 @@ function navigatorFactory(config, map, context) {
     if (config["reviewLayout"] === 'fizzy') {
         navigatorTpl = fizzyTpl;
         navigatorTreeTpl = fizzyTreeTpl;
+        // hack to not allow activate/deactivate bookmarking on icon click in item button
+        _cssCls.collapsed = 'fizzy';
+        _selectors.filter = 'abc';
     }
 
     navigator = component(navigatorApi, _defaults)

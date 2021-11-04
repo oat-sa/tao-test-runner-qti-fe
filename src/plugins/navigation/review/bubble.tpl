@@ -7,7 +7,7 @@
         role="link"
         aria-label="{{index}} of {{../stats.total}} {{icon}}">
         {{#if active}}<span class="{{#if active}}icon-indicator {{/if}}indicator" aria-hidden="true"></span>{{/if}}
-        <span class="icon-{{icon}}" aria-hidden="true"></span>
+        <span class="qti-navigator-icon icon-{{icon}}" aria-hidden="true"></span>
         <span class="step-label" aria-hidden="true">{{position}}</span>
     </button>
 </li>

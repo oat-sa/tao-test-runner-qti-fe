@@ -15,9 +15,9 @@ $colorTextDefault: hsl(0, 0%, 12%);
 $colorBgInverted: $colorTextDefault;
 $colorTextInverted: white;
 $colorPrimaryHighlight: hsl(208, 100%, 32%);
-$colorSuccess: hsl(164, 54%, 25%);
-$colorWarning: hsl(356, 65%, 40%);
 $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
+$headerHeight: 4.5rem;
+$panelPadding: 19px;
 
 .qti-navigator.fizzy {
     .qti-navigator-tree.key-navigation-group.focusin {
@@ -25,15 +25,17 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
     }
 }
 .qti-navigator.fizzy {
-    @include disableSelect();
-    @include flex-container();
-    @include vendor-prefix(flex-direction, column, property);
-    padding: 0;
-    cursor: default;
-    height: 100%;
-    position: relative;
-    background-color: $backgroundColor !important;
-    width: 29rem;
+    &.qti-panel.qti-panel {
+        @include disableSelect();
+        @include flex-container();
+        @include vendor-prefix(flex-direction, column, property);
+        cursor: default;
+        height: 100%;
+        position: relative;
+        background-color: $backgroundColor !important;
+        width: 30rem;
+        padding: $panelPadding 0;
+    }
 
     /* reset parent style */
     button [class*=' icon-'] {
@@ -44,14 +46,18 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
     .qti-navigator-filters.key-navigation-group.focusin.focusin {
         background: $backgroundColor;
     }
+    .qti-navigator-filters {
+        height: calc(100% - #{$headerHeight});
+    }
 
     /* header */
     & > .qti-navigator-label {
         display: flex;
         justify-content: space-between;
-        margin: 12px 10px 0 10px;
-        padding-bottom: 10px;
+        margin: 0 $panelPadding;
         border-bottom: 1px solid #ccc;
+        min-height: $headerHeight;
+        align-items: center;
 
         .qti-navigator-text {
             @include font-size(20);
@@ -73,7 +79,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
 
     /* tree */
     .qti-navigator-tree {
-        padding: 0 10px;
+        padding: 0 $panelPadding;
         background: none;
 
         span.qti-navigator-label {
@@ -89,10 +95,11 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
         display: flex;
         justify-content: center;
         align-items: center;
-        /* reset parent style */
+        /* reset parent styles */
         padding: 0 !important; /* instead of rewriting 6-classes selector on focusing */
         border: none !important; /* instead of rewriting 6-classes selector on focusing */
 
+        /* reset global styles */
         &.disabled {
             background-color: unset !important;
             color: $colorTextDisabled !important;
@@ -101,16 +108,12 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             text-shadow: none !important;
         }
 
-        /* reset parent styles */
         &.disabled .step {
-            background-color: $colorBgDefault !important;
-            border-style: solid !important;
-            border-radius: $radiusCircular !important;
-            border-width: $borderMedium !important;
-            color: $colorTextDisabled !important;
-            border-color: $colorTextDisabled !important;
-            opacity: 1 !important;
-            text-shadow: none !important;
+            border-width: $borderMedium;
+            color: $colorTextDisabled;
+            border-color: $colorTextDisabled;
+            opacity: 1;
+            text-shadow: none;
         }
 
         /* remove number from item button if item was marked for review */
@@ -143,7 +146,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             min-width: 1.6rem;
             background-color: $backgroundColor;
             top: unset;
-            bottom: -1.6rem;
+            bottom: -1.7rem;
             padding: 0;
             /* centering horizontally */
             left: 50%;
@@ -169,11 +172,11 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
             display: block;
         }
 
-        &:not([disabled]) .step {
+        &:not(.disabled) .step {
             cursor: pointer;
         }
 
-        &:not([disabled]) .step:hover {
+        &:not(.disabled) .step:hover {
             background-color: hsl(208, 100%, 95%);
             color: $colorPrimaryHighlight;
             border-color: $colorPrimaryHighlight;
@@ -261,7 +264,7 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
     padding: 0;
     margin: 0;
     width: auto;
-    height: 100%;
+    height: inherit;
     text-align: initial;
 }
 .qti-navigator .qti-navigator-filters .qti-navigator-filter {

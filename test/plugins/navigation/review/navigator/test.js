@@ -171,7 +171,6 @@ define([
         var component = navigatorFactory(sample.config, sample.map, sample.context);
 
         assert.expect(8);
-
         component
             .on('update', function() {
                 var $element = this.getElement();
@@ -209,10 +208,13 @@ define([
                     '10/10',
                     'The viewed counter is correct'
                 );
-
                 ready();
             })
-            .render($container);
+            .render($container)
+            .update(sample.map, sample.context)
+            .updateConfig({
+                canFlag: true
+            });
     });
 
     QUnit.test('inconsistent item count', function(assert) {
@@ -302,7 +304,11 @@ define([
 
                 ready();
             })
-            .render($container);
+            .render($container)
+            .update(map, sample.context)
+            .updateConfig({
+                canFlag: true
+            });
     });
 
     QUnit.module('Visual');

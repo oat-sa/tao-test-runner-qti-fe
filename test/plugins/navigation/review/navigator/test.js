@@ -325,6 +325,48 @@ define([
 
                 ready();
             })
-            .render($container);
+            .render($container)
+            .update(sample.map, sample.context);
+        });
+
+    QUnit.module('Fizzy layout');
+
+    QUnit.test('close button exists', function(assert) {
+        const ready = assert.async();
+        const $container = $('#qunit-fixture');
+        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy"});
+
+        assert.expect(1);
+
+        navigatorFactory(config, sample.map, sample.context)
+        .on('update', function() {
+            const closeButton = $('.qti-navigator > .qti-navigator-label > .icon-close', $container);
+            assert.equal(
+                closeButton.length,
+                1,
+                'The panel contains close button'
+            );
+
+            ready();
+        })
+        .render($container)
+        .update(sample.map, sample.context);
+    });
+
+    QUnit.test('visual test', function(assert) {
+        const ready = assert.async();
+        const $container = $('#outside');
+        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy"});
+
+        assert.expect(1);
+
+        navigatorFactory(config, sample.map, sample.context)
+        .on('update', function() {
+            assert.ok(true);
+
+            ready();
+        })
+        .render($container)
+        .update(sample.map, sample.context);
     });
 });

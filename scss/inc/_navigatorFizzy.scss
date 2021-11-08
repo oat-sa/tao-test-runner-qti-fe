@@ -19,12 +19,92 @@ $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
 $headerHeight: 4.5rem;
 $panelPadding: 19px;
 
+/* reset default template styles */
+.fizzy {
+    & .qti-navigator-label {
+        padding: 0;
+        line-height: initial;
+        min-width: auto;
+        align-items: center;
+        display: block;
+    }
+
+    & .qti-navigator-filters {
+        padding: 0;
+        margin: 0;
+        width: auto;
+        height: inherit;
+        text-align: initial;
+    }
+
+    & .qti-navigator-filters .qti-navigator-filter {
+        height: 100%;
+    }
+
+    & .qti-navigator-filters ul {
+        display: block;
+    }
+
+    & .qti-navigator-section.active > .qti-navigator-label {
+        background-color: initial;
+        border: none;
+        padding: 0;
+    }
+
+    & .qti-navigator-tree {
+        height: 100%;
+        display: block;
+    }
+
+    & .qti-navigator-item {
+        padding: 0;
+        margin: 0;
+        background: $backgroundColor;
+    }
+
+    & .qti-navigator-item:hover {
+        background: inherit;
+        color: inherit;
+    }
+
+    & .qti-navigator-item.active {
+        background: inherit;
+        color: inherit;
+    }
+
+    & span.icon-viewed {
+        display: none;
+    }
+
+    & .icon-viewed::before {
+        content: '';
+    }
+
+    & span.icon-unseen {
+        display: none;
+    }
+
+    & .icon-unseen::before {
+        content: '';
+    }
+
+    & span.icon-answered {
+        display: none;
+    }
+
+    & .icon-answered::before {
+        content: '';
+    }
+}
+
+/* panel styles */
+
 .qti-navigator.fizzy {
     .qti-navigator-tree.key-navigation-group.focusin {
         background: none;
     }
 }
-.qti-navigator.fizzy.qti-panel {
+.qti-navigator.fizzy {
     &.qti-panel.qti-panel {
         @include disableSelect();
         @include flex-container();
@@ -249,83 +329,5 @@ $panelPadding: 19px;
             white-space: nowrap;
             line-height: initial;
         }
-    }
-}
-
-/* reset default template styles */
-.fizzy {
-    &.qti-navigator .qti-navigator-label {
-        padding: 0;
-        line-height: initial;
-        min-width: auto;
-        align-items: center;
-        display: block;
-    }
-
-    &.qti-navigator .qti-navigator-filters {
-        padding: 0;
-        margin: 0;
-        width: auto;
-        height: inherit;
-        text-align: initial;
-    }
-
-    &.qti-navigator .qti-navigator-filters .qti-navigator-filter {
-        height: 100%;
-    }
-
-    &.qti-navigator .qti-navigator-filters ul {
-        display: block;
-    }
-
-    &.qti-navigator .qti-navigator-section.active > .qti-navigator-label {
-        background-color: initial;
-        border: none;
-        padding: 0;
-    }
-
-    &.qti-navigator .qti-navigator-tree {
-        height: 100%;
-        display: block;
-    }
-
-    &.qti-navigator .qti-navigator-item {
-        padding: 0;
-        margin: 0;
-        background: $backgroundColor;
-    }
-
-    &.qti-navigator .qti-navigator-item:hover {
-        background: inherit;
-        color: inherit;
-    }
-
-    &.qti-navigator .qti-navigator-item.active {
-        background: inherit;
-        color: inherit;
-    }
-
-    &.qti-navigator span.icon-viewed {
-        display: none;
-    }
-
-    &.qti-navigator .icon-viewed::before {
-        content: '';
-    }
-
-    &.qti-navigator span.icon-unseen {
-        display: none;
-    }
-
-    &.qti-navigator .icon-unseen::before {
-        content: '';
-    }
-
-    &.qti-navigator span.icon-answered {
-        display: none;
-    }
-
-    &.qti-navigator .icon-answered::before {
-        content: '';
     }
 }

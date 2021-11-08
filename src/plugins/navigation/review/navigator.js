@@ -23,10 +23,8 @@ import _ from 'lodash';
 import component from 'ui/component';
 import autoscroll from 'ui/autoscroll';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
-import Handlebars from 'handlebars';
 import fizzyTpl from './navigatorFizzy.tpl';
 import fizzyTreeTpl from './navigatorBubbles.tpl';
-import bubbleButton from './bubble.tpl';
 import accordionTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
 import accordionTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
 
@@ -742,7 +740,5 @@ function navigatorFactory(config, map, context) {
     // the component will be ready
     return navigator.init(config);
 }
-
-Handlebars.registerPartial('bubbleButton', bubbleButton);
 
 export default navigatorFactory;

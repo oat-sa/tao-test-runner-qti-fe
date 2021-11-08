@@ -24,7 +24,7 @@ $panelPadding: 19px;
         background: none;
     }
 }
-.qti-navigator.fizzy {
+.qti-navigator.fizzy.qti-panel {
     &.qti-panel.qti-panel {
         @include disableSelect();
         @include flex-container();
@@ -48,6 +48,7 @@ $panelPadding: 19px;
     }
     .qti-navigator-filters {
         height: calc(100% - #{$headerHeight});
+        margin: 0 $panelPadding; /* shows focusing border around tree items */
     }
 
     /* header */
@@ -79,7 +80,6 @@ $panelPadding: 19px;
 
     /* tree */
     .qti-navigator-tree {
-        padding: 0 $panelPadding;
         background: none;
 
         span.qti-navigator-label {
@@ -93,7 +93,7 @@ $panelPadding: 19px;
         height: $hitboxSize;
         width: $hitboxSize;
         display: flex;
-        justify-content: center;
+        justify-content: start;
         align-items: center;
         /* reset parent styles */
         padding: 0 !important; /* instead of rewriting 6-classes selector on focusing */
@@ -253,63 +253,79 @@ $panelPadding: 19px;
 }
 
 /* reset default template styles */
-.qti-navigator .qti-navigator-label {
-    padding: 0;
-    line-height: initial;
-    min-width: auto;
-    align-items: center;
-    display: block;
-}
-.qti-navigator .qti-navigator-filters {
-    padding: 0;
-    margin: 0;
-    width: auto;
-    height: inherit;
-    text-align: initial;
-}
-.qti-navigator .qti-navigator-filters .qti-navigator-filter {
-    height: 100%;
-}
-.qti-navigator .qti-navigator-filters ul {
-    display: block;
-}
-.qti-navigator .qti-navigator-section.active > .qti-navigator-label {
-    background-color: initial;
-    border: none;
-    padding: 0;
-}
-.qti-navigator .qti-navigator-tree {
-    height: 100%;
-    display: block;
-}
-.qti-navigator .qti-navigator-item {
-    padding: 0;
-    margin: 0;
-    background: $backgroundColor;
-}
-.qti-navigator .qti-navigator-item:hover {
-    background: inherit;
-    color: inherit;
-}
-.qti-navigator .qti-navigator-item.active {
-    background: inherit;
-    color: inherit;
-}
-.qti-navigator span.icon-viewed {
-    display: none;
-}
-.qti-navigator .icon-viewed::before {
-    content: '';
-}
-.qti-navigator span.icon-unseen {
-    display: none;
-}
-.qti-navigator .icon-unseen::before {
-    content: '';
-}
-.qti-navigator span.icon-answered {
-    display: none;
-}
-.qti-navigator .icon-answered::before {
-    content: '';
+.fizzy {
+    &.qti-navigator .qti-navigator-label {
+        padding: 0;
+        line-height: initial;
+        min-width: auto;
+        align-items: center;
+        display: block;
+    }
+
+    &.qti-navigator .qti-navigator-filters {
+        padding: 0;
+        margin: 0;
+        width: auto;
+        height: inherit;
+        text-align: initial;
+    }
+
+    &.qti-navigator .qti-navigator-filters .qti-navigator-filter {
+        height: 100%;
+    }
+
+    &.qti-navigator .qti-navigator-filters ul {
+        display: block;
+    }
+
+    &.qti-navigator .qti-navigator-section.active > .qti-navigator-label {
+        background-color: initial;
+        border: none;
+        padding: 0;
+    }
+
+    &.qti-navigator .qti-navigator-tree {
+        height: 100%;
+        display: block;
+    }
+
+    &.qti-navigator .qti-navigator-item {
+        padding: 0;
+        margin: 0;
+        background: $backgroundColor;
+    }
+
+    &.qti-navigator .qti-navigator-item:hover {
+        background: inherit;
+        color: inherit;
+    }
+
+    &.qti-navigator .qti-navigator-item.active {
+        background: inherit;
+        color: inherit;
+    }
+
+    &.qti-navigator span.icon-viewed {
+        display: none;
+    }
+
+    &.qti-navigator .icon-viewed::before {
+        content: '';
+    }
+
+    &.qti-navigator span.icon-unseen {
+        display: none;
+    }
+
+    &.qti-navigator .icon-unseen::before {
+        content: '';
+    }
+
+    &.qti-navigator span.icon-answered {
+        display: none;
+    }
+
+    &.qti-navigator .icon-answered::before {
+        content: '';
+    }
 }

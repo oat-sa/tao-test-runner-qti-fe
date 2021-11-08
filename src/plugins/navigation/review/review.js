@@ -37,11 +37,23 @@ import navigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/naviga
 var buttonData = {
     setFlag: {
         control: 'set-item-flag',
+        title: __('Flag the current item for later review'),
+        icon: 'anchor',
+        text: __('Flag for Review')
+    },
+    unsetFlag: {
+        control: 'unset-item-flag',
+        title: __('Do not flag the current item for later review'),
+        icon: 'anchor',
+        text: __('Unflag for Review')
+    },
+    setFlagBookmarked: {
+        control: 'set-item-flag',
         title: __('Bookmark the current question for later review'),
         icon: 'bookmark',
         text: __('Bookmark question')
     },
-    unsetFlag: {
+    unsetFlagBookmarked: {
         control: 'unset-item-flag',
         title: __('Do not bookmark the current question for later review'),
         icon: 'bookmark-outline',
@@ -64,10 +76,14 @@ var buttonData = {
 /**
  * Gets the definition of the flagItem button related to the context
  * @param {Boolean} flag - the flag status
+ * @param {Object} config - plugin config
  * @returns {Object}
  */
-function getFlagItemButtonData(flag) {
-    const dataType = flag ? 'unsetFlag' : 'setFlag';
+function getFlagItemButtonData(flag, config = null) {
+    let dataType = flag ? 'unsetFlag' : 'setFlag';
+    if (config && config["reviewLayout"] === 'fizzy') {
+        dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
+    }
     return buttonData[dataType];
 }
 
@@ -218,7 +234,7 @@ export default pluginFactory({
                     item.flagged = flag;
 
                     // update the display of the flag button
-                    updateButton(self.flagItemButton, getFlagItemButtonData(flag));
+                    updateButton(self.flagItemButton, getFlagItemButtonData(flag, self.getConfig()));
 
                     // update the item state
                     self.navigator.setItemFlag(position, flag);
@@ -297,7 +313,7 @@ export default pluginFactory({
 
         this.flagItemButton = this.getAreaBroker()
             .getToolbox()
-            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition)));
+            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition), self.getConfig()));
         this.flagItemButton.on('click', function(e) {
             e.preventDefault();
             testRunner.trigger('tool-flagitem');
@@ -357,7 +373,7 @@ export default pluginFactory({
                 if (isPluginAllowed()) {
                     updateButton(
                         self.flagItemButton,
-                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition))
+                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition), self.getConfig())
                     );
                     self.navigator.update(map, context).updateConfig({
                         canFlag: !testPart.isLinear && categories.markReview

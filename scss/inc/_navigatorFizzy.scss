@@ -2,19 +2,12 @@
 
 $lineHeight: 3rem;
 $borderWidth: 1px;
-$backgroundColor: #f2f2f2;
 $radiusCircular: 50%;
 $sizeDefault: 4rem;
 $hitboxSize: 6.25rem;
 $borderThin: 0.125rem;
-$colorTextDisabled: hsl(0, 0%, 45%);
-$colorBgDefault: white;
 $borderMedium: 0.25rem;
 $borderMediumPlus: 0.375rem;
-$colorTextDefault: hsl(0, 0%, 12%);
-$colorBgInverted: $colorTextDefault;
-$colorTextInverted: white;
-$colorPrimaryHighlight: hsl(208, 100%, 32%);
 $offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
 $headerHeight: 4.5rem;
 $panelPadding: 19px;
@@ -59,7 +52,7 @@ $panelPadding: 19px;
     & .qti-navigator-item {
         padding: 0;
         margin: 0;
-        background: $backgroundColor;
+        background: $uiReviewPanelBg;
     }
 
     & .qti-navigator-item:hover {
@@ -112,7 +105,7 @@ $panelPadding: 19px;
         cursor: default;
         height: 100%;
         position: relative;
-        background-color: $backgroundColor !important;
+        background-color: $uiReviewPanelBg !important;
         width: 30rem;
         padding: $panelPadding 0;
     }
@@ -124,7 +117,7 @@ $panelPadding: 19px;
 
     /* reset parent styles */
     .qti-navigator-filters.key-navigation-group.focusin.focusin {
-        background: $backgroundColor;
+        background: $uiReviewPanelBg;
     }
     .qti-navigator-filters {
         height: calc(100% - #{$headerHeight});
@@ -148,10 +141,10 @@ $panelPadding: 19px;
         .icon-close {
             @include font-size(28);
             line-height: $lineHeight;
-            color: $colorTextDefault;
+            color: $uiReviewPanelTextDefault;
 
             &:hover {
-                color: $colorTextDefault;
+                color: $uiReviewPanelTextDefault;
                 text-decoration: none;
                 cursor: pointer;
             }
@@ -173,7 +166,7 @@ $panelPadding: 19px;
         height: $hitboxSize;
         width: $hitboxSize;
         display: flex;
-        justify-content: start;
+        justify-content: center; /* aligning left - cut focusing board for keyboard interacting */
         align-items: center;
         /* reset parent styles */
         padding: 0 !important; /* instead of rewriting 6-classes selector on focusing */
@@ -182,16 +175,16 @@ $panelPadding: 19px;
         /* reset global styles */
         &.disabled {
             background-color: unset !important;
-            color: $colorTextDisabled !important;
-            border-color: $colorTextDisabled !important;
+            color: $uiReviewPanelTextDisabled !important;
+            border-color: $uiReviewPanelTextDisabled !important;
             opacity: 1 !important;
             text-shadow: none !important;
         }
 
         &.disabled .step {
             border-width: $borderMedium;
-            color: $colorTextDisabled;
-            border-color: $colorTextDisabled;
+            color: $uiReviewPanelTextDisabled;
+            border-color: $uiReviewPanelTextDisabled;
             opacity: 1;
             text-shadow: none;
         }
@@ -203,14 +196,14 @@ $panelPadding: 19px;
 
         &.viewed .step {
             border-width: $borderMedium;
-            color: $colorTextDefault;
-            border-color: $colorTextDefault;
+            color: $uiReviewPanelTextDefault;
+            border-color: $uiReviewPanelTextDefault;
         }
 
         &.answered .step {
-            background-color: $colorBgInverted;
-            color: $colorTextInverted;
-            border-color: $colorBgInverted;
+            background-color: $uiReviewPanelBgInverted;
+            color: $uiReviewPanelTextInverted;
+            border-color: $uiReviewPanelBgInverted;
         }
 
         & .indicator {
@@ -221,10 +214,10 @@ $panelPadding: 19px;
             position: absolute;
             display: block;
             z-index: 1;
-            color: $colorTextDefault;
+            color: $uiReviewPanelTextDefault;
             height: 1.4rem;
             min-width: 1.6rem;
-            background-color: $backgroundColor;
+            background-color: $uiReviewPanelBg;
             top: unset;
             bottom: -1.7rem;
             padding: 0;
@@ -258,8 +251,8 @@ $panelPadding: 19px;
 
         &:not(.disabled) .step:hover {
             background-color: hsl(208, 100%, 95%);
-            color: $colorPrimaryHighlight;
-            border-color: $colorPrimaryHighlight;
+            color: $uiReviewPanelPrimaryHighlight;
+            border-color: $uiReviewPanelPrimaryHighlight;
         }
 
         /* keyboard focusing */
@@ -273,25 +266,25 @@ $panelPadding: 19px;
             top: 50%;
             transform: translate(-50%, -50%);
             border-width: $borderMedium;
-            border-color: $colorPrimaryHighlight;
+            border-color: $uiReviewPanelPrimaryHighlight;
             border-style: dotted;
             border-radius: $radiusCircular;
         }
 
         &.key-navigation-highlight.active .step .indicator {
-            color: $colorPrimaryHighlight;
+            color: $uiReviewPanelPrimaryHighlight;
         }
 
         &.key-navigation-highlight.answered > .step {
-            background-color: $colorPrimaryHighlight;
-            color: $colorTextInverted;
-            border-color: $colorPrimaryHighlight;
+            background-color: $uiReviewPanelPrimaryHighlight;
+            color: $uiReviewPanelTextInverted;
+            border-color: $uiReviewPanelPrimaryHighlight;
         }
 
         &.key-navigation-highlight.viewed:not(.answered) > .step {
             border-width: $borderMedium;
-            color: $colorPrimaryHighlight;
-            border-color: $colorPrimaryHighlight;
+            color: $uiReviewPanelPrimaryHighlight;
+            border-color: $uiReviewPanelPrimaryHighlight;
         }
     }
 
@@ -311,15 +304,15 @@ $panelPadding: 19px;
         border-style: solid;
         border-radius: $radiusCircular;
         border-width: $borderThin;
-        border-color: $colorTextDefault;
+        border-color: $uiReviewPanelTextDefault;
 
         /*Fixes firefox button jumps*/
         padding: 0;
 
         font-weight: bold;
         font-size: 1.6rem !important;
-        background-color: $colorBgDefault;
-        color: $colorTextDefault;
+        background-color: $uiReviewPanelBgDefault;
+        color: $uiReviewPanelTextDefault;
         text-shadow: none;
 
         & span.step-label {

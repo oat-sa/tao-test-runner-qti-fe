@@ -91,7 +91,7 @@ export default {
          * @returns {jQuery} - The selected choice element
          */
         const getQtiChoice = function (cursor){
-            return cursor && cursor.navigable && cursor.navigable.getElement().closest('.qti-choice');
+            return cursor && cursor.navigable.getElement().closest('.qti-choice');
         }
 
         /**

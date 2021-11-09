@@ -90,13 +90,12 @@ $panelPadding: 19px;
     }
 }
 
+.test-runner-scope .test-sidebar .fizzy .key-navigation-group.focusin {
+    background: none;
+}
+
 /* panel styles */
 
-.qti-navigator.fizzy {
-    .qti-navigator-tree.key-navigation-group.focusin {
-        background: none;
-    }
-}
 .qti-navigator.fizzy {
     &.qti-panel.qti-panel {
         @include disableSelect();

@@ -81,7 +81,7 @@ var buttonData = {
  */
 function getFlagItemButtonData(flag, config = null) {
     let dataType = flag ? 'unsetFlag' : 'setFlag';
-    if (config && config["reviewLayout"] === 'fizzy') {
+    if (config && config.reviewLayout === 'fizzy') {
         dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
     }
     return buttonData[dataType];
@@ -176,7 +176,7 @@ export default pluginFactory({
         let navigatorConfig = testRunnerOptions.review || {
             defaultOpen : false
         };
-        navigatorConfig = Object.assign({}, navigatorConfig, pluginConfig)
+        navigatorConfig = Object.assign({}, navigatorConfig, pluginConfig);
         let previousItemPosition;
 
         /**
@@ -234,7 +234,7 @@ export default pluginFactory({
                     item.flagged = flag;
 
                     // update the display of the flag button
-                    updateButton(self.flagItemButton, getFlagItemButtonData(flag, self.getConfig()));
+                    updateButton(self.flagItemButton, getFlagItemButtonData(flag, navigatorConfig));
 
                     // update the item state
                     self.navigator.setItemFlag(position, flag);
@@ -313,7 +313,7 @@ export default pluginFactory({
 
         this.flagItemButton = this.getAreaBroker()
             .getToolbox()
-            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition), self.getConfig()));
+            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition), navigatorConfig));
         this.flagItemButton.on('click', function(e) {
             e.preventDefault();
             testRunner.trigger('tool-flagitem');
@@ -373,7 +373,7 @@ export default pluginFactory({
                 if (isPluginAllowed()) {
                     updateButton(
                         self.flagItemButton,
-                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition), self.getConfig())
+                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition), navigatorConfig)
                     );
                     self.navigator.update(map, context).updateConfig({
                         canFlag: !testPart.isLinear && categories.markReview

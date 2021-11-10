@@ -161,6 +161,28 @@ $panelPadding: 19px;
         }
     }
 
+    .qti-navigator-icon {
+        padding: 0;
+        top: 0;
+        left: 0;
+        display: block;
+    }
+
+
+    & .icon-flagged::before {
+        @include icon-bookmark;
+    }
+
+    & .icon-info::before {
+        @include icon-info-bare;
+    }
+    & .icon-unseen {
+        display: none;
+    }
+    & .icon-viewed {
+        display: none;
+    }
+
     .qti-navigator-item {
         height: $hitboxSize;
         width: $hitboxSize;
@@ -192,6 +214,10 @@ $panelPadding: 19px;
         &.flagged span.step-label {
             display: none;
         }
+        /* remove number from item button if item is informational */
+        &.info span.step-label {
+            display: none;
+        }
 
         &.viewed .step {
             border-width: $borderMedium;
@@ -203,10 +229,6 @@ $panelPadding: 19px;
             background-color: $uiReviewPanelBgInverted;
             color: $uiReviewPanelTextInverted;
             border-color: $uiReviewPanelBgInverted;
-        }
-
-        & .indicator {
-            display: none;
         }
 
         &.active .indicator {
@@ -227,21 +249,6 @@ $panelPadding: 19px;
             & > :global(svg) {
                 display: block;
             }
-        }
-
-        & .icon-flagged::before {
-            @include icon-bookmark;
-        }
-
-        & .icon-flagged {
-            display: none;
-        }
-
-        &.flagged .icon-flagged {
-            padding: 0;
-            top: 0;
-            left: 0;
-            display: block;
         }
 
         &:not(.disabled) .step {

@@ -280,6 +280,14 @@ export default pluginFactory({
                 .on('loaditem', togglePlugin)
                 .on('enabletools renderitem', function() {
                     self.enable();
+
+                    if (isPluginEnabled()) {
+                        _.forEach(highlighters.getAllHighlighters(), function (instance) {
+                            if (!instance.isEnabled()) {
+                                instance.on('start').toggleHighlighting(true).enable();
+                            }
+                        });
+                    }
                 })
                 .on('renderitem', function() {
                     var textStimuli;

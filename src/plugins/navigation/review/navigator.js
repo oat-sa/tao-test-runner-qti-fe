@@ -349,8 +349,8 @@ var navigatorApi = {
         section.active = true;
         item.active = true;
 
-        //calculate items total
-        scopedMap.total = Object.values(scopedMap.parts).reduce((prev, curr) => prev + curr.stats.total, 0);
+        //interactive item counter
+        let counter = 0;
 
         // adjust each item with additional meta
         return mapHelper.each(scopedMap, function(itm) {
@@ -380,9 +380,12 @@ var navigatorApi = {
                 icon = icon || 'unseen';
             }
 
+            if(!itm.informational){
+                counter += 1;
+                itm.numberTest = counter; //item position in whole test from 1
+            }
             itm.cls = cls.join(' ');
             itm.icon = icon;
-            itm.numberTest = itm.position + 1; //item position in whole test from 1
         });
     },
 

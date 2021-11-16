@@ -284,7 +284,7 @@ export default pluginFactory({
                     if (isPluginEnabled()) {
                         _.forEach(highlighters.getAllHighlighters(), function (instance) {
                             if (!instance.isEnabled()) {
-                                instance.on('start').toggleHighlighting(true).enable();
+                                instance.on('start').toggleHighlighting(false).enable();
                             }
                         });
                     }

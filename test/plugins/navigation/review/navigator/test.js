@@ -331,12 +331,12 @@ define([
 
     QUnit.module('Fizzy layout');
 
-    QUnit.test('close button exists', function(assert) {
+    QUnit.test('test layout structure', function(assert) {
         const ready = assert.async();
         const $container = $('#qunit-fixture');
         const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy"});
 
-        assert.expect(1);
+        assert.expect(5);
 
         navigatorFactory(config, sample.map, sample.context)
         .on('update', function() {
@@ -346,11 +346,99 @@ define([
                 1,
                 'The panel contains close button'
             );
+            assert.equal(
+                $('li.qti-navigator-item', $container).length,
+                10,
+                'All items are present'
+            );
+            assert.equal(
+                $('li[data-id="item-1"]', $container).length,
+                1,
+                'Only first item is viewed'
+            );
+            assert.equal(
+                $('.qti-navigator-section > .qti-navigator-label', $container).length,
+                1,
+                'section title is present'
+            );
+            assert.equal(
+                $('.qti-navigator-section > ul.qti-navigator-items', $container).length,
+                1,
+                'section items are present'
+            );
 
             ready();
         })
         .render($container)
         .update(sample.map, sample.context);
+    });
+
+    QUnit.test('check informational item', function(assert) {
+        const ready = assert.async();
+        const $container = $('#qunit-fixture');
+        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy"});
+        const map = _.cloneDeep(sample.map);
+
+        map.parts['testPart-1'].sections['assessmentSection-1'].items['item-1'].informational = true;
+
+        assert.expect(4);
+
+        navigatorFactory(config, map, sample.context)
+        .on('update', function() {
+            //first item shows the info icon
+            assert.equal(
+                window.getComputedStyle(document.querySelector('li[data-id="item-1"].info .icon-info'), ':before').getPropertyValue('content'),
+                "\"\"", //informational icon
+                'Informational item label on the button'
+            );
+            assert.false(
+                $('li[data-id="item-1"] .step-label', $container).is( ":visible" ),
+                'Text with item order is not present'
+            );
+
+            //second item shows the number of question
+            assert.ok(
+                $('li[data-id="item-2"] .step-label', $container).is( ":visible" ),
+                'Text with item order is not present'
+            );
+            assert.equal(
+                $('li[data-id="item-2"] .step-label', $container).text(),
+                '1',
+                'Second button have number - 1'
+            );
+
+            ready();
+        })
+        .render($container)
+        .update(map, sample.context);
+    });
+
+    QUnit.test('check bookmark item', function(assert) {
+        const ready = assert.async();
+        const $container = $('#qunit-fixture');
+        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy"});
+        const map = _.cloneDeep(sample.map);
+
+        map.parts['testPart-1'].sections['assessmentSection-1'].items['item-1'].flagged = true;
+
+        assert.expect(2);
+
+        navigatorFactory(config, map, sample.context)
+        .on('update', function() {
+            //first item shows the info icon
+            assert.equal(
+                window.getComputedStyle(document.querySelector('li[data-id="item-1"].flagged .icon-flagged'), ':before').getPropertyValue('content'),
+                "\"\"", //bookmark icon
+                'Bookmark item label on the button'
+            );
+            assert.false(
+                $('li[data-id="item-1"] .step-label', $container).is( ":visible" ),
+                'Text with item order is not present'
+            );
+            ready();
+        })
+        .render($container)
+        .update(map, sample.context);
     });
 
     QUnit.test('visual test', function(assert) {

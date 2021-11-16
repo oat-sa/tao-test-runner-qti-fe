@@ -47,6 +47,18 @@ var buttonData = {
         icon: 'anchor',
         text: __('Unflag for Review')
     },
+    setFlagBookmarked: {
+        control: 'set-item-flag',
+        title: __('Bookmark the current question for later review'),
+        icon: 'bookmark',
+        text: __('Bookmark question')
+    },
+    unsetFlagBookmarked: {
+        control: 'unset-item-flag',
+        title: __('Do not bookmark the current question for later review'),
+        icon: 'bookmark-outline',
+        text: __('Bookmark question')
+    },
     showReview: {
         control: 'show-review',
         title: __('Show the review screen'),
@@ -64,10 +76,14 @@ var buttonData = {
 /**
  * Gets the definition of the flagItem button related to the context
  * @param {Boolean} flag - the flag status
+ * @param {Object} config - plugin config
  * @returns {Object}
  */
-function getFlagItemButtonData(flag) {
-    const dataType = flag ? 'unsetFlag' : 'setFlag';
+function getFlagItemButtonData(flag, config = null) {
+    let dataType = flag ? 'unsetFlag' : 'setFlag';
+    if (config && config.reviewLayout === 'fizzy') {
+        dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
+    }
     return buttonData[dataType];
 }
 
@@ -156,9 +172,11 @@ export default pluginFactory({
 
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
-        const navigatorConfig = testRunnerOptions.review || {
+        const pluginConfig = this.getConfig();
+        let navigatorConfig = testRunnerOptions.review || {
             defaultOpen : false
         };
+        navigatorConfig = Object.assign({}, navigatorConfig, pluginConfig);
         let previousItemPosition;
 
         /**
@@ -216,7 +234,7 @@ export default pluginFactory({
                     item.flagged = flag;
 
                     // update the display of the flag button
-                    updateButton(self.flagItemButton, getFlagItemButtonData(flag));
+                    updateButton(self.flagItemButton, getFlagItemButtonData(flag, navigatorConfig));
 
                     // update the item state
                     self.navigator.setItemFlag(position, flag);
@@ -272,6 +290,9 @@ export default pluginFactory({
                     flagItem(position, flag);
                 }
             })
+            .on('close', function() {
+                testRunner.trigger('tool-reviewpanel');
+            })
             .render();
 
         // restore current item in the navigator if movement not allowed
@@ -292,7 +313,7 @@ export default pluginFactory({
 
         this.flagItemButton = this.getAreaBroker()
             .getToolbox()
-            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition)));
+            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition), navigatorConfig));
         this.flagItemButton.on('click', function(e) {
             e.preventDefault();
             testRunner.trigger('tool-flagitem');
@@ -352,7 +373,7 @@ export default pluginFactory({
                 if (isPluginAllowed()) {
                     updateButton(
                         self.flagItemButton,
-                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition))
+                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition), navigatorConfig)
                     );
                     self.navigator.update(map, context).updateConfig({
                         canFlag: !testPart.isLinear && categories.markReview

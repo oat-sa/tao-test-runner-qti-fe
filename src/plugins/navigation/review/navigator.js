@@ -23,9 +23,13 @@ import _ from 'lodash';
 import component from 'ui/component';
 import autoscroll from 'ui/autoscroll';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
-import navigatorTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
-import navigatorTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
+import fizzyTpl from './navigatorFizzy.tpl';
+import fizzyTreeTpl from './navigatorBubbles.tpl';
+import accordionTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
+import accordionTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
 
+let navigatorTpl = accordionTpl;
+let navigatorTreeTpl = accordionTreeTpl;
 /**
  * Some default values
  * @type {Object}
@@ -112,7 +116,8 @@ var _selectors = {
     notInformational: ':not(.info)',
     informational: '.info',
     hidden: '.hidden',
-    disabled: '.disabled'
+    disabled: '.disabled',
+    closeButton: '.icon-close'
 };
 
 /**
@@ -344,6 +349,9 @@ var navigatorApi = {
         section.active = true;
         item.active = true;
 
+        //interactive item counter
+        let counter = 0;
+
         // adjust each item with additional meta
         return mapHelper.each(scopedMap, function(itm) {
             var cls = [];
@@ -372,6 +380,10 @@ var navigatorApi = {
                 icon = icon || 'unseen';
             }
 
+            if(!itm.informational){
+                counter += 1;
+                itm.numberTest = counter; //item position in whole test from 1
+            }
             itm.cls = cls.join(' ');
             itm.icon = icon;
         });
@@ -552,6 +564,14 @@ function navigatorFactory(config, map, context) {
         navigator.trigger('jump', position);
     }
 
+    if (config.reviewLayout === 'fizzy') {
+        navigatorTpl = fizzyTpl;
+        navigatorTreeTpl = fizzyTreeTpl;
+        // hack to not allow activate/deactivate bookmarking on icon click in item button
+        _cssCls.collapsed = 'fizzy';
+        _selectors.filter = 'abc';
+    }
+
     navigator = component(navigatorApi, _defaults)
         .setTemplate(navigatorTpl)
 
@@ -574,6 +594,7 @@ function navigatorFactory(config, map, context) {
             var $filterBar = $component.find(_selectors.filterBar);
             var $filters = $filterBar.find('li');
             var $tree = $component.find(_selectors.tree);
+            var $closeButton = $component.find(_selectors.closeButton);
 
             // links the component to the underlying DOM elements
             this.controls = {
@@ -709,7 +730,15 @@ function navigatorFactory(config, map, context) {
                 }
             });
 
-            this.update(map, context);
+            //click on close button
+            $closeButton.on('click', function (e) {
+                e.preventDefault();
+                /**
+                 * Review screen should be closed
+                 * @event navigator#close
+                 */
+                navigator.trigger('close');
+            });
         });
 
     // set default filter

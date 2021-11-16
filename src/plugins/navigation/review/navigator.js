@@ -25,6 +25,7 @@ import autoscroll from 'ui/autoscroll';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import fizzyTpl from './navigatorFizzy.tpl';
 import fizzyTreeTpl from './navigatorBubbles.tpl';
+import fizzyTreeLinearTpl from './navigatorBubblesLinear.tpl';
 import accordionTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
 import accordionTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
 
@@ -567,6 +568,9 @@ function navigatorFactory(config, map, context) {
     if (config.reviewLayout === 'fizzy') {
         navigatorTpl = fizzyTpl;
         navigatorTreeTpl = fizzyTreeTpl;
+        if(!config["displaySectionTitles"]){
+            navigatorTreeTpl = fizzyTreeLinearTpl;
+        }
         // hack to not allow activate/deactivate bookmarking on icon click in item button
         _cssCls.collapsed = 'fizzy';
         _selectors.filter = 'abc';

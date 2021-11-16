@@ -90,7 +90,9 @@ export default {
          * @param {Object} cursor - The cursor definition supplied by the keyNavigator
          * @returns {jQuery} - The selected choice element
          */
-        const getQtiChoice = cursor => cursor && cursor.navigable.getElement().closest('.qti-choice');
+        const getQtiChoice = function (cursor){
+            return cursor && cursor.navigable.getElement().closest('.qti-choice');
+        }
 
         /**
          * Creates and registers a keyNavigator for the supplied list of elements

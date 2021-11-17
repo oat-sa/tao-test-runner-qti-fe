@@ -93,6 +93,13 @@ $panelPadding: 19px;
 .test-runner-scope .test-sidebar .fizzy .key-navigation-group.focusin {
     background: none;
 }
+html body .qti-navigator.fizzy .qti-navigator-filter{
+    width: auto;
+}
+html body .qti-navigator.fizzy .qti-navigator-filters{
+    width: auto;
+}
+
 
 /* panel styles */
 
@@ -110,7 +117,7 @@ $panelPadding: 19px;
     }
 
     /* reset parent style */
-    button [class*=' icon-'] {
+    button [class*='icon-'] {
         padding: 0;
     }
 
@@ -179,6 +186,9 @@ $panelPadding: 19px;
         display: none;
     }
     & .icon-viewed {
+        display: none;
+    }
+    & .icon-indicator {
         display: none;
     }
 

@@ -93,13 +93,20 @@ $panelPadding: 19px;
 .test-runner-scope .test-sidebar .fizzy .key-navigation-group.focusin {
     background: none;
 }
+
+/****** theme specific **********/
+/**
+ this styles rewrite default theme styles for MEXCBT project
+ if sometimes in the future this design should be spread out to another project
+ it will be better to move this rewriting to MEXCBT extension/project
+ */
 html body .qti-navigator.fizzy .qti-navigator-filter{
     width: auto;
 }
 html body .qti-navigator.fizzy .qti-navigator-filters{
     width: auto;
 }
-
+/*********************************/
 
 /* panel styles */
 

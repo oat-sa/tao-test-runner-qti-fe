@@ -8,7 +8,8 @@
     "defaultOpen": true,
     "itemTitle": "Item %d",
     "preventsUnseen": true,
-    "canCollapse": false
+    "canCollapse": false,
+    "reviewLayout": "default"
   },
   "map": {
     "parts": {

@@ -334,7 +334,7 @@ define([
     QUnit.test('test layout structure', function(assert) {
         const ready = assert.async();
         const $container = $('#qunit-fixture');
-        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy"});
+        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy", "displaySectionTitles": true});
 
         assert.expect(5);
 
@@ -439,6 +439,63 @@ define([
         })
         .render($container)
         .update(map, sample.context);
+    });
+
+    QUnit.test('check enabled section titles', function(assert) {
+        const ready = assert.async();
+        const $container = $('#qunit-fixture');
+        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy", "displaySectionTitles": true});
+
+        assert.expect(2);
+
+        navigatorFactory(config, sample.map, sample.context)
+        .on('update', function() {
+            assert.equal(
+                $('.qti-navigator-section .qti-navigator-text', $container).text(),
+                'Section 1',
+                'Section title is showing on panel'
+            );
+            assert.equal(
+                $('.fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
+                'Test review',
+                'Review panel title exists'
+            );
+
+            ready();
+        })
+        .render($container)
+        .update(sample.map, sample.context);
+    });
+
+    QUnit.test('check disabling section titles', function(assert) {
+        const ready = assert.async();
+        const $container = $('#qunit-fixture');
+        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy", "displaySectionTitles": false});
+
+        assert.expect(3);
+
+        navigatorFactory(config, sample.map, sample.context)
+        .on('update', function() {
+            assert.equal(
+                $('.qti-navigator-tree .qti-navigator-label:not(button) ', $container).length,
+                0,
+                'No any labels on panel'
+            );
+            assert.equal(
+                $('.fizzy .qti-navigator-item ', $container).length,
+                10,
+                'All items are visible'
+            );
+            assert.equal(
+                $('.fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
+                'Test review',
+                'Review panel title still exists'
+            );
+
+            ready();
+        })
+        .render($container)
+        .update(sample.map, sample.context);
     });
 
     QUnit.test('visual test', function(assert) {

@@ -568,7 +568,7 @@ function navigatorFactory(config, map, context) {
     if (config.reviewLayout === 'fizzy') {
         navigatorTpl = fizzyTpl;
         navigatorTreeTpl = fizzyTreeTpl;
-        if(!config.displaySectionTitles){
+        if (!config.displaySectionTitles) {
             navigatorTreeTpl = fizzyTreeLinearTpl;
         }
         // hack to not allow activate/deactivate bookmarking on icon click in item button

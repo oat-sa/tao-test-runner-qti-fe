@@ -498,35 +498,6 @@ define([
         .update(sample.map, sample.context);
     });
 
-    QUnit.test('check open button flow', function(assert) {
-        const ready = assert.async();
-        const $container = $('#qunit-fixture');
-        const config = Object.assign({}, sample.config, { "reviewLayout": "fizzy"});
-
-        navigatorFactory(config, sample.map, sample.context)
-        .on('update', function() {
-            assert.equal(
-                $('.qti-navigator-tree .qti-navigator-label:not(button) ', $container).length,
-                0,
-                'No any labels on panel'
-            );
-            assert.equal(
-                $('.fizzy .qti-navigator-item ', $container).length,
-                10,
-                'All items are visible'
-            );
-            assert.equal(
-                $('.fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
-                'Test overview',
-                'Review panel title still exists'
-            );
-
-            ready();
-        })
-        .render($container)
-        .update(sample.map, sample.context);
-    });
-
     QUnit.test('visual test', function(assert) {
         const ready = assert.async();
         const $container = $('#outside');

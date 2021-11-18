@@ -487,6 +487,9 @@ export default pluginFactory({
         this.flagItemButton.turnOff();
 
         this.toggleButton.disable();
+        if (this.customLayout) {
+            this.toggleButton.turnOff();
+        }
 
         this.navigator.disable();
     },

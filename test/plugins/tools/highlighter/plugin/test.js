@@ -199,7 +199,7 @@ define([
                 const $container = areaBroker.getToolboxArea();
                 const plugin = pluginFactory(runner, areaBroker);
 
-                assert.expect(4);
+                assert.expect(6);
 
                 return plugin
                     .init()
@@ -231,6 +231,15 @@ define([
                             true,
                             'The remove button has been disabled'
                         );
+                    })
+                    .then(() => {
+                        runner.trigger('enabletools');
+
+                        const $buttonMain = $container.find('[data-control="highlight-trigger"]');
+                        const $buttonRemove = $container.find('[data-control="highlight-clear"]');
+
+                        assert.equal($buttonMain.hasClass('disabled'), false, 'The trigger button has been enabled');
+                        assert.equal($buttonRemove.hasClass('disabled'), false, 'The remove button has been enabled');
                     });
             })
             .catch(err => {

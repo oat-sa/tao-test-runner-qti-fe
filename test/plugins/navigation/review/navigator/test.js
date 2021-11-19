@@ -457,7 +457,7 @@ define([
             );
             assert.equal(
                 $('.fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
-                'Test review',
+                'Test overview',
                 'Review panel title exists'
             );
 
@@ -488,7 +488,7 @@ define([
             );
             assert.equal(
                 $('.fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
-                'Test review',
+                'Test overview',
                 'Review panel title still exists'
             );
 

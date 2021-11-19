@@ -70,23 +70,20 @@ var buttonData = {
         title: __('Hide the review screen'),
         icon: 'left',
         text: __('Hide Review')
+    },
+    showTestOverview: {
+        control: 'show-test-overview',
+        title: __('Show test overview panel'),
+        icon: 'desktop-preview',
+        text: __('Test overview')
+    },
+    hideTestOverview: {
+        control: 'hide-test-overview',
+        title: __('Hide test overview panel'),
+        icon: 'desktop-preview',
+        text: __('Test overview')
     }
 };
-
-/**
- * Gets the definition of the flagItem button related to the context
- * @param {Boolean} flag - the flag status
- * @param {Object} config - plugin config
- * @returns {Object}
- */
-function getFlagItemButtonData(flag, config = null) {
-    let dataType = flag ? 'unsetFlag' : 'setFlag';
-    if (config && config.reviewLayout === 'fizzy') {
-        dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
-    }
-    return buttonData[dataType];
-}
-
 
 /**
  * Get the flagged value for the item at that position
@@ -97,16 +94,6 @@ function getFlagItemButtonData(flag, config = null) {
 function isItemFlagged(testMap, position) {
     const item = mapHelper.getItemAt(testMap, position);
     return !!item.flagged;
-}
-
-/**
- * Gets the definition of the toggleNavigator button related to the context
- * @param {Object} navigator - the navigator component
- * @returns {Object}
- */
-function getToggleButtonData(navigator) {
-    var dataType = navigator.is('hidden') ? 'showReview' : 'hideReview';
-    return buttonData[dataType];
 }
 
 /**
@@ -123,7 +110,7 @@ function updateButton(button, data) {
             $button.find('.icon').attr('class', `icon icon-${data.icon}`);
             $button.find('.text').text(data.text);
 
-            if (_.contains(data.control, 'flag')) {
+            if (data.control.includes('flag') || data.control.includes('overview')) {
                 if (button.is('active')) {
                     button.turnOff();
                 } else {
@@ -178,6 +165,41 @@ export default pluginFactory({
         };
         navigatorConfig = Object.assign({}, navigatorConfig, pluginConfig);
         let previousItemPosition;
+
+        /**
+         * Check that custom layout activated
+         * @return {boolean}
+         */
+        function isCustomLayout(){
+            return navigatorConfig && navigatorConfig.reviewLayout === 'fizzy';
+        }
+
+        /**
+         * Gets the definition of the flagItem button related to the context
+         * @param {Boolean} flag - the flag status
+         * @param {Object} config - plugin config
+         * @returns {Object}
+         */
+        function getFlagItemButtonData(flag, config = null) {
+            let dataType = flag ? 'unsetFlag' : 'setFlag';
+            if (isCustomLayout()) {
+                dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
+            }
+            return buttonData[dataType];
+        }
+
+        /**
+         * Gets the definition of the toggleNavigator button related to the context
+         * @param {Object} navigator - the navigator component
+         * @returns {Object}
+         */
+        function getToggleButtonData(navigator) {
+            let dataType = navigator.is('hidden') ? 'showReview' : 'hideReview';
+            if (isCustomLayout()) {
+                dataType = navigator.is('hidden') ? 'showTestOverview' : 'hideTestOverview';
+            }
+            return buttonData[dataType];
+        }
 
         /**
          * Retrieve the review categories of the current item
@@ -301,6 +323,7 @@ export default pluginFactory({
         });
 
         this.explicitlyHidden = false;
+        this.customLayout = isCustomLayout();
 
         // register buttons in the toolbox component
         this.toggleButton = this.getAreaBroker()
@@ -447,6 +470,13 @@ export default pluginFactory({
         } else {
             this.flagItemButton.turnOff();
         }
+        if (this.customLayout) {
+            if (!this.explicitlyHidden) {
+                this.toggleButton.turnOn();
+            } else {
+                this.toggleButton.turnOff();
+            }
+        }
     },
 
     /**
@@ -457,6 +487,9 @@ export default pluginFactory({
         this.flagItemButton.turnOff();
 
         this.toggleButton.disable();
+        if (this.customLayout) {
+            this.toggleButton.turnOff();
+        }
 
         this.navigator.disable();
     },

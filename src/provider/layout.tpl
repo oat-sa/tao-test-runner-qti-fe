@@ -23,7 +23,7 @@
             <nav class="rgt navi-box" aria-labelledby="navheader">
                 <h2 id="navheader" class="landmark-title-hidden">{{__ "Main navigation"}}</h2>
                 <ul class="plain navi-box-list"></ul>
-            </div>
+            </nav>
         </div>
     </div>
 

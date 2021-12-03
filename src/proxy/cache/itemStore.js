@@ -29,6 +29,7 @@ import itemPreloaderFactory from 'taoQtiTest/runner/proxy/cache/itemPreloader';
  * The default number of items to store
  */
 const defaultConfig = {
+    itemTTL: 0,
     maxSize: 10,
     preload: false
 };
@@ -48,8 +49,20 @@ export default function itemStoreFactory(options) {
     //in memory storage
     const getStore = () => store('item-cache', store.backends.memory);
 
-    //maintain an index to resolve existence synchronously
-    let index = [];
+    //maintain an index to resolve existence synchronously:
+    // - the array allows to manage the cache in order, it is useful to remove the first entries
+    // - the map allows to quickly check each cache entry, and store some internal metadata like the timestamp
+    let list = [];
+    const index = new Map();
+
+    // check if a key has expired
+    const isExpired = key => {
+        const meta = index.get(key);
+        if (meta) {
+            return config.itemTTL && Date.now() - meta.timestamp >= config.itemTTL;
+        }
+        return false;
+    };
 
     let itemPreloader;
     if (config.preload) {
@@ -70,11 +83,22 @@ export default function itemStoreFactory(options) {
         },
 
         /**
+         * Sets the item store TTL.
+         * @param {number} ttl
+         */
+        setItemTTL(ttl) {
+            config.itemTTL = ttl;
+        },
+
+        /**
          * Get the item form the given key/id/uri
          * @param {string} key - something identifier
          * @returns {Promise<Object>} the item
          */
         get(key) {
+            if (!this.has(key)) {
+                return Promise.resolve();
+            }
             return getStore().then(itemStorage => itemStorage.getItem(key));
         },
 
@@ -84,7 +108,7 @@ export default function itemStoreFactory(options) {
          * @returns {boolean}
          */
         has(key) {
-            return _.contains(index, key);
+            return index.has(key) && !isExpired(key);
         },
 
         /**
@@ -97,8 +121,11 @@ export default function itemStoreFactory(options) {
             return getStore().then(itemStorage => {
                 return itemStorage.setItem(key, item).then(updated => {
                     if (updated) {
-                        if (!_.contains(index, key)) {
-                            index.push(key);
+                        if (!index.has(key)) {
+                            list.push(key);
+                            index.set(key, {
+                                timestamp: Date.now()
+                            });
                         }
 
                         if (config.preload) {
@@ -107,8 +134,8 @@ export default function itemStoreFactory(options) {
                     }
 
                     //do we reach the limit ? then remove one
-                    if (index.length > 1 && index.length > config.maxSize) {
-                        return this.remove(index[0]).then(removed => updated && removed);
+                    if (list.length > 1 && list.length > config.maxSize) {
+                        return this.remove(list[0]).then(removed => updated && removed);
                     }
                     return updated;
                 });
@@ -123,7 +150,7 @@ export default function itemStoreFactory(options) {
          * @returns {Promise<boolean>} resolves with the update status
          */
         update(key, updateKey, updateValue) {
-            if (this.has(key) && _.isString(updateKey)) {
+            if (index.has(key) && _.isString(updateKey)) {
                 return getStore().then(itemStorage => {
                     return itemStorage.getItem(key).then(itemData => {
                         if (_.isPlainObject(itemData)) {
@@ -142,9 +169,10 @@ export default function itemStoreFactory(options) {
          * @returns {Promise<boolean>} resolves once removed
          */
         remove(key) {
-            if (this.has(key)) {
+            if (index.has(key)) {
                 return getStore().then(itemStorage => {
-                    index = _.without(index, key);
+                    list = _.without(list, key);
+                    index.delete(key);
 
                     return itemStorage
                         .getItem(key)
@@ -160,12 +188,22 @@ export default function itemStoreFactory(options) {
         },
 
         /**
+         * Prune the store from expired content.
+         * @returns {Promise}
+         */
+        prune() {
+            const expired = list.filter(isExpired);
+            return Promise.all(expired.map(key => this.remove(key)));
+        },
+
+        /**
          * Clear the store
          * @returns {Promise}
          */
         clear() {
             return getStore().then(itemStorage => {
-                index = [];
+                list = [];
+                index.clear();
                 return itemStorage.clear();
             });
         }

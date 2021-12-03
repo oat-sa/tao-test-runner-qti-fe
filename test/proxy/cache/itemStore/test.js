@@ -39,18 +39,25 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
         assert.notDeepEqual(itemStoreFactory(), itemStoreFactory(), 'The factory creates a new object');
     });
 
-    QUnit.test('instance', assert => {
-        assert.expect(6);
+    QUnit.cases
+        .init([
+            { title: 'has' },
+            { title: 'get' },
+            { title: 'set' },
+            { title: 'update' },
+            { title: 'remove' },
+            { title: 'prune' },
+            { title: 'clear' },
+            { title: 'setCacheSize' },
+            { title: 'setItemTTL' }
+        ])
+        .test('instance API ', (data, assert) => {
+            assert.expect(1);
 
-        const itemStore = itemStoreFactory();
+            const itemStore = itemStoreFactory();
 
-        assert.equal(typeof itemStore.get, 'function', 'The store exposes the method get');
-        assert.equal(typeof itemStore.has, 'function', 'The store exposes the method has');
-        assert.equal(typeof itemStore.set, 'function', 'The store exposes the method set');
-        assert.equal(typeof itemStore.update, 'function', 'The store exposes the method update');
-        assert.equal(typeof itemStore.remove, 'function', 'The store exposes the method remove');
-        assert.equal(typeof itemStore.clear, 'function', 'The store exposes the method clear');
-    });
+            assert.equal(typeof itemStore[data.title], 'function', `The store exposes the method ${data.title}`);
+        });
 
     QUnit.module('behavior');
 
@@ -93,7 +100,7 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
         const ready = assert.async();
         assert.expect(15);
 
-        const itemStore = itemStoreFactory(4);
+        const itemStore = itemStoreFactory({ maxSize: 4 });
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         itemStore
@@ -142,11 +149,35 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
             });
     });
 
+    QUnit.test('limited TTL', assert => {
+        const ready = assert.async();
+        assert.expect(3);
+
+        const itemStore = itemStoreFactory({ itemTTL: 10 });
+        assert.equal(typeof itemStore, 'object', 'The store is an object');
+
+        itemStore
+            .set('item1', { name: 'item1' })
+            .then(() => {
+                assert.ok(itemStore.has('item1'), 'The store contains the given item');
+            })
+            .then(() => new Promise(resolve => setTimeout(resolve, 50)))
+            .then(() => {
+                assert.ok(!itemStore.has('item1'), 'The store does not contain the given item anymore');
+
+                ready();
+            })
+            .catch(err => {
+                assert.ok(false, err.message);
+                ready();
+            });
+    });
+
     QUnit.test('remove', assert => {
         const ready = assert.async();
         assert.expect(13);
 
-        const itemStore = itemStoreFactory(4);
+        const itemStore = itemStoreFactory({ maxSize: 4 });
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         Promise.all([
@@ -196,7 +227,7 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
         const ready = assert.async();
         assert.expect(9);
 
-        const itemStore = itemStoreFactory(4);
+        const itemStore = itemStoreFactory({ maxSize: 4 });
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         Promise.all([
@@ -252,11 +283,60 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
             });
     });
 
+    QUnit.test('prune', assert => {
+        const ready = assert.async();
+        assert.expect(8);
+
+        const itemStore = itemStoreFactory({ itemTTL: 10 });
+        assert.equal(typeof itemStore, 'object', 'The store is an object');
+
+        itemStore
+            .set('item1', { name: 'item1' })
+            .then(() => {
+                assert.ok(itemStore.has('item1'), 'The store contains the given item');
+
+                return new Promise(resolve => setTimeout(resolve, 50));
+            })
+            .then(() => {
+                assert.ok(!itemStore.has('item1'), 'The store does not contain the given item anymore');
+
+                return itemStore.remove('item1');
+            })
+            .then(result => {
+                assert.ok(result, 'The item has been removed');
+                return itemStore.set('item1', { name: 'item1' });
+            })
+            .then(() => {
+                assert.ok(itemStore.has('item1'), 'The store contains the given item');
+
+                return new Promise(resolve => setTimeout(resolve, 50));
+            })
+            .then(() => {
+                assert.ok(!itemStore.has('item1'), 'The store does not contain the given item anymore');
+
+                return itemStore.prune();
+            })
+            .then(() => {
+                assert.ok(!itemStore.has('item1'), 'The store does not contain the given item anymore');
+
+                return itemStore.remove('item1');
+            })
+            .then(result => {
+                assert.ok(!result, 'The item has already been removed');
+
+                ready();
+            })
+            .catch(err => {
+                assert.ok(false, err.message);
+                ready();
+            });
+    });
+
     QUnit.test('clear', assert => {
         const ready = assert.async();
         assert.expect(8);
 
-        const itemStore = itemStoreFactory(4);
+        const itemStore = itemStoreFactory({ maxSize: 4 });
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         Promise.all([

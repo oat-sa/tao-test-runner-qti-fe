@@ -48,6 +48,16 @@ const cacheSize = 20;
 const loadNextDelay = 450;
 
 /**
+ * The default TimeToLive for assets resolving.
+ * Each item comes with a baseUrl that may have a TTL bound to it.
+ * Once this TTL is expired, the assets won't be reachable.
+ * For this reason, we need to remove from the cache items having an expired TTL.
+ * @type {number}
+ * @private
+ */
+const defaultItemTTL = 15 * 60;
+
+/**
  * Overrides the qtiServiceProxy with the precaching behavior
  * @extends taoQtiTest/runner/proxy/qtiServiceProxy
  */
@@ -63,8 +73,16 @@ export default _.defaults(
             //install the parent proxy
             qtiServiceProxy.install.call(this);
 
+            const getConfigOption = (name, defaultValue) => {
+                if (config && config.options && config.options.itemCaching) {
+                    defaultValue = parseInt(config.options.itemCaching[name], 10) || defaultValue;
+                }
+                return defaultValue;
+            };
+
             //we keep items here
             this.itemStore = itemStoreFactory({
+                itemTTL: defaultItemTTL * 1000,
                 maxSize: cacheSize,
                 preload: true,
                 testId: config.serviceCallId
@@ -92,13 +110,13 @@ export default _.defaults(
              * Get the item cache size from the test data
              * @returns {number} the cache size
              */
-            this.getCacheAmount = () => {
-                let cacheAmount = 1;
-                if (config && config.options && config.options.itemCaching) {
-                    cacheAmount = parseInt(config.options.itemCaching.amount, 10) || cacheAmount;
-                }
-                return cacheAmount;
-            };
+            this.getCacheAmount = () => getConfigOption('amount', 1);
+
+            /**
+             * Get the item store TimeToLive
+             * @returns {number} the item store TTL
+             */
+            this.getItemTTL = () => getConfigOption('itemStoreTTL', defaultItemTTL) * 1000;
 
             /**
              * Check whether we have the item in the store
@@ -447,6 +465,10 @@ export default _.defaults(
          *                      Any error will be provided if rejected.
          */
         getItem(itemIdentifier, params) {
+            // remove the expired entries from the cache
+            // prune anyway, if an issue occurs it should not prevent the remaining process to happen
+            const pruneStore = () => this.itemStore.prune().catch(_.noop);
+
             /**
              * try to load the next items
              */
@@ -482,11 +504,13 @@ export default _.defaults(
                         )
                             .then(response => {
                                 if (response && response.items) {
-                                    _.forEach(response.items, item => {
-                                        if (item && item.itemIdentifier) {
-                                            //store the response and start caching assets
-                                            this.itemStore.set(item.itemIdentifier, item);
-                                        }
+                                    return pruneStore().then(() => {
+                                        _.forEach(response.items, item => {
+                                            if (item && item.itemIdentifier) {
+                                                //store the response and start caching assets
+                                                this.itemStore.set(item.itemIdentifier, item);
+                                            }
+                                        });
                                     });
                                 }
                             })
@@ -494,6 +518,9 @@ export default _.defaults(
                     }, loadNextDelay);
                 }
             };
+
+            // the proxy options are supplied after the 'init' phase, we need to apply them later
+            this.itemStore.setItemTTL(this.getItemTTL());
 
             //resolve from the store
             if (this.getItemFromStore && this.itemStore.has(itemIdentifier)) {
@@ -509,7 +536,7 @@ export default _.defaults(
                 true
             ).then(response => {
                 if (response && response.success) {
-                    this.itemStore.set(itemIdentifier, response);
+                    pruneStore().then(() => this.itemStore.set(itemIdentifier, response));
                 }
 
                 loadNextItem();

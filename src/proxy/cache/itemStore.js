@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 Open Assessment Technologies SA
+ * Copyright (c) 2017-2021 Open Assessment Technologies SA
  */
 
 /**
@@ -28,32 +28,30 @@ import itemPreloaderFactory from 'taoQtiTest/runner/proxy/cache/itemPreloader';
 /**
  * The default number of items to store
  */
-var defaultConfig = {
+const defaultConfig = {
     maxSize: 10,
     preload: false
 };
 
 /**
  * Create an item store
- * @param {Object} [options]
- * @param {Number} [options.maxSize = 10] - the store limit
- * @param {Boolean} [options.preload] - do we preload items when storing them
- * @param {String} [options.testId] - the unique identifier of the test instance, required if preload is true
+ * @param {object} [options]
+ * @param {number} [options.maxSize = 10] - the store limit
+ * @param {boolean} [options.preload] - do we preload items when storing them
+ * @param {string} [options.testId] - the unique identifier of the test instance, required if preload is true
  *
  * @returns {itemStore}
  */
 export default function itemStoreFactory(options) {
-    var config = _.defaults(options || {}, defaultConfig);
+    const config = _.defaults(options || {}, defaultConfig);
 
     //in memory storage
-    var getStore = function getStore() {
-        return store('item-cache', store.backends.memory);
-    };
+    const getStore = () => store('item-cache', store.backends.memory);
 
     //maintain an index to resolve existence synchronously
-    var index = [];
+    let index = [];
 
-    var itemPreloader;
+    let itemPreloader;
     if (config.preload) {
         itemPreloader = itemPreloaderFactory(_.pick(config, ['testId']));
     }
@@ -67,57 +65,50 @@ export default function itemStoreFactory(options) {
          *
          * @param {number} cacheSize
          */
-        setCacheSize: function setCacheSize(cacheSize) {
+        setCacheSize(cacheSize) {
             config.maxSize = cacheSize;
         },
 
         /**
          * Get the item form the given key/id/uri
-         * @param {String} key - something identifier
+         * @param {string} key - something identifier
          * @returns {Promise<Object>} the item
          */
-        get: function get(key) {
-            return getStore().then(function(itemStorage) {
-                return itemStorage.getItem(key);
-            });
+        get(key) {
+            return getStore().then(itemStorage => itemStorage.getItem(key));
         },
 
         /**
          * Check whether the given item is in the store
-         * @param {String} key - something identifier
-         * @returns {Boolean}
+         * @param {string} key - something identifier
+         * @returns {boolean}
          */
-        has: function has(key) {
+        has(key) {
             return _.contains(index, key);
         },
 
         /**
          * Add/Set an item into the store, under the given key
-         * @param {String} key - something identifier
-         * @param {Object} item - the item
-         * @returns {Promise<Boolean>} chains
+         * @param {string} key - something identifier
+         * @param {object} item - the item
+         * @returns {Promise<boolean>} chains
          */
-        set: function set(key, item) {
-            var self = this;
-            return getStore().then(function(itemStorage) {
-                return itemStorage.setItem(key, item).then(function(updated) {
+        set(key, item) {
+            return getStore().then(itemStorage => {
+                return itemStorage.setItem(key, item).then(updated => {
                     if (updated) {
                         if (!_.contains(index, key)) {
                             index.push(key);
                         }
 
                         if (config.preload) {
-                            _.defer(function() {
-                                itemPreloader.preload(item);
-                            });
+                            _.defer(() => itemPreloader.preload(item));
                         }
                     }
 
                     //do we reach the limit ? then remove one
                     if (index.length > 1 && index.length > config.maxSize) {
-                        return self.remove(index[0]).then(function(removed) {
-                            return updated && removed;
-                        });
+                        return this.remove(index[0]).then(removed => updated && removed);
                     }
                     return updated;
                 });
@@ -126,15 +117,15 @@ export default function itemStoreFactory(options) {
 
         /**
          * Update some data of a store item
-         * @param {String} key - something identifier
-         * @param {String} updateKey - key to update
+         * @param {string} key - something identifier
+         * @param {string} updateKey - key to update
          * @param {*} updateValue - new data for the updateKey
-         * @returns {Promise<Boolean>} resolves with the update status
+         * @returns {Promise<boolean>} resolves with the update status
          */
-        update: function update(key, updateKey, updateValue) {
+        update(key, updateKey, updateValue) {
             if (this.has(key) && _.isString(updateKey)) {
-                return getStore().then(function(itemStorage) {
-                    return itemStorage.getItem(key).then(function(itemData) {
+                return getStore().then(itemStorage => {
+                    return itemStorage.getItem(key).then(itemData => {
                         if (_.isPlainObject(itemData)) {
                             itemData[updateKey] = updateValue;
                             return itemStorage.setItem(key, itemData);
@@ -147,26 +138,22 @@ export default function itemStoreFactory(options) {
 
         /**
          * Remove the item from the store
-         * @param {String} key - something identifier
-         * @returns {Promise<Boolean>} resolves once removed
+         * @param {string} key - something identifier
+         * @returns {Promise<boolean>} resolves once removed
          */
-        remove: function remove(key) {
+        remove(key) {
             if (this.has(key)) {
-                return getStore().then(function(itemStorage) {
+                return getStore().then(itemStorage => {
                     index = _.without(index, key);
 
                     return itemStorage
                         .getItem(key)
-                        .then(function(item) {
+                        .then(item => {
                             if (config.preload) {
-                                _.defer(function() {
-                                    itemPreloader.unload(item);
-                                });
+                                _.defer(() => itemPreloader.unload(item));
                             }
                         })
-                        .then(function() {
-                            return itemStorage.removeItem(key);
-                        });
+                        .then(() => itemStorage.removeItem(key));
                 });
             }
             return Promise.resolve(false);
@@ -176,8 +163,8 @@ export default function itemStoreFactory(options) {
          * Clear the store
          * @returns {Promise}
          */
-        clear: function clear() {
-            return getStore().then(function(itemStorage) {
+        clear() {
+            return getStore().then(itemStorage => {
                 index = [];
                 return itemStorage.clear();
             });

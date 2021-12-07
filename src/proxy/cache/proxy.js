@@ -73,9 +73,15 @@ export default _.defaults(
             //install the parent proxy
             qtiServiceProxy.install.call(this);
 
-            const getConfigOption = (name, defaultValue) => {
+            /**
+             * Gets the value of an item caching option. All values are numeric only.
+             * @param {string} name
+             * @param {number} defaultValue
+             * @returns {number}
+             */
+            const getItemCachingOption = (name, defaultValue) => {
                 if (config && config.options && config.options.itemCaching) {
-                    defaultValue = parseInt(config.options.itemCaching[name], 10) || defaultValue;
+                    return parseInt(config.options.itemCaching[name], 10) || defaultValue;
                 }
                 return defaultValue;
             };
@@ -110,13 +116,13 @@ export default _.defaults(
              * Get the item cache size from the test data
              * @returns {number} the cache size
              */
-            this.getCacheAmount = () => getConfigOption('amount', 1);
+            this.getCacheAmount = () => getItemCachingOption('amount', 1);
 
             /**
              * Get the item store TimeToLive
              * @returns {number} the item store TTL
              */
-            this.getItemTTL = () => getConfigOption('itemStoreTTL', defaultItemTTL) * 1000;
+            this.getItemTTL = () => getItemCachingOption('itemStoreTTL', defaultItemTTL) * 1000;
 
             /**
              * Check whether we have the item in the store
@@ -519,7 +525,8 @@ export default _.defaults(
                 }
             };
 
-            // the proxy options are supplied after the 'init' phase, we need to apply them later
+            // the additional proxy options are supplied after the 'init' phase as a result of the `init` action,
+            // we need to apply them later
             this.itemStore.setItemTTL(this.getItemTTL());
 
             //resolve from the store

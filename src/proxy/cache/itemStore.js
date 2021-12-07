@@ -47,14 +47,12 @@ const defaultConfig = {
 export default function itemStoreFactory(options) {
     const config = _.defaults(options || {}, defaultConfig);
 
-    //in memory storage
+    // in memory storage
     const getStore = () => store('item-cache', store.backends.memory);
 
-    //maintain an index to resolve existence synchronously:
-    // - the array allows to manage the cache in order, it is useful to remove the first entries
-    // - the map allows to quickly check each cache entry, and store some internal metadata like the timestamp
-    let list = [];
+    // maintain an index to resolve existence synchronously
     const index = new Map();
+    let lastIndexedPosition = 0;
 
     // check if a key has expired
     const isExpired = key => {
@@ -63,6 +61,30 @@ export default function itemStoreFactory(options) {
             return config.itemTTL && Date.now() - meta.timestamp >= config.itemTTL;
         }
         return false;
+    };
+
+    // retrieve the first item by position from the index
+    const findFirstIndexedItem = () => {
+        let first = null;
+        let lowest = Number.POSITIVE_INFINITY;
+        index.forEach((item, key) => {
+            if (item.position < lowest) {
+                lowest = item.position;
+                first = key;
+            }
+        });
+        return first;
+    };
+
+    // retrieve all expired items from the index
+    const findExpiredItems = () => {
+        const expired = [];
+        index.forEach((item, key) => {
+            if (isExpired(key)) {
+                expired.push(key);
+            }
+        });
+        return expired;
     };
 
     let itemPreloader;
@@ -123,8 +145,8 @@ export default function itemStoreFactory(options) {
                 return itemStorage.setItem(key, item).then(updated => {
                     if (updated) {
                         if (!index.has(key)) {
-                            list.push(key);
                             index.set(key, {
+                                position: lastIndexedPosition++,
                                 timestamp: Date.now()
                             });
                         }
@@ -135,8 +157,8 @@ export default function itemStoreFactory(options) {
                     }
 
                     //do we reach the limit ? then remove one
-                    if (list.length > 1 && list.length > config.maxSize) {
-                        return this.remove(list[0]).then(removed => updated && removed);
+                    if (index.size > 1 && index.size > config.maxSize) {
+                        return this.remove(findFirstIndexedItem()).then(removed => updated && removed);
                     }
                     return updated;
                 });
@@ -172,7 +194,6 @@ export default function itemStoreFactory(options) {
         remove(key) {
             if (index.has(key)) {
                 return getStore().then(itemStorage => {
-                    list = _.without(list, key);
                     index.delete(key);
 
                     return itemStorage
@@ -193,8 +214,7 @@ export default function itemStoreFactory(options) {
          * @returns {Promise}
          */
         prune() {
-            const expired = list.filter(isExpired);
-            return Promise.all(expired.map(key => this.remove(key)));
+            return Promise.all(findExpiredItems().map(this.remove));
         },
 
         /**
@@ -203,7 +223,6 @@ export default function itemStoreFactory(options) {
          */
         clear() {
             return getStore().then(itemStorage => {
-                list = [];
                 index.clear();
                 return itemStorage.clear();
             });

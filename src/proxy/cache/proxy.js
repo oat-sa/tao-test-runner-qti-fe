@@ -48,7 +48,7 @@ const cacheSize = 20;
 const loadNextDelay = 450;
 
 /**
- * The default TimeToLive for assets resolving.
+ * The default TimeToLive for assets resolving, in seconds.
  * Each item comes with a baseUrl that may have a TTL bound to it.
  * Once this TTL is expired, the assets won't be reachable.
  * For this reason, we need to remove from the cache items having an expired TTL.

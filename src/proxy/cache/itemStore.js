@@ -37,6 +37,7 @@ const defaultConfig = {
 /**
  * Create an item store
  * @param {object} [options]
+ * @param {number} [options.itemTTL = 0] - The TTL for each item in the store, in milliseconds. 0 means no TTL.
  * @param {number} [options.maxSize = 10] - the store limit
  * @param {boolean} [options.preload] - do we preload items when storing them
  * @param {string} [options.testId] - the unique identifier of the test instance, required if preload is true

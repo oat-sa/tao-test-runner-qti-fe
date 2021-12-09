@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 Open Assessment Technologies SA
+ * Copyright (c) 2017-2021 Open Assessment Technologies SA
  */
 
 /**
@@ -28,32 +28,66 @@ import itemPreloaderFactory from 'taoQtiTest/runner/proxy/cache/itemPreloader';
 /**
  * The default number of items to store
  */
-var defaultConfig = {
+const defaultConfig = {
+    itemTTL: 0,
     maxSize: 10,
     preload: false
 };
 
 /**
  * Create an item store
- * @param {Object} [options]
- * @param {Number} [options.maxSize = 10] - the store limit
- * @param {Boolean} [options.preload] - do we preload items when storing them
- * @param {String} [options.testId] - the unique identifier of the test instance, required if preload is true
+ * @param {object} [options]
+ * @param {number} [options.itemTTL = 0] - The TTL for each item in the store, in milliseconds. 0 means no TTL.
+ * @param {number} [options.maxSize = 10] - the store limit
+ * @param {boolean} [options.preload] - do we preload items when storing them
+ * @param {string} [options.testId] - the unique identifier of the test instance, required if preload is true
  *
  * @returns {itemStore}
  */
 export default function itemStoreFactory(options) {
-    var config = _.defaults(options || {}, defaultConfig);
+    const config = _.defaults(options || {}, defaultConfig);
 
-    //in memory storage
-    var getStore = function getStore() {
-        return store('item-cache', store.backends.memory);
+    // in memory storage
+    const getStore = () => store('item-cache', store.backends.memory);
+
+    // maintain an index to resolve existence synchronously
+    const index = new Map();
+    let lastIndexedPosition = 0;
+
+    // check if a key has expired
+    const isExpired = key => {
+        const meta = index.get(key);
+        if (meta) {
+            return config.itemTTL && Date.now() - meta.timestamp >= config.itemTTL;
+        }
+        return false;
     };
 
-    //maintain an index to resolve existence synchronously
-    var index = [];
+    // retrieve the first item by position from the index
+    const findFirstIndexedItem = () => {
+        let first = null;
+        let lowest = Number.POSITIVE_INFINITY;
+        index.forEach((item, key) => {
+            if (item.position < lowest) {
+                lowest = item.position;
+                first = key;
+            }
+        });
+        return first;
+    };
 
-    var itemPreloader;
+    // retrieve all expired items from the index
+    const findExpiredItems = () => {
+        const expired = [];
+        index.forEach((item, key) => {
+            if (isExpired(key)) {
+                expired.push(key);
+            }
+        });
+        return expired;
+    };
+
+    let itemPreloader;
     if (config.preload) {
         itemPreloader = itemPreloaderFactory(_.pick(config, ['testId']));
     }
@@ -67,57 +101,64 @@ export default function itemStoreFactory(options) {
          *
          * @param {number} cacheSize
          */
-        setCacheSize: function setCacheSize(cacheSize) {
+        setCacheSize(cacheSize) {
             config.maxSize = cacheSize;
         },
 
         /**
+         * Sets the item store TTL.
+         * @param {number} ttl
+         */
+        setItemTTL(ttl) {
+            config.itemTTL = ttl;
+        },
+
+        /**
          * Get the item form the given key/id/uri
-         * @param {String} key - something identifier
+         * @param {string} key - something identifier
          * @returns {Promise<Object>} the item
          */
-        get: function get(key) {
-            return getStore().then(function(itemStorage) {
-                return itemStorage.getItem(key);
-            });
+        get(key) {
+            if (!this.has(key)) {
+                return Promise.resolve();
+            }
+            return getStore().then(itemStorage => itemStorage.getItem(key));
         },
 
         /**
          * Check whether the given item is in the store
-         * @param {String} key - something identifier
-         * @returns {Boolean}
+         * @param {string} key - something identifier
+         * @returns {boolean}
          */
-        has: function has(key) {
-            return _.contains(index, key);
+        has(key) {
+            return index.has(key) && !isExpired(key);
         },
 
         /**
          * Add/Set an item into the store, under the given key
-         * @param {String} key - something identifier
-         * @param {Object} item - the item
-         * @returns {Promise<Boolean>} chains
+         * @param {string} key - something identifier
+         * @param {object} item - the item
+         * @returns {Promise<boolean>} chains
          */
-        set: function set(key, item) {
-            var self = this;
-            return getStore().then(function(itemStorage) {
-                return itemStorage.setItem(key, item).then(function(updated) {
+        set(key, item) {
+            return getStore().then(itemStorage => {
+                return itemStorage.setItem(key, item).then(updated => {
                     if (updated) {
-                        if (!_.contains(index, key)) {
-                            index.push(key);
+                        if (!index.has(key)) {
+                            index.set(key, {
+                                position: lastIndexedPosition++,
+                                timestamp: Date.now()
+                            });
                         }
 
                         if (config.preload) {
-                            _.defer(function() {
-                                itemPreloader.preload(item);
-                            });
+                            _.defer(() => itemPreloader.preload(item));
                         }
                     }
 
                     //do we reach the limit ? then remove one
-                    if (index.length > 1 && index.length > config.maxSize) {
-                        return self.remove(index[0]).then(function(removed) {
-                            return updated && removed;
-                        });
+                    if (index.size > 1 && index.size > config.maxSize) {
+                        return this.remove(findFirstIndexedItem()).then(removed => updated && removed);
                     }
                     return updated;
                 });
@@ -126,15 +167,15 @@ export default function itemStoreFactory(options) {
 
         /**
          * Update some data of a store item
-         * @param {String} key - something identifier
-         * @param {String} updateKey - key to update
+         * @param {string} key - something identifier
+         * @param {string} updateKey - key to update
          * @param {*} updateValue - new data for the updateKey
-         * @returns {Promise<Boolean>} resolves with the update status
+         * @returns {Promise<boolean>} resolves with the update status
          */
-        update: function update(key, updateKey, updateValue) {
-            if (this.has(key) && _.isString(updateKey)) {
-                return getStore().then(function(itemStorage) {
-                    return itemStorage.getItem(key).then(function(itemData) {
+        update(key, updateKey, updateValue) {
+            if (index.has(key) && _.isString(updateKey)) {
+                return getStore().then(itemStorage => {
+                    return itemStorage.getItem(key).then(itemData => {
                         if (_.isPlainObject(itemData)) {
                             itemData[updateKey] = updateValue;
                             return itemStorage.setItem(key, itemData);
@@ -147,38 +188,42 @@ export default function itemStoreFactory(options) {
 
         /**
          * Remove the item from the store
-         * @param {String} key - something identifier
-         * @returns {Promise<Boolean>} resolves once removed
+         * @param {string} key - something identifier
+         * @returns {Promise<boolean>} resolves once removed
          */
-        remove: function remove(key) {
-            if (this.has(key)) {
-                return getStore().then(function(itemStorage) {
-                    index = _.without(index, key);
+        remove(key) {
+            if (index.has(key)) {
+                return getStore().then(itemStorage => {
+                    index.delete(key);
 
                     return itemStorage
                         .getItem(key)
-                        .then(function(item) {
+                        .then(item => {
                             if (config.preload) {
-                                _.defer(function() {
-                                    itemPreloader.unload(item);
-                                });
+                                _.defer(() => itemPreloader.unload(item));
                             }
                         })
-                        .then(function() {
-                            return itemStorage.removeItem(key);
-                        });
+                        .then(() => itemStorage.removeItem(key));
                 });
             }
             return Promise.resolve(false);
         },
 
         /**
+         * Prune the store from expired content.
+         * @returns {Promise}
+         */
+        prune() {
+            return Promise.all(findExpiredItems().map(this.remove));
+        },
+
+        /**
          * Clear the store
          * @returns {Promise}
          */
-        clear: function clear() {
-            return getStore().then(function(itemStorage) {
-                index = [];
+        clear() {
+            return getStore().then(itemStorage => {
+                index.clear();
                 return itemStorage.clear();
             });
         }

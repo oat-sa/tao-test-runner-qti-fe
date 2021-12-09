@@ -21,117 +21,121 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define(['taoQtiTest/runner/proxy/cache/itemStore'], function(itemStoreFactory) {
+define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) {
     'use strict';
 
     QUnit.module('API');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', assert => {
         assert.expect(1);
 
         assert.equal(typeof itemStoreFactory, 'function', 'The module exposes a function');
     });
 
-    QUnit.test('factory', function(assert) {
+    QUnit.test('factory', assert => {
         assert.expect(2);
 
         assert.equal(typeof itemStoreFactory(), 'object', 'The factory creates an object');
         assert.notDeepEqual(itemStoreFactory(), itemStoreFactory(), 'The factory creates a new object');
     });
 
-    QUnit.test('instance', function(assert) {
-        var itemStore;
-        assert.expect(6);
+    QUnit.cases
+        .init([
+            { title: 'has' },
+            { title: 'get' },
+            { title: 'set' },
+            { title: 'update' },
+            { title: 'remove' },
+            { title: 'prune' },
+            { title: 'clear' },
+            { title: 'setCacheSize' },
+            { title: 'setItemTTL' }
+        ])
+        .test('instance API ', (data, assert) => {
+            assert.expect(1);
 
-        itemStore = itemStoreFactory();
+            const itemStore = itemStoreFactory();
 
-        assert.equal(typeof itemStore.get, 'function', 'The store exposes the method get');
-        assert.equal(typeof itemStore.has, 'function', 'The store exposes the method has');
-        assert.equal(typeof itemStore.set, 'function', 'The store exposes the method set');
-        assert.equal(typeof itemStore.update, 'function', 'The store exposes the method update');
-        assert.equal(typeof itemStore.remove, 'function', 'The store exposes the method remove');
-        assert.equal(typeof itemStore.clear, 'function', 'The store exposes the method clear');
-    });
+            assert.equal(typeof itemStore[data.title], 'function', `The store exposes the method ${data.title}`);
+        });
 
     QUnit.module('behavior');
 
-    QUnit.test('basic access', function(assert) {
-        var ready = assert.async();
-        var itemStore;
-        var item = { foo: true };
-        var key = 'item1';
+    QUnit.test('basic access', assert => {
+        const ready = assert.async();
+        const item = { foo: true };
+        const key = 'item1';
 
         assert.expect(6);
 
-        itemStore = itemStoreFactory();
+        const itemStore = itemStoreFactory();
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         assert.equal(itemStore.has(key), false, 'The store does not contains the given item');
         itemStore
             .get(key)
-            .then(function(value) {
+            .then(value => {
                 assert.equal(typeof value, 'undefined', 'The store does not contains the given item');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.set(key, item);
             })
-            .then(function(assigned) {
+            .then(assigned => {
                 assert.ok(assigned, 'The value assignment is done');
                 assert.ok(itemStore.has(key), 'The store contains the given item');
                 return itemStore.get(key);
             })
-            .then(function(value) {
+            .then(value => {
                 assert.deepEqual(value, item, 'The store gives the correct item');
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, err.message);
                 ready();
             });
     });
 
-    QUnit.test('limited size', function(assert) {
-        var ready = assert.async();
-        var itemStore;
+    QUnit.test('limited size', assert => {
+        const ready = assert.async();
         assert.expect(15);
 
-        itemStore = itemStoreFactory(4);
+        const itemStore = itemStoreFactory({ maxSize: 4 });
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         itemStore
             .set('item1', { name: 'item1' })
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.set('item2', { name: 'item2' });
             })
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.set('item3', { name: 'item3' });
             })
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.set('item4', { name: 'item4' });
             })
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
                 assert.ok(itemStore.has('item4'), 'The store contains the given item');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.set('item5', { name: 'item5' });
             })
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
                 assert.ok(itemStore.has('item4'), 'The store contains the given item');
@@ -139,18 +143,41 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function(itemStoreFactory) {
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, err.message);
                 ready();
             });
     });
 
-    QUnit.test('remove', function(assert) {
-        var ready = assert.async();
-        var itemStore;
+    QUnit.test('limited TTL', assert => {
+        const ready = assert.async();
+        assert.expect(3);
+
+        const itemStore = itemStoreFactory({ itemTTL: 10 });
+        assert.equal(typeof itemStore, 'object', 'The store is an object');
+
+        itemStore
+            .set('item1', { name: 'item1' })
+            .then(() => {
+                assert.ok(itemStore.has('item1'), 'The store contains the given item');
+            })
+            .then(() => new Promise(resolve => setTimeout(resolve, 50)))
+            .then(() => {
+                assert.ok(!itemStore.has('item1'), 'The store does not contain the given item anymore');
+
+                ready();
+            })
+            .catch(err => {
+                assert.ok(false, err.message);
+                ready();
+            });
+    });
+
+    QUnit.test('remove', assert => {
+        const ready = assert.async();
         assert.expect(13);
 
-        itemStore = itemStoreFactory(4);
+        const itemStore = itemStoreFactory({ maxSize: 4 });
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         Promise.all([
@@ -159,30 +186,30 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function(itemStoreFactory) {
             itemStore.set('item3', { name: 'item3' }),
             itemStore.set('item4', { name: 'item4' })
         ])
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
                 assert.ok(itemStore.has('item4'), 'The store contains the given item');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.remove('item3');
             })
-            .then(function(removed) {
+            .then(removed => {
                 assert.ok(removed, 'The removal went well');
                 assert.ok(!itemStore.has('item3'), 'The item was removed from the store');
             })
-            .then(function() {
+            .then(() => {
                 assert.ok(!itemStore.has('zoobizoob'), 'The item does not exists');
                 return itemStore.remove('zoobizoob');
             })
-            .then(function(removed) {
+            .then(removed => {
                 assert.ok(!removed, 'Nothing to remove');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.set('item5', { name: 'item5' });
             })
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item4'), 'The store contains the given item');
@@ -190,18 +217,17 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function(itemStoreFactory) {
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, err.message);
                 ready();
             });
     });
 
-    QUnit.test('update', function(assert) {
-        var ready = assert.async();
-        var itemStore;
+    QUnit.test('update', assert => {
+        const ready = assert.async();
         assert.expect(9);
 
-        itemStore = itemStoreFactory(4);
+        const itemStore = itemStoreFactory({ maxSize: 4 });
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         Promise.all([
@@ -213,24 +239,24 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function(itemStoreFactory) {
             }),
             itemStore.set('item3', { name: 'item3' })
         ])
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.update('item2', 'response', []);
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.update('item2', 'some', 'thing else');
             })
-            .then(function(updated) {
+            .then(updated => {
                 assert.ok(updated, 'The updated went well');
                 assert.ok(itemStore.has('item2'), 'The item is still in the store from the store');
 
                 return itemStore.get('item2');
             })
-            .then(function(newItem) {
+            .then(newItem => {
                 assert.deepEqual(
                     newItem,
                     {
@@ -241,28 +267,76 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function(itemStoreFactory) {
                     'The item has been updated correclty'
                 );
             })
-            .then(function() {
+            .then(() => {
                 assert.ok(!itemStore.has('zoobizoob'), 'The item does not exists');
                 return itemStore.update('zoobizoob', 'nope', true);
             })
-            .then(function(updated) {
+            .then(updated => {
                 assert.ok(!updated, 'Nothing to update');
             })
-            .then(function() {
+            .then(() => {
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, err.message);
                 ready();
             });
     });
 
-    QUnit.test('clear', function(assert) {
-        var ready = assert.async();
-        var itemStore;
+    QUnit.test('prune', assert => {
+        const ready = assert.async();
         assert.expect(8);
 
-        itemStore = itemStoreFactory(4);
+        const itemStore = itemStoreFactory({ itemTTL: 10 });
+        assert.equal(typeof itemStore, 'object', 'The store is an object');
+
+        itemStore
+            .set('item1', { name: 'item1' })
+            .then(() => {
+                assert.ok(itemStore.has('item1'), 'The store contains the given item');
+
+                return new Promise(resolve => setTimeout(resolve, 50));
+            })
+            .then(() => {
+                assert.ok(!itemStore.has('item1'), 'The store does not contain the given item anymore');
+
+                return itemStore.remove('item1');
+            })
+            .then(result => {
+                assert.ok(result, 'The item has been removed');
+                return itemStore.set('item1', { name: 'item1' });
+            })
+            .then(() => {
+                assert.ok(itemStore.has('item1'), 'The store contains the given item');
+
+                return new Promise(resolve => setTimeout(resolve, 50));
+            })
+            .then(() => {
+                assert.ok(!itemStore.has('item1'), 'The store does not contain the given item anymore');
+
+                return itemStore.prune();
+            })
+            .then(() => {
+                assert.ok(!itemStore.has('item1'), 'The store does not contain the given item anymore');
+
+                return itemStore.remove('item1');
+            })
+            .then(result => {
+                assert.ok(!result, 'The item has already been removed');
+
+                ready();
+            })
+            .catch(err => {
+                assert.ok(false, err.message);
+                ready();
+            });
+    });
+
+    QUnit.test('clear', assert => {
+        const ready = assert.async();
+        assert.expect(8);
+
+        const itemStore = itemStoreFactory({ maxSize: 4 });
         assert.equal(typeof itemStore, 'object', 'The store is an object');
 
         Promise.all([
@@ -270,15 +344,15 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function(itemStoreFactory) {
             itemStore.set('item2', { name: 'item2' }),
             itemStore.set('item3', { name: 'item3' })
         ])
-            .then(function() {
+            .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
             })
-            .then(function() {
+            .then(() => {
                 return itemStore.clear();
             })
-            .then(function(cleared) {
+            .then(cleared => {
                 assert.ok(cleared, 'The clear wen well');
                 assert.ok(!itemStore.has('item1'), 'The item was removed from the store');
                 assert.ok(!itemStore.has('item2'), 'The item was removed from the store');
@@ -286,7 +360,7 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function(itemStoreFactory) {
 
                 ready();
             })
-            .catch(function(err) {
+            .catch(err => {
                 assert.ok(false, err.message);
                 ready();
             });

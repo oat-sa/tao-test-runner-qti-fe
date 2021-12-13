@@ -492,18 +492,40 @@ var qtiProvider = {
             })
             .on('pause', function(data) {
                 const testContext = self.getTestContext();
-
+                let baseParams = {
+                    itemDefinition: testContext.itemIdentifier,
+                    reason: {
+                        reasons: data && data.reasons,
+                        comment: data && (data.originalMessage || data.message)
+                    }
+                }
                 this.setState('closedOrSuspended', true);
 
-                this.getProxy()
-                    .callTestAction('pause', {
-                        itemDefinition: testContext.itemIdentifier,
-                        itemState: self.itemRunner.getState(),
-                        reason: {
-                            reasons: data && data.reasons,
-                            comment: data && (data.originalMessage || data.message)
+                // get item response depends on availability item runner
+                const itemState = new Promise((resolve, reject) => {
+                    if(self.itemRunner.isCleared()){
+                        const proxy = this.getProxy();
+                        const store = proxy && proxy.itemStore;
+
+                        if(store) {
+                            store.get(testContext.itemIdentifier)
+                            .then(result => {
+                                resolve(result.itemState);
+                            })
+                            .catch(err => reject(err));
+                        } else {
+                            reject(__('Response can not be stored.'));
                         }
-                    })
+                    } else {
+                        resolve(self.itemRunner.getState());
+                    }
+                });
+
+                itemState.then(data =>{
+                    const params = Object.assign({}, baseParams, {itemState: data});
+
+                    self.getProxy()
+                    .callTestAction('pause', params)
                     .then(function() {
                         self.trigger('leave', {
                             code: states.testSession.suspended,
@@ -513,6 +535,7 @@ var qtiProvider = {
                     .catch(function(err) {
                         self.trigger('error', err);
                     });
+                });
             })
             .on('move skip exit timeout pause', function() {
                 stopwatch.stop();

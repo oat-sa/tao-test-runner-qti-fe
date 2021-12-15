@@ -60,6 +60,9 @@ typings/
 # next.js build output
 .next
 
+#eslint report
+eslint_report.json
+
 dist
 css/
 .idea

@@ -14,13 +14,16 @@
         "test:cov": "npm run build:cov && npx qunit-testrunner --cov",
         "test:dev": "NODE_ENV=development run-p test:keepAlive build:watch",
         "coverage": "nyc report",
+        "coverage:clover": "nyc report --reporter=clover",
         "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",
         "build": "rollup --config ./build/rollup.config.js",
         "build:dev": "NODE_ENV=development npm run build:watch",
         "build:cov": "rollup --config ./build/rollup.config.js --environment COVERAGE",
         "build:watch": "rollup --config ./build/rollup.config.js --watch",
         "build:scss": "node ./build/scss.js",
-        "lint": "eslint src test",
+        "lint:src": "eslint -c .eslintrc.js src",
+        "lint:test": "eslint -c .eslintrc.js test",
+        "lint:report": "eslint -c .eslintrc.js --output-file eslint_report.json --format json src | true",
         "prepare": "npm run build:scss && npm run build"
     },
     "repository": {
@@ -37,15 +40,18 @@
     "publishConfig": {
         "access": "public"
     },
+    "engines": {
+        "node": ">=14.0.0"
+    },
     "license": "GPL-2.0",
     "bugs": {
         "url": "https://github.com/oat-sa/tao-test-runner-qti-fe/issues"
     },
     "homepage": "https://github.com/oat-sa/tao-test-runner-qti-fe#readme",
     "devDependencies": {
-        "@babel/core": "^7.5.0",
-        "@babel/preset-env": "^7.5.2",
-        "@oat-sa/browserslist-config-tao": "^0.1.0",
+        "@babel/core": "^7.15.8",
+        "@babel/preset-env": "^7.15.8",
+        "@oat-sa/browserslist-config-tao": "^0.3.1",
         "@oat-sa/eslint-config-tao": "^1.1.1",
         "@oat-sa/expr-eval": "1.3.0",
         "@oat-sa/prettier-config": "^0.1.1",
@@ -62,8 +68,6 @@
         "decimal.js": "10.1.1",
         "dompurify": "1.0.11",
         "eslint": "^7.32.0",
-        "eslint-plugin-es": "^4.1.0",
-        "eslint-plugin-jsdoc": "^36.1.0",
         "gamp": "0.2.1",
         "glob": "^7.1.4",
         "glob-promise": "^3.4.0",

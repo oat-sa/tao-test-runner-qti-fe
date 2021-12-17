@@ -505,7 +505,7 @@ var qtiProvider = {
 
                 const itemState = self.itemRunner.getState();
                 if (Object.keys(itemState).length) {
-                    params = Object.assign({}, params, { itemState });
+                    params.itemState = itemState;
                 }
 
                 this.getProxy()

@@ -495,7 +495,7 @@ var qtiProvider = {
 
                 this.setState('closedOrSuspended', true);
 
-                let params = {
+                const params = {
                     itemDefinition: testContext.itemIdentifier,
                     reason: {
                         reasons: data && data.reasons,

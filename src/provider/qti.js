@@ -495,15 +495,21 @@ var qtiProvider = {
 
                 this.setState('closedOrSuspended', true);
 
+                const params = {
+                    itemDefinition: testContext.itemIdentifier,
+                    reason: {
+                        reasons: data && data.reasons,
+                        comment: data && (data.originalMessage || data.message)
+                    }
+                };
+
+                const itemState = self.itemRunner.getState();
+                if (Object.keys(itemState).length) {
+                    params.itemState = itemState;
+                }
+
                 this.getProxy()
-                    .callTestAction('pause', {
-                        itemDefinition: testContext.itemIdentifier,
-                        itemState: self.itemRunner.getState(),
-                        reason: {
-                            reasons: data && data.reasons,
-                            comment: data && (data.originalMessage || data.message)
-                        }
-                    })
+                    .callTestAction('pause', params)
                     .then(function() {
                         self.trigger('leave', {
                             code: states.testSession.suspended,

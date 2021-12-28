@@ -62,26 +62,33 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        var testRunner = this.getTestRunner();
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
         var isLeaving = false;
 
         // immediate handling of proctor's actions
         testRunner.getProxy().channel('teststate', function(data) {
-            if (
-                !isLeaving &&
-                data &&
-                ('close' === data.type || 'pause' === data.type) &&
-                !testRunner.getState('closedOrSuspended')
-            ) {
-                isLeaving = true;
+            const testStateType = data && data.type;
+            const hasValidType = 'close' === testStateType || 'pause' === testStateType;
+            const canTriggerTestState = !isLeaving && hasValidType && !testRunner.getState('closedOrSuspended');
 
-                if ('pause' === data.type) {
-                    testRunner.trigger('pause', data);
-                } else {
-                    testRunner.setState('closedOrSuspended', true);
-                    testRunner.trigger('leave', data);
-                }
+            if (!canTriggerTestState) {
+                return;
             }
+
+            isLeaving = true;
+            let triggerData = data;
+            if (testRunnerOptions.skipPausedAssesmentDialog && data) {
+                triggerData = Object.assign({}, data, { skipPausedAssesmentDialog: testRunnerOptions.skipPausedAssesmentDialog });
+            }
+
+            if ('pause' === testStateType) {
+                testRunner.trigger('pause', triggerData);
+                return;
+            }
+
+            testRunner.setState('closedOrSuspended', true);
+            testRunner.trigger('leave', triggerData);
         });
     }
 });

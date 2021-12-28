@@ -508,12 +508,15 @@ var qtiProvider = {
                     params.itemState = itemState;
                 }
 
+                const skipPausedAssesmentDialog = data && data.skipPausedAssesmentDialog;
+                const pauseMessage = skipPausedAssesmentDialog ? null : data && data.message;
+
                 this.getProxy()
                     .callTestAction('pause', params)
                     .then(function() {
                         self.trigger('leave', {
                             code: states.testSession.suspended,
-                            message: data && data.message
+                            message: pauseMessage
                         });
                     })
                     .catch(function(err) {

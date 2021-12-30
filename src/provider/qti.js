@@ -508,8 +508,8 @@ var qtiProvider = {
                     params.itemState = itemState;
                 }
 
-                const skipPausedAssesmentDialog = data && data.skipPausedAssesmentDialog;
-                const pauseMessage = skipPausedAssesmentDialog ? null : data && data.message;
+                const skipPausedAssessmentDialog = data && data.skipPausedAssessmentDialog;
+                const pauseMessage = skipPausedAssessmentDialog ? null : data && data.message;
 
                 this.getProxy()
                     .callTestAction('pause', params)

@@ -78,8 +78,8 @@ export default pluginFactory({
 
             isLeaving = true;
             let triggerData = data;
-            if (testRunnerOptions.skipPausedAssesmentDialog && data) {
-                triggerData = Object.assign({}, data, { skipPausedAssesmentDialog: testRunnerOptions.skipPausedAssesmentDialog });
+            if (testRunnerOptions.skipPausedAssessmentDialog && data) {
+                triggerData = Object.assign({}, data, { skipPausedAssessmentDialog: testRunnerOptions.skipPausedAssessmentDialog });
             }
 
             if ('pause' === testStateType) {

@@ -514,7 +514,7 @@ var qtiProvider = {
                         self.trigger('leave', {
                             code: states.testSession.suspended,
                             message: data && data.message,
-                            skipExitMessage: data && data.skipPausedAssesmentDialog
+                            skipExitMessage: data && data.skipPausedAssessmentDialog
                         });
                     })
                     .catch(function(err) {

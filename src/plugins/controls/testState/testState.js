@@ -62,8 +62,7 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init: function init() {
-        const testRunner = this.getTestRunner();
-        const testRunnerOptions = testRunner.getOptions();
+        var testRunner = this.getTestRunner();
         var isLeaving = false;
 
         // immediate handling of proctor's actions
@@ -75,16 +74,12 @@ export default pluginFactory({
                 !testRunner.getState('closedOrSuspended')
             ) {
                 isLeaving = true;
-                let triggerData = data;
-                if (testRunnerOptions.skipPausedAssessmentDialog && data) {
-                    triggerData = Object.assign({}, data, { skipPausedAssessmentDialog: testRunnerOptions.skipPausedAssessmentDialog });
-                }
 
                 if ('pause' === data.type) {
-                    testRunner.trigger('pause', triggerData);
+                    testRunner.trigger('pause', data);
                 } else {
                     testRunner.setState('closedOrSuspended', true);
-                    testRunner.trigger('leave', triggerData);
+                    testRunner.trigger('leave', data);
                 }
             }
         });

@@ -249,16 +249,20 @@ var qtiProvider = {
         function computeNext(action, params, loadPromise) {
             const context = self.getTestContext();
             const currentItem = self.getCurrentItem();
+            const options = self.getOptions();
+            const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
 
             //catch server errors
             var submitError = function submitError(err) {
                 if (err && err.unrecoverable){
-                    self.trigger(
-                        'alert.error',
-                        __(
-                            'An unrecoverable error occurred. Your test session will be paused.'
-                        )
-                    );
+                    if (!skipPausedAssessmentDialog) {
+                        self.trigger(
+                            'alert.error',
+                            __(
+                                'An unrecoverable error occurred. Your test session will be paused.'
+                            )
+                        );
+                    }
 
                     self.trigger('pause', {message : err.message});
                 } else if (err.code === 200) {
@@ -492,6 +496,8 @@ var qtiProvider = {
             })
             .on('pause', function(data) {
                 const testContext = self.getTestContext();
+                const options = self.getOptions();
+                const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
 
                 this.setState('closedOrSuspended', true);
 
@@ -514,7 +520,7 @@ var qtiProvider = {
                         self.trigger('leave', {
                             code: states.testSession.suspended,
                             message: data && data.message,
-                            skipExitMessage: data && data.skipPausedAssessmentDialog
+                            skipExitMessage: skipPausedAssessmentDialog
                         });
                     })
                     .catch(function(err) {

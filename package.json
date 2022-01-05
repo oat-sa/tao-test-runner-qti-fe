@@ -66,7 +66,7 @@
         "async": "0.2.10",
         "autoprefixer": "^9.6.1",
         "decimal.js": "10.1.1",
-        "dompurify": "1.0.11",
+        "dompurify": "2.0.17",
         "eslint": "^7.32.0",
         "gamp": "0.2.1",
         "glob": "^7.1.4",

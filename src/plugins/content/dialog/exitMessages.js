@@ -44,7 +44,12 @@ export default pluginFactory({
         // intercepts the `leave` event,
         // then if a message needs to be displayed displays it and waits the user acknowledges it
         testRunner.before('leave', function leave(e, data) {
-            if (_.isObject(data) && data.message) {
+            const dataIsObject = _.isObject(data);
+            if (dataIsObject && data.skipExitMessage) {
+                return;
+            }
+
+            if (dataIsObject && data.message) {
                 return new Promise(function(resolve) {
                     var context = testRunner.getTestContext();
 

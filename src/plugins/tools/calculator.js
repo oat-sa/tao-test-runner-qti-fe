@@ -32,6 +32,7 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
+import calculatorTpl from 'taoQtiTest/runner/plugins/tools/calculator/calculator.tpl';
 
 /**
  * Default config for calculator components
@@ -217,7 +218,7 @@ export default pluginFactory({
                 icon: 'table',
                 text: __('Calculator')
             });
-        this.$calculatorContainer = $('<div class="widget-calculator">');
+        this.$calculatorContainer = $(calculatorTpl());
 
         //init calculator instance var, it will be created only necessary
         this.calculator = null;

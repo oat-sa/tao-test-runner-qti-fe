@@ -706,7 +706,7 @@ function navigatorFactory(config, map, context) {
      */
     function flagItem($item) {
         //not implemented for fizzy
-        if (!this.isFizzyLayout) {
+        if (!navigator.isFizzyLayout) {
             const position = $item.data('position');
             const flagged = !$item.hasClass(_cssCls.flagged);
 

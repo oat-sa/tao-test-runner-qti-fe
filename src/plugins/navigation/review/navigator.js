@@ -190,7 +190,7 @@ var navigatorApi = {
             const updatedItem = mapHelper.getItemAt(updatedMap, parseInt(position));
             if (updatedItem) {
                 updatedItem.flagged = flag;
-                const updatedScopeMap = mapHelper.getScopeMapFromContext(updatedMap, this.context, this.config.scope);
+                const updatedScopeMap = mapHelper.getScopeMapFromContext(updatedMap, this.testContext, this.config.scope);
                 const updatedFizzyMap = this.getFizzyItemButtonMap(updatedScopeMap, false, false);
                 let updatedItemData;
                 _.forEach(updatedFizzyMap.sections, fizzySection => {
@@ -332,7 +332,7 @@ var navigatorApi = {
             this.controls.$tree.html(navigatorTreeTpl(scopedMap));
 
             if (this.isFizzyLayout) {
-                const scopeMap = mapHelper.getScopeMapFromContext(this.map, this.context, this.config.scope);
+                const scopeMap = mapHelper.getScopeMapFromContext(this.map, this.testContext, this.config.scope);
                 const disableUnseenItems = this.config.preventsUnseen && !isSkipaheadEnabled;
                 const fizzyItemButtonMap = this.getFizzyItemButtonMap(scopeMap, disableUnseenItems);
                 this.renderItemButtonListComponents(fizzyItemButtonMap, activeItem.id, disableUnseenItems);
@@ -421,7 +421,7 @@ var navigatorApi = {
         });
     },
 
-    getFizzyItemButtonMap: function getFizzyItemButtonMap(map, disableUnseenItems) {
+    getFizzyItemButtonMap: function getFizzyItemButtonMap(scopeMap, disableUnseenItems) {
         const displaySectionTitles = this.getConfig().displaySectionTitles;
 
         let nonInformationalCount = 0;
@@ -429,7 +429,7 @@ var navigatorApi = {
             sections: []
         };
 
-        _.forEach(map.parts, function(part) {
+        _.forEach(scopeMap.parts, function(part) {
             _.forEach(part.sections, function (dataSection) {
                 let fizzySection;
                 if (displaySectionTitles) {

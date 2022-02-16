@@ -5,9 +5,7 @@ $lineHeight: 3rem;
 $borderWidth: 1px;
 $borderColor: $textHighlight;
 
-
-/*TODO: common container styles? proper selector [or better not - can break some themes...leave previous override solution?] */
-.qti-navigator:not(.fizzy).xxxxxx {
+.qti-navigator {
     @include disableSelect();
     @include flex-container();
     @include vendor-prefix(flex-direction, column, property);

@@ -31,8 +31,8 @@ import {
  */
 const selectors = {
     filters: '.qti-navigator-filters .qti-navigator-filter',
-    unseenItems: '.qti-navigator-tree .qti-navigator-item:not(.unseen) .qti-navigator-label',
-    allItems: '.qti-navigator-tree .qti-navigator-item .qti-navigator-label',
+    enabledItems: '.qti-navigator-tree .qti-navigator-item:not(.disabled) .qti-navigator-label',
+    enabledItemsFizzy: '.qti-navigator-tree .buttonlist-item:not(.disabled) .buttonlist-btn'
 };
 
 /**
@@ -51,6 +51,7 @@ export default {
         const config = this.getConfig();
         const $panel = this.getTestRunner().getAreaBroker().getPanelArea();
         const $navigator = $panel.find('.qti-navigator');
+        const isFizzyLayout = $navigator.hasClass('fizzy');
         let filtersNavigator;
         let itemsNavigator;
 
@@ -148,8 +149,7 @@ export default {
             }
 
             const $navigatorTree = $panel.find('.qti-navigator-tree');
-            const skipAheadEnabled = $panel.find('.qti-navigator').is('.skipahead-enabled');
-            const $trees = $navigator.find(skipAheadEnabled ? selectors.allItems : selectors.unseenItems);
+            const $trees = $navigator.find(isFizzyLayout ? selectors.enabledItemsFizzy : selectors.enabledItems);
             const navigableTrees = navigableDomElement.createFromDoms($trees);
 
             $trees.first().addClass('key-navigation-scrollable-up');
@@ -165,8 +165,8 @@ export default {
                         let pos = 0;
                         if (config.flatNavigation || currentFilter !== 'flagged') {
                             pos = _.findIndex(navigableElements, navigable => {
-                                const $parent = navigable.getElement().parent('.qti-navigator-item');
-                                if ($parent.hasClass('active') && $parent.is(':visible')) {
+                                const $parent = navigable.getElement().parent(isFizzyLayout ? '.buttonlist-item' : '.qti-navigator-item');
+                                if ($parent.hasClass(isFizzyLayout ? 'buttonlist-item-active' : 'active') && $parent.is(':visible')) {
                                     return true;
                                 }
                             });

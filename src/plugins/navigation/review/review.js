@@ -177,10 +177,9 @@ export default pluginFactory({
         /**
          * Gets the definition of the flagItem button related to the context
          * @param {Boolean} flag - the flag status
-         * @param {Object} config - plugin config
          * @returns {Object}
          */
-        function getFlagItemButtonData(flag, config = null) {
+        function getFlagItemButtonData(flag) {
             let dataType = flag ? 'unsetFlag' : 'setFlag';
             if (isCustomLayout()) {
                 dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';

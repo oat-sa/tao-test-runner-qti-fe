@@ -20,12 +20,13 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
+import __ from 'i18n';
 import component from 'ui/component';
 import autoscroll from 'ui/autoscroll';
+import itemButtonListFactory from 'ui/itemButtonList';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import fizzyTpl from './navigatorFizzy.tpl';
 import fizzyTreeTpl from './navigatorBubbles.tpl';
-import fizzyTreeLinearTpl from './navigatorBubblesLinear.tpl';
 import accordionTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
 import accordionTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
 
@@ -83,9 +84,9 @@ var _selectors = {
     component: '.qti-navigator',
     filterBar: '.qti-navigator-filters',
     filter: '.qti-navigator-filter',
-    tree: '.qti-navigator-tree',
+    tree: '.qti-navigator-tree', //+ linear
     collapseHandle: '.qti-navigator-collapsible',
-    linearState: '.qti-navigator-linear',
+    linearState: '.qti-navigator-linear', //+ linear
     infoAnswered: '.qti-navigator-answered .qti-navigator-counter',
     infoViewed: '.qti-navigator-viewed .qti-navigator-counter',
     infoUnanswered: '.qti-navigator-unanswered .qti-navigator-counter',
@@ -118,7 +119,8 @@ var _selectors = {
     informational: '.info',
     hidden: '.hidden',
     disabled: '.disabled',
-    closeButton: '.icon-close'
+    closeButton: '.icon-close', //+ (fizzy-only, btw)
+    itemButtonListContainer: '.review-panel-items'
 };
 
 /**
@@ -183,30 +185,48 @@ var navigatorApi = {
      * @param {Boolean} flag
      */
     setItemFlag: function setItemFlag(position, flag) {
-        var $item = position && position.jquery ? position : this.controls.$tree.find(`[data-position=${position}]`);
-        var progression = this.progression;
-        var icon;
+        if (this.isFizzyLayout) {
+            const updatedMap = _.cloneDeep(this.map);
+            const updatedItem = mapHelper.getItemAt(updatedMap, parseInt(position));
+            if (updatedItem) {
+                updatedItem.flagged = flag;
+                const updatedScopeMap = mapHelper.getScopeMapFromContext(updatedMap, this.context, this.config.scope);
+                const updatedFizzyMap = this.getFizzyItemButtonMap(updatedScopeMap, false, false);
+                let updatedItemData;
+                _.forEach(updatedFizzyMap.sections, fizzySection => {
+                    updatedItemData = _.find(fizzySection.items, (fizzyItem) => fizzyItem.id === updatedItem.id);
+                    if (updatedItemData) {
+                        return false;
+                    }
+                });
+                this.itemButtonListComponents.forEach(c => c.updateItem(updatedItem.id, updatedItemData));
+            }
+        } else {
+            const $item = position && position.jquery ? position : this.controls.$tree.find(`[data-position=${position}]`);
+            const progression = this.progression;
+            let icon;
 
-        // update the map stats
-        this.updateStats(position, flag);
+            // update the map stats
+            this.updateStats(position, flag);
 
-        // update the item flag
-        $item.toggleClass(_cssCls.flagged, flag);
+            // update the item flag
+            $item.toggleClass(_cssCls.flagged, flag);
 
-        // set the item icon according to its state
-        icon = _.find(_iconCls, _.bind($item.hasClass, $item)) || _cssCls.unseen;
-        $item.find(_selectors.icons).attr('class', `${_cssCls.icon} icon-${icon}`);
+            // set the item icon according to its state
+            icon = _.find(_iconCls, _.bind($item.hasClass, $item)) || _cssCls.unseen;
+            $item.find(_selectors.icons).attr('class', `${_cssCls.icon} icon-${icon}`);
 
-        // update the info panel
-        progression.flagged = this.controls.$tree.find(_selectors.flagged).length;
-        this.writeCount(
-            this.controls.$infoFlagged,
-            progression.flagged,
-            this.getProgressionTotal(progression, 'questions')
-        );
+            // update the info panel
+            progression.flagged = this.controls.$tree.find(_selectors.flagged).length;
+            this.writeCount(
+                this.controls.$infoFlagged,
+                progression.flagged,
+                this.getProgressionTotal(progression, 'questions')
+            );
 
-        // recompute the filters
-        this.filter(this.currentFilter);
+            // recompute the filters
+            this.filter(this.currentFilter);
+        }
     },
 
     /**
@@ -283,9 +303,11 @@ var navigatorApi = {
             total: 0
         };
         const totalQuestions = this.getProgressionTotal(progression, 'questions');
+        const activeItem = mapHelper.getActiveItem(scopedMap);
 
         this.map = map;
         this.progression = progression;
+        this.testContext = context;
 
         // update the info panel
         this.writeCount(this.controls.$infoAnswered, progression.answered, totalQuestions);
@@ -298,12 +320,6 @@ var navigatorApi = {
         if (!testPart.isLinear) {
             this.controls.$filterBar.show();
             this.controls.$linearState.hide();
-            this.controls.$tree.html(navigatorTreeTpl(scopedMap));
-
-            this.autoScroll();
-
-            const activeItem = mapHelper.getActiveItem(scopedMap);
-            this.setState('prevents-unseen', this.config.preventsUnseen);
 
             const isSkipaheadEnabled =
                 activeItem &&
@@ -311,10 +327,21 @@ var navigatorApi = {
                 _.indexOf(activeItem.categories, 'x-tao-option-review-skipahead') >= 0;
 
             this.setState('skipahead-enabled', isSkipaheadEnabled);
+            this.setState('prevents-unseen', this.config.preventsUnseen);
 
-            if (this.config.preventsUnseen && !isSkipaheadEnabled) {
-                // disables all unseen items to prevent the test taker has access to.
-                this.controls.$tree.find(_selectors.unseen).addClass(_cssCls.disabled);
+            this.controls.$tree.html(navigatorTreeTpl(scopedMap));
+
+            if (this.isFizzyLayout) {
+                const scopeMap = mapHelper.getScopeMapFromContext(this.map, this.context, this.config.scope);
+                const disableUnseenItems = this.config.preventsUnseen && !isSkipaheadEnabled;
+                const fizzyItemButtonMap = this.getFizzyItemButtonMap(scopeMap, disableUnseenItems);
+                this.renderItemButtonListComponents(fizzyItemButtonMap, activeItem.id, disableUnseenItems);
+            } else {
+                if (this.config.preventsUnseen && !isSkipaheadEnabled) {
+                    // disables all unseen items to prevent the test taker has access to.
+                    this.controls.$tree.find(_selectors.unseen).addClass(_cssCls.disabled);
+                }
+                this.autoScroll();
             }
         } else {
             this.controls.$filterBar.hide();
@@ -322,8 +349,10 @@ var navigatorApi = {
             this.controls.$tree.empty();
         }
 
-        // apply again the current filter
-        this.filter(this.controls.$filters.filter(_selectors.actives).data('mode'));
+        if (!this.isFizzyLayout) {
+            // apply again the current filter
+            this.filter(this.controls.$filters.filter(_selectors.actives).data('mode'));
+        }
 
         /**
          * @event navigator#update the navigation data have changed
@@ -344,6 +373,8 @@ var navigatorApi = {
         var testPart = mapHelper.getPart(scopedMap, context.testPartId) || {};
         var section = mapHelper.getSection(scopedMap, context.sectionId) || {};
         var item = mapHelper.getItem(scopedMap, context.itemIdentifier) || {};
+
+        scopedMap.displaySectionTitles = this.getConfig().displaySectionTitles;
 
         // set the active part/section/item
         testPart.active = true;
@@ -383,11 +414,82 @@ var navigatorApi = {
 
             if(!itm.informational){
                 counter += 1;
-                itm.numberTest = counter; //item position in whole test from 1
+                itm.numberTest = counter; //item position in this scope from 1
             }
             itm.cls = cls.join(' ');
             itm.icon = icon;
         });
+    },
+
+    getFizzyItemButtonMap: function getFizzyItemButtonMap(map, disableUnseenItems) {
+        const displaySectionTitles = this.getConfig().displaySectionTitles;
+
+        let nonInformationalCount = 0;
+        const fizzyMap = {
+            sections: []
+        };
+
+        _.forEach(map.parts, function(part) {
+            _.forEach(part.sections, function (dataSection) {
+                let fizzySection;
+                if (displaySectionTitles) {
+                    fizzySection = {
+                        label: dataSection.label,
+                        items: []
+                    };
+                    fizzyMap.sections.push(fizzySection);
+                } else {
+                    if (fizzyMap.sections.length) {
+                        fizzySection = fizzyMap.sections[0];
+                    } else {
+                        fizzySection = {
+                            items: []
+                        };
+                        fizzyMap.sections.push(fizzySection);
+                    }
+                }
+
+                _.forEach(dataSection.items, function (dataItem) {
+                    if (!dataItem.informational) {
+                        nonInformationalCount++;
+                    }
+
+                    const fizzyItem = {
+                        id: dataItem.id,
+                        position: dataItem.position
+                    };
+                    fizzySection.items.push(fizzyItem);
+
+                    fizzyItem.numericLabel = dataItem.informational ? '' : `${nonInformationalCount}`;
+
+                    if (dataItem.informational) {
+                        fizzyItem.icon = 'info';
+                        fizzyItem.ariaLabel = __('Informational item');
+                    } else if (dataItem.flagged) {
+                        fizzyItem.icon = 'flagged';
+                        fizzyItem.ariaLabel = __('Bookmarked question %s', nonInformationalCount);
+                    } else {
+                        fizzyItem.icon = null;
+                        fizzyItem.ariaLabel = __('Question %s', nonInformationalCount);
+                    }
+
+                    if (dataItem.answered) {
+                        fizzyItem.status = 'answered';
+                    } else if (dataItem.viewed) {
+                        fizzyItem.status = 'viewed';
+                    } else {
+                        fizzyItem.status = 'unseen';
+                    }
+
+                    if (disableUnseenItems && !dataItem.viewed) {
+                        // disables all unseen items to prevent the test taker has access to.
+                        fizzyItem.disabled = true;
+                    }
+                });
+            });
+        });
+
+        return fizzyMap;
     },
 
     /**
@@ -411,29 +513,40 @@ var navigatorApi = {
      * Selects an item
      * @param {String|jQuery} position The item's position
      * @param {Boolean} [open] Forces the tree to be opened on the selected item
-     * @returns {jQuery} Returns the selected item
      */
     select: function select(position, open) {
-        // find the item to select and extract its hierarchy
-        var $tree = this.controls.$tree;
-        var selected = position && position.jquery ? position : $tree.find(`[data-position=${position}]`);
-        var hierarchy = selected.parentsUntil($tree);
-        var previousPosition = 0;
-        var $previous = $tree.find(_selectors.activeItem);
-        if ($previous.length) {
-            previousPosition = $previous.data('position');
+        let previousPosition = 0;
+
+        if (this.isFizzyLayout) {
+            const previousItem = mapHelper.getItem(this.map, this.testContext.itemIdentifier);
+            if (previousItem) {
+                previousPosition = previousItem.position;
+            }
+            const item = mapHelper.getItemAt(this.map, parseInt(position));
+            if (item) {
+                this.itemButtonListComponents.forEach(c => c.setActiveItem(item.id));
+            }
+        } else {
+            // find the item to select and extract its hierarchy
+            const $tree = this.controls.$tree;
+            const selected = position && position.jquery ? position : $tree.find(`[data-position=${position}]`);
+            const hierarchy = selected.parentsUntil($tree);
+            const $previous = $tree.find(_selectors.activeItem);
+            if ($previous.length) {
+                previousPosition = $previous.data('position');
+            }
+
+            // collapse the full tree and open only the hierarchy of the selected item
+            if (open) {
+                this.openOnly(hierarchy);
+            }
+
+            // select the item
+            $tree.find(_selectors.actives).removeClass(_cssCls.active);
+            hierarchy.add(selected).addClass(_cssCls.active);
+
+            position = selected.data('position');
         }
-
-        // collapse the full tree and open only the hierarchy of the selected item
-        if (open) {
-            this.openOnly(hierarchy);
-        }
-
-        // select the item
-        $tree.find(_selectors.actives).removeClass(_cssCls.active);
-        hierarchy.add(selected).addClass(_cssCls.active);
-
-        position = selected.data('position');
 
         /**
          * An item is selected
@@ -443,8 +556,6 @@ var navigatorApi = {
          * @event navigator#selected
          */
         this.trigger('selected', position, previousPosition);
-
-        return selected;
     },
 
     /**
@@ -511,9 +622,67 @@ var navigatorApi = {
         }
 
         return this;
+    },
+
+    /**
+     * Jumps to an item
+     * @param {Number} position
+     * @private
+     */
+    jump: function jump(position) {
+        /**
+         * A jump to a particular item is required
+         * @event navigator#jump
+         * @param {Number} position - The item position on which jump
+         */
+        this.trigger('jump', position);
+    },
+
+    /**
+     * Get active item, based on data, not visual state
+     * Unlike `mapHelper.getActiveItem`, works with original `map`, not `scopedMap`
+     * @param {Object} map
+     * @param {Object} testContext
+     * @returns {Object} item
+     */
+    getActiveItemFromTestContext: function (map, testContext) {
+        return mapHelper.getItem(map, testContext.itemIdentifier);
+    },
+
+    renderItemButtonListComponents: function(fizzyItemButtonMap, activeItemId, disableUnseenItems) {
+        this.itemButtonListComponents.forEach(c => c.destroy());
+        this.itemButtonListComponents = [];
+
+        const self = this;
+        this.controls.$tree.find(_selectors.itemButtonListContainer).each((index, itemButtonListContainerElem) => {
+            const itemButtonListComponent = itemButtonListFactory({
+                items: fizzyItemButtonMap.sections[index].items,
+                scrollContainer: this.controls.$tree
+            })
+                .render(itemButtonListContainerElem)
+                .on('click', function onItemClick({ position }) {
+                    // click on an item: jump to the position
+                    const item = mapHelper.getItemAt(self.map, position);
+                    const activeItem = self.getActiveItemFromTestContext(self.map, self.testContext);
+
+                    if (item && !self.is('disabled')) {
+                        if (
+                            !(disableUnseenItems && !item.viewed) &&
+                            (!activeItem || item.position !== activeItem.position)
+                        ) {
+                            self.select(position);
+                            self.jump(position);
+                        }
+                    }
+                });
+            this.itemButtonListComponents.push(itemButtonListComponent);
+        });
+
+        this.itemButtonListComponents.forEach(c => c.setActiveItem(activeItemId));
     }
 };
 
+/* eslint-disable no-unused-vars */
 /**
  *
  * @param {Object} config
@@ -527,6 +696,8 @@ var navigatorApi = {
  * @returns {*}
  */
 function navigatorFactory(config, map, context) {
+    /* eslint-enable no-unused-vars */
+
     var navigator;
 
     /**
@@ -534,59 +705,45 @@ function navigatorFactory(config, map, context) {
      * @param {jQuery} $item
      */
     function flagItem($item) {
-        var position = $item.data('position');
-        var flagged = !$item.hasClass(_cssCls.flagged);
+        //not implemented for fizzy
+        if (!this.isFizzyLayout) {
+            const position = $item.data('position');
+            const flagged = !$item.hasClass(_cssCls.flagged);
 
-        // update the display
-        navigator.setItemFlag(position, flagged);
+            // update the display
+            navigator.setItemFlag(position, flagged);
 
-        /**
-         * An item is flagged
-         * @event navigator#flag
-         * @param {Number} position - The item position on which jump
-         * @param {Boolean} flag - Tells whether the item is marked for review or not
-         */
-        navigator.trigger('flag', position, flagged);
-    }
-
-    /**
-     * Jumps to an item
-     * @param {jQuery} $item
-     * @private
-     */
-    function jump($item) {
-        var position = $item.data('position');
-
-        /**
-         * A jump to a particular item is required
-         * @event navigator#jump
-         * @param {Number} position - The item position on which jump
-         */
-        navigator.trigger('jump', position);
+            /**
+             * An item is flagged
+             * @event navigator#flag
+             * @param {Number} position - The item position on which jump
+             * @param {Boolean} flag - Tells whether the item is marked for review or not
+             */
+            navigator.trigger('flag', position, flagged);
+        }
     }
 
     if (config.reviewLayout === 'fizzy') {
         navigatorTpl = fizzyTpl;
         navigatorTreeTpl = fizzyTreeTpl;
-        if (!config.displaySectionTitles) {
-            navigatorTreeTpl = fizzyTreeLinearTpl;
-        }
-        // hack to not allow activate/deactivate bookmarking on icon click in item button
-        _cssCls.collapsed = 'fizzy';
-        _selectors.filter = 'abc';
     }
 
     navigator = component(navigatorApi, _defaults)
         .setTemplate(navigatorTpl)
 
+        .on('init', function() {
+            this.isFizzyLayout = this.getConfig().reviewLayout === 'fizzy';
+            this.itemButtonListComponents = [];
+        })
+
         // uninstalls the component
         .on('destroy', function() {
             this.controls = null;
-        })
 
-        // keep the activ item visible
-        .on('show', function() {
-            this.autoScroll();
+            if (this.isFizzyLayout) {
+                this.itemButtonListComponents.forEach(c => c.destroy());
+                this.itemButtonListComponents = [];
+            }
         })
 
         // renders the component
@@ -628,73 +785,99 @@ function navigatorFactory(config, map, context) {
             // apply options
             this.updateConfig();
 
-            // click on the collapse handle: collapse/expand the review panel
-            $component.on(`click${_selectors.component}`, _selectors.collapseHandle, function() {
-                if (!self.is('disabled')) {
-                    $component.toggleClass(_cssCls.collapsed);
-                    if ($component.hasClass(_cssCls.collapsed)) {
-                        self.openSelected();
-                    }
-                }
-            });
-
-            // click on the info panel title: toggle the related panel
-            $component.on(`click${_selectors.component}`, _selectors.infoPanelLabels, function() {
-                if (!self.is('disabled')) {
-                    self.togglePanel($(this).closest(_selectors.infoPanel), _selectors.infoPanel);
-                }
-            });
-
-            // click on a part title: toggle the related panel
-            $tree.on(`click${_selectors.component}`, _selectors.partLabels, function() {
-                var $panel;
-
-                if (!self.is('disabled')) {
-                    $panel = $(this).closest(_selectors.parts);
-
-                    if (self.togglePanel($panel, _selectors.parts)) {
-                        if ($panel.hasClass(_cssCls.active)) {
+            if (!this.isFizzyLayout) {
+                // click on the collapse handle: collapse/expand the review panel
+                $component.on(`click${_selectors.component}`, _selectors.collapseHandle, function() {
+                    if (!self.is('disabled')) {
+                        $component.toggleClass(_cssCls.collapsed);
+                        if ($component.hasClass(_cssCls.collapsed)) {
                             self.openSelected();
-                        } else {
-                            self.openOnly($panel.find(_selectors.sections).first(), $panel);
                         }
                     }
-                }
-            });
+                });
 
-            // click on a section title: toggle the related panel
-            $tree.on(`click${_selectors.component}`, _selectors.sectionLabels, function() {
-                if (!self.is('disabled')) {
-                    self.togglePanel($(this).closest(_selectors.sections), _selectors.sections);
-                }
-            });
+                // click on the info panel title: toggle the related panel
+                $component.on(`click${_selectors.component}`, _selectors.infoPanelLabels, function() {
+                    if (!self.is('disabled')) {
+                        self.togglePanel($(this).closest(_selectors.infoPanel), _selectors.infoPanel);
+                    }
+                });
 
-            // click on an item: jump to the position
-            $tree.on(`click${_selectors.component}`, _selectors.itemLabels, function(event) {
-                var $item, $target;
+                // click on a part title: toggle the related panel
+                $tree.on(`click${_selectors.component}`, _selectors.partLabels, function() {
+                    var $panel;
 
-                if (!self.is('disabled')) {
-                    $item = $(this).closest(_selectors.items);
+                    if (!self.is('disabled')) {
+                        $panel = $(this).closest(_selectors.parts);
 
-                    if (!$item.hasClass(_cssCls.disabled)) {
-                        $target = $(event.target);
-                        if (
-                            self.config.canFlag &&
-                            $target.is(_selectors.icons) &&
-                            !$component.hasClass(_cssCls.collapsed)
-                        ) {
-                            // click on the icon, just flag the item, unless the panel is collapsed
-                            if (!$item.hasClass(_cssCls.unseen) && !$item.hasClass(_cssCls.info)) {
-                                flagItem($item);
+                        if (self.togglePanel($panel, _selectors.parts)) {
+                            if ($panel.hasClass(_cssCls.active)) {
+                                self.openSelected();
+                            } else {
+                                self.openOnly($panel.find(_selectors.sections).first(), $panel);
                             }
-                        } else if (!$item.hasClass(_cssCls.active)) {
-                            // go to the selected item
-                            self.select($item);
-                            jump($item);
                         }
                     }
-                }
-            });
+                });
+
+                // click on a section title: toggle the related panel
+                $tree.on(`click${_selectors.component}`, _selectors.sectionLabels, function() {
+                    if (!self.is('disabled')) {
+                        self.togglePanel($(this).closest(_selectors.sections), _selectors.sections);
+                    }
+                });
+
+                // click on an item: jump to the position
+                // fizzy click handler will be bound when rendering itemButtonList
+                $tree.on(`click${_selectors.component}`, _selectors.itemLabels, function (event) {
+                    var $item, $target;
+
+                    if (!self.is('disabled')) {
+                        $item = $(this).closest(_selectors.items);
+
+                        if (!$item.hasClass(_cssCls.disabled)) {
+                            $target = $(event.target);
+                            if (
+                                self.config.canFlag &&
+                                $target.is(_selectors.icons) &&
+                                !$component.hasClass(_cssCls.collapsed)
+                            ) {
+                                // click on the icon, just flag the item, unless the panel is collapsed
+                                if (!$item.hasClass(_cssCls.unseen) && !$item.hasClass(_cssCls.info)) {
+                                    flagItem($item);
+                                }
+                            } else if (!$item.hasClass(_cssCls.active)) {
+                                // go to the selected item
+                                self.select($item);
+                                self.jump($item.data('position'));
+                            }
+                        }
+                    }
+                });
+
+                // click on a filter button
+                $filterBar.on(`click${_selectors.component}`, _selectors.filter, function() {
+                    var $btn, mode;
+
+                    if (!self.is('disabled')) {
+                        $btn = $(this);
+                        mode = $btn.data('mode');
+
+                        // select the button
+                        $filters.removeClass(_cssCls.active);
+                        $filters.attr('aria-selected', false);
+                        $component.removeClass(_cssCls.collapsed);
+                        $btn.addClass(_cssCls.active);
+                        $btn.attr('aria-selected', true);
+
+                        // filter the items
+                        self.filter(mode);
+
+                        //after filtering, ensure that the active item (if exists) is visible
+                        self.autoScroll();
+                    }
+                });
+            }
 
             // click on the start button inside a linear part: jump to the position
             $tree.on(`click${_selectors.component}`, _selectors.linearStart, function() {
@@ -706,31 +889,8 @@ function navigatorFactory(config, map, context) {
                     // go to the first item of the linear part
                     if (!$btn.hasClass(_cssCls.disabled)) {
                         $btn.addClass(_cssCls.disabled);
-                        jump($btn);
+                        self.jump($btn.data('position'));
                     }
-                }
-            });
-
-            // click on a filter button
-            $filterBar.on(`click${_selectors.component}`, _selectors.filter, function() {
-                var $btn, mode;
-
-                if (!self.is('disabled')) {
-                    $btn = $(this);
-                    mode = $btn.data('mode');
-
-                    // select the button
-                    $filters.removeClass(_cssCls.active);
-                    $filters.attr('aria-selected', false);
-                    $component.removeClass(_cssCls.collapsed);
-                    $btn.addClass(_cssCls.active);
-                    $btn.attr('aria-selected', true);
-
-                    // filter the items
-                    self.filter(mode);
-
-                    //after filtering, ensure that the active item (if exists) is visible
-                    self.autoScroll();
                 }
             });
 
@@ -743,6 +903,12 @@ function navigatorFactory(config, map, context) {
                  */
                 navigator.trigger('close');
             });
+        })
+        .on('enable', function() {
+            this.itemButtonListComponents.forEach(c => c.enable());
+        })
+        .on('disable', function() {
+            this.itemButtonListComponents.forEach(c => c.disable());
         });
 
     // set default filter

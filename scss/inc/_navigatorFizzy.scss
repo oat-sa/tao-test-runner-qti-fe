@@ -1,97 +1,56 @@
 @import 'inc/bootstrap';
 
 $lineHeight: 3rem;
-$headerHeight: 4.5rem;
-$panelPadding: 19px;
+$separatorColor: whiten($grey, 0.4);
 
-/* reset default template styles */
-.fizzy {
-    & .qti-navigator-label {
-        padding: 0;
-        line-height: initial;
-        min-width: auto;
-        align-items: center;
-        display: block;
-    }
+.qti-navigator-fizzy {
+    @include disableSelect();
+    @include flex-container();
+    @include vendor-prefix(flex-direction, column, property);
+    cursor: default;
+    min-width: calc(18rem - 8px);
+    height: 100%;
+    position: relative;
+    background-color: $uiReviewPanelBg !important;
+    width: 30rem;
 
-    & .qti-navigator-filters {
-        padding: 0;
-        margin: 0;
-        width: auto;
-        height: inherit;
-        text-align: initial;
-    }
-
-    & .qti-navigator-filters .qti-navigator-filter {
-        height: 100%;
-    }
-
-    & .qti-navigator-filters ul {
-        display: block;
-    }
-
-    & .qti-navigator-section.active > .qti-navigator-label {
-        background-color: initial;
-        border: none;
-        padding: 0;
-    }
-
-    & .qti-navigator-tree {
+    .qti-navigator-tree {
+        overflow-y: auto;
         height: 100%;
         display: block;
-    }
-}
-
-.test-runner-scope .test-sidebar .fizzy .key-navigation-group.focusin {
-    background: none;
-}
-
-/****** theme specific **********/
-/**
- this styles rewrite default theme styles for MEXCBT project
- if sometimes in the future this design should be spread out to another project
- it will be better to move this rewriting to MEXCBT extension/project
- */
-html body .qti-navigator.fizzy .qti-navigator-filter{
-    width: auto;
-}
-html body .qti-navigator.fizzy .qti-navigator-filters{
-    width: auto;
-}
-/*********************************/
-
-/* panel styles */
-
-.qti-navigator.fizzy {
-    &.qti-panel.qti-panel {
-        @include disableSelect();
-        @include flex-container();
-        @include vendor-prefix(flex-direction, column, property);
-        cursor: default;
-        height: 100%;
-        position: relative;
-        background-color: $uiReviewPanelBg !important;
-        width: 30rem;
-        padding: $panelPadding 0;
+        background: none;
+        margin: 0 5px;
     }
 
-    /* reset parent styles */
-    .qti-navigator-filters.key-navigation-group.focusin.focusin {
-        background: $uiReviewPanelBg;
-    }
-    .qti-navigator-filters {
-        height: calc(100% - #{$headerHeight});
-        margin: 0 $panelPadding; /* shows focusing border around tree items */
+    .qti-navigator-linear {
+        padding: 8px;
+        background: white();
+
+        .qti-navigator-message {
+            @include font-size(14);
+        }
     }
 
-    /* header */
-    & > .qti-navigator-label {
+    .qti-navigator-section {
+        display: block;
+
+        .qti-navigator-label {
+            background-color: initial;
+            border: none;
+            padding: 0;
+            line-height: initial;
+            margin: 13px 0 10px 0;
+            @include font-size(15);
+        }
+    }
+
+    .qti-navigator-header {
         display: flex;
         justify-content: space-between;
-        margin: 0 $panelPadding;
-        border-bottom: 1px solid #ccc;
-        min-height: $headerHeight;
-        align-items: center;
+        border-bottom: 1px solid $separatorColor;
+        padding: 15px 0 5px 0;
+        margin: 0 5px;
+        line-height: initial;
 
         .qti-navigator-text {
             @include font-size(20);
@@ -108,17 +67,6 @@ html body .qti-navigator.fizzy .qti-navigator-filters{
                 text-decoration: none;
                 cursor: pointer;
             }
-        }
-    }
-
-    /* tree */
-    .qti-navigator-tree {
-        background: none;
-
-        span.qti-navigator-label {
-            margin: 13px 0 10px 0;
-            display: block;
-            @include font-size(15);
         }
     }
 }

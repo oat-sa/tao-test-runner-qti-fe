@@ -456,7 +456,7 @@ define([
                 'Section title is showing on panel'
             );
             assert.equal(
-                $('.fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
+                $('.qti-navigator-fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
                 'Test overview',
                 'Review panel title exists'
             );
@@ -482,12 +482,12 @@ define([
                 'No any labels on panel'
             );
             assert.equal(
-                $('.fizzy .qti-navigator-item ', $container).length,
+                $('.qti-navigator-fizzy .qti-navigator-item ', $container).length,
                 10,
                 'All items are visible'
             );
             assert.equal(
-                $('.fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
+                $('.qti-navigator-fizzy > .qti-navigator-label > .qti-navigator-text', $container).text(),
                 'Test overview',
                 'Review panel title still exists'
             );

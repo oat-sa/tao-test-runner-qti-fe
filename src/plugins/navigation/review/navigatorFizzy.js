@@ -21,7 +21,7 @@ import componentFactory from 'ui/component';
 import itemButtonListFactory from 'ui/itemButtonList';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import navigatorTpl from './navigatorFizzy.tpl';
-import navigatorTreeTpl from './navigatorBubbles.tpl';
+import navigatorTreeTpl from './navigatorFizzyTree.tpl';
 
 /**
  * Some default values

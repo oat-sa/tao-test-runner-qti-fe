@@ -31,6 +31,7 @@ import {
  */
 const selectors = {
     filters: '.qti-navigator-filters .qti-navigator-filter',
+    filtersFizzy: '.qti-navigator-tree',
     enabledItems: '.qti-navigator-tree .qti-navigator-item:not(.disabled) .qti-navigator-label',
     enabledItemsFizzy: '.qti-navigator-tree .buttonlist-item:not(.disabled) .buttonlist-btn'
 };
@@ -51,7 +52,7 @@ export default {
         const config = this.getConfig();
         const $panel = this.getTestRunner().getAreaBroker().getPanelArea();
         const $navigator = $panel.find('.qti-navigator');
-        const isFizzyLayout = $navigator.hasClass('fizzy');
+        const isFizzyLayout = $navigator.hasClass('qti-navigator-fizzy');
         let filtersNavigator;
         let itemsNavigator;
 
@@ -65,7 +66,7 @@ export default {
 
         let testStatusNavigation;
         if ($navigator.length && !$navigator.hasClass('disabled')) {
-            const $filters = $navigator.find(selectors.filters);
+            const $filters = $navigator.find(isFizzyLayout ? selectors.filtersFizzy : selectors.filters);
             const navigableFilters = navigableDomElement.createFromDoms($filters);
             const $testStatusHeader = $navigator.find('.qti-navigator-info.collapsible > .qti-navigator-label');
             const navigableTestStatus = navigableDomElement.createFromDoms($testStatusHeader);
@@ -96,7 +97,7 @@ export default {
                     id: 'navigator-filters',
                     propagateTab: false,
                     elements: navigableFilters,
-                    group: $navigator.find('.qti-navigator-filters')
+                    group: $navigator.find(isFizzyLayout ? '.qti-navigator-tree' : '.qti-navigator-filters')
                 });
 
                 setupItemsNavigator(filtersNavigator, {

@@ -8,7 +8,7 @@
                     <span class="qti-navigator-label" title="{{label}}">
                         <span class="qti-navigator-text">{{label}}</span>
                     </span>
-                    <div class="review-panel-items"></div>
+                    <div class="qti-navigator-items"></div>
                 </li>
                 {{/each}}
             </ul>
@@ -20,7 +20,7 @@
         <li class="qti-navigator-part active">
             <ul class="qti-navigator-sections plain">
                 <li class="qti-navigator-section active">
-                   <div class="review-panel-items"></div>
+                   <div class="qti-navigator-items"></div>
                 </li>
             </ul>
         </li>

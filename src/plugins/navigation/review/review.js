@@ -29,7 +29,8 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
-import navigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigator';
+import defaultNavigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigator';
+import fizzyNavigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigatorFizzy';
 
 /**
  * The display states of the buttons
@@ -170,7 +171,7 @@ export default pluginFactory({
          * Check that custom layout activated
          * @return {boolean}
          */
-        function isCustomLayout(){
+        function isFizzyLayout(){
             return navigatorConfig && navigatorConfig.reviewLayout === 'fizzy';
         }
 
@@ -181,7 +182,7 @@ export default pluginFactory({
          */
         function getFlagItemButtonData(flag) {
             let dataType = flag ? 'unsetFlag' : 'setFlag';
-            if (isCustomLayout()) {
+            if (isFizzyLayout()) {
                 dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
             }
             return buttonData[dataType];
@@ -194,7 +195,7 @@ export default pluginFactory({
          */
         function getToggleButtonData(navigator) {
             let dataType = navigator.is('hidden') ? 'showReview' : 'hideReview';
-            if (isCustomLayout()) {
+            if (isFizzyLayout()) {
                 dataType = navigator.is('hidden') ? 'showTestOverview' : 'hideTestOverview';
             }
             return buttonData[dataType];
@@ -296,6 +297,7 @@ export default pluginFactory({
             updateButton(self.toggleButton, getToggleButtonData(self.navigator));
         }
 
+        const navigatorFactory = isFizzyLayout() ? fizzyNavigatorFactory : defaultNavigatorFactory;
         this.navigator = navigatorFactory(navigatorConfig, testMap, testContext)
             .on('selected', function(position, previousPosition) {
                 previousItemPosition = previousPosition;
@@ -322,7 +324,7 @@ export default pluginFactory({
         });
 
         this.explicitlyHidden = false;
-        this.customLayout = isCustomLayout();
+        this.customLayout = isFizzyLayout();
 
         // register buttons in the toolbox component
         this.toggleButton = this.getAreaBroker()

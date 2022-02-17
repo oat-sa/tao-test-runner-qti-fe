@@ -47,7 +47,6 @@ const _selectors = {
 };
 
 /**
- *
  * @param {Object} config
  * @param {String} [config.scope] Limit the review screen to a particular scope: test, testPart, testSection
  * @param {Boolean} [config.preventsUnseen] Prevents the test taker to access unseen items
@@ -56,13 +55,16 @@ const _selectors = {
 function navigatorFactory(config) {
     let component;
 
-    // click on an item: jump to the position
-    function onItemClick(itemId, disableUnseenItems) {
+    /**
+     * Handle click on an item: jump to the position, if allowed
+     * @param {String} itemId
+     */
+    function onItemClick(itemId) {
         const item = mapHelper.getItem(component.map, itemId);
         const activeItem = mapHelper.getItem(component.map, component.testContext.itemIdentifier);
         if (item && !component.is('disabled')) {
             if (
-                !(disableUnseenItems && !item.viewed) &&
+                !(component.disableUnseenItems && !item.viewed) &&
                 (!activeItem || item.position !== activeItem.position)
             ) {
                 component.select(item.position);
@@ -76,7 +78,12 @@ function navigatorFactory(config) {
         }
     }
 
-    function renderItemButtonListComponents(fizzyItemButtonMap, activeItemId, disableUnseenItems) {
+    /**
+     * Render items
+     * @param {Object} fizzyItemButtonMap - list of items in format needed for rendering
+     * @param {String} activeItemId
+     */
+    function renderItemButtonListComponents(fizzyItemButtonMap, activeItemId) {
         component.itemButtonListComponents.forEach(c => c.destroy());
         component.itemButtonListComponents = [];
 
@@ -86,14 +93,20 @@ function navigatorFactory(config) {
                 scrollContainer: component.controls.$tree
             })
                 .render(itemButtonListContainerElem)
-                .on('click', ({id}) => onItemClick(id, disableUnseenItems));
+                .on('click', ({ id }) => onItemClick(id));
             component.itemButtonListComponents.push(itemButtonListComponent);
         });
 
         component.itemButtonListComponents.forEach(c => c.setActiveItem(activeItemId));
     }
 
-    function getFizzyItemButtonMap(scopeMap, disableUnseenItems) {
+    /**
+     * Get list of items in format needed for rendering
+     * @param {Object} scopedMap - test map, limited to the scope
+     * @param {Boolean} disableUnseenItems
+     * @returns {Object}
+     */
+    function getFizzyItemButtonMap(scopedMap, disableUnseenItems) {
         const displaySectionTitles = component.getConfig().displaySectionTitles;
 
         let nonInformationalCount = 0;
@@ -101,7 +114,7 @@ function navigatorFactory(config) {
             sections: []
         };
 
-        _.forEach(scopeMap.parts, function(part) {
+        _.forEach(scopedMap.parts, function (part) {
             _.forEach(part.sections, function (dataSection) {
                 let fizzySection;
                 if (displaySectionTitles) {
@@ -177,13 +190,17 @@ function navigatorFactory(config) {
         setItemFlag: function setItemFlag(position, flag) {
             const updatedMap = _.cloneDeep(this.map);
             const updatedItem = mapHelper.getItemAt(updatedMap, position);
-            if (updatedItem) {
+            if (updatedItem && updatedItem.id) {
                 updatedItem.flagged = flag;
-                const updatedScopeMap = mapHelper.getScopeMapFromContext(updatedMap, this.testContext, this.config.scope);
-                const updatedFizzyMap = getFizzyItemButtonMap(updatedScopeMap, false, false);
+                const updatedScopeMap = mapHelper.getScopeMapFromContext(
+                    updatedMap,
+                    this.testContext,
+                    this.config.scope
+                );
+                const updatedFizzyMap = getFizzyItemButtonMap(updatedScopeMap, this.disableUnseenItems);
                 let updatedItemData;
                 _.forEach(updatedFizzyMap.sections, fizzySection => {
-                    updatedItemData = _.find(fizzySection.items, (fizzyItem) => fizzyItem.id === updatedItem.id);
+                    updatedItemData = _.find(fizzySection.items, fizzyItem => fizzyItem.id === updatedItem.id);
                     if (updatedItemData) {
                         return false;
                     }
@@ -212,26 +229,24 @@ function navigatorFactory(config) {
             const scopedMap = mapHelper.getScopeMapFromContext(map, context, this.config.scope);
             scopedMap.displaySectionTitles = this.getConfig().displaySectionTitles;
 
+            const activeItemId = context.itemIdentifier;
+            const isSkipaheadEnabled = mapHelper.hasItemCategory(map, activeItemId, 'x-tao-option-review-skipahead');
+
             this.map = map;
             this.testContext = context;
+            this.disableUnseenItems = this.config.preventsUnseen && !isSkipaheadEnabled;
 
             // rebuild the tree
             const testPart = mapHelper.getPart(map, context.testPartId);
             if (!testPart.isLinear) {
-                this.controls.$linearState.hide();
-
-                const activeItemId = context.itemIdentifier;
-                const isSkipaheadEnabled = mapHelper.hasItemCategory(map, activeItemId, 'x-tao-option-review-skipahead');
-
                 this.setState('skipahead-enabled', isSkipaheadEnabled);
                 this.setState('prevents-unseen', this.config.preventsUnseen);
 
+                this.controls.$linearState.hide();
                 this.controls.$tree.html(navigatorTreeTpl(scopedMap));
 
-                const disableUnseenItems = this.config.preventsUnseen && !isSkipaheadEnabled;
-                const fizzyItemButtonMap = getFizzyItemButtonMap(scopedMap, disableUnseenItems);
-                renderItemButtonListComponents(fizzyItemButtonMap, activeItemId, disableUnseenItems);
-
+                const fizzyItemButtonMap = getFizzyItemButtonMap(scopedMap, this.disableUnseenItems);
+                renderItemButtonListComponents(fizzyItemButtonMap, activeItemId);
             } else {
                 this.controls.$linearState.show();
                 this.controls.$tree.empty();
@@ -253,17 +268,16 @@ function navigatorFactory(config) {
             let previousPosition = 0;
 
             const previousItem = mapHelper.getItem(this.map, this.testContext.itemIdentifier);
-            if (previousItem) {
+            if (previousItem && previousItem.id) {
                 previousPosition = previousItem.position;
             }
             const item = mapHelper.getItemAt(this.map, parseInt(position));
-            if (item) {
+            if (item && item.id) {
                 this.itemButtonListComponents.forEach(c => c.setActiveItem(item.id));
             }
 
             /**
              * An item is selected
-             *
              * @param {Number} position - The item position on which select
              * @param {Number} previousPosition - The item position from which select
              * @event navigator#selected
@@ -274,44 +288,38 @@ function navigatorFactory(config) {
 
     component = componentFactory(navigatorApi, _defaults)
         .setTemplate(navigatorTpl)
-        .on('init', function() {
+        .on('init', function () {
             this.itemButtonListComponents = [];
         })
-        .on('destroy', function() {
+        .on('destroy', function () {
             this.controls = null;
             this.itemButtonListComponents.forEach(c => c.destroy());
             this.itemButtonListComponents = [];
         })
         .on('render', function () {
-            // main component element
             const $component = this.getElement();
-            // links the component to the underlying DOM elements
             this.controls = {
-                // access to the tree of parts/sections/items
                 $tree: $component.find(_selectors.tree),
-                // access to the panel displayed when a linear part is reached
                 $linearState: $component.find(_selectors.linearState),
                 $closeButton: $component.find(_selectors.closeButton)
             };
 
-            //click on close button
             this.controls.$closeButton.on('click', function (e) {
                 e.preventDefault();
                 /**
                  * Review screen should be closed
-                 * @fires navigator#close
+                 * @event navigator#close
                  */
                 component.trigger('close');
             });
         })
-        .on('enable', function() {
+        .on('enable', function () {
             this.itemButtonListComponents.forEach(c => c.enable());
         })
-        .on('disable', function() {
+        .on('disable', function () {
             this.itemButtonListComponents.forEach(c => c.disable());
         });
 
-    // the component will be ready
     return component.init(config);
 }
 

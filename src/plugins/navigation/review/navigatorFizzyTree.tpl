@@ -1,4 +1,4 @@
-<ul class="qti-navigator-sections plain">
+<ol class="qti-navigator-sections plain">
 {{#if displaySectionTitles}}
     {{#each parts}}
         {{#each sections}}
@@ -15,4 +15,4 @@
         <div class="qti-navigator-items"></div>
     </li>
 {{/if}}
-</ul>
+</ol>

@@ -516,11 +516,9 @@ var navigatorApi = {
  * @param {Boolean} [config.canCollapse] Allow the test taker to collapse the component
  * @param {Boolean} [config.canFlag] Allow the test taker to flag items
  * @param {Boolean} [config.hidden] Hide the component at init
- * @param {Object} map The current test map
- * @param {Object} context The current test context
  * @returns {*}
  */
-function navigatorFactory(config, map, context) {
+function navigatorFactory(config) {
     var navigator;
 
     /**

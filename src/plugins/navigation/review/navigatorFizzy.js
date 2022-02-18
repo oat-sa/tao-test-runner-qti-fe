@@ -62,7 +62,7 @@ function navigatorFactory(config) {
     function onItemClick(itemId) {
         const item = mapHelper.getItem(component.map, itemId);
         const activeItem = mapHelper.getItem(component.map, component.testContext.itemIdentifier);
-        if (item && !component.is('disabled')) {
+        if (item && item.id && !component.is('disabled')) {
             if (
                 !(component.disableUnseenItems && !item.viewed) &&
                 (!activeItem || item.position !== activeItem.position)

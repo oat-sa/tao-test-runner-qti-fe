@@ -298,7 +298,7 @@ export default pluginFactory({
         }
 
         const navigatorFactory = isFizzyLayout() ? fizzyNavigatorFactory : defaultNavigatorFactory;
-        this.navigator = navigatorFactory(navigatorConfig, testMap, testContext)
+        this.navigator = navigatorFactory(navigatorConfig)
             .on('selected', function(position, previousPosition) {
                 previousItemPosition = previousPosition;
             })
@@ -324,7 +324,7 @@ export default pluginFactory({
         });
 
         this.explicitlyHidden = false;
-        this.customLayout = isFizzyLayout();
+        this.isFizzyLayout = isFizzyLayout();
 
         // register buttons in the toolbox component
         this.toggleButton = this.getAreaBroker()
@@ -471,7 +471,7 @@ export default pluginFactory({
         } else {
             this.flagItemButton.turnOff();
         }
-        if (this.customLayout) {
+        if (this.isFizzyLayout) {
             if (!this.explicitlyHidden) {
                 this.toggleButton.turnOn();
             } else {
@@ -488,7 +488,7 @@ export default pluginFactory({
         this.flagItemButton.turnOff();
 
         this.toggleButton.disable();
-        if (this.customLayout) {
+        if (this.isFizzyLayout) {
             this.toggleButton.turnOff();
         }
 

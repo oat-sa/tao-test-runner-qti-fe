@@ -60,6 +60,7 @@ function initFizzy(config, $panel, $navigator, keyNavigators, managedNavigators)
             id: 'navigator-items',
             elements: navigableItems,
             group: $navigatorTree,
+            loop: true,
             defaultPosition(navigableElements) {
                 let pos = _.findIndex(navigableElements, navigable => {
                     const $parent = getItemFromNavigable(navigable);

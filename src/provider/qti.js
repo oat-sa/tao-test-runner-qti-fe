@@ -24,6 +24,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
 import cachedStore from 'core/cachedStore';
+import browser from 'util/browser';
 import areaBrokerFactory from 'taoTests/runner/areaBroker';
 import proxyFactory from 'taoTests/runner/proxy';
 import probeOverseerFactory from 'taoTests/runner/probeOverseer';
@@ -38,7 +39,6 @@ import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
 import states from 'taoQtiTest/runner/config/states';
 import stopwatchFactory from 'taoQtiTest/runner/provider/stopwatch';
-import currentItem from "../helpers/currentItem";
 
 /**
  * A Test runner provider to be registered against the runner
@@ -741,6 +741,17 @@ var qtiProvider = {
                     this.on('statechange', changeState);
 
                     resolve();
+                })
+                .after('render', function() {
+                    //iOS only fix: sometimes the wrapper is not scrollable because of some bugs in Safari iOS
+                    //we have to force it to reconsider if the scroll needs to apply
+                    if (browser.isIOs()) {
+                        const wrapperElt = self.getAreaBroker().getContainer().find('.content-wrapper').get(0);
+                        if (wrapperElt) {
+                            wrapperElt.style.overflow = 'hidden';
+                            setTimeout(() => wrapperElt.style.overflow = 'auto', 0);
+                        }
+                    }
                 })
                 .on('warning', function(err) {
                     self.trigger('warning', err);

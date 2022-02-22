@@ -16,7 +16,7 @@ $separatorColor: whiten($grey, 0.4);
 
     .qti-navigator-tree {
         overflow-y: auto;
-        height: 100%;
+        max-height: 100%;
         display: block;
         background: none;
         margin: 0 5px;
@@ -24,6 +24,7 @@ $separatorColor: whiten($grey, 0.4);
 
     .qti-navigator-linear {
         padding: 8px;
+        margin: 0 5px;
         background: white();
 
         .qti-navigator-message {

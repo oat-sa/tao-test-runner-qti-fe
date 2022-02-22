@@ -165,15 +165,10 @@ export default pluginFactory({
             defaultOpen : false
         };
         navigatorConfig = Object.assign({}, navigatorConfig, pluginConfig);
-        let previousItemPosition;
 
-        /**
-         * Check that custom layout activated
-         * @return {boolean}
-         */
-        function isFizzyLayout(){
-            return navigatorConfig && navigatorConfig.reviewLayout === 'fizzy';
-        }
+        this.isFizzyLayout = navigatorConfig && navigatorConfig.reviewLayout === 'fizzy';
+
+        let previousItemPosition;
 
         /**
          * Gets the definition of the flagItem button related to the context
@@ -182,7 +177,7 @@ export default pluginFactory({
          */
         function getFlagItemButtonData(flag) {
             let dataType = flag ? 'unsetFlag' : 'setFlag';
-            if (isFizzyLayout()) {
+            if (self.isFizzyLayout) {
                 dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
             }
             return buttonData[dataType];
@@ -195,7 +190,7 @@ export default pluginFactory({
          */
         function getToggleButtonData(navigator) {
             let dataType = navigator.is('hidden') ? 'showReview' : 'hideReview';
-            if (isFizzyLayout()) {
+            if (self.isFizzyLayout) {
                 dataType = navigator.is('hidden') ? 'showTestOverview' : 'hideTestOverview';
             }
             return buttonData[dataType];
@@ -297,7 +292,7 @@ export default pluginFactory({
             updateButton(self.toggleButton, getToggleButtonData(self.navigator));
         }
 
-        const navigatorFactory = isFizzyLayout() ? fizzyNavigatorFactory : defaultNavigatorFactory;
+        const navigatorFactory = this.isFizzyLayout ? fizzyNavigatorFactory : defaultNavigatorFactory;
         this.navigator = navigatorFactory(navigatorConfig)
             .on('selected', function(position, previousPosition) {
                 previousItemPosition = previousPosition;
@@ -324,7 +319,6 @@ export default pluginFactory({
         });
 
         this.explicitlyHidden = false;
-        this.isFizzyLayout = isFizzyLayout();
 
         // register buttons in the toolbox component
         this.toggleButton = this.getAreaBroker()

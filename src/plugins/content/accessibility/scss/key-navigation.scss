@@ -57,10 +57,8 @@
                 }
             }
         }
-        .qti-navigator-fizzy .key-navigation-group {
-            &.focusin {
-                background: $uiReviewPanelBg;
-            }
+        .qti-navigator-fizzy .key-navigation-group.focusin {
+            background: $uiReviewPanelBg;
         }
     }
 

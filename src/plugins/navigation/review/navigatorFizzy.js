@@ -187,7 +187,7 @@ function navigatorFactory(config) {
          * @param {Number} position
          * @param {Boolean} flag
          */
-        setItemFlag: function setItemFlag(position, flag) {
+        setItemFlag(position, flag) {
             const updatedMap = _.cloneDeep(this.map);
             const updatedItem = mapHelper.getItemAt(updatedMap, position);
             if (updatedItem && updatedItem.id) {
@@ -213,7 +213,7 @@ function navigatorFactory(config) {
          * Update the config
          * @returns {navigatorApi}
          */
-        updateConfig: function updateConfig() {
+        updateConfig() {
             //not implemented
             return this;
         },
@@ -264,7 +264,7 @@ function navigatorFactory(config) {
          * Selects an item
          * @param {Number} position The item's position
          */
-        select: function select(position) {
+        select(position) {
             let previousPosition = 0;
 
             const previousItem = mapHelper.getItem(this.map, this.testContext.itemIdentifier);

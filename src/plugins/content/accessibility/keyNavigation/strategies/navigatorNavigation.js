@@ -16,7 +16,7 @@
  * Copyright (c) 2020 Open Assessment Technologies SA ;
  */
 
-import _ from "lodash";
+import _ from 'lodash';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import {
@@ -31,7 +31,7 @@ import {
  */
 const selectors = {
     filters: '.qti-navigator-filters .qti-navigator-filter',
-    enabledItems: '.qti-navigator-tree .qti-navigator-item:not(.disabled) .qti-navigator-label',
+    enabledItems: '.qti-navigator-tree .qti-navigator-item:not(.disabled) .qti-navigator-label'
 };
 
 /**
@@ -51,7 +51,7 @@ function initFizzy(config, $panel, $navigator, keyNavigators, managedNavigators)
      * (`navigable`: '.buttonlist-btn'; `parent()`: '.buttonlist-item')
      * @returns {jQuery}
      */
-    const getItemFromNavigable = (navigable) => {
+    const getItemFromNavigable = navigable => {
         return navigable.getElement().parent();
     };
 
@@ -70,17 +70,16 @@ function initFizzy(config, $panel, $navigator, keyNavigators, managedNavigators)
                 return pos >= 0 ? pos : 0;
             }
         })
-        .on('focus', cursor => {
-            getItemFromNavigable(cursor.navigable).addClass('key-navigation-highlight');
-        })
-        .on('blur', cursor => {
-            getItemFromNavigable(cursor.navigable).removeClass('key-navigation-highlight');
-        })
-        ;
+            .on('focus', cursor => {
+                getItemFromNavigable(cursor.navigable).addClass('key-navigation-highlight');
+            })
+            .on('blur', cursor => {
+                getItemFromNavigable(cursor.navigable).removeClass('key-navigation-highlight');
+            });
 
         setupItemsNavigator(itemsNavigator, {
             keyNextItem: config.keyNextItem,
-            keyPrevItem: config.keyPrevItem,
+            keyPrevItem: config.keyPrevItem
         });
         setupClickableNavigator(itemsNavigator);
 
@@ -113,27 +112,14 @@ export default {
         if ($navigator.length && !$navigator.hasClass('disabled')) {
             if (isFizzyLayout) {
                 initFizzy(config, $panel, $navigator, this.keyNavigators, this.managedNavigators);
-            }
-            else {
-                let filtersNavigator;
-                let itemsNavigator;
-
-                //the tag to identify if the item listing has been browsed, to only "smart jump" to active item only on the first visit
-                let itemListingVisited = false;
-                //the position of the filter in memory, to only "smart jump" to active item only on the first visit
-                let currentFilter;
-
-                let testStatusNavigation;
-
-                const $filters = $navigator.find(selectors.filters);
-                const navigableFilters = navigableDomElement.createFromDoms($filters);
+            } else {
                 const $testStatusHeader = $navigator.find('.qti-navigator-info.collapsible > .qti-navigator-label');
                 const navigableTestStatus = navigableDomElement.createFromDoms($testStatusHeader);
 
                 $testStatusHeader.addClass('key-navigation-actionable');
 
                 if (navigableTestStatus.length) {
-                    testStatusNavigation = keyNavigator({
+                    const testStatusNavigation = keyNavigator({
                         keepState: config.keepState,
                         id: 'navigator-test-status',
                         propagateTab: false,
@@ -149,6 +135,16 @@ export default {
                     this.keyNavigators.push(testStatusNavigation);
                     this.managedNavigators.push(testStatusNavigation);
                 }
+
+                let filtersNavigator;
+                let itemsNavigator;
+                //the tag to identify if the item listing has been browsed, to only "smart jump" to active item only on the first visit
+                let itemListingVisited = false;
+                //the position of the filter in memory, to only "smart jump" to active item only on the first visit
+                let currentFilter;
+
+                const $filters = $navigator.find(selectors.filters);
+                const navigableFilters = navigableDomElement.createFromDoms($filters);
 
                 if (navigableFilters.length) {
                     filtersNavigator = keyNavigator({

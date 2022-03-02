@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-test-runner-qti",
-    "version": "2.28.2",
+    "version": "2.28.3",
     "description": "TAO Test Runner QTI implementation",
     "files": [
         "dist",
@@ -57,7 +57,7 @@
         "@oat-sa/prettier-config": "^0.1.1",
         "@oat-sa/rollup-plugin-wildcard-external": "^0.1.0",
         "@oat-sa/tao-core-libs": "0.4.4",
-        "@oat-sa/tao-core-sdk": "1.16.1",
+        "@oat-sa/tao-core-sdk": "1.17.0",
         "@oat-sa/tao-core-ui": "1.52.0",
         "@oat-sa/tao-item-runner": "^0.8.0",
         "@oat-sa/tao-item-runner-qti": "0.25.0",

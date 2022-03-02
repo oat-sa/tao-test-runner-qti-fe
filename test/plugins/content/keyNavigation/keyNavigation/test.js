@@ -30,6 +30,7 @@ define([
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/item.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/rubrics.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/navigation.json',
+    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/navigationFizzy.json',
     'jquery.simulate'
 ], function (
     $,
@@ -44,7 +45,8 @@ define([
     testDefinition,
     itemsBank,
     rubricsBank,
-    navigationCases
+    navigationCases,
+    navigationFizzyCases
 ) {
     'use strict';
 
@@ -119,7 +121,7 @@ define([
         assert.equal(keyNavigation.getTestRunner(), testRunner, 'The test runner is accessible');
     });
 
-    QUnit.cases.init(navigationCases).test('Navigation mode ', (data, assert) => {
+    QUnit.cases.init([...navigationCases, ...navigationFizzyCases]).test('Navigation mode ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#qunit-fixture');
         const config = {
@@ -136,6 +138,10 @@ define([
             }, delay);
         });
 
+        const testData = _.cloneDeep(backendMock.getTestData());
+        testData.config.review.reviewLayout = data.reviewLayout || 'default';
+
+        backendMock.setTestData(testData);
         backendMock.setRubricsBank(data.rubrics && rubricsBank);
 
         assert.expect(8 + data.steps.length);

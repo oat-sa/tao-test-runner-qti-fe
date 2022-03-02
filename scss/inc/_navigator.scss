@@ -5,7 +5,7 @@ $lineHeight: 3rem;
 $borderWidth: 1px;
 $borderColor: $textHighlight;
 
-.qti-navigator {
+.qti-navigator-default {
     @include disableSelect();
     @include flex-container();
     @include vendor-prefix(flex-direction, column, property);

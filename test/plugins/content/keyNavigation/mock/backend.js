@@ -237,14 +237,16 @@ define([
         // Mock the queries
         $.mockjax({
             url: '/init*',
-            responseText: {
-                success: true,
-                toolStates: [],
-                lastStoreId: false,
-                messages: [],
-                testData,
-                testContext,
-                testMap
+            response: function () {
+                this.responseText = {
+                    success: true,
+                    toolStates: [],
+                    lastStoreId: false,
+                    messages: [],
+                    testData,
+                    testContext,
+                    testMap
+                };
             }
         });
         $.mockjax({

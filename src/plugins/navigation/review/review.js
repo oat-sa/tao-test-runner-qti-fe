@@ -29,7 +29,8 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
-import navigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigator';
+import defaultNavigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigator';
+import fizzyNavigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigatorFizzy';
 
 /**
  * The display states of the buttons
@@ -164,25 +165,19 @@ export default pluginFactory({
             defaultOpen : false
         };
         navigatorConfig = Object.assign({}, navigatorConfig, pluginConfig);
-        let previousItemPosition;
 
-        /**
-         * Check that custom layout activated
-         * @return {boolean}
-         */
-        function isCustomLayout(){
-            return navigatorConfig && navigatorConfig.reviewLayout === 'fizzy';
-        }
+        this.isFizzyLayout = navigatorConfig && navigatorConfig.reviewLayout === 'fizzy';
+
+        let previousItemPosition;
 
         /**
          * Gets the definition of the flagItem button related to the context
          * @param {Boolean} flag - the flag status
-         * @param {Object} config - plugin config
          * @returns {Object}
          */
-        function getFlagItemButtonData(flag, config = null) {
+        function getFlagItemButtonData(flag) {
             let dataType = flag ? 'unsetFlag' : 'setFlag';
-            if (isCustomLayout()) {
+            if (self.isFizzyLayout) {
                 dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
             }
             return buttonData[dataType];
@@ -195,7 +190,7 @@ export default pluginFactory({
          */
         function getToggleButtonData(navigator) {
             let dataType = navigator.is('hidden') ? 'showReview' : 'hideReview';
-            if (isCustomLayout()) {
+            if (self.isFizzyLayout) {
                 dataType = navigator.is('hidden') ? 'showTestOverview' : 'hideTestOverview';
             }
             return buttonData[dataType];
@@ -297,7 +292,8 @@ export default pluginFactory({
             updateButton(self.toggleButton, getToggleButtonData(self.navigator));
         }
 
-        this.navigator = navigatorFactory(navigatorConfig, testMap, testContext)
+        const navigatorFactory = this.isFizzyLayout ? fizzyNavigatorFactory : defaultNavigatorFactory;
+        this.navigator = navigatorFactory(navigatorConfig)
             .on('selected', function(position, previousPosition) {
                 previousItemPosition = previousPosition;
             })
@@ -323,7 +319,6 @@ export default pluginFactory({
         });
 
         this.explicitlyHidden = false;
-        this.customLayout = isCustomLayout();
 
         // register buttons in the toolbox component
         this.toggleButton = this.getAreaBroker()
@@ -470,7 +465,7 @@ export default pluginFactory({
         } else {
             this.flagItemButton.turnOff();
         }
-        if (this.customLayout) {
+        if (this.isFizzyLayout) {
             if (!this.explicitlyHidden) {
                 this.toggleButton.turnOn();
             } else {
@@ -487,7 +482,7 @@ export default pluginFactory({
         this.flagItemButton.turnOff();
 
         this.toggleButton.disable();
-        if (this.customLayout) {
+        if (this.isFizzyLayout) {
             this.toggleButton.turnOff();
         }
 

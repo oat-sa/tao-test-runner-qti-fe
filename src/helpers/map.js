@@ -89,11 +89,11 @@ export default {
 
     /**
      * Get active item from the test map
-     * @param {Object} map - The assessment test map
+     * @param {Object} mapWithActive - The assessment test map which has active part/section/item marked
      * @returns {Object} the active item
      */
-    getActiveItem: function getActiveItem(map) {
-        var parts = this.getParts(map),
+    getActiveItem: function getActiveItem(mapWithActive) {
+        var parts = this.getParts(mapWithActive),
             result = {};
 
         _.forEach(parts, function(part) {

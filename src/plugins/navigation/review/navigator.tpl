@@ -1,4 +1,4 @@
-<div class="qti-panel qti-navigator{{#if hidden}} hidden{{/if}}">
+<div class="qti-panel qti-navigator qti-navigator-default{{#if hidden}} hidden{{/if}}">
     <div class="qti-navigator-collapsible">
         <span class="qti-navigator-collapse icon icon-left" title="{{__ 'Collapse the review panel'}}"></span>
         <span class="qti-navigator-expand icon icon-right" title="{{__ 'Expand the review panel'}}"></span>

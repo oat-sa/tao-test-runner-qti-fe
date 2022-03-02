@@ -31,6 +31,7 @@ define([
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/item.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/rubrics.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/navigation.json',
+    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/navigationFizzy.json',
     'jquery.simulate'
 ], function (
     $,
@@ -46,7 +47,8 @@ define([
     testDefinition,
     itemsBank,
     rubricsBank,
-    navigationCases
+    navigationCases,
+    navigationFizzyCases
 ) {
     'use strict';
 
@@ -159,7 +161,7 @@ define([
             .then(ready);
     });
 
-    QUnit.cases.init(navigationCases).test('Navigation mode ', (data, assert) => {
+    QUnit.cases.init([...navigationCases, ...navigationFizzyCases]).test('Navigation mode ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#qunit-fixture');
         const config = _.cloneDeep(configData);
@@ -174,6 +176,10 @@ define([
             }, delay);
         });
 
+        const testData = _.cloneDeep(backendMock.getTestData());
+        testData.config.review.reviewLayout = data.reviewLayout || 'default';
+
+        backendMock.setTestData(testData);
         backendMock.setRubricsBank(data.rubrics && rubricsBank);
 
         assert.expect(8 + data.steps.length);
@@ -235,6 +241,11 @@ define([
     QUnit.test('Visual test', assert => {
         const ready = assert.async();
         assert.expect(1);
+
+        const testData = _.cloneDeep(backendMock.getTestData());
+        testData.config.review.reviewLayout = 'default';
+        backendMock.setTestData(testData);
+
         visualPlayground('#visual-playground', backendMock)
             .then(() => {
                 assert.ok(true, 'The playground is ready');

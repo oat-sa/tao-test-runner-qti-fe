@@ -1,150 +1,57 @@
 @import 'inc/bootstrap';
 
 $lineHeight: 3rem;
-$borderWidth: 1px;
-$radiusCircular: 50%;
-$sizeDefault: 4rem;
-$hitboxSize: 6.25rem;
-$borderThin: 0.125rem;
-$borderMedium: 0.25rem;
-$borderMediumPlus: 0.375rem;
-$offset: calc((#{$hitboxSize} - #{$sizeDefault}) / 2);
-$headerHeight: 4.5rem;
-$panelPadding: 19px;
+$separatorColor: whiten($grey, 0.4);
 
-/* reset default template styles */
-.fizzy {
-    & .qti-navigator-label {
-        padding: 0;
-        line-height: initial;
-        min-width: auto;
-        align-items: center;
+.qti-navigator-fizzy {
+    @include disableSelect();
+    @include flex-container();
+    @include vendor-prefix(flex-direction, column, property);
+    cursor: default;
+    min-width: calc(18rem - 8px);
+    height: 100%;
+    position: relative;
+    background-color: $uiReviewPanelBg !important;
+    width: 30rem;
+
+    .qti-navigator-tree {
+        overflow-y: auto;
+        max-height: 100%;
         display: block;
+        background: none;
+        margin: 0 5px;
     }
 
-    & .qti-navigator-filters {
-        padding: 0;
-        margin: 0;
-        width: auto;
-        height: inherit;
-        text-align: initial;
+    .qti-navigator-linear {
+        padding: 8px;
+        margin: 0 5px;
+        background: white();
+
+        .qti-navigator-message {
+            @include font-size(14);
+        }
     }
 
-    & .qti-navigator-filters .qti-navigator-filter {
-        height: 100%;
-    }
-
-    & .qti-navigator-filters ul {
+    .qti-navigator-section {
         display: block;
+
+        .qti-navigator-label {
+            background-color: initial;
+            border: none;
+            padding: 0;
+            line-height: initial;
+            margin: 13px 0 10px 0;
+            @include font-size(15);
+        }
     }
 
-    & .qti-navigator-section.active > .qti-navigator-label {
-        background-color: initial;
-        border: none;
-        padding: 0;
-    }
-
-    & .qti-navigator-tree {
-        height: 100%;
-        display: block;
-    }
-
-    & .qti-navigator-item {
-        padding: 0;
-        margin: 0;
-        background: $uiReviewPanelBg;
-    }
-
-    & .qti-navigator-item:hover {
-        background: inherit;
-        color: inherit;
-    }
-
-    & .qti-navigator-item.active {
-        background: inherit;
-        color: inherit;
-    }
-
-    & span.icon-viewed {
-        display: none;
-    }
-
-    & .icon-viewed::before {
-        content: '';
-    }
-
-    & span.icon-unseen {
-        display: none;
-    }
-
-    & .icon-unseen::before {
-        content: '';
-    }
-
-    & span.icon-answered {
-        display: none;
-    }
-
-    & .icon-answered::before {
-        content: '';
-    }
-}
-
-.test-runner-scope .test-sidebar .fizzy .key-navigation-group.focusin {
-    background: none;
-}
-
-/****** theme specific **********/
-/**
- this styles rewrite default theme styles for MEXCBT project
- if sometimes in the future this design should be spread out to another project
- it will be better to move this rewriting to MEXCBT extension/project
- */
-html body .qti-navigator.fizzy .qti-navigator-filter{
-    width: auto;
-}
-html body .qti-navigator.fizzy .qti-navigator-filters{
-    width: auto;
-}
-/*********************************/
-
-/* panel styles */
-
-.qti-navigator.fizzy {
-    &.qti-panel.qti-panel {
-        @include disableSelect();
-        @include flex-container();
-        @include vendor-prefix(flex-direction, column, property);
-        cursor: default;
-        height: 100%;
-        position: relative;
-        background-color: $uiReviewPanelBg !important;
-        width: 30rem;
-        padding: $panelPadding 0;
-    }
-
-    /* reset parent style */
-    button [class*='icon-'] {
-        padding: 0;
-    }
-
-    /* reset parent styles */
-    .qti-navigator-filters.key-navigation-group.focusin.focusin {
-        background: $uiReviewPanelBg;
-    }
-    .qti-navigator-filters {
-        height: calc(100% - #{$headerHeight});
-        margin: 0 $panelPadding; /* shows focusing border around tree items */
-    }
-
-    /* header */
-    & > .qti-navigator-label {
+    .qti-navigator-header {
         display: flex;
         justify-content: space-between;
-        margin: 0 $panelPadding;
-        border-bottom: 1px solid #ccc;
-        min-height: $headerHeight;
-        align-items: center;
+        border-bottom: 1px solid $separatorColor;
+        padding: 15px 0 5px 0;
+        margin: 0 5px;
+        line-height: initial;
 
         .qti-navigator-text {
             @include font-size(20);
@@ -161,188 +68,6 @@ html body .qti-navigator.fizzy .qti-navigator-filters{
                 text-decoration: none;
                 cursor: pointer;
             }
-        }
-    }
-
-    /* tree */
-    .qti-navigator-tree {
-        background: none;
-
-        span.qti-navigator-label {
-            margin: 13px 0 10px 0;
-            display: block;
-            @include font-size(15);
-        }
-    }
-
-    .qti-navigator-icon {
-        padding: 0;
-        top: 0;
-        left: 0;
-    }
-
-
-    & .icon-flagged::before {
-        @include icon-bookmark;
-    }
-
-    & .icon-info::before {
-        @include icon-info-bare;
-    }
-    & .icon-unseen {
-        display: none;
-    }
-    & .icon-viewed {
-        display: none;
-    }
-    & .icon-indicator {
-        display: none;
-    }
-
-    .qti-navigator-item {
-        height: $hitboxSize;
-        width: $hitboxSize;
-        display: flex;
-        justify-content: center; /* aligning left - cut focusing board for keyboard interacting */
-        align-items: center;
-        /* reset parent styles */
-        padding: 0 !important; /* instead of rewriting 6-classes selector on focusing */
-        border: none !important; /* instead of rewriting 6-classes selector on focusing */
-
-        /* reset global styles */
-        &.disabled {
-            background-color: unset !important;
-            color: $uiReviewPanelTextDisabled !important;
-            border-color: $uiReviewPanelTextDisabled !important;
-            opacity: 1 !important;
-            text-shadow: none !important;
-        }
-
-        &.disabled .step {
-            border-width: $borderMedium;
-            color: $uiReviewPanelTextDisabled;
-            border-color: $uiReviewPanelTextDisabled;
-            opacity: 1;
-            text-shadow: none;
-        }
-
-        /* remove number from item button if item was marked for review */
-        &.flagged span.step-label {
-            display: none;
-        }
-        /* remove number from item button if item is informational */
-        &.info span.step-label {
-            display: none;
-        }
-
-        &.viewed .step {
-            border-width: $borderMedium;
-            color: $uiReviewPanelTextDefault;
-            border-color: $uiReviewPanelTextDefault;
-        }
-
-        &.answered .step {
-            background-color: $uiReviewPanelBgInverted;
-            color: $uiReviewPanelTextInverted;
-            border-color: $uiReviewPanelBgInverted;
-        }
-
-        &.active .indicator {
-            position: absolute;
-            display: block;
-            z-index: 1;
-            color: $uiReviewPanelTextDefault;
-            height: 1.4rem;
-            min-width: 1.6rem;
-            background-color: $uiReviewPanelBg;
-            top: unset;
-            bottom: -1.7rem;
-            padding: 0;
-            /* centering horizontally */
-            left: 50%;
-            transform: translateX(-50%);
-
-            & > :global(svg) {
-                display: block;
-            }
-        }
-
-        &:not(.disabled) .step {
-            cursor: pointer;
-        }
-
-        &:not(.disabled) .step:hover {
-            background-color: hsl(208, 100%, 95%);
-            color: $uiReviewPanelPrimaryHighlight;
-            border-color: $uiReviewPanelPrimaryHighlight;
-        }
-
-        /* keyboard focusing */
-        &.key-navigation-highlight .step::before {
-            content: '';
-            display: block;
-            position: absolute;
-            width: 5.2rem;
-            height: 5.2rem;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            border-width: $borderMedium;
-            border-color: $uiReviewPanelPrimaryHighlight;
-            border-style: dotted;
-            border-radius: $radiusCircular;
-        }
-
-        &.key-navigation-highlight.active .step .indicator {
-            color: $uiReviewPanelPrimaryHighlight;
-        }
-
-        &.key-navigation-highlight.answered > .step {
-            background-color: $uiReviewPanelPrimaryHighlight;
-            color: $uiReviewPanelTextInverted;
-            border-color: $uiReviewPanelPrimaryHighlight;
-        }
-
-        &.key-navigation-highlight.viewed:not(.answered) > .step {
-            border-width: $borderMedium;
-            color: $uiReviewPanelPrimaryHighlight;
-            border-color: $uiReviewPanelPrimaryHighlight;
-        }
-    }
-
-    .qti-navigator-items {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: start;
-    }
-
-    .step {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: $sizeDefault;
-        width: $sizeDefault;
-        border-style: solid;
-        border-radius: $radiusCircular;
-        border-width: $borderThin;
-        border-color: $uiReviewPanelTextDefault;
-
-        /*Fixes firefox button jumps*/
-        padding: 0;
-
-        font-weight: bold;
-        font-size: 1.6rem !important;
-        background-color: $uiReviewPanelBgDefault;
-        color: $uiReviewPanelTextDefault;
-        text-shadow: none;
-
-        & span.step-label {
-            font-family: 'Nunito Sans', 'Source Sans Pro', Arial, sans-serif !important;
-            max-width: 3.75rem;
-            overflow: hidden;
-            white-space: nowrap;
-            line-height: initial;
         }
     }
 }

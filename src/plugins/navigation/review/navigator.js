@@ -23,14 +23,9 @@ import _ from 'lodash';
 import component from 'ui/component';
 import autoscroll from 'ui/autoscroll';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
-import fizzyTpl from './navigatorFizzy.tpl';
-import fizzyTreeTpl from './navigatorBubbles.tpl';
-import fizzyTreeLinearTpl from './navigatorBubblesLinear.tpl';
-import accordionTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
-import accordionTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
+import navigatorTpl from 'taoQtiTest/runner/plugins/navigation/review/navigator.tpl';
+import navigatorTreeTpl from 'taoQtiTest/runner/plugins/navigation/review/navigatorTree';
 
-let navigatorTpl = accordionTpl;
-let navigatorTreeTpl = accordionTreeTpl;
 /**
  * Some default values
  * @type {Object}
@@ -117,8 +112,7 @@ var _selectors = {
     notInformational: ':not(.info)',
     informational: '.info',
     hidden: '.hidden',
-    disabled: '.disabled',
-    closeButton: '.icon-close'
+    disabled: '.disabled'
 };
 
 /**
@@ -522,11 +516,9 @@ var navigatorApi = {
  * @param {Boolean} [config.canCollapse] Allow the test taker to collapse the component
  * @param {Boolean} [config.canFlag] Allow the test taker to flag items
  * @param {Boolean} [config.hidden] Hide the component at init
- * @param {Object} map The current test map
- * @param {Object} context The current test context
  * @returns {*}
  */
-function navigatorFactory(config, map, context) {
+function navigatorFactory(config) {
     var navigator;
 
     /**
@@ -565,17 +557,6 @@ function navigatorFactory(config, map, context) {
         navigator.trigger('jump', position);
     }
 
-    if (config.reviewLayout === 'fizzy') {
-        navigatorTpl = fizzyTpl;
-        navigatorTreeTpl = fizzyTreeTpl;
-        if (!config.displaySectionTitles) {
-            navigatorTreeTpl = fizzyTreeLinearTpl;
-        }
-        // hack to not allow activate/deactivate bookmarking on icon click in item button
-        _cssCls.collapsed = 'fizzy';
-        _selectors.filter = 'abc';
-    }
-
     navigator = component(navigatorApi, _defaults)
         .setTemplate(navigatorTpl)
 
@@ -598,7 +579,6 @@ function navigatorFactory(config, map, context) {
             var $filterBar = $component.find(_selectors.filterBar);
             var $filters = $filterBar.find('li');
             var $tree = $component.find(_selectors.tree);
-            var $closeButton = $component.find(_selectors.closeButton);
 
             // links the component to the underlying DOM elements
             this.controls = {
@@ -732,16 +712,6 @@ function navigatorFactory(config, map, context) {
                     //after filtering, ensure that the active item (if exists) is visible
                     self.autoScroll();
                 }
-            });
-
-            //click on close button
-            $closeButton.on('click', function (e) {
-                e.preventDefault();
-                /**
-                 * Review screen should be closed
-                 * @event navigator#close
-                 */
-                navigator.trigger('close');
             });
         });
 

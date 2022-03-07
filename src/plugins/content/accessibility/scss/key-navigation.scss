@@ -57,7 +57,9 @@
                 }
             }
         }
-
+        .qti-navigator-fizzy .key-navigation-group.focusin {
+            background: $uiReviewPanelBg;
+        }
     }
 
     .bottom-action-bar.content-action-bar {

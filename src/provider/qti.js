@@ -24,6 +24,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
 import cachedStore from 'core/cachedStore';
+import browser from 'util/browser';
 import areaBrokerFactory from 'taoTests/runner/areaBroker';
 import proxyFactory from 'taoTests/runner/proxy';
 import probeOverseerFactory from 'taoTests/runner/probeOverseer';
@@ -38,7 +39,6 @@ import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
 import states from 'taoQtiTest/runner/config/states';
 import stopwatchFactory from 'taoQtiTest/runner/provider/stopwatch';
-import currentItem from "../helpers/currentItem";
 
 /**
  * A Test runner provider to be registered against the runner
@@ -249,16 +249,20 @@ var qtiProvider = {
         function computeNext(action, params, loadPromise) {
             const context = self.getTestContext();
             const currentItem = self.getCurrentItem();
+            const options = self.getOptions();
+            const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
 
             //catch server errors
             var submitError = function submitError(err) {
                 if (err && err.unrecoverable){
-                    self.trigger(
-                        'alert.error',
-                        __(
-                            'An unrecoverable error occurred. Your test session will be paused.'
-                        )
-                    );
+                    if (!skipPausedAssessmentDialog) {
+                        self.trigger(
+                            'alert.error',
+                            __(
+                                'An unrecoverable error occurred. Your test session will be paused.'
+                            )
+                        );
+                    }
 
                     self.trigger('pause', {message : err.message});
                 } else if (err.code === 200) {
@@ -379,7 +383,7 @@ var qtiProvider = {
         stopwatch.init();
         stopwatch.spread(this, 'tick');
 
-        const timerClientMode = config.options.timer && config.options.timer.restoreTimerFromClient;
+        const isTimerClientMode = () => config.options.timer && config.options.timer.restoreTimerFromClient;
 
         /*
          * Install behavior on events
@@ -492,22 +496,31 @@ var qtiProvider = {
             })
             .on('pause', function(data) {
                 const testContext = self.getTestContext();
+                const options = self.getOptions();
+                const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
 
                 this.setState('closedOrSuspended', true);
 
+                const params = {
+                    itemDefinition: testContext.itemIdentifier,
+                    reason: {
+                        reasons: data && data.reasons,
+                        comment: data && (data.originalMessage || data.message)
+                    }
+                };
+
+                const itemState = self.itemRunner.getState();
+                if (Object.keys(itemState).length) {
+                    params.itemState = itemState;
+                }
+
                 this.getProxy()
-                    .callTestAction('pause', {
-                        itemDefinition: testContext.itemIdentifier,
-                        itemState: self.itemRunner.getState(),
-                        reason: {
-                            reasons: data && data.reasons,
-                            comment: data && (data.originalMessage || data.message)
-                        }
-                    })
+                    .callTestAction('pause', params)
                     .then(function() {
                         self.trigger('leave', {
                             code: states.testSession.suspended,
-                            message: data && data.message
+                            message: data && data.message,
+                            skipExitMessage: skipPausedAssessmentDialog
                         });
                     })
                     .catch(function(err) {
@@ -562,13 +575,13 @@ var qtiProvider = {
                 this.trigger('enableitem enablenav');
             })
             .on('disableitem', function() {
-                if (timerClientMode) {
+                if (isTimerClientMode()) {
                     stopwatch.stop();
                 }
                 this.trigger('disabletools');
             })
             .on('enableitem', function() {
-                if (timerClientMode) {
+                if (isTimerClientMode()) {
                     stopwatch.start();
                 }
                 this.trigger('enabletools');
@@ -728,6 +741,17 @@ var qtiProvider = {
                     this.on('statechange', changeState);
 
                     resolve();
+                })
+                .after('render', function() {
+                    //iOS only fix: sometimes the wrapper is not scrollable because of some bugs in Safari iOS
+                    //we have to force it to reconsider if the scroll needs to apply
+                    if (browser.isIOs()) {
+                        const wrapperElt = self.getAreaBroker().getContainer().find('.content-wrapper').get(0);
+                        if (wrapperElt) {
+                            wrapperElt.style.overflow = 'hidden';
+                            setTimeout(() => wrapperElt.style.overflow = 'auto', 0);
+                        }
+                    }
                 })
                 .on('warning', function(err) {
                     self.trigger('warning', err);

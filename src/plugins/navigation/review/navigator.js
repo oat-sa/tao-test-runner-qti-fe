@@ -344,6 +344,9 @@ var navigatorApi = {
         section.active = true;
         item.active = true;
 
+        //interactive item counter
+        let counter = 0;
+
         // adjust each item with additional meta
         return mapHelper.each(scopedMap, function(itm) {
             var cls = [];
@@ -372,6 +375,10 @@ var navigatorApi = {
                 icon = icon || 'unseen';
             }
 
+            if(!itm.informational){
+                counter += 1;
+                itm.numberTest = counter; //item position in whole test from 1
+            }
             itm.cls = cls.join(' ');
             itm.icon = icon;
         });
@@ -509,11 +516,9 @@ var navigatorApi = {
  * @param {Boolean} [config.canCollapse] Allow the test taker to collapse the component
  * @param {Boolean} [config.canFlag] Allow the test taker to flag items
  * @param {Boolean} [config.hidden] Hide the component at init
- * @param {Object} map The current test map
- * @param {Object} context The current test context
  * @returns {*}
  */
-function navigatorFactory(config, map, context) {
+function navigatorFactory(config) {
     var navigator;
 
     /**
@@ -708,8 +713,6 @@ function navigatorFactory(config, map, context) {
                     self.autoScroll();
                 }
             });
-
-            this.update(map, context);
         });
 
     // set default filter

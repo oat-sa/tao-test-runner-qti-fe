@@ -5,6 +5,12 @@
     position: relative;
 }
 
+.qti-choiceInteraction {
+    .overlay-answer-eliminator {
+        display: none;
+    }
+}
+
 .test-runner-scope {
 
     position: relative;
@@ -50,45 +56,42 @@
         -webkit-flex: 0 1 auto;
         -ms-flex: 0 1 auto;
         flex: 0 1 auto;
-
-        height: calc(100vh - #{(map-get($heights, header) + map-get($heights, footer) + map-get($heights, horizontal-action-bar) * 2) * 1px});
-
         overflow-y: auto;
 
         max-width: 350px;
-        & > .qti-panel {
+
+        &>.qti-panel {
             max-width: 350px;
             padding: 10px;
         }
+
         @media only screen and (max-device-width : 800px) {
             max-width: 200px;
-            & > .qti-panel {
+
+            &>.qti-panel {
                 max-width: 200px;
             }
         }
+
         @media only screen and (min-device-width : 800px) and (max-device-width : 1280px) {
             max-width: 250px;
-            & > .qti-panel {
+
+            &>.qti-panel {
                 max-width: 250px;
             }
         }
+
         @media only screen and (min-device-width : 1280px) and (max-device-width : 1440px) {
             max-width: 300px;
-            & > .qti-panel {
+
+            &>.qti-panel {
                 max-width: 300px;
             }
         }
     }
+
     .test-sidebar-left {
         border-right: 1px $uiGeneralContentBorder solid;
-
-        .landmark-title--hidden {
-            position: absolute;
-            overflow: hidden;
-            height: 1px;
-            width: 1px;
-            word-wrap: normal;
-        }
     }
 
     .test-sidebar-right {
@@ -113,11 +116,11 @@
             top: 0;
             bottom: 0;
             width: 100%;
-            opacity : .9;
+            opacity: .9;
 
             &-full {
                 background-color: $uiGeneralContentBg;
-                opacity : 1;
+                opacity: 1;
             }
         }
     }
@@ -150,24 +153,25 @@
         margin: auto;
         max-width: map-get($widths, item-max-width) * 1px;
         width: 100%;
+
         .qti-rubricBlock {
             margin: 20px 0;
         }
+
         .hidden {
             display: none;
         }
     }
 
     .visible-hidden {
-      position: absolute;
-      overflow: hidden;
-      height: 1px;
-      width: 1px;
-      word-wrap: normal;
-  }
+        position: absolute;
+        overflow: hidden;
+        height: 1px;
+        width: 1px;
+        word-wrap: normal;
+    }
 }
 
 .no-controls .test-runner-scope {
     height: 100vh;
 }
-

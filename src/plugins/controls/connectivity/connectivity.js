@@ -213,21 +213,21 @@ export default pluginFactory({
 
         testRunner.before('loaditem.connectivity', function (e, itemRef, item) {
             const testContext = testRunner.getTestContext();
-            if (item.flags && item.flags.hasFeedbacks) {
+            const {flags} = item;
+
+            if(!flags) {
+                return true;
+            }
+
+            if (flags.hasFeedbacks) {
                 testContext.hasFeedbacks = true;
             }
 
-            if (proxy.isOffline() && item.flags && item.flags.containsNonPreloadedAssets) {
-                self.displayWaitingDialog().then(function () {
+            if ((flags.containsNonPreloadedAssets || flags.hasPci) && proxy.isOffline()) {
+                self.displayWaitingDialog().then(() => {
                     testRunner.loadItem(itemRef);
                 });
-                return false;
-            }
 
-            if (proxy.isOffline() && item.flags && item.flags.hasPci) {
-                self.displayWaitingDialog().then(function () {
-                    testRunner.loadItem(itemRef);
-                });
                 return false;
             }
         });

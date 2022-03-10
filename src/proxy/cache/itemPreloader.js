@@ -281,7 +281,7 @@ function itemPreloaderFactory(options) {
                 }
 
                 if (_.size(item.portableElements.pci)) {
-                    item.flags = Object.assign({}, item.flags, { hasPci: true });
+                    setItemFlag(item, 'hasPci');
                 }
 
                 if (_.size(item.itemData.assets) > 0) {

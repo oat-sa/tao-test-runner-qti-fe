@@ -137,10 +137,7 @@ export default pluginFactory({
         //by regular polling on the "up" signal
         this.polling = pollingFactory({
             action: function action() {
-                testRunner
-                    .getProxy()
-                    .telemetry(testRunner.getTestContext().itemIdentifier, 'up')
-                    .catch(_.noop);
+                testRunner.getProxy().telemetry(testRunner.getTestContext().itemIdentifier, 'up').catch(_.noop);
             },
             interval: defaultConfig.checkInterval,
             autoStart: false
@@ -213,9 +210,9 @@ export default pluginFactory({
 
         testRunner.before('loaditem.connectivity', function (e, itemRef, item) {
             const testContext = testRunner.getTestContext();
-            const {flags} = item;
+            const { flags } = item;
 
-            if(!flags) {
+            if (!flags) {
                 return true;
             }
 
@@ -239,9 +236,7 @@ export default pluginFactory({
             if (proxy.isOffline() && (currentItem.hasFeedbacks || testContext.hasFeedbacks)) {
                 testRunner.trigger('disableitem');
                 self.displayWaitingDialog().then(function () {
-                    testRunner
-                        .trigger('enableitem')
-                        .trigger(e.name, ...args);
+                    testRunner.trigger('enableitem').trigger(e.name, ...args);
                 });
                 return false;
             }

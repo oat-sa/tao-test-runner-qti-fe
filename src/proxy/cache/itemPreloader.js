@@ -280,7 +280,7 @@ function itemPreloaderFactory(options) {
                     setItemFlag(item, 'hasFeedbacks');
                 }
 
-                if (_.size(item.portableElements.pci)) {
+                if (_.size(item.portableElements && item.portableElements.pci)) {
                     setItemFlag(item, 'hasPci');
                 }
 

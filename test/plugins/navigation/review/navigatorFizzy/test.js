@@ -284,7 +284,7 @@ define([
     QUnit.cases
         .init([
             { displayItemTooltip: true, expected: 'Item 1' },
-            { displayItemTooltip: false, expect: void 0 }
+            { displayItemTooltip: false, expected: void 0 }
         ])
         .test('renders item tooltip depending on displayItemTooltip setting', (data, assert) => {
             const ready = assert.async();

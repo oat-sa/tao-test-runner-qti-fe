@@ -32,7 +32,7 @@ define([
         const config = {
             isReviewPanelEnabled: true,
             questionStatus: '',
-        }
+        };
 
         const jumplinksComponent = componentFactory({});
 
@@ -48,7 +48,7 @@ define([
         const config = {
             isReviewPanelEnabled: false,
             questionStatus: '',
-        }
+        };
 
         const jumplinksComponent = componentFactory({});
 
@@ -70,7 +70,7 @@ define([
         const config = {
             isReviewPanelEnabled: true,
             questionStatus: '',
-        }
+        };
 
         const jumplinksComponent = componentFactory({});
 

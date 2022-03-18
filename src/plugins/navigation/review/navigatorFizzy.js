@@ -107,7 +107,7 @@ function navigatorFactory(config) {
      * @returns {Object}
      */
     function getFizzyItemButtonMap(scopedMap, disableUnseenItems) {
-        const displaySectionTitles = component.getConfig().displaySectionTitles;
+        const { displaySectionTitles, displayItemTooltip } = component.getConfig();
 
         let nonInformationalCount = 0;
         const fizzyMap = {
@@ -169,6 +169,8 @@ function navigatorFactory(config) {
                     if (disableUnseenItems && !dataItem.viewed) {
                         // disables all unseen items to prevent the test taker has access to.
                         fizzyItem.disabled = true;
+                    } else if (displayItemTooltip) {
+                        fizzyItem.title = dataItem.label;
                     }
                 });
             });

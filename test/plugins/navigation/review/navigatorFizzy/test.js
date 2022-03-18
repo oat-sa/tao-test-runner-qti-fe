@@ -281,6 +281,31 @@ define([
             .update(sample.map, sample.context);
     });
 
+    QUnit.cases
+        .init([
+            { displayItemTooltip: true, expected: 'Item 1' },
+            { displayItemTooltip: false, expected: void 0 }
+        ])
+        .test('renders item tooltip depending on displayItemTooltip setting', (data, assert) => {
+            const ready = assert.async();
+            const $container = $('#qunit-fixture');
+            const config = Object.assign({}, sample.config, { displayItemTooltip: data.displayItemTooltip });
+
+            assert.expect(1);
+
+            navigatorFactory(config)
+                .on('update', function () {
+                    assert.equal(
+                        $('.buttonlist-item[data-id="item-1"] button', $container).attr('title'),
+                        data.expected,
+                        'Item tooltip is shown depending on displayItemTooltip setting'
+                    );
+                    ready();
+                })
+                .render($container)
+                .update(sample.map, sample.context);
+        });
+
     QUnit.test('on button click, triggers "jump" (preventsUnseen=true)', function (assert) {
         const ready = assert.async();
         const $container = $('#qunit-fixture');

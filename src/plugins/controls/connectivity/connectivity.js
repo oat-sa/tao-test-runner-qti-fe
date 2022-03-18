@@ -137,10 +137,7 @@ export default pluginFactory({
         //by regular polling on the "up" signal
         this.polling = pollingFactory({
             action: function action() {
-                testRunner
-                    .getProxy()
-                    .telemetry(testRunner.getTestContext().itemIdentifier, 'up')
-                    .catch(_.noop);
+                testRunner.getProxy().telemetry(testRunner.getTestContext().itemIdentifier, 'up').catch(_.noop);
             },
             interval: defaultConfig.checkInterval,
             autoStart: false
@@ -213,14 +210,21 @@ export default pluginFactory({
 
         testRunner.before('loaditem.connectivity', function (e, itemRef, item) {
             const testContext = testRunner.getTestContext();
-            if (item.flags && item.flags.hasFeedbacks) {
+            const { flags } = item;
+
+            if (!flags) {
+                return true;
+            }
+
+            if (flags.hasFeedbacks) {
                 testContext.hasFeedbacks = true;
             }
 
-            if (proxy.isOffline() && item.flags && item.flags.containsNonPreloadedAssets) {
-                self.displayWaitingDialog().then(function () {
+            if ((flags.containsNonPreloadedAssets || flags.hasPci) && proxy.isOffline()) {
+                self.displayWaitingDialog().then(() => {
                     testRunner.loadItem(itemRef);
                 });
+
                 return false;
             }
         });
@@ -232,9 +236,7 @@ export default pluginFactory({
             if (proxy.isOffline() && (currentItem.hasFeedbacks || testContext.hasFeedbacks)) {
                 testRunner.trigger('disableitem');
                 self.displayWaitingDialog().then(function () {
-                    testRunner
-                        .trigger('enableitem')
-                        .trigger(e.name, ...args);
+                    testRunner.trigger('enableitem').trigger(e.name, ...args);
                 });
                 return false;
             }

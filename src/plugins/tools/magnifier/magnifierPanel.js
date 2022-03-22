@@ -606,6 +606,7 @@ function magnifierPanelFactory(config) {
 
     dynamicComponentInstance = dynamicComponent({})
         .on('rendercontent', function($content) {
+            // eslint-disable-next-line consistent-this
             var dynamicComponentContext = this;
             var $element = this.getElement();
 

@@ -77,9 +77,7 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
             .then(value => {
                 assert.equal(typeof value, 'undefined', 'The store does not contains the given item');
             })
-            .then(() => {
-                return itemStore.set(key, item);
-            })
+            .then(() => itemStore.set(key, item))
             .then(assigned => {
                 assert.ok(assigned, 'The value assignment is done');
                 assert.ok(itemStore.has(key), 'The store contains the given item');
@@ -108,33 +106,25 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
             .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
             })
-            .then(() => {
-                return itemStore.set('item2', { name: 'item2' });
-            })
+            .then(() => itemStore.set('item2', { name: 'item2' }))
             .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
             })
-            .then(() => {
-                return itemStore.set('item3', { name: 'item3' });
-            })
+            .then(() => itemStore.set('item3', { name: 'item3' }))
             .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
             })
-            .then(() => {
-                return itemStore.set('item4', { name: 'item4' });
-            })
+            .then(() => itemStore.set('item4', { name: 'item4' }))
             .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
                 assert.ok(itemStore.has('item4'), 'The store contains the given item');
             })
-            .then(() => {
-                return itemStore.set('item5', { name: 'item5' });
-            })
+            .then(() => itemStore.set('item5', { name: 'item5' }))
             .then(() => {
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
@@ -192,9 +182,7 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
                 assert.ok(itemStore.has('item4'), 'The store contains the given item');
             })
-            .then(() => {
-                return itemStore.remove('item3');
-            })
+            .then(() => itemStore.remove('item3'))
             .then(removed => {
                 assert.ok(removed, 'The removal went well');
                 assert.ok(!itemStore.has('item3'), 'The item was removed from the store');
@@ -206,9 +194,7 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
             .then(removed => {
                 assert.ok(!removed, 'Nothing to remove');
             })
-            .then(() => {
-                return itemStore.set('item5', { name: 'item5' });
-            })
+            .then(() => itemStore.set('item5', { name: 'item5' }))
             .then(() => {
                 assert.ok(itemStore.has('item1'), 'The store contains the given item');
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
@@ -244,12 +230,8 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
             })
-            .then(() => {
-                return itemStore.update('item2', 'response', []);
-            })
-            .then(() => {
-                return itemStore.update('item2', 'some', 'thing else');
-            })
+            .then(() => itemStore.update('item2', 'response', []))
+            .then(() => itemStore.update('item2', 'some', 'thing else'))
             .then(updated => {
                 assert.ok(updated, 'The updated went well');
                 assert.ok(itemStore.has('item2'), 'The item is still in the store from the store');
@@ -349,9 +331,7 @@ define(['taoQtiTest/runner/proxy/cache/itemStore'], function (itemStoreFactory) 
                 assert.ok(itemStore.has('item2'), 'The store contains the given item');
                 assert.ok(itemStore.has('item3'), 'The store contains the given item');
             })
-            .then(() => {
-                return itemStore.clear();
-            })
+            .then(() => itemStore.clear())
             .then(cleared => {
                 assert.ok(cleared, 'The clear wen well');
                 assert.ok(!itemStore.has('item1'), 'The item was removed from the store');

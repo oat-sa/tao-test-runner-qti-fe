@@ -63,7 +63,7 @@ export default pluginFactory({
             })
             .on('tool-flagitem', () => {
                 let item = testRunner.getCurrentItem();
-                item = { ...item, flagged: !item.flagged};
+                item = Object.assign({}, item, { flagged: !item.flagged });
                 updateState(item);
             });
     },

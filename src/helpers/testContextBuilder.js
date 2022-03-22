@@ -106,7 +106,7 @@ function getTestContext(testContext, testMap, item, section, part, position, att
     if (attempt) {
         newTestContext.attempt = attempt + 1;
     }
-    
+
     if (isLeavingSection) {
         newTestContext.numberRubrics = 0;
         newTestContext.rubrics = '';

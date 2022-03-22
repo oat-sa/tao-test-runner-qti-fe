@@ -22,8 +22,8 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
     'use strict';
 
     var messagesHelperApi = [{ title: 'getExitMessage' }];
-    var testActionMessage = 'You will not be able to access this test once submitted. Click \"OK\" to continue and submit the test.';
-    var actionMessage = 'Click \"OK\" to continue.';
+    var testActionMessage = 'You will not be able to access this test once submitted. Click "OK" to continue and submit the test.';
+    var actionMessage = 'Click "OK" to continue.';
 
     QUnit.module('helpers/messages');
 

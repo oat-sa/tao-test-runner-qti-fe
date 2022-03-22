@@ -146,7 +146,7 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
             if (firstJumpItem) {
                 this.addJump(firstJumpItem.part, firstJumpItem.section, firstJumpItem.item);
             }
-            
+
             if (!contextItemPosition) {
                 return Promise.resolve();
             }
@@ -165,7 +165,7 @@ var offlineJumpTableFactory = function offlineJumpTableFactory(itemStore, respon
                 }
                 return Promise.resolve();
             }
-            
+
             return calculateNextJump();
         },
         /**

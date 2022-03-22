@@ -356,10 +356,12 @@ export default _.defaults(
              * @returns {Promise} resolves with the action result
              */
             this.syncData = () => {
+                let actions;
                 return this.queue.serie(() => {
                     return this.actiontStore
                         .flush()
                         .then(data => {
+                            actions = data;
                             if (data && data.length) {
                                 return this.send('sync', data);
                             }
@@ -367,7 +369,7 @@ export default _.defaults(
                         .catch(err => {
                             if (this.isConnectivityError(err)) {
                                 this.setOffline('communicator');
-                                _.forEach(data, action => {
+                                _.forEach(actions, action => {
                                     this.actiontStore.push(action.action, action.parameters);
                                 });
                             }

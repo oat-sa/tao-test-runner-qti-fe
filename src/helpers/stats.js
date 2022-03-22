@@ -46,6 +46,7 @@ export default {
                 stats.answered--;
             } else if ((isItemCurrentlyAnswered || sync) && !item.answered) {
                 stats.answered++;
+                // eslint-disable-next-line no-dupe-else-if
             } else if (sync && !isItemCurrentlyAnswered && item.answered && testPart.isLinear) {
                 stats.answered++;
             }

@@ -75,17 +75,11 @@ function getActionMessage(scope, submitButtonLabel = __('OK')) {
         case 'section':
         case 'testSection':
         case 'part':
-            msg = __('Click "%s" to continue', submitButtonLabel).trim();
-            if (msg) {
-                msg += '.';
-            }
-            return msg;
+            return __('Click "%s" to continue.', submitButtonLabel).trim();
         case 'test':
         case 'testWithoutInaccessibleItems':
-            return `${__(
-                'You will not be able to access this test once submitted. Click "%s" to continue and submit the test.',
-                submitButtonLabel
-            )}`;
+            msg = __('You will not be able to access this test once submitted. Click "%s" to continue and submit the test.', submitButtonLabel);
+            return `${msg}`;
     }
     return '';
 }
@@ -102,10 +96,7 @@ function getFlaggedItemsWarning(stats, message = '') {
         return message;
     }
     if (message) {
-        return `${message} ${__(
-            'and you flagged %s item(s) that you can review now',
-            flaggedCount.toString()
-        )}`;
+        return `${message} ${__('and you flagged %s item(s) that you can review now', flaggedCount.toString())}`;
     }
     return __('You flagged %s item(s) that you can review now', flaggedCount.toString());
 }
@@ -124,11 +115,7 @@ function getUnansweredItemsWarning(scope, runner, sync) {
     let itemsCountMessage = '';
 
     if (scope === 'section' || scope === 'testSection') {
-        itemsCountMessage = __(
-            'You answered %s of %s question(s) for this section of the test',
-            stats.answered.toString(),
-            stats.questions.toString()
-        );
+        itemsCountMessage = __('You answered %s of %s question(s) for this section of the test', stats.answered.toString(), stats.questions.toString());
 
         if (flaggedCount) {
             itemsCountMessage += `, ${__('and flagged %s of them', flaggedCount.toString())}`;
@@ -139,26 +126,20 @@ function getUnansweredItemsWarning(scope, runner, sync) {
         } else if (unansweredCount === 1) {
             itemsCountMessage = __('There is %s unanswered question', unansweredCount.toString());
         }
-
         if (flaggedCount) {
             itemsCountMessage = getFlaggedItemsWarning(stats, itemsCountMessage);
         }
     } else if (scope === 'part') {
         if (unansweredCount > 1) {
-            itemsCountMessage = __(
-                'There are %s unanswered questions in this part of the test',
-                unansweredCount.toString()
-            );
+            itemsCountMessage = __('There are %s unanswered questions in this part of the test', unansweredCount.toString());
         } else if (unansweredCount === 1) {
-            itemsCountMessage = __(
-                'There is %s unanswered question in this part of the test',
-                unansweredCount.toString()
-            );
+            itemsCountMessage = __('There is %s unanswered question in this part of the test', unansweredCount.toString());
         }
         if (flaggedCount) {
             itemsCountMessage = getFlaggedItemsWarning(stats, itemsCountMessage);
         }
     }
+
     itemsCountMessage = itemsCountMessage.trim();
 
     return itemsCountMessage;

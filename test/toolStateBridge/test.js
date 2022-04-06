@@ -17,7 +17,6 @@
  */
 /**
  * Test the module taoQtiTest/runner/provider/toolStateBridge
-
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 define(['taoQtiTest/runner/provider/toolStateBridge'], function(toolStateBridgeFactory) {

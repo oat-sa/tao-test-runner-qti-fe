@@ -750,6 +750,7 @@ export default function compoundMaskFactory(options, dimensions, position) {
                     .setSize(size.width - options.resizeHandleSize * 2, size.height + options.resizeHandleSize * 2);
             },
 
+            // eslint-disable-next-line no-unused-vars
             beforeResize: function beforeResize(width, height, fromLeft) {
                 this.config.maxWidth = dimensions.rightWidth + (dimensions.innerWidth - constrains.minWidth);
                 this.config.minWidth = constrains.minWidth;

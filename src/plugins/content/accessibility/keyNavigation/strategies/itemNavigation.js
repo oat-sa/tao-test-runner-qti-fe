@@ -64,7 +64,7 @@ const manageLabelledByAttribute = (navigator) => {
         navigator.on('focus', addLabelledByAttribute);
         navigator.on('blur', removeLabelledByAttribute); // applies WCAG behavior for the radio buttons
     }
-}
+};
 
 /**
  * Key navigator strategy applying inside the item.
@@ -92,7 +92,7 @@ export default {
          */
         const getQtiChoice = function (cursor){
             return cursor && cursor.navigable.getElement().closest('.qti-choice');
-        }
+        };
 
         /**
          * Creates and registers a keyNavigator for the supplied list of elements

@@ -38,7 +38,6 @@ define([
     var runner;
     var containerId = 'item-container';
     var providerName = 'mock';
-    let testRunner;
 
     runnerFactory.registerProvider(providerName, providerMock());
 
@@ -72,8 +71,8 @@ define([
     ];
 
     QUnit.cases.init(pluginApi).test('plugin API ', function (data, assert) {
-        var runner = runnerFactory(providerName);
-        var plugin = pluginFactory(runner);
+        var testRunner = runnerFactory(providerName);
+        var plugin = pluginFactory(testRunner);
         assert.equal(
             typeof plugin[data.name],
             'function',
@@ -154,14 +153,15 @@ define([
             renderer.load(function () {
                 var result, $result;
                 var $textBlocks;
-
-                item = _item;
-                item.setRenderer(this);
-
                 var $container = $(`#rendering`);
                 var areaBroker = areaBrokerMock({
                     $brokerContainer: $container
                 });
+                var testRunner;
+
+                item = _item;
+                item.setRenderer(this);
+
                 runnerFactory.registerProvider(providerName, providerMock({areaBroker: areaBroker}));
 
                 testRunner = runnerFactory(providerName);

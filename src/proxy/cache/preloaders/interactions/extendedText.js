@@ -94,6 +94,7 @@ export default {
              * @param {string} itemIdentifier - the id of the item the interaction belongs to
              * @returns {boolean}
              */
+            // eslint-disable-next-line no-unused-vars
             loaded(interaction, itemData, itemIdentifier) {
                 if (interaction.attributes && interaction.attributes.format === 'xhtml') {
                     const lang = getItemLanguage(itemData);
@@ -109,6 +110,7 @@ export default {
              * @param {string} itemIdentifier - the id of the item the interaction belongs to
              * @returns {Promise}
              */
+            // eslint-disable-next-line no-unused-vars
             load(interaction, itemData, itemIdentifier) {
                 if (interaction.attributes && interaction.attributes.format === 'xhtml') {
                     const lang = getItemLanguage(itemData);
@@ -127,6 +129,7 @@ export default {
              * @param {string} itemIdentifier - the id of the item the interaction belongs to
              * @returns {Promise}
              */
+            // eslint-disable-next-line no-unused-vars
             unload(interaction, itemData, itemIdentifier) {
                 // nothing to do actually
                 return Promise.resolve();

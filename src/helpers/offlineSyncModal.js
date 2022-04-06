@@ -132,6 +132,6 @@ function offlineSyncModalFactory(proxy) {
         });
 
     return waitingDialog;
-};
+}
 
 export default offlineSyncModalFactory;

@@ -63,7 +63,7 @@
         "@oat-sa/tao-item-runner-qti": "0.25.0",
         "@oat-sa/tao-qunit-testrunner": "1.0.3",
         "@oat-sa/tao-test-runner": "^0.8.1",
-        "async": "0.2.10",
+        "async": "2.6.4",
         "autoprefixer": "^9.6.1",
         "decimal.js": "10.1.1",
         "dompurify": "1.0.11",

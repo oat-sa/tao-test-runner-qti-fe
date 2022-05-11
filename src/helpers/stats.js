@@ -40,7 +40,7 @@ export default {
         const testPart = runner.getCurrentPart();
         const stats = _.clone(mapHelper.getScopeStats(map, context.itemPosition, scope));
         const options = runner.getOptions();
-        const { partiallyAnsweredIsAnswered } = options.review;
+        const partiallyAnsweredIsAnswered = (options && options.review && options.review.partiallyAnsweredIsAnswered) || true;
 
         if (!item.informational) {
             const isItemCurrentlyAnswered = currentItemHelper.isAnswered(runner, partiallyAnsweredIsAnswered);

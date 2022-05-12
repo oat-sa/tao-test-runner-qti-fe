@@ -39,8 +39,11 @@ export default {
         const item     = runner.getCurrentItem();
         const testPart = runner.getCurrentPart();
         const stats = _.clone(mapHelper.getScopeStats(map, context.itemPosition, scope));
-        const options = runner.getOptions();
-        const partiallyAnsweredIsAnswered = (options && options.review && options.review.partiallyAnsweredIsAnswered) || true;
+        const options = runner.getOptions() || {};
+        let partiallyAnsweredIsAnswered;
+        if (options.review) {
+            partiallyAnsweredIsAnswered = options.review.partiallyAnsweredIsAnswered;
+        }
 
         if (!item.informational) {
             const isItemCurrentlyAnswered = currentItemHelper.isAnswered(runner, partiallyAnsweredIsAnswered);

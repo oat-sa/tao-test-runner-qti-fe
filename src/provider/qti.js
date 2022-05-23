@@ -251,6 +251,7 @@ var qtiProvider = {
             const currentItem = self.getCurrentItem();
             const options = self.getOptions();
             const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
+            const { partiallyAnsweredIsAnswered } = options.review;
 
             //catch server errors
             var submitError = function submitError(err) {
@@ -317,7 +318,7 @@ var qtiProvider = {
                         // when the test part is linear, the item is always answered as we cannot come back to it
                         const testPart = self.getCurrentPart();
                         const isLinear = testPart && testPart.isLinear;
-                        currentItem.answered = isLinear || currentItemHelper.isAnswered(self);
+                        currentItem.answered = isLinear || currentItemHelper.isAnswered(self, partiallyAnsweredIsAnswered);
                     }
                     resolve();
                 }

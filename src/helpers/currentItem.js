@@ -100,9 +100,9 @@ var currentItemHelper = {
         if (baseType === 'boolean') {
             transform = v => v === true || v === 'true';
         } else if (baseType === 'integer') {
-            transform = v => typeof v === 'number' ? v : parseInt(v)
+            transform = v => typeof v === 'number' ? v : parseInt(v);
         } else if (baseType === 'float') {
-            transform = v => typeof v === 'number' ? v : parseFloat(v)
+            transform = v => typeof v === 'number' ? v : parseFloat(v);
         } else if (baseType === 'directedPair' || baseType === 'pair') {
             transform = v => {
                 if (_.isString(v)) {
@@ -153,7 +153,7 @@ var currentItemHelper = {
             value = value[mappedCardinality][baseType];
         }
 
-        const stringyValue = 'string' === baseType || 'integer' === baseType || 'float' === baseType
+        const stringyValue = 'string' === baseType || 'integer' === baseType || 'float' === baseType;
 
         return (
             null === value ||

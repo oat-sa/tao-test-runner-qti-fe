@@ -92,13 +92,17 @@ var currentItemHelper = {
         var mappedCardinality = responseCardinalities[cardinality];
         var response = {};
 
-        if (_.isString(value)) {
+        if (_.isString(value) || _.isNumber(value)) {
             value = [value];
         }
 
         let transform = v => v;
         if (baseType === 'boolean') {
             transform = v => v === true || v === 'true';
+        } else if (baseType === 'integer') {
+            transform = v => typeof v === 'number' ? v : parseInt(v)
+        } else if (baseType === 'float') {
+            transform = v => typeof v === 'number' ? v : parseFloat(v)
         } else if (baseType === 'directedPair' || baseType === 'pair') {
             transform = v => {
                 if (_.isString(v)) {
@@ -149,9 +153,11 @@ var currentItemHelper = {
             value = value[mappedCardinality][baseType];
         }
 
+        const stringyValue = 'string' === baseType || 'integer' === baseType || 'float' === baseType
+
         return (
             null === value ||
-            ('string' === baseType && _.isEmpty(value)) ||
+            (stringyValue && value === '') ||
             (cardinality !== 'single' && _.isEmpty(value))
         );
     },
@@ -168,7 +174,7 @@ var currentItemHelper = {
     isQuestionAnswered: function isQuestionAnswered(response, baseType, cardinality, defaultValue, constraintValue) {
         var answered, currentCardinality, responses;
         var fullyAnswered = true;
-        defaultValue = defaultValue || null;
+        defaultValue = _.isUndefined(defaultValue) ? null : defaultValue;
         constraintValue = constraintValue || 0;
 
         if (currentItemHelper.isQtiValueNull(response, baseType, cardinality)) {

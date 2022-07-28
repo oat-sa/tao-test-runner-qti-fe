@@ -265,8 +265,6 @@ export default pluginFactory({
      * Called during the runner's destroy phase
      */
     destroy: function destroy() {
-        var themeConfig = themeHandler.get('items');
-        themeLoader(themeConfig).unload();
         themeHandler.setActiveNamespace(this.oldNamespace);
 
         shortcut.remove(`.${this.getName()}`);

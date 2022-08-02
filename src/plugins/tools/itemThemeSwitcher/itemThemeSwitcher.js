@@ -58,7 +58,7 @@ export default pluginFactory({
         var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         const pluginConfig = this.getConfig();
-        const oldNamespace = themeHandler.getActiveNamespace();
+        this.oldNamespace = themeHandler.getActiveNamespace();
         const state = {
             availableThemes: [],
             defaultTheme: '',
@@ -70,7 +70,7 @@ export default pluginFactory({
             themeHandler.setActiveNamespace(pluginConfig.activeNamespace);
         }
         const themesConfig = themeHandler.get('items') || {};
-        if (pluginConfig.activeNamespace !== oldNamespace && !_.isEmpty(themesConfig)) {
+        if (pluginConfig.activeNamespace !== this.oldNamespace && !_.isEmpty(themesConfig)) {
             reloadThemes();
         }
 
@@ -265,6 +265,8 @@ export default pluginFactory({
      * Called during the runner's destroy phase
      */
     destroy: function destroy() {
+        themeHandler.setActiveNamespace(this.oldNamespace);
+
         shortcut.remove(`.${this.getName()}`);
         return this.getTestRunner().getPluginStore(this.getName()).then(function(itemThemesStore) {
             return itemThemesStore.removeItem('itemThemeId');

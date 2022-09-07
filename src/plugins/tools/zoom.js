@@ -106,6 +106,7 @@ export default pluginFactory({
         const testRunner = this.getTestRunner();
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const testRunnerContainer = this.getAreaBroker().getContainer().get(0);
 
         /**
          * Checks if the plugin is currently available
@@ -152,6 +153,7 @@ export default pluginFactory({
                     _setZoomLevel(this.$zoomTarget, this.zoom);
                 }
 
+                testRunnerContainer.style.setProperty('--tool-zoom-level', this.zoom / standard);
 
                 // force a browser repaint to fix a scrollbar issue with WebKit
                 forceRepaint(this.$zoomTarget);
@@ -176,6 +178,16 @@ export default pluginFactory({
                 zoomAction(-1);
             }
         }
+
+        /**
+         * Reapplys the same zoom level to the target
+         * It can be useful if the element was (visually-)hidden why zoom happened
+         */
+        const zoomReApply = () => {
+            if (this.zoom !== standard) {
+                _setZoomLevel(this.$zoomTarget, this.zoom);
+            }
+        };
 
         //build element (detached)
         this.buttonZoomOut = this.getAreaBroker()
@@ -242,7 +254,7 @@ export default pluginFactory({
                 this.zoom = standard;
 
                 togglePlugin();
-                tis.disable();
+                this.disable();
             })
             .on('renderitem', () => {
                 this.$container = $('#qti-content');
@@ -257,7 +269,8 @@ export default pluginFactory({
                 this.disable();
             })
             .on('tool-zoomin', zoomIn)
-            .on('tool-zoomout', zoomOut);
+            .on('tool-zoomout', zoomOut)
+            .on('tool-zoomreapply', zoomReApply);
     },
     /**
      * Called during the runner's destroy phase

@@ -120,7 +120,7 @@ export default pluginFactory({
                 'zoom',
                 true
             );
-        }
+        };
 
         /**
          * Is zoom activated ? if not, then we hide the plugin
@@ -132,7 +132,7 @@ export default pluginFactory({
             } else {
                 this.hide();
             }
-        }
+        };
 
         const zoomAction = dir => {
             const inc = increment * dir;
@@ -165,19 +165,19 @@ export default pluginFactory({
 
                 this.$container.scrollLeft(sx).scrollTop(sy);
             }
-        }
+        };
 
         const zoomIn = () => {
             if (this.getState('enabled') !== false) {
                 zoomAction(1);
             }
-        }
+        };
 
         const zoomOut = () => {
             if (this.getState('enabled') !== false) {
                 zoomAction(-1);
             }
-        }
+        };
 
         /**
          * Reapplys the same zoom level to the target

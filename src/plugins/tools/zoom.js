@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019  (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2016-2022  (original work) Open Assessment Technologies SA;
  *
  * @author dieter <dieter@taotesting.com>
  * @author Alexander Zagovorichev <zagovorichev@1pt.com>
@@ -32,19 +32,19 @@ import mapHelper from 'taoQtiTest/runner/helpers/map';
  * The standard zoom level, in percentage
  * @type {Number}
  */
-var standard = 100;
+const standard = 100;
 
 /**
  * Zoom-In/Zoom-Out steps
  * @type {Number}
  */
-var increment = 10;
+const increment = 10;
 
 /**
  * The zoom boundaries, in percentage
  * @type {Object}
  */
-var threshold = {
+const threshold = {
     lower: 10,
     upper: 200
 };
@@ -54,11 +54,11 @@ var threshold = {
  * @param {jQuery} $target
  * @param {Number} level - Zoom percentage
  */
-var _setZoomLevel = function($target, level) {
-    var $parent = $target.parent();
-    var newScale = level / standard;
+const _setZoomLevel = ($target, level) => {
+    const $parent = $target.parent();
+    const newScale = level / standard;
 
-    var isOverZoom = $parent.outerWidth(true) < $target.width() * newScale;
+    const isOverZoom = $parent.outerWidth(true) < $target.width() * newScale;
 
     if (isOverZoom) {
         transformer.setTransformOrigin($target, '0 0');
@@ -75,7 +75,7 @@ var _setZoomLevel = function($target, level) {
  * Restores the standard zoom level
  * @param {jQuery} $target
  */
-var _resetZoom = function($target) {
+const _resetZoom = $target => {
     transformer.reset($target);
 };
 
@@ -84,8 +84,8 @@ var _resetZoom = function($target) {
  * Solution from http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes?answertab=votes#tab-top
  * @param {jQuery} $target
  */
-var forceRepaint = function($target) {
-    var sel = $target[0];
+const forceRepaint = $target => {
+    const sel = $target[0];
     if (sel) {
         sel.style.display = 'none';
         sel.offsetHeight; // no need to store this anywhere, the reference is enough
@@ -102,17 +102,17 @@ export default pluginFactory({
     /**
      * Initialize the plugin (called during runner's init)
      */
-    init: function init() {
-        var self = this;
-        var testRunner = this.getTestRunner();
-        var testRunnerOptions = testRunner.getOptions();
-        var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+    init() {
+        const testRunner = this.getTestRunner();
+        const testRunnerOptions = testRunner.getOptions();
+        const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
+        const testRunnerContainer = this.getAreaBroker().getContainer().get(0);
 
         /**
          * Checks if the plugin is currently available
          * @returns {Boolean}
          */
-        function isConfigured() {
+        const isConfigured = () => {
             //to be activated with the special category x-tao-option-zoom
             return mapHelper.hasItemCategory(
                 testRunner.getTestMap(),
@@ -120,63 +120,74 @@ export default pluginFactory({
                 'zoom',
                 true
             );
-        }
+        };
 
         /**
          * Is zoom activated ? if not, then we hide the plugin
          */
-        function togglePlugin() {
+        const togglePlugin = () => {
             if (isConfigured()) {
                 //allow zoom
-                self.show();
+                this.show();
             } else {
-                self.hide();
+                this.hide();
             }
-        }
+        };
 
-        function zoomAction(dir) {
-            var inc = increment * dir;
-            var el, sx, sy, before, after;
+        const zoomAction = dir => {
+            const inc = increment * dir;
 
-            if (self.$zoomTarget) {
-                el = self.$zoomTarget[0];
+            if (this.$zoomTarget) {
+                const el = this.$zoomTarget[0];
 
-                before = el.getBoundingClientRect();
+                const before = el.getBoundingClientRect();
 
-                sx = self.$container.scrollLeft();
-                sy = self.$container.scrollTop();
+                let sx = this.$container.scrollLeft();
+                let sy = this.$container.scrollTop();
 
-                self.zoom = Math.max(threshold.lower, Math.min(threshold.upper, self.zoom + inc));
+                this.zoom = Math.max(threshold.lower, Math.min(threshold.upper, this.zoom + inc));
 
-                if (self.zoom === standard) {
-                    _resetZoom(self.$zoomTarget);
+                if (this.zoom === standard) {
+                    _resetZoom(this.$zoomTarget);
                 } else {
-                    _setZoomLevel(self.$zoomTarget, self.zoom);
+                    _setZoomLevel(this.$zoomTarget, this.zoom);
                 }
 
-                // force a browser repaint to fix a scrollbar issue with WebKit
-                forceRepaint(self.$zoomTarget);
+                testRunnerContainer.style.setProperty('--tool-zoom-level', this.zoom / standard);
 
-                after = el.getBoundingClientRect();
+                // force a browser repaint to fix a scrollbar issue with WebKit
+                forceRepaint(this.$zoomTarget);
+
+                const after = el.getBoundingClientRect();
 
                 sx = Math.max(0, sx + (after.width - before.width) / 2);
                 sy = Math.max(0, sy + (after.height - before.height) / 2);
 
-                self.$container.scrollLeft(sx).scrollTop(sy);
+                this.$container.scrollLeft(sx).scrollTop(sy);
             }
-        }
+        };
 
-        function zoomIn() {
-            if (self.getState('enabled') !== false) {
+        const zoomIn = () => {
+            if (this.getState('enabled') !== false) {
                 zoomAction(1);
             }
-        }
+        };
 
-        function zoomOut() {
-            if (self.getState('enabled') !== false) {
+        const zoomOut = () => {
+            if (this.getState('enabled') !== false) {
                 zoomAction(-1);
             }
-        }
+        };
+
+        /**
+         * Reapplys the same zoom level to the target
+         * It can be useful if the element was (visually-)hidden why zoom happened
+         */
+        const zoomReApply = () => {
+            if (this.zoom !== standard) {
+                _setZoomLevel(this.$zoomTarget, this.zoom);
+            }
+        };
 
         //build element (detached)
         this.buttonZoomOut = this.getAreaBroker()
@@ -196,13 +207,13 @@ export default pluginFactory({
             });
 
         //attach behavior
-        this.buttonZoomIn.on('click', function(e) {
+        this.buttonZoomIn.on('click', e => {
             e.preventDefault();
             testRunner.trigger('tool-zoomin');
         });
 
         //attach behavior
-        this.buttonZoomOut.on('click', function(e) {
+        this.buttonZoomOut.on('click', e => {
             e.preventDefault();
             testRunner.trigger('tool-zoomout');
         });
@@ -211,7 +222,7 @@ export default pluginFactory({
             if (pluginShortcuts.in) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.in, this.getName(), true),
-                    function() {
+                    () => {
                         testRunner.trigger('tool-zoomin');
                     },
                     {
@@ -223,7 +234,7 @@ export default pluginFactory({
             if (pluginShortcuts.out) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(pluginShortcuts.out, this.getName(), true),
-                    function() {
+                    () => {
                         testRunner.trigger('tool-zoomout');
                     },
                     {
@@ -239,58 +250,59 @@ export default pluginFactory({
 
         //update plugin state based on changes
         testRunner
-            .on('loaditem', function() {
-                self.zoom = standard;
+            .on('loaditem', () => {
+                this.zoom = standard;
 
                 togglePlugin();
-                self.disable();
+                this.disable();
             })
-            .on('renderitem', function() {
-                self.$container = $('#qti-content');
-                self.$zoomTarget = $('.qti-item');
+            .on('renderitem', () => {
+                this.$container = $('#qti-content');
+                this.$zoomTarget = $('.qti-item');
 
-                self.enable();
+                this.enable();
             })
-            .on('enabletools', function() {
-                self.enable();
+            .on('enabletools', () => {
+                this.enable();
             })
-            .on('disabletools unloaditem', function() {
-                self.disable();
+            .on('disabletools unloaditem', () => {
+                this.disable();
             })
             .on('tool-zoomin', zoomIn)
-            .on('tool-zoomout', zoomOut);
+            .on('tool-zoomout', zoomOut)
+            .on('tool-zoomreapply', zoomReApply);
     },
     /**
      * Called during the runner's destroy phase
      */
-    destroy: function destroy() {
+    destroy() {
         shortcut.remove(`.${  this.getName()}`);
     },
     /**
      * Enable the button
      */
-    enable: function enable() {
+    enable() {
         this.buttonZoomIn.enable();
         this.buttonZoomOut.enable();
     },
     /**
      * Disable the button
      */
-    disable: function disable() {
+    disable() {
         this.buttonZoomIn.disable();
         this.buttonZoomOut.disable();
     },
     /**
      * Show the button
      */
-    show: function show() {
+    show() {
         this.buttonZoomIn.show();
         this.buttonZoomOut.show();
     },
     /**
      * Hide the button
      */
-    hide: function hide() {
+    hide() {
         this.buttonZoomIn.hide();
         this.buttonZoomOut.hide();
     }

@@ -188,7 +188,7 @@ export default function getTimers(timeConstraints, isLinear, config) {
         }
 
         timer.remainingWithoutExtraTime = timer.remainingTime;
-        if (timer.extraTime) {
+        if (timer.extraTime && timer.type !== 'min') {
             timer.extraTime.consumed = timer.extraTime.consumed * precision;
             timer.extraTime.remaining = timer.extraTime.remaining * precision;
             timer.extraTime.total = timer.extraTime.total * precision;

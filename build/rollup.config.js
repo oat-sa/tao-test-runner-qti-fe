@@ -108,7 +108,7 @@ export default inputs.map(input => {
                     },
                     module: Handlebars
                 },
-                // helpers: ['build/tpl.js'],
+                helpers: ['lib/handlebars/helpers'],
                 templateExtension: '.tpl'
             }),
             ...(process.env.COVERAGE ? [istanbul()] : []),

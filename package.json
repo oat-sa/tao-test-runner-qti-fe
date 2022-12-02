@@ -84,7 +84,7 @@
         "nyc": "^15.0.1",
         "open-cli": "^7.1.0",
         "popper.js": "1.15.0",
-        "postcss-node-sass": "^2.1.8",
+        "postcss-node-sass": "^3.1.2",
         "postcss-scss": "^2.0.0",
         "prettier": "^2.7.1",
         "qunit": "^2.19.1",

@@ -78,7 +78,7 @@
         "jquery": "1.9.1",
         "jquery-mockjax": "^2.5.0",
         "jquery-simulate": "^1.0.2",
-        "lodash": "2.4.1",
+        "lodash": "4.17.21",
         "moment": "^2.29.4",
         "moment-timezone": "^0.5.37",
         "nyc": "^15.0.1",

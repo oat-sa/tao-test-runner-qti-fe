@@ -48,7 +48,8 @@ Handlebars.Visitor.prototype.accept = function() {
 };
 /* --------------------------------------------------------- */
 
-const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
+const globPath = p => p.replace(/\\/g, '/');
+const inputs = glob.sync(globPath(path.join(srcDir, '**', '*.js')));
 
 /**
  * Define all modules as external, so rollup won't bundle them together.
@@ -131,7 +132,7 @@ export default inputs.map(input => {
  * It is asyncronous and it was made with purpose to run parallely with build,
  * because they do not effect each other
  */
-glob(path.join(srcDir, '**', '*.tpl')).then(files => {
+glob(globPath(path.join(srcDir, '**', '*.tpl'))).then(files => {
     files.forEach(async (file) => {
         const targetFile = path.resolve(outputDir, path.relative(srcDir, file));
         await mkdirp(path.dirname(targetFile));

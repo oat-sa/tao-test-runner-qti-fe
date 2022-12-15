@@ -74,8 +74,8 @@ $borderColor: $textHighlight;
         position: relative;
         top: 1px;
         display: inline-block;
-        width: 2rem;
         line-height: #{$lineHeight - .2rem};
+        margin-right: 0.5rem;
     }
 
     // unseen items cannot be marked for review, disable the pointer cursor on them

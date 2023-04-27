@@ -21,10 +21,11 @@
         "build:cov": "rollup --config ./build/rollup.config.js --environment COVERAGE",
         "build:watch": "rollup --config ./build/rollup.config.js --watch",
         "build:scss": "node ./build/scss.js",
+        "build:all": "npm run build:scss && npm run build",
         "lint:src": "eslint -c .eslintrc.js src",
         "lint:test": "eslint -c .eslintrc.js test",
         "lint:report": "eslint -c .eslintrc.js --output-file eslint_report.json --format json src | true",
-        "prepare": "npm run build:scss && npm run build"
+        "prepare": "npm run build:all"
     },
     "repository": {
         "type": "git",

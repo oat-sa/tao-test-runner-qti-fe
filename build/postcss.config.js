@@ -20,7 +20,7 @@ const { scssVendorDir, scssMainDir } = require('./path');
 
 module.exports = {
     plugins: [
-        require('postcss-node-sass')({
+        require('@csstools/postcss-sass')({
             includePaths: [scssVendorDir, scssMainDir]
         }),
         require('autoprefixer')

@@ -16,7 +16,7 @@
  * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
  */
 
-define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(libPathDefinition) {
+define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function (libPathDefinition) {
     requirejs.config({
         baseUrl: '/',
         paths: Object.assign(
@@ -72,20 +72,21 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
         'css!basicStyle/tao-main-style.css',
         'css!basicStyle/new-test-runner.css'
     ]);
-    define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function() {
+    define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function () {
         requirejs.config({ nodeIdCompat: true });
     });
 
-    define('context', ['module'], function(module) {
+    define('context', ['module'], function (module) {
         return module.config();
     });
 
-    define('i18n', ['core/format'], format => (text, ...variables) => {
-        if (variables) {
-            text = format(text, ...variables);
-        }
-        return text;
-    });
+    define('i18n', ['core/format'], format =>
+        (text, ...variables) => {
+            if (variables) {
+                text = format(text, ...variables);
+            }
+            return text;
+        });
 
     define('taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', [], () => ({
         name: 'mock',
@@ -109,4 +110,11 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
         }
     }));
     define('taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory', [], () => {});
+    define('services/features', function () {
+        return {
+            isVisible: function () {
+                return true;
+            }
+        };
+    });
 });

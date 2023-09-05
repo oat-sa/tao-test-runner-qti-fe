@@ -51,7 +51,7 @@ export default pluginFactory({
         };
 
         //change plugin state
-        testRunner.on('disableitem', shield).on('enableitem unloaditem', unshield);
+        testRunner.on('disableitem', shield).on('enableitem unloaditem modalFeedbacks', unshield);
     },
 
     /**

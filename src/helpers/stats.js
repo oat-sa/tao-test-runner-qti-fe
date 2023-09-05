@@ -39,13 +39,19 @@ export default {
         const item     = runner.getCurrentItem();
         const testPart = runner.getCurrentPart();
         const stats = _.clone(mapHelper.getScopeStats(map, context.itemPosition, scope));
+        const options = runner.getOptions() || {};
+        let partiallyAnsweredIsAnswered;
+        if (options.review) {
+            partiallyAnsweredIsAnswered = options.review.partiallyAnsweredIsAnswered;
+        }
 
         if (!item.informational) {
-            const isItemCurrentlyAnswered = currentItemHelper.isAnswered(runner);
+            const isItemCurrentlyAnswered = currentItemHelper.isAnswered(runner, partiallyAnsweredIsAnswered);
             if (!isItemCurrentlyAnswered && item.answered) {
                 stats.answered--;
             } else if ((isItemCurrentlyAnswered || sync) && !item.answered) {
                 stats.answered++;
+                // eslint-disable-next-line no-dupe-else-if
             } else if (sync && !isItemCurrentlyAnswered && item.answered && testPart.isLinear) {
                 stats.answered++;
             }

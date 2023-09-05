@@ -66,20 +66,28 @@ export default pluginFactory({
                 id: groupNavigationId,
                 group: $navigationGroupElement,
                 elements: navigableDomElement.createFromDoms($navigationElements.add($navigationGroupElement)),
-                replace: true,
                 propagateTab: false,
                 loop: true,
                 keepState: true,
             })
                 .on('tab', () => {
-                    this.navigationGroup.next();
+                    if (ttsComponent.is('sfhMode')) {
+                        this.navigationGroup.next();
 
-                    testRunner.trigger(`${actionPrefix}next`);
+                        testRunner.trigger(`${actionPrefix}next`);
+                    }
                 })
                 .on('shift+tab', () => {
-                    this.navigationGroup.previous();
+                    if (ttsComponent.is('sfhMode')) {
+                        this.navigationGroup.previous();
 
-                    testRunner.trigger(`${actionPrefix}previous`);
+                        testRunner.trigger(`${actionPrefix}previous`);
+                    }
+                })
+                .on('activate', () => {
+                    if (ttsComponent.is('sfhMode')) {
+                        testRunner.trigger(`${actionPrefix}togglePlayback`);
+                    }
                 })
                 .on('blur', () => {
                     setTimeout(
@@ -91,7 +99,18 @@ export default pluginFactory({
                         0
                     );
                 })
-                .focusPosition($navigationElements.length);
+                .setCursorAt($navigationElements.length);
+
+            ttsComponent.on('next finish', () => {
+                if (ttsComponent.is('sfhMode')) {
+                    const $currentElement = this.navigationGroup.getCursor().navigable.getElement();
+                    const { selector } = ttsComponent.getCurrentItem() || {};
+
+                    if (!selector || !$currentElement.is(selector)) {
+                        this.navigationGroup.next();
+                    }
+                }
+            });
         };
 
         /**
@@ -185,8 +204,10 @@ export default pluginFactory({
             if (this.getState('enabled')) {
                 if (this.getState('active')) {
                     disablePlugin();
+                    this.setState('sleep', true);
                 } else {
                     enablePlugin();
+                    this.setState('sleep', false);
                 }
             }
         };
@@ -214,6 +235,14 @@ export default pluginFactory({
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),
                     () => {
+                        if (
+                            key === 'spaceTogglePlayback'
+                            && ttsComponent
+                            && ttsComponent.is('sfhMode')
+                        ) {
+                            return;
+                        }
+
                         const eventKey = key.endsWith('TogglePlayback') ? 'togglePlayback' : key;
 
                         testRunner.trigger(actionPrefix + eventKey);
@@ -269,6 +298,10 @@ export default pluginFactory({
                 }
             })
             .on('renderitem', () => {
+                if (!isConfigured()) {
+                    return;
+                }
+
                 ttsApipData = ttsApipDataProvider(testRunner.itemRunner.getData().apipAccessibility || {})
                     .map((apipItemData) => Object.assign(
                         {},
@@ -285,6 +318,10 @@ export default pluginFactory({
 
                 getTTSComponent().setMediaContentData(ttsApipData);
                 this.show();
+                if (!this.getState('sleep')) {
+                    this.setState('enabled', true);
+                    toggleTool();
+                }
             });
     },
     /**

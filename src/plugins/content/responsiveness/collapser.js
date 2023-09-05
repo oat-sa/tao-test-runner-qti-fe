@@ -257,13 +257,13 @@ export default pluginFactory({
          * @returns {Array}
          */
         function getSortedCollapsiblesFromDom() {
-            var $elements = getControlsFromDom(),
+            var $controlElements = getControlsFromDom(),
                 _allCollapsibles = [],
                 order = {};
 
             // group items by prefix
             // eg. zoomIn and zoomOut -> zoom
-            $elements.each(function() {
+            $controlElements.each(function() {
                 var ctrl = this.dataset.control,
                     // re makes group `foo` from `foo-bar`, `fooBar` and `foo_bar`
                     // if we do not have a prefix use the control name as key to ensure uniqueness

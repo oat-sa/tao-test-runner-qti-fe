@@ -36,12 +36,12 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import timeEncoder from 'core/encoder/time';
-import pollingFactory from 'core/polling';
-import timerFactory from 'core/timer';
 import component from 'ui/component';
 import countdownTpl from 'taoQtiTest/runner/plugins/controls/timer/component/tpl/countdown';
+import getTimerMessage from 'taoQtiTest/runner/helpers/getTimerMessage';
 import tooltip from 'ui/tooltip';
 import 'taoQtiTest/runner/plugins/controls/timer/component/css/countdown.css';
+import moment from "moment";
 
 //Precision is milliseconds
 var precision = 1000;
@@ -51,9 +51,7 @@ var precision = 1000;
  */
 var defaults = {
     showBeforeStart: true,
-    displayWarning: true,
-    polling: true,
-    frequency: 500
+    displayWarning: true
 };
 
 /**
@@ -75,9 +73,9 @@ var warningTimeout = {
  * @param {String} config.id - the timer unique identifier
  * @param {String} config.label - the text to display above the timer
  * @param {String} config.type - the type of countdown (to categorize them)
+ * @param {String} [config.scope] - scope of a timer
+ * @param {Number} [config.unansweredQuestions] - number of unanswered options
  * @param {Number} [config.remainingTime] - the current value of the countdown, in milliseconds
- * @param {Boolean} [config.polling = true] - does the countdown handles the polling itself ?
- * @param {Number} [config.frequency = 500] - polling frequency in ms (if active)
  * @param {Boolean} [config.showBeforeStart = true] - do we show the time before starting
  * @param {Boolean} [config.displayWarning = true] - do we display the warnings or trigger only the event
  * @param {Object[]} [config.warnings] - define warnings thresholds
@@ -87,7 +85,8 @@ var warningTimeout = {
  * @returns {countdown} the component, initialized and rendered
  */
 export default function countdownFactory($container, config) {
-    var $time;
+    let $time;
+    let $timeScreenreader;
 
     /**
      * @typedef {Object} countdown
@@ -97,11 +96,12 @@ export default function countdownFactory($container, config) {
             /**
              * Update the countdown
              * @param {Number} remainingTime - the time remaining (milliseconds)
+             * @param {Number} unansweredQuestions
              * @returns {countdown} chains
              * @fires countdown#change - when the value has changed
              * @fires countdown#warn - when a threshold is reached
              */
-            update: function udpate(remainingTime) {
+            update: function udpate(remainingTime, unansweredQuestions) {
                 var self = this;
                 var encodedTime;
                 var warningId;
@@ -117,8 +117,21 @@ export default function countdownFactory($container, config) {
                         encodedTime = timeEncoder.encode(this.remainingTime / precision);
                         if (encodedTime !== this.encodedTime) {
                             this.encodedTime = encodedTime;
+                            const time = moment.duration(this.remainingTime / precision, 'seconds');
+                            const hours = time.get('hours');
+                            const minutes = time.get('minutes');
+                            const seconds = time.get('seconds');
 
                             $time.text(this.encodedTime);
+                            $timeScreenreader.text(
+                                getTimerMessage(
+                                    hours,
+                                    minutes,
+                                    seconds,
+                                    unansweredQuestions,
+                                    this.config.scope
+                                )
+                            );
                         }
 
                         if (this.warnings) {
@@ -150,6 +163,34 @@ export default function countdownFactory($container, config) {
                             }
                         }
 
+                        if (this.warningsForScreenreader) {
+                            //the warnings have already be sorted
+                            const screenreaderWarningId = _.findLastKey(this.warningsForScreenreader, (warning) => (
+                                warning &&
+                                !warning.shown &&
+                                warning.threshold > 0 &&
+                                warning.threshold >= self.remainingTime
+                            ));
+
+                            if (screenreaderWarningId) {
+                                this.warningsForScreenreader[screenreaderWarningId].shown = true;
+
+                                /**
+                                 * Warn user the timer reach a threshold
+                                 * @event countdown#warnscreenreader
+                                 * @param {Function} message
+                                 * @param {Number} remainingTime
+                                 * @param {String} scope
+                                 */
+                                this.trigger(
+                                    'warnscreenreader',
+                                    this.warningsForScreenreader[screenreaderWarningId].message,
+                                    self.remainingTime,
+                                    this.warningsForScreenreader[screenreaderWarningId].scope
+                                );
+                            }
+                        }
+
                         /**
                          * The current value has changed
                          * @event countdown#change
@@ -175,17 +216,6 @@ export default function countdownFactory($container, config) {
                     this.enable();
                     this.setState('running', true);
 
-                    if (this.polling) {
-                        this.polling.start();
-
-                        if (!this.is('started')) {
-                            this.setState('started', true);
-                            this.timer.start();
-                        } else {
-                            this.timer.resume();
-                        }
-                    }
-
                     /**
                      * The count has started
                      * @event countdown#start
@@ -203,11 +233,6 @@ export default function countdownFactory($container, config) {
             stop: function stop() {
                 if (this.is('rendered') && this.is('running')) {
                     this.setState('running', false);
-
-                    if (this.polling) {
-                        this.timer.pause();
-                        this.polling.stop();
-                    }
 
                     /**
                      * The count is stopped
@@ -245,27 +270,15 @@ export default function countdownFactory($container, config) {
         defaults
     )
         .on('init', function() {
-            var self = this;
-
             this.remainingTime = this.config.remainingTime;
+            this.unansweredQuestions = this.config.unansweredQuestions;
 
             if (this.config.warnings) {
                 this.warnings = _.sortBy(this.config.warnings, 'threshold');
             }
 
-            //if configured, create a polling for the countdown
-            if (this.config.polling === true && this.config.frequency > 0) {
-                this.timer = timerFactory({
-                    autoStart: false
-                });
-                this.polling = pollingFactory({
-                    action: function pollingAction() {
-                        var elapsed = self.timer.tick();
-                        self.update(self.remainingTime - elapsed);
-                    },
-                    interval: this.config.frequency,
-                    autoStart: false
-                });
+            if (this.config.warningsForScreenreader) {
+                this.warningsForScreenreader = _.sortBy(this.config.warningsForScreenreader, 'threshold');
             }
 
             //auto renders
@@ -273,6 +286,7 @@ export default function countdownFactory($container, config) {
         })
         .on('render', function() {
             $time = $('.time', this.getElement());
+            $timeScreenreader = $('.time--screenreader', this.getElement());
 
             if (this.config.showBeforeStart === true) {
                 $time.text(timeEncoder.encode(this.remainingTime / precision));

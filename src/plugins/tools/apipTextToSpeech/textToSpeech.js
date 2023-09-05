@@ -34,7 +34,7 @@ import 'nouislider';
 const defaultConfig = {
     activeElementClass: 'tts-active-content-node',
     elementClass: 'tts-content-node',
-    left: 50,
+    left: -10,
     maxPlaybackRate: 2,
     minPlaybackRate: 0.5,
     playbackRate: 1,
@@ -134,8 +134,8 @@ function maskingComponentFactory(container, config) {
 
             const $currentTarget = $(e.currentTarget);
             // Find APIP item associated with clicked element
-            const selectedItem = mediaContentData.find(({ selector }) => $currentTarget.is(selector));
-            currentPlayback = [selectedItem];
+            const selectedItemIndex = mediaContentData.findIndex(({ selector }) => $currentTarget.is(selector));
+            currentPlayback = mediaContentData.slice(selectedItemIndex);
 
             this.stop();
             this.initNextItem();
@@ -156,7 +156,7 @@ function maskingComponentFactory(container, config) {
          */
         initItemWithTextSelection() {
             // Check if there is selected content
-            if (!selection || !selection.toString()) {
+            if (this.is('sfhMode') || !selection || !selection.toString()) {
                 return;
             }
 
@@ -178,6 +178,9 @@ function maskingComponentFactory(container, config) {
         /**
          * Check if there is next APIP item to play and start playback if component in playing state.
          * If there is no APIP item to play stop playback
+         *
+         * @fires finish
+         * @fires next
          */
         initNextItem() {
             const { activeElementClass } = this.config;
@@ -197,9 +200,12 @@ function maskingComponentFactory(container, config) {
                     audio.play();
                 }
 
+                this.trigger('next');
+
                 return;
             }
 
+            this.trigger('finish');
             this.stop();
         },
         /**
@@ -276,9 +282,7 @@ function maskingComponentFactory(container, config) {
 
             const isPlaying = this.is('playing');
 
-            if (!this.is('sfhMode')) {
-                this.initDefaultModeItem();
-            }
+            this.initDefaultModeItem();
 
             if (!isPlaying && currentItem) {
                 audio.play();
@@ -306,7 +310,23 @@ function maskingComponentFactory(container, config) {
             const isSettings = this.is('settings');
 
             this.setState('settings', !isSettings);
+
+            // if settings was enabled make sure that component still inside the container
+            if (!isSettings) {
+                this.handleResize();
+            }
         },
+        /**
+         * Handle browser resize
+         */
+        handleResize() {
+            // offset from right
+            const offsetFromRight = 10;
+            const { x, y } = this.getPosition();
+            const maxXPosition = window.innerWidth - this.getElement().width() - offsetFromRight;
+
+            this.moveTo(x > maxXPosition ? maxXPosition : x, y);
+        }
     };
 
     const ttsComponent = component(spec, defaultConfig);
@@ -324,13 +344,16 @@ function maskingComponentFactory(container, config) {
             this.render(container);
         })
         .on('render', function () {
-            const {
+            let {
                 left,
                 maxPlaybackRate,
                 minPlaybackRate,
                 playbackRate: defaultPlaybackRate,
                 top
             } = this.getConfig();
+            if (left < 0) {
+                left = window.innerWidth - this.getElement().width() + left;
+            }
             const $element = this.getElement();
             const $closeElement = $('.tts-control-close', $element);
             const $dragElement = $('.tts-control-drag', $element);
@@ -396,6 +419,8 @@ function maskingComponentFactory(container, config) {
                 this.initNextItem();
             });
 
+            window.addEventListener('resize', this.handleResize);
+
             // move to initial position
             this.moveTo(left, top);
         })
@@ -409,6 +434,8 @@ function maskingComponentFactory(container, config) {
             container.removeClass('tts-component-container');
             this.clearAPIPElements();
             this.stop();
+
+            window.removeEventListener('resize', this.handleResize);
         });
 
     ttsComponent.init(config);

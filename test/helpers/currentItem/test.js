@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2022 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -225,7 +225,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
     });
 
     QUnit.test('helpers/currentItem.isQuestionAnswered', function(assert) {
-        assert.expect(11);
+        assert.expect(21);
 
         // Null
         assert.equal(
@@ -243,6 +243,16 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
             false,
             'The question should not be answered'
         );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered(null, 'integer', 'single'),
+            false,
+            'The question should not be answered'
+        );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered(null, 'float', 'single'),
+            false,
+            'The question should not be answered'
+        );
 
         // Default
         assert.equal(
@@ -252,6 +262,26 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         );
         assert.equal(
             currentItemHelper.isQuestionAnswered({ list: { string: ['foo'] } }, 'string', 'multiple', ['foo']),
+            false,
+            'The question should not be answered'
+        );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered({ base: { integer: 0 } }, 'integer', 'single', 0),
+            false,
+            'The question should not be answered'
+        );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered({ base: { integer: 5000000000 } }, 'integer', 'single', 5e9),
+            false,
+            'The question should not be answered'
+        );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered({ base: { float: 1.1 } }, 'float', 'single', 1.1),
+            false,
+            'The question should not be answered'
+        );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered({ base: { float: 1.0000000001 } }, 'float', 'single', 1.0000000001),
             false,
             'The question should not be answered'
         );
@@ -272,6 +302,16 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
             false,
             'The question should not be answered'
         );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered({ base: { integer: null } }, 'integer', 'single', 0),
+            false,
+            'The question should not be answered'
+        );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered({ base: { float: null } }, 'float', 'single', 1.1),
+            false,
+            'The question should not be answered'
+        );
 
         // Not null or default
         assert.equal(
@@ -288,6 +328,16 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
             currentItemHelper.isQuestionAnswered({ list: { string: [] } }, 'string', 'multiple'),
             false,
             'The question should not be answered'
+        );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered({ base: { integer: 0 } }, 'integer', 'single'),
+            true,
+            'The question should be answered'
+        );
+        assert.equal(
+            currentItemHelper.isQuestionAnswered({ base: { float: 1.1 } }, 'float', 'single'),
+            true,
+            'The question should be answered'
         );
     });
 
@@ -316,15 +366,25 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
                 defaultValue: []
             }
         };
-        var responded = { RESPONSE1: { base: null }, RESPONSE2: { base: { string: 'foo' } } };
+        var fullyResponded = { RESPONSE1: { base:  { string: 'bar' } }, RESPONSE2: { base: { string: 'foo' } } };
+        var partiallyResponded = { RESPONSE1: { base: null }, RESPONSE2: { base: { string: 'foo' } } };
         var notResponded = { RESPONSE1: { base: null }, RESPONSE2: { base: null } };
-        var respondedRunner = runnerMock(responded, declarations);
+
+        var fullyRespondedRunner = runnerMock(fullyResponded, declarations);
+        var partiallyRespondedRunner = runnerMock(partiallyResponded, declarations);
         var notRespondedRunner = runnerMock(notResponded, declarations);
 
-        assert.expect(2);
+        var partially = false;
 
-        assert.equal(currentItemHelper.isAnswered(respondedRunner), true, 'The item should be answered');
-        assert.equal(currentItemHelper.isAnswered(notRespondedRunner), false, 'The item should not be answered');
+        assert.expect(6);
+
+        assert.equal(currentItemHelper.isAnswered(fullyRespondedRunner), true, 'The fully answered item should be answered');
+        assert.equal(currentItemHelper.isAnswered(partiallyRespondedRunner), true, 'The partially answered item should be answered');
+        assert.equal(currentItemHelper.isAnswered(notRespondedRunner), false, 'The unanswered item should not be answered');
+
+        assert.equal(currentItemHelper.isAnswered(fullyRespondedRunner, partially), true, 'The fully answered item should be answered');
+        assert.equal(currentItemHelper.isAnswered(partiallyRespondedRunner, partially), false, 'The partially answered item should not be answered');
+        assert.equal(currentItemHelper.isAnswered(notRespondedRunner, partially), false, 'The unanswered item should not be answered');
     });
 
     QUnit.cases

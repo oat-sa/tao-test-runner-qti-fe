@@ -66,10 +66,11 @@
         &.horizontal-action-bar {
             opacity: 1;
             height: #{(map-get($heights, horizontal-action-bar)) * 1px };
+            flex-basis: #{(map-get($heights, horizontal-action-bar)) * 1px }; //IE11 touch
 
             &.top-action-bar > .control-box {
 
-                height: #{(map-get($heights, horizontal-action-bar)) * 1px };
+                height: #{(map-get($heights, horizontal-action-bar) - 2) * 1px };
 
                 display: -ms-flexbox;
                 display: -webkit-flex;
@@ -177,8 +178,8 @@
                         border-bottom: 1px solid blacken($canvas, 0.2);
                         margin: 0;
                         @include border-radius(0);
-                        height: 32px;
-                        padding: 6px 15px;
+                        height: auto;
+                        padding: 8px 15px 9px;
                         line-height: 1;
                         border-left: solid 3px transparent;
 
@@ -203,6 +204,7 @@
                             }
                         }
 
+                        &:focus,
                         &.hover,
                         &:hover {
                             background-color: $info;
@@ -252,7 +254,6 @@
                         padding: 0;
                     }
                 }
-
             }
         }
     }

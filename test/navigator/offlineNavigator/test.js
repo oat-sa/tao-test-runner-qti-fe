@@ -79,8 +79,8 @@ define([
     QUnit.test('it returns Promise after calling init method', function(assert) {
         offlineNavigator
             .setTestMap(mapHelper.createJumpTable(testMapJson))
-            .setTestContext(testContextJson)
-        var promise = offlineNavigator['init']();
+            .setTestContext(testContextJson);
+        const promise = offlineNavigator['init']();
         assert.equal(typeof promise, 'object');
     });
 
@@ -101,14 +101,14 @@ define([
                 .then(() => {
                     offlineNavigator.navigate(data.direction, data.scope, null, { itemResponse: {} }).then(function(result) {
                         assert.expect(4);
-        
+
                         assert.equal(typeof result, 'object');
                         assert.equal(result.itemIdentifier, data.expectedItem);
                         assert.equal(result.sectionId, data.expectedSection);
                         assert.equal(result.testPartId, data.expectedPart);
                         done();
                     });
-                })
+                });
         });
 
     QUnit.test('it supports previousItem navigation action', function(assert) {
@@ -127,7 +127,7 @@ define([
                 ]).then(function(result) {
                     result = result[2];
                     assert.expect(4);
-        
+
                     assert.equal(typeof result, 'object');
                     assert.equal(result.itemIdentifier, 'Q02');
                     assert.equal(result.sectionId, 'S01');

@@ -29,7 +29,8 @@ import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
-import navigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigator';
+import defaultNavigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigator';
+import fizzyNavigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigatorFizzy';
 
 /**
  * The display states of the buttons
@@ -47,6 +48,18 @@ var buttonData = {
         icon: 'anchor',
         text: __('Unflag for Review')
     },
+    setFlagBookmarked: {
+        control: 'set-item-flag',
+        title: __('Bookmark the current question for later review'),
+        icon: 'bookmark',
+        text: __('Bookmark question')
+    },
+    unsetFlagBookmarked: {
+        control: 'unset-item-flag',
+        title: __('Do not bookmark the current question for later review'),
+        icon: 'bookmark-outline',
+        text: __('Bookmark question')
+    },
     showReview: {
         control: 'show-review',
         title: __('Show the review screen'),
@@ -58,19 +71,20 @@ var buttonData = {
         title: __('Hide the review screen'),
         icon: 'left',
         text: __('Hide Review')
+    },
+    showTestOverview: {
+        control: 'show-test-overview',
+        title: __('Show test overview panel'),
+        icon: 'desktop-preview',
+        text: __('Test overview')
+    },
+    hideTestOverview: {
+        control: 'hide-test-overview',
+        title: __('Hide test overview panel'),
+        icon: 'desktop-preview',
+        text: __('Test overview')
     }
 };
-
-/**
- * Gets the definition of the flagItem button related to the context
- * @param {Boolean} flag - the flag status
- * @returns {Object}
- */
-function getFlagItemButtonData(flag) {
-    const dataType = flag ? 'unsetFlag' : 'setFlag';
-    return buttonData[dataType];
-}
-
 
 /**
  * Get the flagged value for the item at that position
@@ -81,16 +95,6 @@ function getFlagItemButtonData(flag) {
 function isItemFlagged(testMap, position) {
     const item = mapHelper.getItemAt(testMap, position);
     return !!item.flagged;
-}
-
-/**
- * Gets the definition of the toggleNavigator button related to the context
- * @param {Object} navigator - the navigator component
- * @returns {Object}
- */
-function getToggleButtonData(navigator) {
-    var dataType = navigator.is('hidden') ? 'showReview' : 'hideReview';
-    return buttonData[dataType];
 }
 
 /**
@@ -107,7 +111,7 @@ function updateButton(button, data) {
             $button.find('.icon').attr('class', `icon icon-${data.icon}`);
             $button.find('.text').text(data.text);
 
-            if (_.contains(data.control, 'flag')) {
+            if (data.control.includes('flag') || data.control.includes('overview')) {
                 if (button.is('active')) {
                     button.turnOff();
                 } else {
@@ -156,10 +160,41 @@ export default pluginFactory({
 
         const testRunnerOptions = testRunner.getOptions();
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
-        const navigatorConfig = testRunnerOptions.review || {
+        const pluginConfig = this.getConfig();
+        let navigatorConfig = testRunnerOptions.review || {
             defaultOpen : false
         };
+        navigatorConfig = Object.assign({}, navigatorConfig, pluginConfig);
+
+        this.isFizzyLayout = navigatorConfig && navigatorConfig.reviewLayout === 'fizzy';
+
         let previousItemPosition;
+
+        /**
+         * Gets the definition of the flagItem button related to the context
+         * @param {Boolean} flag - the flag status
+         * @returns {Object}
+         */
+        function getFlagItemButtonData(flag) {
+            let dataType = flag ? 'unsetFlag' : 'setFlag';
+            if (self.isFizzyLayout) {
+                dataType = flag ? 'unsetFlagBookmarked' : 'setFlagBookmarked';
+            }
+            return buttonData[dataType];
+        }
+
+        /**
+         * Gets the definition of the toggleNavigator button related to the context
+         * @param {Object} navigator - the navigator component
+         * @returns {Object}
+         */
+        function getToggleButtonData(navigator) {
+            let dataType = navigator.is('hidden') ? 'showReview' : 'hideReview';
+            if (self.isFizzyLayout) {
+                dataType = navigator.is('hidden') ? 'showTestOverview' : 'hideTestOverview';
+            }
+            return buttonData[dataType];
+        }
 
         /**
          * Retrieve the review categories of the current item
@@ -216,7 +251,7 @@ export default pluginFactory({
                     item.flagged = flag;
 
                     // update the display of the flag button
-                    updateButton(self.flagItemButton, getFlagItemButtonData(flag));
+                    updateButton(self.flagItemButton, getFlagItemButtonData(flag, navigatorConfig));
 
                     // update the item state
                     self.navigator.setItemFlag(position, flag);
@@ -257,7 +292,8 @@ export default pluginFactory({
             updateButton(self.toggleButton, getToggleButtonData(self.navigator));
         }
 
-        this.navigator = navigatorFactory(navigatorConfig, testMap, testContext)
+        const navigatorFactory = this.isFizzyLayout ? fizzyNavigatorFactory : defaultNavigatorFactory;
+        this.navigator = navigatorFactory(navigatorConfig)
             .on('selected', function(position, previousPosition) {
                 previousItemPosition = previousPosition;
             })
@@ -271,6 +307,9 @@ export default pluginFactory({
                 if (self.getState('enabled') !== false) {
                     flagItem(position, flag);
                 }
+            })
+            .on('close', function() {
+                testRunner.trigger('tool-reviewpanel');
             })
             .render();
 
@@ -292,7 +331,7 @@ export default pluginFactory({
 
         this.flagItemButton = this.getAreaBroker()
             .getToolbox()
-            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition)));
+            .createEntry(getFlagItemButtonData(isItemFlagged(testMap, testContext.itemPosition), navigatorConfig));
         this.flagItemButton.on('click', function(e) {
             e.preventDefault();
             testRunner.trigger('tool-flagitem');
@@ -352,7 +391,7 @@ export default pluginFactory({
                 if (isPluginAllowed()) {
                     updateButton(
                         self.flagItemButton,
-                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition))
+                        getFlagItemButtonData(isItemFlagged(map, context.itemPosition), navigatorConfig)
                     );
                     self.navigator.update(map, context).updateConfig({
                         canFlag: !testPart.isLinear && categories.markReview
@@ -426,6 +465,13 @@ export default pluginFactory({
         } else {
             this.flagItemButton.turnOff();
         }
+        if (this.isFizzyLayout) {
+            if (!this.explicitlyHidden) {
+                this.toggleButton.turnOn();
+            } else {
+                this.toggleButton.turnOff();
+            }
+        }
     },
 
     /**
@@ -436,6 +482,9 @@ export default pluginFactory({
         this.flagItemButton.turnOff();
 
         this.toggleButton.disable();
+        if (this.isFizzyLayout) {
+            this.toggleButton.turnOff();
+        }
 
         this.navigator.disable();
     },

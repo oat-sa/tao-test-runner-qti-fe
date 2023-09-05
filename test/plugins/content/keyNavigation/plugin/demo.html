@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Key Navigation - Visual Playground</title>
+        <link rel="stylesheet" href="../assets/tao-3.css"/>
+        <link rel="stylesheet" href="../assets/qti-runner.css"/>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function() {
+                require(['qunitEnv'], function() {
+                    // mock Client Config data:
+                    requirejs.config({
+                        config: {
+                            'core/request': {
+                                noToken: true
+                            }
+                        }
+                    });
+                    require(['taoQtiTest/test/runner/plugins/content/keyNavigation/plugin/demo'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+        <style>
+            #visual-playground {
+                position: relative;
+                width: 100%;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            .playground-selector {
+                position: relative;
+                width: 100%;
+                padding: 5px;
+                border-bottom: 2px solid #266d9c;
+                flex: 0 0 auto;
+            }
+            .playground-view {
+                flex: 1 1 auto;
+            }
+            .playground-view .test-runner-scope {
+                height: calc(100vh - 140px);
+            }
+            footer {
+                position: relative;
+                line-height: 2em;
+                min-height: 2em;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <div id="visual-playground">
+            <nav class="playground-selector">
+                <label>Key navigation mode:</label>
+                <button data-mode="default">Default</button>
+                <button data-mode="linear">Linear</button>
+                <button data-mode="native">Native</button>
+            </nav>
+            <section class="playground-view" data-mode="default"></section>
+        </div>
+    </body>
+</html>

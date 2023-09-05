@@ -65,7 +65,7 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
 
         /**
          * Initialization method for the offline navigator component
-         * It get called in proxy init function 
+         * It get called in proxy init function
          *
          * @returns {Promise}
          */
@@ -118,7 +118,7 @@ export default function offlineNavigatorFactory(itemStore, responseStore) {
                         // 4. return new textContext with right attempt
                         itemStore.get(lastJump.item)
                             .then(itemFromStore => {
-                                const newTestContext = testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump, itemFromStore.attempt)
+                                const newTestContext = testContextBuilder.buildTestContextFromJump(testContext, testMap, lastJump, itemFromStore.attempt);
                                 itemStore.update(newTestContext.itemIdentifier, 'attempt', newTestContext.attempt)
                                     .then(() => resolve(newTestContext));
                             });

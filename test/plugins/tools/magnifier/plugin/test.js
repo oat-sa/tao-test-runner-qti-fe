@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 
 define([
@@ -22,22 +22,24 @@ define([
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/runner/plugins/tools/magnifier/magnifier'
-], function($, _, runnerFactory, providerMock, magnifierFactory) {
+], function ($, _, runnerFactory, providerMock, magnifierFactory) {
     'use strict';
 
-    var providerName = 'mock';
+    const uiDelay = 50;
+
+    const providerName = 'mock';
     runnerFactory.registerProvider(providerName, providerMock());
 
     const sampleTestContext = {
-        itemIdentifier : 'item-1'
+        itemIdentifier: 'item-1'
     };
     const sampleTestMap = {
         parts: {
-            p1 : {
-                sections : {
-                    s1 : {
-                        items : {
-                            'item-1' : {
+            p1: {
+                sections: {
+                    s1: {
+                        items: {
+                            'item-1': {
                                 categories: ['x-tao-option-magnifier']
                             }
                         }
@@ -45,7 +47,7 @@ define([
                 }
             }
         },
-        jumps : [{
+        jumps: [{
             identifier: 'item-1',
             section: 's1',
             part: 'p1',
@@ -53,10 +55,22 @@ define([
         }]
     };
 
+    /**
+     * Gets a configured instance of the Test Runner
+     * @returns {Promise<runner>}
+     */
+    function getTestRunner() {
+        const runner = runnerFactory(providerName);
+        runner.getDataHolder();
+        runner.setTestContext(sampleTestContext);
+        runner.setTestMap(sampleTestMap);
+        return Promise.resolve(runner);
+    }
+
     QUnit.module('API');
 
-    QUnit.test('module', function(assert) {
-        var runner = runnerFactory(providerName);
+    QUnit.test('module', assert => {
+        const runner = runnerFactory(providerName);
 
         assert.expect(3);
 
@@ -67,303 +81,338 @@ define([
 
     QUnit.cases
         .init([
-            { name: 'init', title: 'init' },
-            { name: 'render', title: 'render' },
-            { name: 'finish', title: 'finish' },
-            { name: 'destroy', title: 'destroy' },
-            { name: 'trigger', title: 'trigger' },
-            { name: 'getTestRunner', title: 'getTestRunner' },
-            { name: 'getAreaBroker', title: 'getAreaBroker' },
-            { name: 'getConfig', title: 'getConfig' },
-            { name: 'setConfig', title: 'setConfig' },
-            { name: 'getState', title: 'getState' },
-            { name: 'setState', title: 'setState' },
-            { name: 'show', title: 'show' },
-            { name: 'hide', title: 'hide' },
-            { name: 'enable', title: 'enable' },
-            { name: 'disable', title: 'disable' }
+            { title: 'init' },
+            { title: 'render' },
+            { title: 'finish' },
+            { title: 'destroy' },
+            { title: 'trigger' },
+            { title: 'getTestRunner' },
+            { title: 'getAreaBroker' },
+            { title: 'getConfig' },
+            { title: 'setConfig' },
+            { title: 'getState' },
+            { title: 'setState' },
+            { title: 'show' },
+            { title: 'hide' },
+            { title: 'enable' },
+            { title: 'disable' }
         ])
-        .test('plugin ', function(data, assert) {
-            var runner = runnerFactory(providerName);
-            var magnifier = magnifierFactory(runner);
+        .test('plugin ', (data, assert) => {
+            const runner = runnerFactory(providerName);
+            const magnifier = magnifierFactory(runner);
             assert.expect(1);
 
-            assert.equal(typeof magnifier[data.name], 'function', `The plugin exposes a ${  data.name  } method`);
+            assert.equal(typeof magnifier[data.title], 'function', `The plugin exposes a ${data.title} method`);
         });
 
     QUnit.module('plugin lifecycle');
 
-    QUnit.test('init', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            magnifier = magnifierFactory(runner, areaBroker),
-            $container = runner.getAreaBroker().getToolboxArea(),
-            $button;
+    QUnit.test('init', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const magnifier = magnifierFactory(runner, areaBroker);
+                const $container = runner.getAreaBroker().getToolboxArea();
 
-        assert.expect(4);
+                assert.expect(4);
 
-        magnifier
-            .init()
-            .then(function() {
-                areaBroker.getToolbox().render($container);
+                return magnifier
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                $button = $container.find('[data-control="magnify"]');
+                        const $button = $container.find('[data-control="magnify"]');
 
-                assert.equal($button.length, 1, 'The magnifier has created a button');
-                assert.ok(magnifier.getState('init'), 'The magnifier is initialised');
-                assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
-                assert.ok($button.hasClass('disabled'), 'The button starts disabled');
-
-                ready();
+                        assert.equal($button.length, 1, 'The magnifier has created a button');
+                        assert.ok(magnifier.getState('init'), 'The magnifier is initialised');
+                        assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
+                        assert.ok($button.hasClass('disabled'), 'The button starts disabled');
+                    });
             })
-            .catch(function(err) {
-                assert.ok(false, `The init method must not fail : ${  err.message}`);
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
-    QUnit.test('render', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            magnifier = magnifierFactory(runner, areaBroker),
-            $container = runner.getAreaBroker().getToolboxArea(),
-            $button;
+    QUnit.test('render', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const magnifier = magnifierFactory(runner, areaBroker);
+                const $container = runner.getAreaBroker().getToolboxArea();
 
-        assert.expect(4);
+                assert.expect(4);
 
-        magnifier
-            .init()
-            .then(function() {
-                assert.ok(magnifier.getState('init'), 'The magnifier is initialised');
+                return magnifier
+                    .init()
+                    .then(() => {
+                        assert.ok(magnifier.getState('init'), 'The magnifier is initialised');
 
-                areaBroker.getToolbox().render($container);
+                        areaBroker.getToolbox().render($container);
 
-                $button = $container.find('[data-control="magnify"]');
+                        const $button = $container.find('[data-control="magnify"]');
 
-                assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
-                assert.equal($button.length, 1, 'The plugin button has been appended');
-                assert.ok($button.hasClass('disabled'), 'The plugin button starts disabled');
-
-                ready();
+                        assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
+                        assert.equal($button.length, 1, 'The plugin button has been appended');
+                        assert.ok($button.hasClass('disabled'), 'The plugin button starts disabled');
+                    });
             })
-            .catch(function(err) {
-                assert.ok(false, `Unexpected failure : ${  err.message}`);
-                ready();
-            });
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
-    QUnit.test('state', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            magnifier = magnifierFactory(runner, areaBroker),
-            $container = runner.getAreaBroker().getToolboxArea(),
-            $button;
+    QUnit.test('state', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const magnifier = magnifierFactory(runner, areaBroker);
+                const $container = runner.getAreaBroker().getToolboxArea();
 
-        assert.expect(11);
+                assert.expect(11);
 
-        magnifier
-            .init()
-            .then(function() {
-                assert.ok(magnifier.getState('init'), 'The magnifier is initialised');
+                return magnifier
+                    .init()
+                    .then(() => {
+                        assert.ok(magnifier.getState('init'), 'The magnifier is initialised');
 
-                areaBroker.getToolbox().render($container);
+                        areaBroker.getToolbox().render($container);
 
-                $button = $container.find('[data-control="magnify"]');
+                        const $button = $container.find('[data-control="magnify"]');
 
-                assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
-                assert.equal($button.length, 1, 'The plugin button has been appended');
-                assert.ok($button.hasClass('disabled'), 'The plugin button starts disabled');
+                        assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
+                        assert.equal($button.length, 1, 'The plugin button has been appended');
+                        assert.ok($button.hasClass('disabled'), 'The plugin button starts disabled');
 
-                return magnifier.enable().then(function() {
-                    assert.ok(magnifier.getState('enabled'), 'The magnifier is now enabled');
-                    assert.ok(!$button.hasClass('disabled'), 'The plugin button is enabled');
+                        return magnifier.enable();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="magnify"]');
 
-                    assert.ok(!$button.hasClass('hidden'), 'The plugin button is visible');
+                        assert.ok(magnifier.getState('enabled'), 'The magnifier is now enabled');
+                        assert.ok(!$button.hasClass('disabled'), 'The plugin button is enabled');
 
-                    return magnifier.hide().then(function() {
+                        assert.ok(!$button.hasClass('hidden'), 'The plugin button is visible');
+
+                        return magnifier.hide();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="magnify"]');
+
                         assert.ok($button.hasClass('hidden'), 'The plugin button is hidden');
 
-                        return magnifier.show().then(function() {
-                            assert.ok(!$button.hasClass('hidden'), 'The plugin button is visible');
+                        return magnifier.show();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="magnify"]');
 
-                            return magnifier.disable().then(function() {
-                                assert.ok(!magnifier.getState('enabled'), 'The magnifier is now disabled');
-                                assert.ok($button.hasClass('disabled'), 'The plugin button is disabled');
+                        assert.ok(!$button.hasClass('hidden'), 'The plugin button is visible');
 
-                                ready();
-                            });
-                        });
+                        return magnifier.disable();
+                    })
+                    .then(() => {
+                        const $button = $container.find('[data-control="magnify"]');
+
+                        assert.ok(!magnifier.getState('enabled'), 'The magnifier is now disabled');
+                        assert.ok($button.hasClass('disabled'), 'The plugin button is disabled');
                     });
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
             })
-            .catch(function(err) {
-                assert.ok(false, `Unexpected failure : ${  err.message}`);
-                ready();
-            });
+            .then(ready);
     });
 
-    QUnit.test('destroy', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            magnifier = magnifierFactory(runner, areaBroker),
-            $container = runner.getAreaBroker().getToolboxArea(),
-            $button;
+    QUnit.test('destroy', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => {
+                const areaBroker = runner.getAreaBroker();
+                const magnifier = magnifierFactory(runner, areaBroker);
+                const $container = runner.getAreaBroker().getToolboxArea();
 
-        assert.expect(3);
+                assert.expect(3);
 
-        magnifier
-            .init()
-            .then(function() {
-                areaBroker.getToolbox().render($container);
+                return magnifier
+                    .init()
+                    .then(() => {
+                        areaBroker.getToolbox().render($container);
 
-                $button = $container.find('[data-control="magnify"]');
+                        const $button = $container.find('[data-control="magnify"]');
 
-                assert.ok(magnifier.getState('init'), 'The magnifier is initialised');
+                        assert.ok(magnifier.getState('init'), 'The magnifier is initialised');
 
-                assert.equal($button.length, 1, 'The plugin button has been appended');
+                        assert.equal($button.length, 1, 'The plugin button has been appended');
 
-                return magnifier.destroy().then(function() {
-                    areaBroker.getToolbox().destroy();
+                        return magnifier.destroy();
+                    })
+                    .then(() => {
+                        areaBroker.getToolbox().destroy();
 
-                    $button = $container.find('[data-control="magnify"]');
+                        const $button = $container.find('[data-control="magnify"]');
 
-                    assert.equal($button.length, 0, 'The plugin button has been removed');
-                    ready();
+                        assert.equal($button.length, 0, 'The plugin button has been removed');
+                    });
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
             })
-            .catch(function(err) {
-                assert.ok(false, `Unexpected failure : ${  err.message}`);
-                ready();
-            });
+            .then(ready);
     });
 
     QUnit.module('magnifier');
 
-    QUnit.test('create', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            magnifier = magnifierFactory(runner, areaBroker),
-            $container = $('#qunit-fixture'),
-            $button;
+    QUnit.test('create', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => new Promise(resolve => {
+                const areaBroker = runner.getAreaBroker();
+                const magnifier = magnifierFactory(runner, areaBroker);
+                const $container = $('#qunit-fixture');
+                let $button;
 
-        assert.expect(12);
+                assert.expect(12);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                runner.setTestContext(sampleTestContext);
+                runner.setTestMap(sampleTestMap);
 
-        runner.on('plugin-magnifier-create.magnifier', function() {
-            assert.equal($('.magnifier', $container).length, 1, 'A magnifier has been created');
-            assert.ok($('.magnifier', $container).hasClass('hidden'), 'The magnifier is hidden');
-        });
+                runner.on('plugin-magnifier-create.magnifier', () => {
+                    assert.equal($('.magnifier', $container).length, 1, 'A magnifier has been created');
+                    assert.ok($('.magnifier', $container).hasClass('hidden'), 'The magnifier is hidden');
+                });
 
-        runner.on('plugin-magnifier-show.magnifier', function() {
-            _.defer(function() {
-                assert.ok(!$('.magnifier', $container).hasClass('hidden'), 'The magnifier is visible');
-                assert.ok($button.hasClass('active'), 'The button is turned on');
+                runner.on('plugin-magnifier-show.magnifier', () => {
+                    _.defer(() => {
+                        assert.ok(!$('.magnifier', $container).hasClass('hidden'), 'The magnifier is visible');
+                        assert.ok($button.hasClass('active'), 'The button is turned on');
 
-                _.delay(function() {
-                    $button.trigger('click');
-                }, 250);
-            });
-        });
+                        _.delay(() => {
+                            $button.trigger('click');
+                        }, uiDelay);
+                    });
+                });
 
-        runner.on('plugin-magnifier-hide.magnifier', function() {
-            _.defer(function() {
-                assert.ok($('.magnifier', $container).hasClass('hidden'), 'The magnifier is hidden');
-                assert.ok(!$button.hasClass('active'), 'The button is turned off');
+                runner.on('plugin-magnifier-hide.magnifier', () => {
+                    _.defer(() => {
+                        assert.ok($('.magnifier', $container).hasClass('hidden'), 'The magnifier is hidden');
+                        assert.ok(!$button.hasClass('active'), 'The button is turned off');
 
-                ready();
-            });
-        });
+                        runner.off('.magnifier');
+                        resolve();
+                    });
+                });
 
-        magnifier
-            .init()
-            .then(function() {
-                assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
+                magnifier
+                    .init()
+                    .then(() => {
+                        assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
 
-                areaBroker.getToolbox().render(areaBroker.getToolboxArea());
-                $button = $('[data-control="magnify"]', areaBroker.getToolboxArea());
+                        areaBroker.getToolbox().render(areaBroker.getToolboxArea());
+                        $button = $('[data-control="magnify"]', areaBroker.getToolboxArea());
 
-                return magnifier.enable().then(function() {
-                    assert.ok(magnifier.getState('enabled'), 'The magnifier is not disabled anymore');
-                    assert.equal($button.length, 1, 'The plugin button has been appended');
-                    assert.ok(!$button.hasClass('disabled'), 'The button is not disabled anymore');
-                    assert.ok(!$button.hasClass('active'), 'The button is not turned on');
+                        return magnifier.enable();
+                    })
+                    .then(() => {
+                        assert.ok(magnifier.getState('enabled'), 'The magnifier is not disabled anymore');
+                        assert.equal($button.length, 1, 'The plugin button has been appended');
+                        assert.ok(!$button.hasClass('disabled'), 'The button is not disabled anymore');
+                        assert.ok(!$button.hasClass('active'), 'The button is not turned on');
 
-                    assert.equal($('.magnifier', $container).length, 0, 'No magnifier exists yet');
+                        assert.equal($('.magnifier', $container).length, 0, 'No magnifier exists yet');
 
-                    $button.trigger('click');
+                        $button.trigger('click');
+                    });
+            }))
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
             })
-            .catch(function(err) {
-                assert.ok(false, `Unexpected failure : ${  err.message}`);
-                ready();
-            });
+            .then(ready);
     });
 
-    QUnit.test('zoom', function(assert) {
-        var ready = assert.async();
-        var runner = runnerFactory(providerName),
-            areaBroker = runner.getAreaBroker(),
-            magnifier = magnifierFactory(runner, areaBroker),
-            $container = $('#qunit-fixture'),
-            $button,
-            expectedZoomLevel = 2;
+    QUnit.test('zoom', assert => {
+        const ready = assert.async();
+        getTestRunner()
+            .then(runner => new Promise(resolve => {
+                const areaBroker = runner.getAreaBroker();
+                const magnifier = magnifierFactory(runner, areaBroker);
+                const $container = $('#qunit-fixture');
+                let $button;
+                let expectedZoomLevel = 2;
 
-        assert.expect(8);
+                assert.expect(8);
 
-        runner.setTestContext(sampleTestContext);
-        runner.setTestMap(sampleTestMap);
+                runner.setTestContext(sampleTestContext);
+                runner.setTestMap(sampleTestMap);
 
-        runner.on('plugin-magnifier-create.magnifier', function() {
-            assert.equal($('.magnifier', $container).length, 1, 'A magnifier has been created');
+                runner.on('plugin-magnifier-create.magnifier', () => {
+                    assert.equal($('.magnifier', $container).length, 1, 'A magnifier has been created');
 
-            _.delay(function() {
-                expectedZoomLevel = 2.5;
+                    _.delay(() => {
+                        expectedZoomLevel = 2.5;
 
-                runner.trigger('tool-magnifier-in');
+                        runner.trigger('tool-magnifier-in');
 
-                _.delay(function() {
-                    expectedZoomLevel = 2;
-                    runner.trigger('tool-magnifier-out');
+                        _.delay(() => {
+                            expectedZoomLevel = 2;
+                            runner.trigger('tool-magnifier-out');
 
-                    _.delay(function() {
-                        ready();
-                    }, 250);
-                }, 250);
-            }, 250);
-        });
+                            _.delay(() => {
+                                resolve();
+                            }, uiDelay);
+                        }, uiDelay);
+                    }, uiDelay);
+                });
 
-        runner.on('plugin-magnifier-zoom.magnifier', function(plugin, zoomLevel) {
-            assert.equal(zoomLevel, expectedZoomLevel, 'The magnifier is set the right zoom level');
-        });
+                runner.on('plugin-magnifier-zoom.magnifier', (plugin, zoomLevel) => {
+                    assert.equal(zoomLevel, expectedZoomLevel, 'The magnifier is set the right zoom level');
+                });
 
-        magnifier
-            .init()
-            .then(function() {
-                assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
+                magnifier
+                    .init()
+                    .then(() => {
+                        assert.ok(!magnifier.getState('enabled'), 'The magnifier starts disabled');
 
-                areaBroker.getToolbox().render(areaBroker.getToolboxArea());
-                $button = $('[data-control="magnify"]', areaBroker.getToolboxArea());
+                        areaBroker.getToolbox().render(areaBroker.getToolboxArea());
+                        $button = $('[data-control="magnify"]', areaBroker.getToolboxArea());
 
-                return magnifier.enable().then(function() {
-                    assert.ok(magnifier.getState('enabled'), 'The magnifier is not disabled anymore');
-                    assert.equal($button.length, 1, 'The plugin button has been appended');
-                    assert.ok(!$button.hasClass('disabled'), 'The button is not disabled anymore');
+                        return magnifier.enable();
+                    })
+                    .then(() => {
+                        assert.ok(magnifier.getState('enabled'), 'The magnifier is not disabled anymore');
+                        assert.equal($button.length, 1, 'The plugin button has been appended');
+                        assert.ok(!$button.hasClass('disabled'), 'The button is not disabled anymore');
 
-                    assert.equal($('.magnifier', $container).length, 0, 'No magnifier exists yet');
+                        assert.equal($('.magnifier', $container).length, 0, 'No magnifier exists yet');
 
-                    $button.trigger('click');
+                        $button.trigger('click');
+                    });
+            }))
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
             })
-            .catch(function(err) {
-                assert.ok(false, `Unexpected failure : ${  err.message}`);
-                ready();
-            });
+            .then(ready);
     });
 });

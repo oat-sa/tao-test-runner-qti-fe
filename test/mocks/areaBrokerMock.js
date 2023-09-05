@@ -56,6 +56,7 @@ define(['jquery', 'lodash', 'ui/areaBroker', 'taoQtiTest/runner/ui/toolbox/toolb
                 'content', //where the content is renderer, for example an item
                 'toolbox', //the place to add arbitrary tools, like a zoom, a comment box, etc.
                 'navigation', //the navigation controls like next, previous, skip
+                'mainLandmark', //the header landmark for the main
                 'control', //the control center of the test, progress, timers, etc.
                 'header', //the area that could contains the test titles
                 'panel' //a panel to add more advanced GUI (item review, navigation pane, etc.)

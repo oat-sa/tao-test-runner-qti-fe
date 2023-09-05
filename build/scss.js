@@ -30,10 +30,9 @@ const limit = promiseLimit(5);
 /**
  * Build scss file with postcss and postcssScss plugin
  * @param {string} scssFile
- * @param {map: Boolean} options
  */
 const buildScss = async scssFile => {
-    const outputFile = scssFile.replace(/([\/\.])scss(\/|$)/g, '$1css$2');
+    const outputFile = scssFile.replace(/([\/.])scss(\/|$)/g, '$1css$2');
 
     // load file content
     let source;
@@ -81,7 +80,7 @@ const writeOutResult = async result => {
 
     // write out map if exist
     if (result.map) {
-        await writeFile(`${outputFile}.map`, result.map, { flag: 'w' });
+        await writeFile(`${outputFile}.map`, result.map.toString(), { flag: 'w' });
     }
 };
 
@@ -90,8 +89,9 @@ const writeOutResult = async result => {
  */
 const scssDirectories = [scssMainDir, srcDir];
 
+const globPath = p => p.replace(/\\/g, '/');
 glob(
-    path.join(rootPath, `+(${scssDirectories.map(dir => path.relative(rootPath, dir)).join('|')})`, '**', '[^_]*.scss'),
+    globPath(path.join(rootPath, `+(${scssDirectories.map(dir => path.relative(rootPath, dir)).join('|')})`, '**', '[^_]*.scss')),
     (err, files) => {
         if (err) {
             throw err;

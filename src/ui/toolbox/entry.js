@@ -82,6 +82,15 @@ var itemComponentApi = {
      */
     turnOn: function turnOn() {
         this.setState('active', true);
+
+        const element = this.getElement();
+        if (!element || (element.attr('role') !== 'option')) { // Not pretty bit quick
+            return;
+        }
+
+        element
+            .attr('aria-selected', 'true') // JAWS ignores aria-selected attribute
+            .attr('aria-checked', 'true'); // NVDA not read aria-selected="true"
     },
 
     /**
@@ -89,6 +98,15 @@ var itemComponentApi = {
      */
     turnOff: function turnOff() {
         this.setState('active', false);
+
+        const element = this.getElement();
+        if (!element || (element.attr('role') !== 'option')) { // Not pretty bit quick
+            return;
+        }
+
+        element
+            .attr('aria-selected', 'false') // NVDA + Chrome ignores aria-checked="false"
+            .attr('aria-checked', 'false');
     },
 
     /**

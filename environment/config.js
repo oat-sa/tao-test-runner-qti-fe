@@ -13,10 +13,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
  */
 
-define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(libPathDefinition) {
+define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function (libPathDefinition) {
     requirejs.config({
         baseUrl: '/',
         paths: Object.assign(
@@ -28,6 +28,7 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
 
                 /* TEST related */
                 'qunit-parameterize': '/environment/qunit2-parameterize',
+                'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
                 qunit: '/node_modules/qunit/qunit',
                 'taoQtiTest/test/runner': '/test',
                 'taoQtiItem/test/samples': '/test/samples',
@@ -47,6 +48,7 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
                 'taoQtiItem/qtiItem': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiItem',
                 'taoQtiItem/qtiCommonRenderer': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiCommonRenderer',
                 'taoQtiItem/qtiRunner': '/node_modules/@oat-sa/tao-item-runner-qti/dist/qtiRunner',
+                'taoQtiItem/reviewRenderer': '/node_modules/@oat-sa/tao-item-runner-qti/dist/reviewRenderer',
                 'taoTests/runner': '/node_modules/@oat-sa/tao-test-runner/dist',
 
                 /* LIBS */
@@ -70,20 +72,21 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
         'css!basicStyle/tao-main-style.css',
         'css!basicStyle/new-test-runner.css'
     ]);
-    define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function() {
+    define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function () {
         requirejs.config({ nodeIdCompat: true });
     });
 
-    define('context', ['module'], function(module) {
+    define('context', ['module'], function (module) {
         return module.config();
     });
 
-    define('i18n', ['core/format'], format => (text, ...variables) => {
-        if (variables) {
-            text = format(text, ...variables);
-        }
-        return text;
-    });
+    define('i18n', ['core/format'], format =>
+        (text, ...variables) => {
+            if (variables) {
+                text = format(text, ...variables);
+            }
+            return text;
+        });
 
     define('taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', [], () => ({
         name: 'mock',
@@ -107,4 +110,11 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
         }
     }));
     define('taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory', [], () => {});
+    define('services/features', function () {
+        return {
+            isVisible: function () {
+                return true;
+            }
+        };
+    });
 });

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017-2019 Open Assessment Technologies SA
+ * Copyright (c) 2017-2021 Open Assessment Technologies SA
  */
 
 /**
@@ -33,17 +33,29 @@ import offlineErrorHelper from 'taoQtiTest/runner/helpers/offlineErrorHelper';
 
 /**
  * The number of items to keep in the cache
- * @type {Number}
+ * @type {number}
+ * @private
  */
-var cacheSize = 20;
+const cacheSize = 20;
 
 /**
  * The number of ms to wait after an item is loaded
  * to start loading the next.
  * This value is more or less the time needed to render an item.
- * @type {Number}
+ * @type {number}
+ * @private
  */
-var loadNextDelay = 450;
+const loadNextDelay = 450;
+
+/**
+ * The default TimeToLive for assets resolving, in seconds.
+ * Each item comes with a baseUrl that may have a TTL bound to it.
+ * Once this TTL is expired, the assets won't be reachable.
+ * For this reason, we need to remove from the cache items having an expired TTL.
+ * @type {number}
+ * @private
+ */
+const defaultItemTTL = 15 * 60;
 
 /**
  * Overrides the qtiServiceProxy with the precaching behavior
@@ -55,16 +67,28 @@ export default _.defaults(
 
         /**
          * Installs the proxy
-         * @param {Object} config
+         * @param {object} config
          */
-        install: function install(config) {
-            var self = this;
-
+        install(config) {
             //install the parent proxy
             qtiServiceProxy.install.call(this);
 
+            /**
+             * Gets the value of an item caching option. All values are numeric only.
+             * @param {string} name
+             * @param {number} defaultValue
+             * @returns {number}
+             */
+            const getItemCachingOption = (name, defaultValue) => {
+                if (config && config.options && config.options.itemCaching) {
+                    return parseInt(config.options.itemCaching[name], 10) || defaultValue;
+                }
+                return defaultValue;
+            };
+
             //we keep items here
             this.itemStore = itemStoreFactory({
+                itemTTL: defaultItemTTL * 1000,
                 maxSize: cacheSize,
                 preload: true,
                 testId: config.serviceCallId
@@ -90,61 +114,57 @@ export default _.defaults(
 
             /**
              * Get the item cache size from the test data
-             * @returns {Number} the cache size
+             * @returns {number} the cache size
              */
-            this.getCacheAmount = function getCacheAmount() {
-                var cacheAmount = 1;
-                if (config && config.options && config.options.itemCaching) {
-                    cacheAmount = parseInt(config.options.itemCaching.amount, 10) || cacheAmount;
-                }
-                return cacheAmount;
-            };
+            this.getCacheAmount = () => getItemCachingOption('amount', 1);
+
+            /**
+             * Get the item store TimeToLive
+             * @returns {number} the item store TTL
+             */
+            this.getItemTTL = () => getItemCachingOption('itemStoreTTL', defaultItemTTL) * 1000;
 
             /**
              * Check whether we have the item in the store
-             * @param {String} itemIdentifier - the item identifier
-             * @returns {Boolean}
+             * @param {string} itemIdentifier - the item identifier
+             * @returns {boolean}
              */
-            this.hasItem = function hasItem(itemIdentifier) {
-                return itemIdentifier && self.itemStore.has(itemIdentifier);
-            };
+            this.hasItem = itemIdentifier => itemIdentifier && this.itemStore.has(itemIdentifier);
 
             /**
              * Check whether we have the next item in the store
-             * @param {String} itemIdentifier - the CURRENT item identifier
-             * @returns {Boolean}
+             * @param {string} itemIdentifier - the CURRENT item identifier
+             * @returns {boolean}
              */
-            this.hasNextItem = function hasNextItem(itemIdentifier) {
-                var sibling = navigationHelper.getNextItem(this.getDataHolder().get('testMap'), itemIdentifier);
-                return sibling && self.hasItem(sibling.id);
+            this.hasNextItem = itemIdentifier => {
+                const sibling = navigationHelper.getNextItem(this.getDataHolder().get('testMap'), itemIdentifier);
+                return sibling && this.hasItem(sibling.id);
             };
 
             /**
              * Check whether we have the previous item in the store
-             * @param {String} itemIdentifier - the CURRENT item identifier
-             * @returns {Boolean}
+             * @param {string} itemIdentifier - the CURRENT item identifier
+             * @returns {boolean}
              */
-            this.hasPreviousItem = function hasPreviousItem(itemIdentifier) {
-                var sibling = navigationHelper.getPreviousItem(this.getDataHolder().get('testMap'), itemIdentifier);
-                return sibling && self.hasItem(sibling.id);
+            this.hasPreviousItem = itemIdentifier => {
+                const sibling = navigationHelper.getPreviousItem(this.getDataHolder().get('testMap'), itemIdentifier);
+                return sibling && this.hasItem(sibling.id);
             };
 
             /**
              * Offline ? We try to navigate offline, or just say 'ok'
              *
-             * @param {String} action - the action name (ie. move, skip, timeout)
-             * @param {Object} actionParams - the parameters sent along the action
-             * @returns {Object} action result
+             * @param {string} action - the action name (ie. move, skip, timeout)
+             * @param {object} actionParams - the parameters sent along the action
+             * @returns {object} action result
              */
-            this.offlineAction = function offlineAction(action, actionParams) {
-                var testNavigator;
-                var newTestContext;
-                var result = { success: true };
+            this.offlineAction = (action, actionParams) => {
+                const result = { success: true };
 
-                var blockingActions = ['exitTest', 'timeout'];
+                const blockingActions = ['exitTest', 'timeout'];
 
-                var testContext = this.getDataHolder().get('testContext');
-                var testMap = this.getDataHolder().get('testMap');
+                const testContext = this.getDataHolder().get('testContext');
+                const testMap = this.getDataHolder().get('testMap');
 
                 if (action === 'pause') {
                     throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflinePauseError(), {
@@ -162,8 +182,8 @@ export default _.defaults(
 
                 // try the navigation if the actionParams context meaningful data
                 if (actionParams.direction && actionParams.scope) {
-                    testNavigator = testNavigatorFactory(testContext, testMap);
-                    newTestContext = testNavigator.navigate(
+                    const testNavigator = testNavigatorFactory(testContext, testMap);
+                    const newTestContext = testNavigator.navigate(
                         actionParams.direction,
                         actionParams.scope,
                         actionParams.ref
@@ -173,7 +193,7 @@ export default _.defaults(
                     if (
                         !newTestContext ||
                         !newTestContext.itemIdentifier ||
-                        !self.hasItem(newTestContext.itemIdentifier)
+                        !this.hasItem(newTestContext.itemIdentifier)
                     ) {
                         throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineNavError());
                     }
@@ -181,7 +201,7 @@ export default _.defaults(
                     result.testContext = newTestContext;
                 }
 
-                self.markActionAsOffline(actionParams);
+                this.markActionAsOffline(actionParams);
 
                 return result;
             };
@@ -189,68 +209,60 @@ export default _.defaults(
             /**
              * Process action which should be sent using message channel.
              *
-             * @param action
-             * @param actionParams
-             * @param deferred
+             * @param {string} action
+             * @param {object} actionParams
+             * @param {boolean} deferred
+             *
              * @returns {Promise} resolves with the action result
              */
-            this.processSyncAction = function processSyncAction(action, actionParams, deferred) {
-                return new Promise(function(resolve, reject) {
-                    self.scheduleAction(action, actionParams)
-                        .then(function(actionData) {
-                            self.actionPromises[actionData.params.actionId] = resolve;
-                            self.actionRejectPromises[actionData.params.actionId] = reject;
+            this.processSyncAction = (action, actionParams, deferred) => {
+                return new Promise((resolve, reject) => {
+                    this.scheduleAction(action, actionParams)
+                        .then(actionData => {
+                            this.actionPromises[actionData.params.actionId] = resolve;
+                            this.actionRejectPromises[actionData.params.actionId] = reject;
                             if (!deferred) {
-                                self.syncData()
-                                    .then(function(result) {
-                                        if (self.isOnline()) {
-                                            _.forEach(result, function(actionResult) {
-                                                var actionId =
+                                this.syncData()
+                                    .then(result => {
+                                        if (this.isOnline()) {
+                                            _.forEach(result, actionResult => {
+                                                const actionId =
                                                     actionResult.requestParameters &&
                                                     actionResult.requestParameters.actionId
                                                         ? actionResult.requestParameters.actionId
                                                         : null;
 
-                                                if (!actionResult.success && self.actionRejectPromises[actionId]) {
+                                                if (!actionResult.success && this.actionRejectPromises[actionId]) {
                                                     const error = new Error(actionResult.message);
                                                     error.unrecoverable = true;
                                                     return reject(error);
                                                 }
 
-                                                if (actionId && self.actionPromises[actionId]) {
-                                                    self.actionPromises[actionId](actionResult);
+                                                if (actionId && this.actionPromises[actionId]) {
+                                                    this.actionPromises[actionId](actionResult);
                                                 }
                                             });
                                         }
                                     })
-                                    .catch(function(reason) {
-                                        reject(reason);
-                                    });
+                                    .catch(reject);
                             }
                         })
-                        .catch(function(reason) {
-                            reject(reason);
-                        });
+                        .catch(reject);
                 });
             };
 
             /**
              * Schedule an action do be done with next call
              *
-             * @param {String} action - the action name (ie. move, skip, timeout)
-             * @param {Object} actionParams - the parameters sent along the action
+             * @param {string} action - the action name (ie. move, skip, timeout)
+             * @param {object} params - the parameters sent along the action
              * @returns {Promise} resolves with the action data
              */
-            this.scheduleAction = function scheduleAction(action, actionParams) {
-                actionParams.actionId = `${action}_${new Date().getTime()}`;
-                return self.actiontStore
-                    .push(action, self.prepareParams(_.defaults(actionParams || {}, self.requestConfig)))
-                    .then(function() {
-                        return {
-                            action: action,
-                            params: actionParams
-                        };
-                    });
+            this.scheduleAction = (action, params) => {
+                params.actionId = `${action}_${new Date().getTime()}`;
+                return this.actiontStore
+                    .push(action, this.prepareParams(_.defaults(params || {}, this.requestConfig)))
+                    .then(() => ({ action, params }));
             };
 
             /**
@@ -269,42 +281,45 @@ export default _.defaults(
              *      └─ request fails
              *         └─ run the offline action
              *
-             * @param {String} action - the action name (ie. move, skip, timeout)
-             * @param {Object} actionParams - the parameters sent along the action
-             * @param {Boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
+             * @param {string} url
+             * @param {string} action - the action name (ie. move, skip, timeout)
+             * @param {object} actionParams - the parameters sent along the action
+             * @param {boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
+             * @param {boolean} noToken whether the request should be sent with a CSRF token or not
+             *
              * @returns {Promise} resolves with the action result
              */
-            this.requestNetworkThenOffline = function requestNetworkThenOffline(url, action, actionParams, deferred) {
-                var testContext = this.getDataHolder().get('testContext');
-                var communicationConfig = self.configStorage.getCommunicationConfig();
+            this.requestNetworkThenOffline = (url, action, actionParams, deferred, noToken) => {
+                const testContext = this.getDataHolder().get('testContext');
+                const communicationConfig = this.configStorage.getCommunicationConfig();
 
                 //perform the request, but fallback on offline if the request itself fails
-                var runRequestThenOffline = function runRequestThenOffline() {
-                    var request;
+                const runRequestThenOffline = () => {
+                    let request;
                     if (communicationConfig.syncActions && communicationConfig.syncActions.indexOf(action) >= 0) {
-                        request = self.processSyncAction(action, actionParams, deferred);
+                        request = this.processSyncAction(action, actionParams, deferred);
                     } else {
                         //action is not synchronizable
                         //fallback to direct request
-                        request = self.request(url, actionParams);
-                        request.then(function(result) {
-                            if (self.isOffline()) {
-                                return self.scheduleAction(action, actionParams);
+                        request = this.request(url, actionParams, void 0, noToken || false);
+                        request.then(result => {
+                            if (this.isOffline()) {
+                                return this.scheduleAction(action, actionParams);
                             }
                             return result;
                         });
                     }
 
                     return request
-                        .then(function(result) {
-                            if (self.isOffline()) {
-                                return self.offlineAction(action, actionParams);
+                        .then(result => {
+                            if (this.isOffline()) {
+                                return this.offlineAction(action, actionParams);
                             }
                             return result;
                         })
-                        .catch(function(error) {
-                            if (self.isConnectivityError(error) && self.isOffline()) {
-                                return self.offlineAction(action, actionParams);
+                        .catch(error => {
+                            if (this.isConnectivityError(error) && this.isOffline()) {
+                                return this.offlineAction(action, actionParams);
                             }
                             throw error;
                         });
@@ -313,19 +328,19 @@ export default _.defaults(
                 if (this.isOffline()) {
                     //try the telemetry action, just in case
                     return this.telemetry(testContext.itemIdentifier, 'up')
-                        .then(function() {
+                        .then(() => {
                             //if the up request succeed, we run the request
-                            if (self.isOnline()) {
+                            if (this.isOnline()) {
                                 return runRequestThenOffline();
                             }
-                            return self.scheduleAction(action, actionParams).then(function() {
-                                return self.offlineAction(action, actionParams);
+                            return this.scheduleAction(action, actionParams).then(() => {
+                                return this.offlineAction(action, actionParams);
                             });
                         })
-                        .catch(function(err) {
-                            if (self.isConnectivityError(err)) {
-                                return self.scheduleAction(action, actionParams).then(function() {
-                                    return self.offlineAction(action, actionParams);
+                        .catch(err => {
+                            if (this.isConnectivityError(err)) {
+                                return this.scheduleAction(action, actionParams).then(() => {
+                                    return this.offlineAction(action, actionParams);
                                 });
                             }
                             throw err;
@@ -340,22 +355,22 @@ export default _.defaults(
              * Flush and synchronize actions collected while offline
              * @returns {Promise} resolves with the action result
              */
-            this.syncData = function syncData() {
-                var actions;
-                return this.queue.serie(function() {
-                    return self.actiontStore
+            this.syncData = () => {
+                let actions;
+                return this.queue.serie(() => {
+                    return this.actiontStore
                         .flush()
-                        .then(function(data) {
+                        .then(data => {
                             actions = data;
                             if (data && data.length) {
-                                return self.send('sync', data);
+                                return this.send('sync', data);
                             }
                         })
-                        .catch(function(err) {
-                            if (self.isConnectivityError(err)) {
-                                self.setOffline('communicator');
-                                _.forEach(actions, function(action) {
-                                    self.actiontStore.push(action.action, action.parameters);
+                        .catch(err => {
+                            if (this.isConnectivityError(err)) {
+                                this.setOffline('communicator');
+                                _.forEach(actions, action => {
+                                    this.actiontStore.push(action.action, action.parameters);
                                 });
                             }
                             throw err;
@@ -370,13 +385,11 @@ export default _.defaults(
              *
              * @returns {Promise} resolves with the store contents
              */
-            this.exportActions = function exportActions() {
-                var actions;
-                return this.queue.serie(function() {
-                    return self.actiontStore.flush().then(function(data) {
-                        actions = data;
-                        _.forEach(actions, function(action) {
-                            self.actiontStore.push(action.action, action.parameters);
+            this.exportActions = () => {
+                return this.queue.serie(() => {
+                    return this.actiontStore.flush().then(data => {
+                        _.forEach(data, action => {
+                            this.actiontStore.push(action.action, action.parameters);
                         });
                         return data;
                     });
@@ -387,14 +400,14 @@ export default _.defaults(
              * Mark action as performed in offline mode
              * Action to mark as offline will be defined by actionParams.actionId parameter value.
              *
-             * @param {Object} actionParams - the action parameters
-             * @return {Promise}
+             * @param {object} actionParams - the action parameters
+             * @returns {Promise}
              */
-            this.markActionAsOffline = function markActionAsOffline(actionParams) {
+            this.markActionAsOffline = actionParams => {
                 actionParams.offline = true;
-                return this.queue.serie(function() {
-                    return self.actiontStore.update(
-                        self.prepareParams(_.defaults(actionParams || {}, self.requestConfig))
+                return this.queue.serie(() => {
+                    return this.actiontStore.update(
+                        this.prepareParams(_.defaults(actionParams || {}, this.requestConfig))
                     );
                 });
             };
@@ -402,17 +415,15 @@ export default _.defaults(
 
         /**
          * Initializes the proxy
-         * @param {Object} config - The config provided to the proxy factory
-         * @param {String} config.testDefinition - The URI of the test
-         * @param {String} config.testCompilation - The URI of the compiled delivery
-         * @param {String} config.serviceCallId - The URI of the service call
-         * @param {Object} [params] - Some optional parameters to join to the call
+         * @param {object} config - The config provided to the proxy factory
+         * @param {string} config.testDefinition - The URI of the test
+         * @param {string} config.testCompilation - The URI of the compiled delivery
+         * @param {string} config.serviceCallId - The URI of the service call
+         * @param {object} [params] - Some optional parameters to join to the call
          * @returns {Promise} - Returns a promise. The proxy will be fully initialized on resolve.
          *                      Any error will be provided if rejected.
          */
-        init: function init(config, params) {
-            var self = this;
-
+        init(config, params) {
             if (!this.getDataHolder()) {
                 throw new Error('Unable to retrieve test runners data holder');
             }
@@ -423,18 +434,18 @@ export default _.defaults(
             //set up the action store for the current service call
             this.actiontStore = actionStoreFactory(config.serviceCallId);
 
-            //we resync as soon as the connection is back
-            this.on('reconnect', function() {
+            //we resynchronise as soon as the connection is back
+            this.on('reconnect', function () {
                 return this.syncData()
-                    .then(function(responses) {
-                        self.dataUpdater.update(responses);
+                    .then(responses => {
+                        this.dataUpdater.update(responses);
                     })
-                    .catch(function(err) {
-                        self.trigger('error', err);
+                    .catch(err => {
+                        this.trigger('error', err);
                     });
             });
 
-            //if some actions remains unsynced
+            //if some actions remains not synchronized
             this.syncData();
 
             //run the init
@@ -446,7 +457,7 @@ export default _.defaults(
          * @returns {Promise} - Returns a promise. The proxy will be fully uninstalled on resolve.
          *                      Any error will be provided if rejected.
          */
-        destroy: function destroy() {
+        destroy() {
             this.itemStore.clear();
 
             this.getItemFromStore = false;
@@ -456,26 +467,32 @@ export default _.defaults(
 
         /**
          * Gets an item definition by its identifier, also gets its current state
-         * @param {String} itemIdentifier - The identifier of the item to get
-         * @param {Object} [params] - additional parameters
+         * @param {string} itemIdentifier - The identifier of the item to get
+         * @param {object} [params] - additional parameters
          * @returns {Promise} - Returns a promise. The item data will be provided on resolve.
          *                      Any error will be provided if rejected.
          */
-        getItem: function getItem(itemIdentifier, params) {
-            var self = this;
+        getItem(itemIdentifier, params) {
+            // remove the expired entries from the cache
+            // prune anyway, if an issue occurs it should not prevent the remaining process to happen
+            const pruneStore = () => this.itemStore.prune().catch(_.noop);
 
             /**
              * try to load the next items
-             * @returns {Promise} that always resolves
              */
-            var loadNextItem = function loadNextItem() {
-                var testMap = self.getDataHolder().get('testMap');
+            const loadNextItem = () => {
+                const testMap = this.getDataHolder().get('testMap');
 
-                var siblings = navigationHelper.getSiblingItems(testMap, itemIdentifier, 'both', self.getCacheAmount());
-                var missing = _.reduce(
+                const siblings = navigationHelper.getSiblingItems(
+                    testMap,
+                    itemIdentifier,
+                    'both',
+                    this.getCacheAmount()
+                );
+                const missing = _.reduce(
                     siblings,
-                    function(list, sibling) {
-                        if (!self.hasItem(sibling.id)) {
+                    (list, sibling) => {
+                        if (!this.hasItem(sibling.id)) {
                             list.push(sibling.id);
                         }
                         return list;
@@ -484,21 +501,24 @@ export default _.defaults(
                 );
 
                 //don't run a request if not needed
-                if (self.isOnline() && missing.length) {
-                    _.delay(function() {
-                        self.requestNetworkThenOffline(
-                            self.configStorage.getTestActionUrl('getNextItemData'),
+                if (this.isOnline() && missing.length) {
+                    _.delay(() => {
+                        this.requestNetworkThenOffline(
+                            this.configStorage.getTestActionUrl('getNextItemData'),
                             'getNextItemData',
                             { itemDefinition: missing },
-                            false
+                            false,
+                            true
                         )
-                            .then(function(response) {
+                            .then(response => {
                                 if (response && response.items) {
-                                    _.forEach(response.items, function(item) {
-                                        if (item && item.itemIdentifier) {
-                                            //store the response and start caching assets
-                                            self.itemStore.set(item.itemIdentifier, item);
-                                        }
+                                    return pruneStore().then(() => {
+                                        _.forEach(response.items, item => {
+                                            if (item && item.itemIdentifier) {
+                                                //store the response and start caching assets
+                                                this.itemStore.set(item.itemIdentifier, item);
+                                            }
+                                        });
                                     });
                                 }
                             })
@@ -507,6 +527,10 @@ export default _.defaults(
                 }
             };
 
+            // the additional proxy options are supplied after the 'init' phase as a result of the `init` action,
+            // we need to apply them later
+            this.itemStore.setItemTTL(this.getItemTTL());
+
             //resolve from the store
             if (this.getItemFromStore && this.itemStore.has(itemIdentifier)) {
                 loadNextItem();
@@ -514,11 +538,14 @@ export default _.defaults(
                 return this.itemStore.get(itemIdentifier);
             }
 
-            return this.request(this.configStorage.getItemActionUrl(itemIdentifier, 'getItem'), params).then(function(
-                response
-            ) {
+            return this.request(
+                this.configStorage.getItemActionUrl(itemIdentifier, 'getItem'),
+                params,
+                void 0,
+                true
+            ).then(response => {
                 if (response && response.success) {
-                    self.itemStore.set(itemIdentifier, response);
+                    pruneStore().then(() => this.itemStore.set(itemIdentifier, response));
                 }
 
                 loadNextItem();
@@ -529,31 +556,30 @@ export default _.defaults(
 
         /**
          * Submits the state and the response of a particular item
-         * @param {String} itemIdentifier - The identifier of the item to update
-         * @param {Object} state - The state to submit
-         * @param {Object} response - The response object to submit
-         * @param {Object} [params] - Some optional parameters to join to the call
+         * @param {string} itemIdentifier - The identifier of the item to update
+         * @param {object} state - The state to submit
+         * @param {object} response - The response object to submit
+         * @param {object} [params] - Some optional parameters to join to the call
          * @returns {Promise} - Returns a promise. The result of the request will be provided on resolve.
          *                      Any error will be provided if rejected.
          */
-        submitItem: function submitItem(itemIdentifier, state, response, params) {
-            var self = this;
-            return this.itemStore.update(itemIdentifier, 'itemState', state).then(function() {
-                return qtiServiceProxy.submitItem.call(self, itemIdentifier, state, response, params);
+        submitItem(itemIdentifier, state, response, params) {
+            return this.itemStore.update(itemIdentifier, 'itemState', state).then(() => {
+                return qtiServiceProxy.submitItem.call(this, itemIdentifier, state, response, params);
             });
         },
 
         /**
          * Sends the test variables
-         * @param {Object} variables
-         * @param {Boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
+         * @param {object} variables
+         * @param {boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
          * @returns {Promise} - Returns a promise. The result of the request will be provided on resolve.
          *                      Any error will be provided if rejected.
          * @fires sendVariables
          */
-        sendVariables: function sendVariables(variables, deferred) {
-            var action = 'storeTraceData';
-            var actionParams = {
+        sendVariables(variables, deferred) {
+            const action = 'storeTraceData';
+            const actionParams = {
                 traceData: JSON.stringify(variables)
             };
 
@@ -567,13 +593,13 @@ export default _.defaults(
 
         /**
          * Calls an action related to the test
-         * @param {String} action - The name of the action to call
-         * @param {Object} [params] - Some optional parameters to join to the call
-         * @param {Boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
+         * @param {string} action - The name of the action to call
+         * @param {object} [params] - Some optional parameters to join to the call
+         * @param {boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
          * @returns {Promise} - Returns a promise. The result of the request will be provided on resolve.
          *                      Any error will be provided if rejected.
          */
-        callTestAction: function callTestAction(action, params, deferred) {
+        callTestAction(action, params, deferred) {
             return this.requestNetworkThenOffline(
                 this.configStorage.getTestActionUrl(action),
                 action,
@@ -584,17 +610,16 @@ export default _.defaults(
 
         /**
          * Calls an action related to a particular item
-         * @param {String} itemIdentifier - The identifier of the item for which call the action
-         * @param {String} action - The name of the action to call
-         * @param {Object} [params] - Some optional parameters to join to the call
-         * @param {Boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
+         * @param {string} itemIdentifier - The identifier of the item for which call the action
+         * @param {string} action - The name of the action to call
+         * @param {object} [params] - Some optional parameters to join to the call
+         * @param {boolean} deferred whether action can be scheduled (put into queue) to be sent in a bunch of actions later.
          * @returns {Promise} - Returns a promise. The result of the request will be provided on resolve.
          *                      Any error will be provided if rejected.
          */
-        callItemAction: function callItemAction(itemIdentifier, action, params, deferred) {
-            var self = this;
-            var updateStatePromise = Promise.resolve();
-            var testMap = this.getDataHolder().get('testMap');
+        callItemAction(itemIdentifier, action, params, deferred) {
+            let updateStatePromise = Promise.resolve();
+            const testMap = this.getDataHolder().get('testMap');
 
             //update the item state
             if (params.itemState) {
@@ -602,11 +627,11 @@ export default _.defaults(
             }
 
             //check if we have already the item for the action we are going to perform
-            self.getItemFromStore =
-                (navigationHelper.isMovingToNextItem(action, params) && self.hasNextItem(itemIdentifier)) ||
-                (navigationHelper.isMovingToPreviousItem(action, params) && self.hasPreviousItem(itemIdentifier)) ||
+            this.getItemFromStore =
+                (navigationHelper.isMovingToNextItem(action, params) && this.hasNextItem(itemIdentifier)) ||
+                (navigationHelper.isMovingToPreviousItem(action, params) && this.hasPreviousItem(itemIdentifier)) ||
                 (navigationHelper.isJumpingToItem(action, params) &&
-                    self.hasItem(mapHelper.getItemIdentifier(testMap, params.ref)));
+                    this.hasItem(mapHelper.getItemIdentifier(testMap, params.ref)));
 
             //If item action is move to another item ensure the next request will start the timer
             if (
@@ -617,9 +642,9 @@ export default _.defaults(
                 params.start = true;
             }
 
-            return updateStatePromise.then(function() {
-                return self.requestNetworkThenOffline(
-                    self.configStorage.getItemActionUrl(itemIdentifier, action),
+            return updateStatePromise.then(() => {
+                return this.requestNetworkThenOffline(
+                    this.configStorage.getItemActionUrl(itemIdentifier, action),
                     action,
                     _.merge({ itemDefinition: itemIdentifier }, params),
                     deferred

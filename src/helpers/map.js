@@ -89,11 +89,11 @@ export default {
 
     /**
      * Get active item from the test map
-     * @param {Object} map - The assessment test map
+     * @param {Object} mapWithActive - The assessment test map which has active part/section/item marked
      * @returns {Object} the active item
      */
-    getActiveItem: function getActiveItem(map) {
-        var parts = this.getParts(map),
+    getActiveItem: function getActiveItem(mapWithActive) {
+        var parts = this.getParts(mapWithActive),
             result = {};
 
         _.forEach(parts, function(part) {
@@ -303,15 +303,19 @@ export default {
                     return testStats;
                 }
 
-                // Calculate all unanswered questions in inaccessible parts
-                const countOfInaccessibleUnasweredQestions = parts
-                    .slice(linearPartIndex)
+                // Calculate all unanswered and flagged questions in inaccessible parts
+                const inaccessibleParts = parts.slice(linearPartIndex);
+                const countOfInaccessibleUnasweredQestions = inaccessibleParts
                     .reduce((acc, {stats: { questions, answered }}) => acc + (questions - answered), 0);
-
+                const countOfInaccessibleFlaggedQestions = inaccessibleParts
+                    .reduce((acc, {stats: { flagged }}) => acc + flagged, 0);
                 return Object.assign(
                     {},
                     testStats,
-                    { answered: testStats.answered + countOfInaccessibleUnasweredQestions }
+                    {
+                        answered: testStats.answered + countOfInaccessibleUnasweredQestions,
+                        flagged: testStats.flagged - countOfInaccessibleFlaggedQestions
+                    }
                 );
             }
 

@@ -7,12 +7,10 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
-                    // mock Client Config data:
                     requirejs.config({
-                        config: {
-                            'core/tokenHandler': {
-                                tokens: ['token1', 'token2', 'token3', 'token4', 'token5']
-                            }
+                        paths: {
+                            'ckeditor': '/test/mocks/ckeditorMock',
+                            'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator': '/test/mocks/ckConfiguratorMock'
                         }
                     });
                     require(['taoQtiTest/test/runner/proxy/offline/proxy/test'], function() {

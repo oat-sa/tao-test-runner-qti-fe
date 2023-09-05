@@ -58,7 +58,7 @@ export default pluginFactory({
         var pluginShortcuts = (testRunnerOptions.shortcuts || {})[this.getName()] || {};
 
         const pluginConfig = this.getConfig();
-        const oldNamespace = themeHandler.getActiveNamespace();
+        this.oldNamespace = themeHandler.getActiveNamespace();
         const state = {
             availableThemes: [],
             defaultTheme: '',
@@ -70,7 +70,7 @@ export default pluginFactory({
             themeHandler.setActiveNamespace(pluginConfig.activeNamespace);
         }
         const themesConfig = themeHandler.get('items') || {};
-        if (pluginConfig.activeNamespace !== oldNamespace && !_.isEmpty(themesConfig)) {
+        if (pluginConfig.activeNamespace !== this.oldNamespace && !_.isEmpty(themesConfig)) {
             reloadThemes();
         }
 
@@ -132,12 +132,13 @@ export default pluginFactory({
             if (themesConfig.default) {
                 state.defaultTheme = themesConfig.default;
                 state.selectedTheme = themesConfig.default;
+                changeTheme(themesConfig.default);
             }
             if (themesConfig.available) {
                 _.forEach(themesConfig.available, function(theme) {
                     state.availableThemes.push({
                         id: theme.id,
-                        label: theme.name
+                        label: __(theme.name)
                     });
                 });
             }
@@ -151,6 +152,11 @@ export default pluginFactory({
                 title: __('Change the current color preset'),
                 icon: 'contrast',
                 text: __('Contrast')
+            })
+            .after('render', () => {
+                if (!isPluginAllowed()) {
+                    self.hide();
+                }
             })
             .on('click', function(e) {
                 e.preventDefault();
@@ -169,6 +175,7 @@ export default pluginFactory({
                 .getAreaBroker()
                 .getToolbox()
                 .createEntry({
+                    role: 'option',
                     control: theme.id,
                     title: theme.label,
                     icon: 'preview',
@@ -239,6 +246,9 @@ export default pluginFactory({
                 if (self.getState('enabled') !== false) {
                     self.menuButton.toggleMenu();
                 }
+            })
+            .on('tool-themeswitcher-setnavtype', function(type) {
+                self.menuButton.setNavigationType(type);
             });
 
         return testRunner.getPluginStore(this.getName()).then(function(itemThemesStore) {
@@ -255,7 +265,12 @@ export default pluginFactory({
      * Called during the runner's destroy phase
      */
     destroy: function destroy() {
+        themeHandler.setActiveNamespace(this.oldNamespace);
+
         shortcut.remove(`.${this.getName()}`);
+        return this.getTestRunner().getPluginStore(this.getName()).then(function(itemThemesStore) {
+            return itemThemesStore.removeItem('itemThemeId');
+        });
     },
 
     /**

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Test Runner provider for QTI Tests.
@@ -24,6 +24,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
 import cachedStore from 'core/cachedStore';
+import browser from 'util/browser';
 import areaBrokerFactory from 'taoTests/runner/areaBroker';
 import proxyFactory from 'taoTests/runner/proxy';
 import probeOverseerFactory from 'taoTests/runner/probeOverseer';
@@ -37,6 +38,7 @@ import qtiItemRunner from 'taoQtiItem/runner/qtiItemRunner';
 import getAssetManager from 'taoQtiTest/runner/config/assetManager';
 import layoutTpl from 'taoQtiTest/runner/provider/layout';
 import states from 'taoQtiTest/runner/config/states';
+import stopwatchFactory from 'taoQtiTest/runner/provider/stopwatch';
 
 /**
  * A Test runner provider to be registered against the runner
@@ -56,6 +58,7 @@ var qtiProvider = {
             content: $('#qti-content', $layout),
             toolbox: $('.tools-box', $layout),
             navigation: $('.navi-box-list', $layout),
+            mainLandmark: $('#test-title-header', $layout),
             control: $('.top-action-bar .control-box', $layout),
             actionsBar: $('.bottom-action-bar .control-box', $layout),
             panel: $('.test-sidebar-left', $layout),
@@ -246,10 +249,22 @@ var qtiProvider = {
         function computeNext(action, params, loadPromise) {
             const context = self.getTestContext();
             const currentItem = self.getCurrentItem();
+            const options = self.getOptions();
+            const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
+            const { partiallyAnsweredIsAnswered } = options.review;
 
             //catch server errors
             var submitError = function submitError(err) {
                 if (err && err.unrecoverable){
+                    if (!skipPausedAssessmentDialog) {
+                        self.trigger(
+                            'alert.error',
+                            __(
+                                'An unrecoverable error occurred. Your test session will be paused.'
+                            )
+                        );
+                    }
+
                     self.trigger('pause', {message : err.message});
                 } else if (err.code === 200) {
                     //some server errors are valid, so we don't fail (prevent empty responses)
@@ -267,7 +282,10 @@ var qtiProvider = {
             const feedbackPromise = new Promise(resolve => {
 
                 //@deprecated feedbacks from testContext
-                if (currentItem.hasFeedbacks || context.hasFeedbacks) {
+                if (
+                    (currentItem.hasFeedbacks || context.hasFeedbacks)
+                    && context.itemSessionState <= states.itemSession.interacting
+                ) {
                     params = _.omit(params, ['itemState', 'itemResponse']);
 
                     self.getProxy()
@@ -300,7 +318,7 @@ var qtiProvider = {
                         // when the test part is linear, the item is always answered as we cannot come back to it
                         const testPart = self.getCurrentPart();
                         const isLinear = testPart && testPart.isLinear;
-                        currentItem.answered = isLinear || currentItemHelper.isAnswered(self);
+                        currentItem.answered = isLinear || currentItemHelper.isAnswered(self, partiallyAnsweredIsAnswered);
                     }
                     resolve();
                 }
@@ -360,6 +378,13 @@ var qtiProvider = {
 
         areaBroker.setComponent('toolbox', toolboxFactory());
         areaBroker.getToolbox().init();
+
+        const stopwatch = stopwatchFactory({});
+
+        stopwatch.init();
+        stopwatch.spread(this, 'tick');
+
+        const isTimerClientMode = () => config.options.timer && config.options.timer.restoreTimerFromClient;
 
         /*
          * Install behavior on events
@@ -458,8 +483,12 @@ var qtiProvider = {
                             } else {
                                 self.trigger(
                                     'alert.timeout',
-                                    __('Time limit reached, this part of the test has ended.'),
-                                    resolve
+                                    __('The time limit has been reached for this part of the test.'),
+                                    () => {
+                                        self.trigger('timeoutAccepted');
+
+                                        resolve();
+                                    }
                                 );
                             }
                         })
@@ -467,24 +496,40 @@ var qtiProvider = {
                 }
             })
             .on('pause', function(data) {
+                const testContext = self.getTestContext();
+                const options = self.getOptions();
+                const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
+
                 this.setState('closedOrSuspended', true);
 
+                const params = {
+                    itemDefinition: testContext.itemIdentifier,
+                    reason: {
+                        reasons: data && data.reasons,
+                        comment: data && (data.originalMessage || data.message)
+                    }
+                };
+
+                const itemState = self.itemRunner.getState();
+                if (Object.keys(itemState).length) {
+                    params.itemState = itemState;
+                }
+
                 this.getProxy()
-                    .callTestAction('pause', {
-                        reason: {
-                            reasons: data && data.reasons,
-                            comment: data && (data.originalMessage || data.message)
-                        }
-                    })
+                    .callTestAction('pause', params)
                     .then(function() {
                         self.trigger('leave', {
                             code: states.testSession.suspended,
-                            message: data && data.message
+                            message: data && data.message,
+                            skipExitMessage: skipPausedAssessmentDialog
                         });
                     })
                     .catch(function(err) {
                         self.trigger('error', err);
                     });
+            })
+            .on('move skip exit timeout pause', function() {
+                stopwatch.stop();
             })
             .on('loaditem', function() {
                 var context = this.getTestContext();
@@ -524,16 +569,27 @@ var qtiProvider = {
                 }
                 this.trigger('enablenav');
             })
+            .after('renderitem', function(){
+                stopwatch.start();
+            })
             .on('resumeitem', function() {
                 this.trigger('enableitem enablenav');
             })
             .on('disableitem', function() {
+                if (isTimerClientMode()) {
+                    stopwatch.stop();
+                }
                 this.trigger('disabletools');
             })
             .on('enableitem', function() {
+                if (isTimerClientMode()) {
+                    stopwatch.start();
+                }
                 this.trigger('enabletools');
             })
             .on('error', function() {
+                stopwatch.stop();
+
                 this.trigger('disabletools enablenav');
             })
             .on('finish', function() {
@@ -545,6 +601,8 @@ var qtiProvider = {
             })
             .on('flush', function() {
                 this.destroy();
+
+                stopwatch.destroy();
             });
 
         //starts the event collection
@@ -625,15 +683,13 @@ var qtiProvider = {
     loadItem: function loadItem(itemIdentifier) {
         return this.getProxy()
             .getItem(itemIdentifier)
-            .then(function(data) {
-                //aggregate the results
-                return {
-                    content: data.itemData,
-                    baseUrl: data.baseUrl,
-                    state: data.itemState,
-                    portableElements: data.portableElements
-                };
-            });
+            .then(({itemData, baseUrl, itemState, portableElements, flags}) => ({
+                content: itemData,
+                baseUrl,
+                state: itemState,
+                portableElements,
+                flags
+            }));
     },
 
     /**
@@ -686,6 +742,17 @@ var qtiProvider = {
                     this.on('statechange', changeState);
 
                     resolve();
+                })
+                .after('render', function() {
+                    //iOS only fix: sometimes the wrapper is not scrollable because of some bugs in Safari iOS
+                    //we have to force it to reconsider if the scroll needs to apply
+                    if (browser.isIOs()) {
+                        const wrapperElt = self.getAreaBroker().getContainer().find('.content-wrapper').get(0);
+                        if (wrapperElt) {
+                            wrapperElt.style.overflow = 'hidden';
+                            setTimeout(() => wrapperElt.style.overflow = 'auto', 0);
+                        }
+                    }
                 })
                 .on('warning', function(err) {
                     self.trigger('warning', err);
@@ -770,6 +837,9 @@ var qtiProvider = {
                     }
                 })
                 .then(function() {
+                    probeOverseer.stop();
+                })
+                .catch(function() {
                     probeOverseer.stop();
                 });
         } else {

@@ -83,6 +83,10 @@ export default pluginFactory({
                 title: __('Highlight Text'),
                 icon: 'text-marker',
                 control: 'highlight-trigger',
+                aria: {
+                    pressed: 'false',
+                    label: __('(Visual) Highlight Text')
+                },
                 text: __('Highlight')
             });
 
@@ -92,6 +96,9 @@ export default pluginFactory({
                 title: __('Clear all active highlights'),
                 icon: 'result-nok',
                 control: 'highlight-clear',
+                aria: {
+                    label: __('(Visual) Clear all active highlights')
+                },
                 text: __('Clear Highlights')
             });
 
@@ -273,6 +280,14 @@ export default pluginFactory({
                 .on('loaditem', togglePlugin)
                 .on('enabletools renderitem', function() {
                     self.enable();
+
+                    if (isPluginEnabled()) {
+                        _.forEach(highlighters.getAllHighlighters(), function (instance) {
+                            if (!instance.isEnabled()) {
+                                instance.on('start').toggleHighlighting(false).enable();
+                            }
+                        });
+                    }
                 })
                 .on('renderitem', function() {
                     var textStimuli;
@@ -313,11 +328,15 @@ export default pluginFactory({
                         instance
                             .on('start', function() {
                                 self.buttonMain.turnOn();
+                                self.buttonMain.$component
+                                    .attr('aria-pressed', 'true');
                                 self.trigger('start');
                                 hasHighlights = true;
                             })
                             .on('end', function() {
                                 self.buttonMain.turnOff();
+                                self.buttonMain.$component
+                                    .attr('aria-pressed', 'false');
                                 self.trigger('end');
                             });
                     }

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -26,16 +26,19 @@ import pollingFactory from 'core/polling';
 import waitingDialog from 'ui/waitingDialog/waitingDialog';
 import pluginFactory from 'taoTests/runner/plugin';
 import connectivityTpl from 'taoQtiTest/runner/plugins/controls/connectivity/connectivity.tpl';
+import namespaceHelper from 'util/namespace';
 
 /**
  * The plugin default configuration
  * @type {Object}
  * @property {Number} checkInterval - when offline, interval to check if we're back online
  * @property {Boolean} indicator - do we display the indicator in the test UI
+ * @property {Boolean} message - do we display the message in the test UI
  */
 var defaultConfig = {
     checkInterval: 30 * 1000,
-    indicator: true
+    indicator: true,
+    message: false
 };
 
 /**
@@ -59,15 +62,16 @@ export default pluginFactory({
             //create the indicator
             this.$element = $(
                 connectivityTpl({
-                    state: proxy.isOnline() ? 'connected' : 'disconnected'
+                    state: proxy.isOnline() ? 'connected' : 'disconnected',
+                    message: config.message
                 })
             );
 
             testRunner
-                .on('disconnect', function() {
+                .on('disconnect', function () {
                     self.$element.removeClass('connected').addClass('disconnected');
                 })
-                .on('reconnect', function() {
+                .on('reconnect', function () {
                     self.$element.removeClass('disconnected').addClass('connected');
                 });
         }
@@ -97,14 +101,14 @@ export default pluginFactory({
          */
         this.displayWaitingDialog = function displayWaitingDialog(message = '') {
             var dialog;
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 if (!waiting) {
                     waiting = true;
 
                     //if a pause event occurs while waiting,
                     //we also wait the connection to be back
-                    testRunner.before('pause.waiting', function() {
-                        return new Promise(function(pauseResolve) {
+                    testRunner.before('pause.waiting', function () {
+                        return new Promise(function (pauseResolve) {
                             proxy.off('reconnect.pausing').after('reconnect.pausing', pauseResolve);
                         });
                     });
@@ -115,11 +119,11 @@ export default pluginFactory({
                         waitContent: __('Please wait while we try to restore the connection.'),
                         proceedContent: __('The connection seems to be back, please proceed')
                     })
-                        .on('proceed', function() {
+                        .on('proceed', function () {
                             resolve();
                         })
-                        .on('render', function() {
-                            proxy.off('reconnect.waiting').after('reconnect.waiting', function() {
+                        .on('render', function () {
+                            proxy.off('reconnect.waiting').after('reconnect.waiting', function () {
                                 testRunner.off('pause.waiting');
                                 waiting = false;
                                 dialog.endWait();
@@ -133,10 +137,7 @@ export default pluginFactory({
         //by regular polling on the "up" signal
         this.polling = pollingFactory({
             action: function action() {
-                testRunner
-                    .getProxy()
-                    .telemetry(testRunner.getTestContext().itemIdentifier, 'up')
-                    .catch(_.noop);
+                testRunner.getProxy().telemetry(testRunner.getTestContext().itemIdentifier, 'up').catch(_.noop);
             },
             interval: defaultConfig.checkInterval,
             autoStart: false
@@ -163,13 +164,13 @@ export default pluginFactory({
         //this could be caused by pauses for example.
         //If caused by an action like exitTest it will be handled
         //by navigation errors (see below)
-        testRunner.before('leave', function(e, data) {
+        testRunner.before('leave', function (e, data) {
             if (proxy.isOffline()) {
                 self.displayWaitingDialog(data.message)
-                    .then(function() {
+                    .then(function () {
                         testRunner.trigger('leave', data);
                     })
-                    .catch(function(generalErr) {
+                    .catch(function (generalErr) {
                         testRunner.trigger('error', generalErr);
                     });
 
@@ -178,7 +179,7 @@ export default pluginFactory({
         });
 
         //intercept offline navigation errors
-        testRunner.before('error.connectivity', function(e, err) {
+        testRunner.before('error.connectivity', function (e, err) {
             // detect and prevent connectivity errors
             if (proxy.isConnectivityError(err)) {
                 return false;
@@ -186,7 +187,7 @@ export default pluginFactory({
 
             if (proxy.isOffline()) {
                 self.displayWaitingDialog()
-                    .then(function() {
+                    .then(function () {
                         if (err.type === 'nav') {
                             testRunner.loadItem(testRunner.getTestContext().itemIdentifier);
                         }
@@ -200,12 +201,50 @@ export default pluginFactory({
                             });
                         }
                     })
-                    .catch(function(generalErr) {
+                    .catch(function (generalErr) {
                         testRunner.trigger('error', generalErr);
                     });
                 return false;
             }
         });
+
+        testRunner.before('loaditem.connectivity', function (e, itemRef, item) {
+            const testContext = testRunner.getTestContext();
+            const { flags } = item;
+
+            if (!flags) {
+                return true;
+            }
+
+            if (flags.hasFeedbacks) {
+                testContext.hasFeedbacks = true;
+            }
+
+            if ((flags.containsNonPreloadedAssets || flags.hasPci) && proxy.isOffline()) {
+                self.displayWaitingDialog().then(() => {
+                    testRunner.loadItem(itemRef);
+                });
+
+                return false;
+            }
+        });
+
+        testRunner.before(namespaceHelper.namespaceAll('move skip timeout', 'connectivity'), function (e, ...args) {
+            var testContext = testRunner.getTestContext();
+            var currentItem = testRunner.getCurrentItem();
+
+            if (proxy.isOffline() && (currentItem.hasFeedbacks || testContext.hasFeedbacks)) {
+                testRunner.trigger('disableitem');
+                self.displayWaitingDialog().then(function () {
+                    testRunner.trigger('enableitem').trigger(e.name, ...args);
+                });
+                return false;
+            }
+        });
+    },
+
+    destroy() {
+        this.getTestRunner().off('.connectivity');
     },
 
     /**

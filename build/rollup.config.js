@@ -13,12 +13,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
  */
 
 import path from 'path';
 import glob from 'glob-promise';
 import alias from 'rollup-plugin-alias';
+import clear from 'rollup-plugin-clear';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import cssResolve from './css-resolve';
 import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
@@ -31,7 +32,8 @@ const Handlebars = require('handlebars');
 
 const isDev = process.env.NODE_ENV === 'development';
 
-const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
+const globPath = p => p.replace(/\\/g, '/');
+const inputs = glob.sync(globPath(path.join(srcDir, '**', '*.js')));
 
 /**
  * Define all modules as external, so rollup won't bundle them together.
@@ -62,15 +64,21 @@ export default inputs.map(input => {
         external: [
             ...localExternals,
             'handlebars',
+            'interact',
             'jquery',
             'lodash',
             'moment',
             'module',
+            'nouislider',
             'i18n',
             'ckeditor',
             'layout/loading-bar'
         ],
         plugins: [
+            clear({
+                targets: [outputDir],
+                watch: false
+            }),
             cssResolve(),
             wildcardExternal(['core/**', 'ui/**', 'util/**', 'lib/**', 'taoTests/**', 'taoItems/**', 'taoQtiItem/**']),
             alias({
@@ -85,7 +93,7 @@ export default inputs.map(input => {
                     },
                     module: Handlebars
                 },
-                // helpers: ['build/tpl.js'],
+                helpers: ['lib/handlebars/helpers'],
                 templateExtension: '.tpl'
             }),
             ...(process.env.COVERAGE ? [istanbul()] : []),
@@ -108,7 +116,7 @@ export default inputs.map(input => {
  * It is asyncronous and it was made with purpose to run parallely with build,
  * because they do not effect each other
  */
-glob(path.join(srcDir, '**', '*.tpl')).then(files => {
+glob(globPath(path.join(srcDir, '**', '*.tpl'))).then(files => {
     files.forEach(async (file) => {
         const targetFile = path.resolve(outputDir, path.relative(srcDir, file));
         await mkdirp(path.dirname(targetFile));

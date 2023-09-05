@@ -46,16 +46,22 @@ export default pluginFactory({
             const testMap = testRunner.getTestMap();
 
             return {
-                nextSection : mapHelper.hasItemCategory(
+                nextSection: mapHelper.hasItemCategory(
                     testMap,
                     testContext.itemIdentifier,
                     'nextSection',
                     true
                 ),
-                nextSectionWarning : mapHelper.hasItemCategory(
+                nextSectionWarning: mapHelper.hasItemCategory(
                     testMap,
                     testContext.itemIdentifier,
                     'nextSectionWarning',
+                    true
+                ),
+                noExitTimedSectionWarning: mapHelper.hasItemCategory(
+                    testMap,
+                    testContext.itemIdentifier,
+                    'noExitTimedSectionWarning',
                     true
                 )
             };
@@ -75,6 +81,21 @@ export default pluginFactory({
             testRunner.next('section');
         }
 
+        /**
+         * Check if warn section leaving dialog enabled to prevent showing double dialogs
+         * @returns {Boolean}
+         */
+        const isWarnSectionLeavingEabled = () => {
+            const testContext = testRunner.getTestContext();
+            const categories = getNextSectionCategories();
+            const timeConstraints = testContext.timeConstraints || [];
+
+
+            return timeConstraints.some(({ source }) => source === testContext.sectionId)
+                && !categories.noExitTimedSectionWarning
+                && !(testRunnerOptions.timer || {}).keepUpToTimeout;
+        };
+
         this.$element = $(
             buttonTpl({
                 control: 'next-section',
@@ -91,21 +112,25 @@ export default pluginFactory({
             if (self.getState('enabled') !== false) {
                 self.disable();
 
-                if (categories.nextSectionWarning) {
+                if (categories.nextSectionWarning && !isWarnSectionLeavingEabled()) {
+                    const submitButtonLabel = __('CONTINUE TO THE NEXT SECTION');
+
                     testRunner.trigger(
                         'confirm.nextsection',
                         messages.getExitMessage(
-                            __('Once you close this section, you cannot return to it or change your answers.'),
                             'section',
-                            testRunner
+                            testRunner,
+                            '',
+                            false,
+                            submitButtonLabel
                         ),
                         nextSection, // if the test taker accept
                         enable, // if the test taker refuse
                         {
                             buttons: {
                                 labels: {
-                                    ok: __('Close this Section'),
-                                    cancel: __('Review my Answers')
+                                    ok: submitButtonLabel,
+                                    cancel: __('CANCEL')
                                 }
                             }
                         }

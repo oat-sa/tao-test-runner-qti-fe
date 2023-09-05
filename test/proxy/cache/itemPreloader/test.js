@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017-2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2017-2021 Open Assessment Technologies SA ;
  */
 
 /**
@@ -230,5 +230,25 @@ define([
                 assert.ok(false, err);
                 ready();
             });
+    });
+
+    QUnit.test('preloader sets containsNonPreloadedAssets flag', function (assert) {
+        const ready = assert.async();
+        assert.expect(1);
+
+        const itemPreloader = itemPreloaderFactory(options);
+
+        const nonPreloadableItem = Object.assign({}, itemData, {
+            itemData: Object.assign({}, itemData.itemData, { assets: { video: { 'foo.mp4': 'foo.mp4' } } })
+        });
+
+        itemPreloader.preload(nonPreloadableItem).then(() => {
+            assert.deepEqual(
+                nonPreloadableItem.flags,
+                { containsNonPreloadedAssets: true },
+                'sets containsNonPreloadedAssets flag'
+            );
+            ready();
+        });
     });
 });

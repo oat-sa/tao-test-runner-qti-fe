@@ -1,0 +1,7 @@
+dist/
+node_modules/
+.nyc_ouput/
+coverage/
+environment/
+css/
+scss/

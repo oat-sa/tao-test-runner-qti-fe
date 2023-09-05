@@ -18,7 +18,7 @@
 /**
  * Test the time\'s plugin timerbox component
  */
-define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/timerbox'], function($, timerboxFactory) {
+define(['jquery', 'lodash', 'taoQtiTest/runner/plugins/controls/timer/component/timerbox'], function($, _, timerboxFactory) {
     'use strict';
 
     QUnit.module('API');
@@ -182,7 +182,13 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/timerbox']
                 this.render($container);
             })
             .on('update', function() {
+                const timers = this.getTimers();
+
                 this.start();
+
+                _.forOwn(timers, ({ countdown, remainingTime }) => {
+                    countdown.update(remainingTime - 1000);
+                });
             })
             .on('timerstart', function(timer) {
                 var self = this;
@@ -327,12 +333,23 @@ define(['jquery', 'taoQtiTest/runner/plugins/controls/timer/component/timerbox']
                         remainingTime: 1500
                     }
                 }).then(function() {
+                    const timers = self.getTimers();
+
                     self.start();
+
+                    self.ticksInterval = setInterval(function() {
+                        _.forOwn(timers, ({ countdown, remainingTime }) => {
+                            countdown.update(remainingTime - 1000);
+                        });
+                    }, 1000);
                 });
             })
             .on('timerend', function(timer) {
                 if (timer.id === 'timer-1') {
                     assert.ok(true);
+
+                    clearInterval(this.ticksInterval);
+
                     ready();
                 }
             })

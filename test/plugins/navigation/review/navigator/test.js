@@ -34,13 +34,13 @@ define([
     QUnit.test('factory', function(assert) {
         assert.expect(2);
         assert.equal(
-            typeof navigatorFactory(sample.config, sample.map, sample.context),
+            typeof navigatorFactory(sample.config),
             'object',
             'The factory creates an object'
         );
         assert.notDeepEqual(
-            navigatorFactory(sample.config, sample.map, sample.context),
-            navigatorFactory(sample.config, sample.map, sample.context),
+            navigatorFactory(sample.config),
+            navigatorFactory(sample.config),
             'The factory creates a new object'
         );
     });
@@ -101,7 +101,7 @@ define([
             }
         ])
         .test('component API contains ', function(data, assert) {
-            var component = navigatorFactory(sample.config, sample.map, sample.context);
+            var component = navigatorFactory(sample.config);
             assert.expect(1);
             assert.equal(typeof component[data.name], 'function', `The component has the method ${  data.name}`);
         });
@@ -122,7 +122,7 @@ define([
             }
         ])
         .test('eventifier API contains ', function(data, assert) {
-            var component = navigatorFactory(sample.config, sample.map, sample.context);
+            var component = navigatorFactory(sample.config);
             assert.expect(1);
             assert.equal(typeof component[data.name], 'function', `The component has the method ${  data.name}`);
         });
@@ -132,7 +132,7 @@ define([
     QUnit.test('DOM', function(assert) {
         var ready = assert.async();
         var $container = $('#qunit-fixture');
-        var component = navigatorFactory(sample.config, sample.map, sample.context);
+        var component = navigatorFactory(sample.config);
 
         assert.expect(8);
 
@@ -168,10 +168,9 @@ define([
     QUnit.test('item count', function(assert) {
         var ready = assert.async();
         var $container = $('#qunit-fixture');
-        var component = navigatorFactory(sample.config, sample.map, sample.context);
+        var component = navigatorFactory(sample.config);
 
         assert.expect(8);
-
         component
             .on('update', function() {
                 var $element = this.getElement();
@@ -209,10 +208,13 @@ define([
                     '10/10',
                     'The viewed counter is correct'
                 );
-
                 ready();
             })
-            .render($container);
+            .render($container)
+            .update(sample.map, sample.context)
+            .updateConfig({
+                canFlag: true
+            });
     });
 
     QUnit.test('inconsistent item count', function(assert) {
@@ -258,7 +260,7 @@ define([
                 informational: true
             }
         };
-        component = navigatorFactory(sample.config, map, sample.context);
+        component = navigatorFactory(sample.config);
 
         assert.expect(8);
 
@@ -302,7 +304,11 @@ define([
 
                 ready();
             })
-            .render($container);
+            .render($container)
+            .update(map, sample.context)
+            .updateConfig({
+                canFlag: true
+            });
     });
 
     QUnit.module('Visual');
@@ -313,12 +319,13 @@ define([
 
         assert.expect(1);
 
-        navigatorFactory(sample.config, sample.map, sample.context)
+        navigatorFactory(sample.config)
             .on('render', function() {
                 assert.ok(true);
 
                 ready();
             })
-            .render($container);
+            .render($container)
+            .update(sample.map, sample.context);
     });
 });

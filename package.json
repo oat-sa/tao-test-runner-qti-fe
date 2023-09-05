@@ -71,7 +71,7 @@
         "gamp": "0.2.1",
         "glob": "^8.1.0",
         "glob-promise": "^5.0.0",
-        "handlebars": "1.3.0",
+        "handlebars": "4.7.8",
         "interactjs": "1.3.4",
         "jquery": "1.9.1",
         "jquery-mockjax": "^2.5.0",

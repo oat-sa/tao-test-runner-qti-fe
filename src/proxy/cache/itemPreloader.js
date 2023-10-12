@@ -175,13 +175,22 @@ function itemPreloaderFactory(options) {
      * @private
      */
     const interactionLoad = item => {
-        return Promise.all(getItemInteractions(item.itemData).map(interaction => {
-            if (interactionPreloader.has(interaction.qtiClass)) {
-                logger.debug(`Loading interaction ${interaction.serial}(${interaction.qtiClass}) for item ${item.itemIdentifier}`);
-                return interactionPreloader.load(interaction.qtiClass, interaction, item.itemData, item.itemIdentifier);
-            }
-            return Promise.resolve();
-        }));
+        return Promise.all(
+            getItemInteractions(item.itemData).map(interaction => {
+                if (interactionPreloader.has(interaction.qtiClass)) {
+                    logger.debug(
+                        `Loading interaction ${interaction.serial}(${interaction.qtiClass}) for item ${item.itemIdentifier}`
+                    );
+                    return interactionPreloader.load(
+                        interaction.qtiClass,
+                        interaction,
+                        item.itemData,
+                        item.itemIdentifier
+                    );
+                }
+                return Promise.resolve();
+            })
+        );
     };
 
     /**
@@ -193,13 +202,22 @@ function itemPreloaderFactory(options) {
      * @private
      */
     const interactionUnload = item => {
-        return Promise.all(getItemInteractions(item.itemData).map(interaction => {
-            if (interactionPreloader.has(interaction.qtiClass)) {
-                logger.debug(`Unloading interaction ${interaction.serial}(${interaction.qtiClass}) for item ${item.itemIdentifier}`);
-                return interactionPreloader.unload(interaction.qtiClass, interaction, item.itemData, item.itemIdentifier);
-            }
-            return Promise.resolve();
-        }));
+        return Promise.all(
+            getItemInteractions(item.itemData).map(interaction => {
+                if (interactionPreloader.has(interaction.qtiClass)) {
+                    logger.debug(
+                        `Unloading interaction ${interaction.serial}(${interaction.qtiClass}) for item ${item.itemIdentifier}`
+                    );
+                    return interactionPreloader.unload(
+                        interaction.qtiClass,
+                        interaction,
+                        item.itemData,
+                        item.itemIdentifier
+                    );
+                }
+                return Promise.resolve();
+            })
+        );
     };
 
     /**
@@ -288,7 +306,7 @@ function itemPreloaderFactory(options) {
                     loading.push(assetLoad(item));
                 }
             }
-            return Promise.all(loading).then(results => results.length > 0 && _.all(results, _.isTrue));
+            return Promise.all(loading).then(results => results.length > 0 && results.every(_.isTrue));
         },
 
         /**
@@ -313,7 +331,7 @@ function itemPreloaderFactory(options) {
                 }
             }
 
-            return Promise.all(loading).then(results => results.length > 0 && _.all(results, _.isTrue));
+            return Promise.all(loading).then(results => results.length > 0 && results.every(_.isTrue));
         }
     };
 }

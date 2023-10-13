@@ -18,7 +18,6 @@
 /**
  * @author Péter Halász <peter@taotesting.com>
  */
-import _ from 'lodash';
 
 /**
  * MATCH branching rule

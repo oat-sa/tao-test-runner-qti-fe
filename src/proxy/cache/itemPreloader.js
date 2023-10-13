@@ -306,7 +306,7 @@ function itemPreloaderFactory(options) {
                     loading.push(assetLoad(item));
                 }
             }
-            return Promise.all(loading).then(results => results.length > 0 && results.every(_.isTrue));
+            return Promise.all(loading).then(results => results.length > 0 && results.every(Boolean));
         },
 
         /**
@@ -331,7 +331,7 @@ function itemPreloaderFactory(options) {
                 }
             }
 
-            return Promise.all(loading).then(results => results.length > 0 && results.every(_.isTrue));
+            return Promise.all(loading).then(results => results.length > 0 && results.every(Boolean));
         }
     };
 }

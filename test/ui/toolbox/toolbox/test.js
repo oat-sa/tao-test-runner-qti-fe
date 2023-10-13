@@ -18,14 +18,19 @@
 /**
  * @author Christophe Noël <christophe@taotesting.com>
  */
-define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'], function($, _, hider, toolboxFactory) {
+define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'], function (
+    $,
+    _,
+    hider,
+    toolboxFactory
+) {
     'use strict';
 
     var fixtureContainer = '#qunit-fixture';
 
     QUnit.module('plugin');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', function (assert) {
         assert.expect(1);
 
         assert.ok(typeof toolboxFactory === 'function', 'The module expose a function');
@@ -33,7 +38,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
 
     QUnit.module('Toolbox rendering');
 
-    QUnit.test('render / destroy', function(assert) {
+    QUnit.test('render / destroy', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer);
 
@@ -62,7 +67,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
 
     QUnit.module('Item creation and rendering');
 
-    QUnit.test('.createText()', function(assert) {
+    QUnit.test('.createText()', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             $result;
@@ -84,7 +89,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         assert.ok($result.hasClass('sample-class'), 'text item has the correct class');
     });
 
-    QUnit.test('.createEntry()', function(assert) {
+    QUnit.test('.createEntry()', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             $result;
@@ -113,7 +118,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         assert.equal($result.length, 1, 'entry has an icon');
     });
 
-    QUnit.test('.createMenu()', function(assert) {
+    QUnit.test('.createMenu()', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             items = {},
@@ -167,7 +172,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
 
     QUnit.module('Default renderer');
 
-    QUnit.test('render entries in registration order', function(assert) {
+    QUnit.test('render entries in registration order', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             items = {},
@@ -195,7 +200,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         assert.equal($result.eq(4).data('control'), 'entry5', 'entry5 has been rendered in 5th position');
     });
 
-    QUnit.test('handle menu entries and orphan menu entries', function(assert) {
+    QUnit.test('handle menu entries and orphan menu entries', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             items = {},
@@ -275,7 +280,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
 
     QUnit.module('Menus interactions');
 
-    QUnit.test('Interacting with a pre-rendered menu does not cause errors', function(assert) {
+    QUnit.test('Interacting with a pre-rendered menu does not cause errors', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             menu;
@@ -285,7 +290,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         toolbox.init();
         menu = toolbox.createMenu();
 
-        _.each(Object.getOwnPropertyNames(menu), function(prop) {
+        _.each(Object.getOwnPropertyNames(menu), function (prop) {
             if (typeof menu[prop] === 'function') {
                 menu[prop]();
             }
@@ -303,7 +308,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         menu.enable();
     });
 
-    QUnit.test('Opening a menu close opened menus', function(assert) {
+    QUnit.test('Opening a menu close opened menus', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             items = {},
@@ -345,7 +350,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         toolbox.render($container);
         toolbox.enable();
 
-        _.invoke(items, 'enable'); // Enable all items. This is usually the plugin responsability
+        Object.keys(items).forEach(key => items[key].enable()); // Enable all items. This is usually the plugin responsability
 
         $toggle1 = $container.find('[data-control="menu1"]');
         $toggle2 = $container.find('[data-control="menu2"]');
@@ -384,7 +389,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         assert.ok(hider.isHidden($menu3), 'menu3 is hidden');
     });
 
-    QUnit.test('Clicking outside of an opened menu closes it', function(assert) {
+    QUnit.test('Clicking outside of an opened menu closes it', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             items = {},
@@ -406,7 +411,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         toolbox.render($container);
         toolbox.enable();
 
-        _.invoke(items, 'enable'); // Enable all items. This is usually the plugin responsability
+        Object.keys(items).forEach(key => items[key].enable()); // Enable all items. This is usually the plugin responsability
 
         $toggle = $container.find('[data-control="menu"]');
         $menu = $container.find('[data-control="menu-menu"]');
@@ -420,7 +425,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         assert.ok(hider.isHidden($menu), 'menu is hidden');
     });
 
-    QUnit.test('Clicking a menu entry closes the menu', function(assert) {
+    QUnit.test('Clicking a menu entry closes the menu', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             items = {},
@@ -443,7 +448,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
         toolbox.render($container);
         toolbox.enable();
 
-        _.invoke(items, 'enable'); // Enable all items. This is usually the plugin responsability
+        Object.keys(items).forEach(key => items[key].enable()); // Enable all items. This is usually the plugin responsability
 
         $toggle = $container.find('[data-control="menu"]');
         $menu = $container.find('[data-control="menu-menu"]');
@@ -480,7 +485,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
 
     QUnit.module('Menu button');
 
-    QUnit.test('button opened/closed state', function(assert) {
+    QUnit.test('button opened/closed state', function (assert) {
         var toolbox = toolboxFactory(),
             $container = $(fixtureContainer),
             items = {},
@@ -500,7 +505,7 @@ define(['jquery', 'lodash', 'ui/hider', 'taoQtiTest/runner/ui/toolbox/toolbox'],
 
         toolbox.render($container);
 
-        _.invoke(items, 'enable'); // Enable all items. This is usually the plugin responsability
+        Object.keys(items).forEach(key => items[key].enable()); // Enable all items. This is usually the plugin responsability
 
         // Check button
         $result = $container.find('[data-control="sample-menu"]');

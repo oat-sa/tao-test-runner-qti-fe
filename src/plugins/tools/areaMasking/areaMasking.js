@@ -65,17 +65,14 @@ export default pluginFactory({
         const self = this;
 
         const testRunner = this.getTestRunner();
-        const $container = testRunner
-            .getAreaBroker()
-            .getContentArea()
-            .parent();
+        const $container = testRunner.getAreaBroker().getContentArea().parent();
         const testRunnerOptions = testRunner.getOptions();
         const config = Object.assign({}, defaultConfig, this.getConfig());
         const pluginShortcuts = (testRunnerOptions.shortcuts || {})[pluginName] || {};
 
         function addMask() {
             maskComponent()
-                .on('render', function() {
+                .on('render', function () {
                     self.masks.push(this);
                     self.button.turnOn();
 
@@ -84,7 +81,7 @@ export default pluginFactory({
                      */
                     self.trigger('maskadd');
                 })
-                .on('destroy', function() {
+                .on('destroy', function () {
                     self.masks = _.without(self.masks, this);
                     if (self.masks.length < config.max) {
                         self.enable();
@@ -116,17 +113,17 @@ export default pluginFactory({
             });
 
         //add a new mask each time the button is pressed
-        this.button.on('click', function(e) {
+        this.button.on('click', function (e) {
             e.preventDefault();
             testRunner.trigger(`${actionPrefix}toggle`);
         });
 
         // handle the plugin's shortcuts
         if (testRunnerOptions.allowShortcuts) {
-            _.forEach(pluginShortcuts, function(command, key) {
+            _.forEach(pluginShortcuts, function (command, key) {
                 shortcut.add(
                     namespaceHelper.namespaceAll(command, pluginName, true),
-                    function() {
+                    function () {
                         // just fire the action using the event loop
                         testRunner.trigger(actionPrefix + key);
                     },
@@ -167,16 +164,16 @@ export default pluginFactory({
         //update plugin state based on changes
         testRunner
             .on('loaditem', togglePlugin)
-            .on('enabletools renderitem', function() {
+            .on('enabletools renderitem', function () {
                 self.enable();
             })
-            .on('disabletools unloaditem', function() {
+            .on('disabletools unloaditem', function () {
                 self.disable();
                 //remove all masks
-                _.invoke(self.masks, 'destroy');
+                self.masks.forEach(mask => mask.destroy());
             })
             // commands that controls the plugin
-            .on(`${actionPrefix}toggle`, function() {
+            .on(`${actionPrefix}toggle`, function () {
                 if (isEnabled()) {
                     if (self.masks.length === 0) {
                         self.trigger('open');
@@ -184,7 +181,7 @@ export default pluginFactory({
                     if (self.masks.length < config.max) {
                         addMask();
                     } else if (config.max === 1) {
-                        _.invoke(self.masks, 'destroy');
+                        self.masks.forEach(mask => mask.destroy());
                     }
                 }
             });

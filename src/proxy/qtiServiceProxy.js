@@ -55,8 +55,8 @@ var qtiServiceProxy = {
             var stringifyParams = ['itemState', 'itemResponse', 'toolStates'];
 
             if (_.isPlainObject(actionParams)) {
-                return _.mapValues(actionParams, function(value, key) {
-                    if (_.contains(stringifyParams, key)) {
+                return _.mapValues(actionParams, function (value, key) {
+                    if (stringifyParams.includes(key)) {
                         return JSON.stringify(value);
                     }
                     return value;
@@ -86,7 +86,7 @@ var qtiServiceProxy = {
                 sequential: true,
                 timeout: self.configStorage.getTimeout()
             })
-                .then(function(response) {
+                .then(function (response) {
                     self.setOnline();
 
                     if (response && response.success) {
@@ -95,7 +95,7 @@ var qtiServiceProxy = {
                         return Promise.reject(response);
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     if (self.isConnectivityError(error)) {
                         self.setOffline('request');
                     }

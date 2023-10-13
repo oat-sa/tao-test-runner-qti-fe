@@ -57,7 +57,7 @@ var getScope = function getScope(value) {
     if (scopeMapping[value]) {
         return scopeMapping[value];
     }
-    if (_.contains(scopes, value)) {
+    if (scopes.includes(value)) {
         return value;
     }
     return null;
@@ -101,9 +101,9 @@ export default function getTimers(timeConstraints, isLinear, config) {
      */
     var constraintsWarnings = _.reduce(
         config.warnings,
-        function(acc, warnings, qtiScope) {
+        function (acc, warnings, qtiScope) {
             var scope = getScope(qtiScope);
-            acc[scope] = _.map(warnings, function(value, key) {
+            acc[scope] = _.map(warnings, function (value, key) {
                 return {
                     threshold: parseInt(key, 10) * precision,
                     message: function applyMessage(remainingTime) {
@@ -120,7 +120,6 @@ export default function getTimers(timeConstraints, isLinear, config) {
         {}
     );
 
-
     /**
      * The warnings comes in a weird format (ie. {scope:[threshold, ...]}) , so we reformat them
      */
@@ -129,18 +128,12 @@ export default function getTimers(timeConstraints, isLinear, config) {
         (acc, warnings, qtiScope) => {
             const scope = getScope(qtiScope);
 
-            acc[scope] = _.map(warnings, (value) => ({
+            acc[scope] = _.map(warnings, value => ({
                 threshold: parseInt(value, 10) * precision,
                 message: function applyMessage(remainingTime, unansweredQuestions) {
-                    const displayRemaining = moment
-                        .duration(remainingTime / precision, 'seconds')
-                        .humanize();
+                    const displayRemaining = moment.duration(remainingTime / precision, 'seconds').humanize();
 
-                    return format(
-                        warningMessagesForScreenraeder[scope],
-                        displayRemaining,
-                        unansweredQuestions
-                    );
+                    return format(warningMessagesForScreenraeder[scope], displayRemaining, unansweredQuestions);
                 },
                 scope,
                 shown: false
@@ -178,7 +171,7 @@ export default function getTimers(timeConstraints, isLinear, config) {
         timer.allowLateSubmission = constraintData.allowLateSubmission;
 
         if (type === 'min') {
-            timer.id = `${type  }-${  constraintData.scope  }-${  constraintData.source}`;
+            timer.id = `${type}-${constraintData.scope}-${constraintData.source}`;
             timer.originalTime = constraintData.minTime * precision;
             timer.remainingTime = constraintData.minTimeRemaining * precision;
         } else {
@@ -211,7 +204,7 @@ export default function getTimers(timeConstraints, isLinear, config) {
         return timer;
     };
 
-    _.forEach(timeConstraints, function(timeConstraint) {
+    _.forEach(timeConstraints, function (timeConstraint) {
         var constraintData = _.clone(timeConstraint);
         var newTimer;
 

@@ -174,7 +174,7 @@ export default _.defaults(
 
                 //we just block those actions and the end of the test
                 if (
-                    _.contains(blockingActions, action) ||
+                    blockingActions.includes(action) ||
                     (actionParams.direction === 'next' && navigationHelper.isLast(testMap, testContext.itemIdentifier))
                 ) {
                     throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineExitError());

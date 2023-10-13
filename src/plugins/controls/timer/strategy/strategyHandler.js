@@ -63,7 +63,7 @@ export default function getStrategyHandler(testRunner, strategies) {
      */
     var applyToStrategies = function applyToStrategies(timerId, action) {
         var api = _.keys(strategyHandler);
-        if (_.isEmpty(timerId) || _.isEmpty(action) || !_.contains(api, action)) {
+        if (_.isEmpty(timerId) || _.isEmpty(action) || !api.includes(action)) {
             throw new TypeError('Invalid timer id or unauthorized action');
         }
 
@@ -71,7 +71,7 @@ export default function getStrategyHandler(testRunner, strategies) {
             return Promise.resolve();
         }
         return Promise.all(
-            _.map(actives[timerId], function(strategy) {
+            _.map(actives[timerId], function (strategy) {
                 if (_.isFunction(strategy[action])) {
                     return strategy[action]();
                 }
@@ -96,7 +96,7 @@ export default function getStrategyHandler(testRunner, strategies) {
          * @returns {Promise} resolves once the set up is done
          */
         setUp: function setUp(timer) {
-            _.forEach(availableStrategies, function(availableStrategy) {
+            _.forEach(availableStrategies, function (availableStrategy) {
                 var strategy = availableStrategy(testRunner, timer);
                 if (strategy !== false) {
                     actives[timer.id] = actives[timer.id] || [];
@@ -152,7 +152,7 @@ export default function getStrategyHandler(testRunner, strategies) {
          * @returns {Promise}
          */
         tearDown: function tearDown(timer) {
-            return applyToStrategies(timer.id, 'tearDown').then(function() {
+            return applyToStrategies(timer.id, 'tearDown').then(function () {
                 actives = _.omit(actives, timer.id);
             });
         }

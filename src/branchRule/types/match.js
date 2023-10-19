@@ -18,7 +18,6 @@
 /**
  * @author Péter Halász <peter@taotesting.com>
  */
-import _ from 'lodash';
 
 /**
  * MATCH branching rule
@@ -48,8 +47,8 @@ export default function matchBranchRuleFactory(
             return Promise.all([
                 responseStore.getCorrectResponse(correctIdentifier),
                 responseStore.getResponse(variableIdentifier)
-            ]).then(function(result) {
-                return _.contains(result[0], result[1]);
+            ]).then(function (result) {
+                return result[0].includes(result[1]);
             });
         }
     };

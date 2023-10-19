@@ -38,7 +38,7 @@ import testContextBuilder from 'taoQtiTest/runner/helpers/testContextBuilder';
  * @throws {TypeError} if the given parameters aren't objects
  */
 var navigatorFactory = function navigatorFactory(testContext, testMap) {
-    if (!_.all([testContext, testMap], _.isPlainObject)) {
+    if (![testContext, testMap].every(_.isPlainObject)) {
         throw new TypeError('The navigator must be built with a testData, a testContext and a testMap');
     }
 
@@ -64,11 +64,7 @@ var navigatorFactory = function navigatorFactory(testContext, testMap) {
          * @returns {Object} the new test context
          */
         nextItem: function nextItem() {
-            return testContextBuilder.buildTestContextFromPosition(
-                testContext,
-                testMap,
-                testContext.itemPosition + 1
-            );
+            return testContextBuilder.buildTestContextFromPosition(testContext, testMap, testContext.itemPosition + 1);
         },
 
         /**
@@ -76,11 +72,7 @@ var navigatorFactory = function navigatorFactory(testContext, testMap) {
          * @returns {Object} the new test context
          */
         previousItem: function previsousItem() {
-            return testContextBuilder.buildTestContextFromPosition(
-                testContext,
-                testMap,
-                testContext.itemPosition - 1
-            );
+            return testContextBuilder.buildTestContextFromPosition(testContext, testMap, testContext.itemPosition - 1);
         },
 
         /**

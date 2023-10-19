@@ -19,7 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  * @author Christophe Noël <christophe@taotesting.com>
  */
-define(['jquery', 'lodash', 'ui/areaBroker', 'taoQtiTest/runner/ui/toolbox/toolbox'], function(
+define(['jquery', 'lodash', 'ui/areaBroker', 'taoQtiTest/runner/ui/toolbox/toolbox'], function (
     $,
     _,
     areaBrokerFactory,
@@ -74,14 +74,11 @@ define(['jquery', 'lodash', 'ui/areaBroker', 'taoQtiTest/runner/ui/toolbox/toolb
             if (!config.areas) {
                 config.areas = config.defaultAreas;
             } else {
-                config.areas = _.keys(_.merge(_.object(config.areas), _.object(config.defaultAreas)));
+                config.areas = [...new Set([...config.areas, ...config.defaultAreas])];
             }
 
             _.forEach(config.areas, areaId => {
-                config.mapping[areaId] = $('<div />')
-                    .addClass('test-area')
-                    .addClass(areaId)
-                    .appendTo($areaBrokerDom);
+                config.mapping[areaId] = $('<div />').addClass('test-area').addClass(areaId).appendTo($areaBrokerDom);
             });
 
             // Create only missing areas

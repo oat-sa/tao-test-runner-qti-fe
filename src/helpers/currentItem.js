@@ -71,7 +71,7 @@ var currentItemHelper = {
      */
     getResponseDeclaration: function getResponseDeclaration(runner, identifier) {
         var found = null;
-        _.forEach(currentItemHelper.getDeclarations(runner), function(declaration) {
+        _.forEach(currentItemHelper.getDeclarations(runner), function (declaration) {
             var attributes = declaration.attributes || {};
             if (attributes.identifier === identifier) {
                 found = declaration;
@@ -100,9 +100,9 @@ var currentItemHelper = {
         if (baseType === 'boolean') {
             transform = v => v === true || v === 'true';
         } else if (baseType === 'integer') {
-            transform = v => typeof v === 'number' ? v : parseInt(v);
+            transform = v => (typeof v === 'number' ? v : parseInt(v));
         } else if (baseType === 'float') {
-            transform = v => typeof v === 'number' ? v : parseFloat(v);
+            transform = v => (typeof v === 'number' ? v : parseFloat(v));
         } else if (baseType === 'directedPair' || baseType === 'pair') {
             transform = v => {
                 if (_.isString(v)) {
@@ -155,11 +155,7 @@ var currentItemHelper = {
 
         const stringyValue = 'string' === baseType || 'integer' === baseType || 'float' === baseType;
 
-        return (
-            null === value ||
-            (stringyValue && value === '') ||
-            (cardinality !== 'single' && _.isEmpty(value))
-        );
+        return null === value || (stringyValue && value === '') || (cardinality !== 'single' && _.isEmpty(value));
     },
 
     /**
@@ -200,7 +196,7 @@ var currentItemHelper = {
 
         var constraintValues = {};
 
-        _.forEach(interactions, function(interaction) {
+        _.forEach(interactions, function (interaction) {
             var attributes = interaction.attributes || {};
             var qtiClass = interaction.__proto__.qtiClass;
             var constraintProperty;
@@ -233,7 +229,7 @@ var currentItemHelper = {
             declarations = currentItemHelper.getDeclarations(runner);
             constraintValues = currentItemHelper.guessInteractionConstraintValues(runner);
 
-            _.forEach(declarations, function(declaration) {
+            _.forEach(declarations, function (declaration) {
                 var attributes = declaration.attributes || {};
                 var response = responses[attributes.identifier];
                 var baseType = attributes.baseType;
@@ -272,12 +268,11 @@ var currentItemHelper = {
 
         return _(interactions)
             .values()
-            .filter(function(element) {
+            .filter(function (element) {
                 return element.qtiClass === 'include';
             })
-            .pluck('attributes')
-            .pluck('href')
-            .value();
+            .value()
+            .map(val => (val.attributes ? val.attributes.href : null));
     },
 
     /**
@@ -291,9 +286,9 @@ var currentItemHelper = {
         var textStimuli;
         if (stimuli.length > 0) {
             // Filter the ones containing text:
-            textStimuli = stimuli.filter(function(stimulusHref) {
+            textStimuli = stimuli.filter(function (stimulusHref) {
                 var domNode = document.querySelector(`.qti-include[data-href="${stimulusHref}"]`);
-                return _(domNode.childNodes).some(function(child) {
+                return _(domNode.childNodes).some(function (child) {
                     return child.nodeType === child.TEXT_NODE;
                 });
             });

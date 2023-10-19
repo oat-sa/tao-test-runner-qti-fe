@@ -36,7 +36,7 @@ import _ from 'lodash';
 var mergeCollection = function mergeCollection(collection) {
     return _.reduce(
         collection,
-        function(acc, value) {
+        function (acc, value) {
             if (value) {
                 return _.merge(acc, value);
             }
@@ -83,10 +83,10 @@ export default function toolStateBridgeFactory(testStore, activePlugins) {
          */
         setTools: function setTools(toolNames) {
             tools = _(toolNames)
-                .filter(function(toolName) {
-                    return _.contains(activePlugins, toolName);
+                .filter(function (toolName) {
+                    return activePlugins.includes(toolName);
                 })
-                .map(function(toolName) {
+                .map(function (toolName) {
                     testStore.startChangeTracking(toolName);
                     return toolName;
                 })
@@ -109,22 +109,22 @@ export default function toolStateBridgeFactory(testStore, activePlugins) {
          * @returns {Promise<Boolean>} resolves with true if restored
          */
         restoreState: function restoreState(toolName, toolState) {
-            if (_.contains(tools, toolName) && _.isPlainObject(toolState)) {
+            if (tools.includes(toolName) && _.isPlainObject(toolState)) {
                 return testStore
                     .getStore(toolName)
-                    .then(function(toolStore) {
-                        return toolStore.clear().then(function() {
+                    .then(function (toolStore) {
+                        return toolStore.clear().then(function () {
                             return toolStore;
                         });
                     })
-                    .then(function(toolStore) {
+                    .then(function (toolStore) {
                         return Promise.all(
-                            _.map(toolState, function(value, key) {
+                            _.map(toolState, function (value, key) {
                                 return toolStore.setItem(key, value);
                             })
                         );
                     })
-                    .then(function() {
+                    .then(function () {
                         testStore.resetChanges(toolName);
                         return true;
                     });
@@ -140,8 +140,8 @@ export default function toolStateBridgeFactory(testStore, activePlugins) {
         restoreStates: function restoreStates(states) {
             var self = this;
             return Promise.all(
-                _.map(states, function(toolState, toolName) {
-                    return self.restoreState(toolName, toolState).then(function(result) {
+                _.map(states, function (toolState, toolName) {
+                    return self.restoreState(toolName, toolState).then(function (result) {
                         var formattedResult = {};
                         formattedResult[toolName] = result;
                         return formattedResult;
@@ -157,8 +157,8 @@ export default function toolStateBridgeFactory(testStore, activePlugins) {
          * @returns {Promise<Object|Boolean>} resolves with the state
          */
         getState: function getState(toolName, reset) {
-            if (_.contains(tools, toolName) && testStore.hasChanges(toolName)) {
-                return testStore.getStore(toolName).then(function(toolStore) {
+            if (tools.includes(toolName) && testStore.hasChanges(toolName)) {
+                return testStore.getStore(toolName).then(function (toolStore) {
                     if (reset !== false) {
                         testStore.resetChanges(toolName);
                     }
@@ -175,8 +175,8 @@ export default function toolStateBridgeFactory(testStore, activePlugins) {
         getStates: function getStates() {
             var self = this;
             return Promise.all(
-                _.map(tools, function(toolName) {
-                    return self.getState(toolName).then(function(toolState) {
+                _.map(tools, function (toolName) {
+                    return self.getState(toolName).then(function (toolState) {
                         //format the state to keep the tool identifier
                         var formattedState = {};
                         if (toolState) {

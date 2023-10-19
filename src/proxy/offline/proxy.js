@@ -116,7 +116,7 @@ export default _.defaults(
              * @returns {Object} action result
              */
             this.offlineAction = function offlineAction(action, actionParams) {
-                return new Promise(function(resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     var result = { success: true };
                     var blockingActions = ['exitTest', 'timeout', 'pause'];
                     var dataHolder = self.getDataHolder();
@@ -125,7 +125,7 @@ export default _.defaults(
                     var isLast =
                         testContext && testMap ? navigationHelper.isLast(testMap, testContext.itemIdentifier) : false;
                     var isOffline = self.isOffline();
-                    var isBlocked = _.contains(blockingActions, action);
+                    var isBlocked = blockingActions.includes(action);
                     var isNavigationAction = actionParams.direction === 'next' || action === 'skip';
                     var isDirectionDefined;
                     var isMeaningfullScope = !!actionParams.scope;
@@ -138,14 +138,14 @@ export default _.defaults(
                      * @param {Object} options.testContext - current test testContext dataset
                      * @param {Object} results - navigtion result output object
                      */
-                    var navigate = function(navigator, options, results) {
+                    var navigate = function (navigator, options, results) {
                         var newTestContext;
 
                         navigator
                             .setTestContext(options.testContext)
                             .setTestMap(options.testMap)
                             .navigate(actionParams.direction, actionParams.scope, actionParams.ref, actionParams)
-                            .then(function(res) {
+                            .then(function (res) {
                                 newTestContext = res;
 
                                 if (
@@ -161,7 +161,7 @@ export default _.defaults(
                                 results.testContext = newTestContext;
                                 resolve(results);
                             })
-                            .catch(function(err) {
+                            .catch(function (err) {
                                 reject(err);
                             });
                     };
@@ -177,22 +177,22 @@ export default _.defaults(
                         result.testContext = {
                             state: states.testSession.closed
                         };
-                        const offlineSync = function() {
+                        const offlineSync = function () {
                             offlineSyncModal(self)
-                                .on('proceed', function() {
+                                .on('proceed', function () {
                                     self.syncData()
-                                        .then(function() {
+                                        .then(function () {
                                             // if is online resolve promise
                                             if (self.isOnline()) {
                                                 return resolve(result);
                                             }
                                         })
-                                        .catch(function() {
+                                        .catch(function () {
                                             return resolve({ success: false });
                                         });
                                 })
-                                .on('secondaryaction', function() {
-                                    self.initiateDownload().catch(function() {
+                                .on('secondaryaction', function () {
+                                    self.initiateDownload().catch(function () {
                                         return resolve({ success: false });
                                     });
                                 });
@@ -202,7 +202,7 @@ export default _.defaults(
                         } else {
                             return self
                                 .syncData()
-                                .then(function() {
+                                .then(function () {
                                     if (self.isOffline()) {
                                         // in case last request was failed and connection lost
                                         // show offlineWaitingDialog
@@ -210,7 +210,7 @@ export default _.defaults(
                                     }
                                     return resolve(result);
                                 })
-                                .catch(function() {
+                                .catch(function () {
                                     return resolve({ success: false });
                                 });
                         }
@@ -228,7 +228,7 @@ export default _.defaults(
                         } else {
                             return self
                                 .syncData()
-                                .then(function() {
+                                .then(function () {
                                     navigate(
                                         self.offlineNavigator,
                                         {
@@ -238,7 +238,7 @@ export default _.defaults(
                                         result
                                     );
                                 })
-                                .catch(function() {
+                                .catch(function () {
                                     return resolve({ success: false });
                                 });
                         }
@@ -264,7 +264,7 @@ export default _.defaults(
 
                 return self.actionStore
                     .push(action, self.prepareParams(_.defaults(actionParams || {}, self.requestConfig)))
-                    .then(function() {
+                    .then(function () {
                         return {
                             action: action,
                             params: actionParams
@@ -280,20 +280,22 @@ export default _.defaults(
              * @returns {Promise} resolves with the action result
              */
             this.sendSyncData = function sendSyncData(data, attempt = 1) {
-                return new Promise((resolve, reject) => self.send('sync', data)
-                    .then(resolve)
-                    .catch((err) => {
-                        if (self.isConnectivityError(err) && attempt < maxSyncAttempts) {
-                            return self.sendSyncData(data, attempt + 1)
-                                .then(resolve)
-                                .catch(reject);
-                        }
+                return new Promise((resolve, reject) =>
+                    self
+                        .send('sync', data)
+                        .then(resolve)
+                        .catch(err => {
+                            if (self.isConnectivityError(err) && attempt < maxSyncAttempts) {
+                                return self
+                                    .sendSyncData(data, attempt + 1)
+                                    .then(resolve)
+                                    .catch(reject);
+                            }
 
-                        return reject(err);
-                    })
+                            return reject(err);
+                        })
                 );
             };
-
 
             /**
              * Flush and synchronize actions collected while offline
@@ -305,19 +307,19 @@ export default _.defaults(
 
                 this.syncInProgress = true;
 
-                return this.queue.serie(function() {
+                return this.queue.serie(function () {
                     return self.actionStore
                         .flush()
-                        .then(function(data) {
+                        .then(function (data) {
                             actions = data;
                             if (data && data.length) {
                                 return self.sendSyncData(data);
                             }
                         })
-                        .catch(function(err) {
+                        .catch(function (err) {
                             if (self.isConnectivityError(err)) {
                                 self.setOffline('communicator');
-                                _.forEach(actions, function(action) {
+                                _.forEach(actions, function (action) {
                                     self.actionStore.push(action.action, action.parameters, action.timestamp);
                                 });
                                 return;
@@ -327,7 +329,8 @@ export default _.defaults(
                             self.trigger('error', err);
 
                             throw err;
-                        }).then(data => {
+                        })
+                        .then(data => {
                             self.syncInProgress = false;
                             return data;
                         });
@@ -357,18 +360,18 @@ export default _.defaults(
             };
 
             this.initiateDownload = function initiateDownload() {
-                return this.queue.serie(function() {
+                return this.queue.serie(function () {
                     return self.actionStore
                         .flush()
-                        .then(function(actions) {
-                            _.forEach(actions, function(action) {
+                        .then(function (actions) {
+                            _.forEach(actions, function (action) {
                                 self.actionStore.push(action.action, action.parameters, action.timestamp);
                             });
 
                             return actions;
                         })
                         .then(self.prepareDownload)
-                        .then(function(data) {
+                        .then(function (data) {
                             return download(data.filename, data.content);
                         });
                 });
@@ -411,7 +414,7 @@ export default _.defaults(
                 return true;
             });
 
-            return InitCallPromise.then(function(response) {
+            return InitCallPromise.then(function (response) {
                 var promises = [];
 
                 if (!response.items) {
@@ -420,7 +423,7 @@ export default _.defaults(
 
                 self.itemStore.setCacheSize(_.size(response.items));
 
-                _.forEach(response.items, function(item, itemIdentifier) {
+                _.forEach(response.items, function (item, itemIdentifier) {
                     promises.push(self.itemStore.set(itemIdentifier, item));
                 });
 
@@ -444,7 +447,7 @@ export default _.defaults(
         destroy: function destroy() {
             var self = this;
 
-            return this.itemStore.clear().then(function() {
+            return this.itemStore.clear().then(function () {
                 return qtiServiceProxy.destroy.call(self);
             });
         },
@@ -473,7 +476,7 @@ export default _.defaults(
         submitItem: function submitItem(itemIdentifier, state, response, params) {
             var self = this;
 
-            return this.itemStore.update(itemIdentifier, 'itemState', state).then(function() {
+            return this.itemStore.update(itemIdentifier, 'itemState', state).then(function () {
                 return qtiServiceProxy.submitItem.call(self, itemIdentifier, state, response, params);
             });
         },
@@ -493,10 +496,10 @@ export default _.defaults(
 
             return self
                 .scheduleAction(action, actionParams)
-                .then(function() {
+                .then(function () {
                     return self.offlineAction(action, actionParams);
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     return Promise.reject(err);
                 });
         },
@@ -514,10 +517,10 @@ export default _.defaults(
 
             return self
                 .scheduleAction(action, params)
-                .then(function() {
+                .then(function () {
                     return self.offlineAction(action, params);
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     return Promise.reject(err);
                 });
         },
@@ -550,19 +553,19 @@ export default _.defaults(
             }
 
             return updateStatePromise
-                .then(function() {
+                .then(function () {
                     params = _.assign({ itemDefinition: itemIdentifier }, params);
 
                     return self
                         .scheduleAction(action, params)
-                        .then(function() {
+                        .then(function () {
                             return self.offlineAction(action, params);
                         })
-                        .catch(function(err) {
+                        .catch(function (err) {
                             return Promise.reject(err);
                         });
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     return Promise.reject(err);
                 });
         }

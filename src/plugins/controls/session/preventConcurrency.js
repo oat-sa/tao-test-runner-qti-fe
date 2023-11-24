@@ -49,6 +49,9 @@ export default pluginFactory({
                                 return sequenceStore.getSequenceNumber().then(lastSequenceNumber => {
                                     if (lastSequenceNumber !== sequenceNumber) {
                                         testRunner.off('tick');
+                                        testRunner.trigger('disabletools');
+                                        testRunner.trigger('disablenav');
+                                        testRunner.trigger('disableitem');
                                         testRunner.trigger('concurrency');
                                         return Promise.reject();
                                     }

@@ -17,15 +17,13 @@
  */
 import context from 'context';
 import loggerFactory from 'core/logger';
-import store from 'core/store';
 import __ from 'i18n';
 import states from 'taoQtiTest/runner/config/states';
+import { getSequenceNumber, getSequenceStore } from 'taoQtiTest/runner/services/sequenceStore';
 import pluginFactory from 'taoTests/runner/plugin';
 
 const logger = loggerFactory('taoQtiTest/runner/plugins/controls/session/preventConcurrency');
 
-const STORE_ID = 'current';
-const SEQUENCE_NUMBER = 'sequence';
 const FEATURE_FLAG = 'FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS';
 
 /**
@@ -38,48 +36,38 @@ export default pluginFactory({
      * Initializes the plugin (called during runner's init)
      */
     init() {
-        if (!context.featureFlags[FEATURE_FLAG]) {
-            return;
-        }
-
         const testRunner = this.getTestRunner();
         const options = testRunner.getOptions();
         const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
 
-        return testRunner
-            .getTestStore()
-            .getStorageIdentifier()
-            .then(storeId => {
-                const sequenceNumber = `${storeId}-${Date.now()}`;
-
-                function detectConcurrency(lastSequenceNumber) {
-                    if (lastSequenceNumber !== sequenceNumber) {
-                        logger.warn(
-                            `The sequence number has changed. Was another delivery opened in the same browser?`
-                        );
-                        testRunner.off('tick');
-                        testRunner.trigger('concurrency');
-                        return Promise.reject();
-                    }
-                }
-
-                function stopOnConcurrency() {
-                    testRunner.trigger('leave', {
-                        code: states.testSession.suspended,
-                        message: __(
-                            'A concurrent delivery has been detected. Please use the last open session. The present window can be closed.'
-                        ),
-                        skipExitMessage: skipPausedAssessmentDialog
-                    });
-                }
-
-                return store(STORE_ID).then(deliveryStore =>
-                    deliveryStore.setItem(SEQUENCE_NUMBER, sequenceNumber).then(() => {
-                        testRunner
-                            .on('tick', () => deliveryStore.getItem(SEQUENCE_NUMBER).then(detectConcurrency))
-                            .on('concurrency', stopOnConcurrency);
-                    })
-                );
-            });
+        return Promise.all([getSequenceNumber(testRunner), getSequenceStore()]).then(
+            ([sequenceNumber, sequenceStore]) =>
+                sequenceStore.setSequenceNumber(sequenceNumber).then(() => {
+                    testRunner
+                        .on('tick', () => {
+                            if (context.featureFlags[FEATURE_FLAG]) {
+                                return sequenceStore.getSequenceNumber().then(lastSequenceNumber => {
+                                    if (lastSequenceNumber !== sequenceNumber) {
+                                        testRunner.off('tick');
+                                        testRunner.trigger('concurrency');
+                                        return Promise.reject();
+                                    }
+                                });
+                            }
+                        })
+                        .on('concurrency', () => {
+                            logger.warn(
+                                `The sequence number has changed. Was another delivery opened in the same browser?`
+                            );
+                            testRunner.trigger('leave', {
+                                code: states.testSession.suspended,
+                                message: __(
+                                    'A concurrent delivery has been detected. Please use the last open session. The present window can be closed.'
+                                ),
+                                skipExitMessage: skipPausedAssessmentDialog
+                            });
+                        });
+                })
+        );
     }
 });

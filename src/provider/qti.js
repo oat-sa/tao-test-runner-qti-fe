@@ -251,7 +251,7 @@ var qtiProvider = {
             const currentItem = self.getCurrentItem();
             const options = self.getOptions();
             const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
-            const { partiallyAnsweredIsAnswered } = options.review;
+            const partiallyAnsweredIsAnswered = options.review?.partiallyAnsweredIsAnswered;
 
             //catch server errors
             var submitError = function submitError(err) {

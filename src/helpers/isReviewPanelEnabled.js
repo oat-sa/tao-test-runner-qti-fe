@@ -11,7 +11,8 @@ function isReviewPanelEnabled(runner) {
         'reviewScreen',
         true
     );
-    const itemReviewEnabled = runner.getOptions().review.enabled;
+    //const itemReviewEnabled = runner.getOptions().review.enabled;
+    const itemReviewEnabled = false;
     return reviewEnabled && itemReviewEnabled;
 }
 

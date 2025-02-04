@@ -175,3 +175,9 @@
 .no-controls .test-runner-scope {
     height: 100vh;
 }
+
+.item-writing-mode-vertical-rl {
+   & #qti-content {
+        height: 100%;
+    }
+}

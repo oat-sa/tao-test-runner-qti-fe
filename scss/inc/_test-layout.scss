@@ -143,6 +143,11 @@
         padding: 30px;
     }
 
+    .qti-itemBody.writing-mode-vertical-rl {
+        writing-mode: vertical-rl;
+        overflow: auto;
+    }
+
     .size-wrapper {
         max-width: map-get($widths, size-wrapper) * 1px;
         margin: auto;

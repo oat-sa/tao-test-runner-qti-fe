@@ -143,11 +143,6 @@
         padding: 30px;
     }
 
-    .qti-itemBody.writing-mode-vertical-rl {
-        writing-mode: vertical-rl;
-        overflow: auto;
-    }
-
     .size-wrapper {
         max-width: map-get($widths, size-wrapper) * 1px;
         margin: auto;
@@ -185,4 +180,12 @@
    & #qti-content {
         height: 100%;
     }
+}
+.qti-itemBody.writing-mode-vertical-rl {
+    writing-mode: vertical-rl;
+    block-size: 100%;
+    inline-size: 100%;
+    overflow: auto;
+    overscroll-behavior: contain;
+    line-height: 1.8; /* assuming ruby tags */
 }

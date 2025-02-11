@@ -177,12 +177,16 @@
 }
 
 .item-writing-mode-vertical-rl {
-   & #qti-content {
+    & #qti-content {
         height: 100%;
+    }
+    .qti-item {
+        padding: 15px;
     }
 }
 .qti-itemBody.writing-mode-vertical-rl {
     writing-mode: vertical-rl;
+    padding: 15px;
     block-size: 100%;
     inline-size: 100%;
     overflow: auto;

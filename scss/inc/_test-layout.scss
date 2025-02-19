@@ -175,3 +175,21 @@
 .no-controls .test-runner-scope {
     height: 100vh;
 }
+
+.item-writing-mode-vertical-rl {
+    #qti-content {
+        height: 100%;
+    }
+    .qti-item {
+        padding: 15px;
+    }
+}
+.qti-itemBody.writing-mode-vertical-rl {
+    writing-mode: vertical-rl;
+    padding: 15px;
+    block-size: 100%;
+    inline-size: 100%;
+    overflow: auto;
+    overscroll-behavior: contain;
+    line-height: 1.8; /* assuming ruby tags */
+}

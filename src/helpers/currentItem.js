@@ -261,18 +261,27 @@ var currentItemHelper = {
      * - note: min/max constraints are handled by `isAnswered` method
      * - note: doesn't check if is answered or not.
      * @param {Object} runner - testRunner instance
+     * @param {Boolean} bypassValidateResponses -
+     *   only such `itemState` will be considered invalid: `{ validity: { isValid: false, bypassValidateResponses: true } }`;
+     *   to use for response conversion errors, where we can't even submit user response with the required response baseType.
      * @returns {Boolean}
      */
-    isValid: function isValid(runner) {
+    isValid: function isValid(runner, bypassValidateResponses = false) {
         const itemRunner = runner.itemRunner;
         if (itemRunner) {
             const itemState = itemRunner && itemRunner.getState();
             const declarations = currentItemHelper.getDeclarations(runner);
 
-            return !Object.values(declarations).some(function (declaration) {
+            return Object.values(declarations).every(function (declaration) {
                 const attributes = declaration.attributes || {};
                 const interactionState = itemState[attributes.identifier];
-                return interactionState && interactionState.validity && interactionState.validity.isValid === false;
+                if (!interactionState || !interactionState.validity) {
+                    return true;
+                }
+                if (bypassValidateResponses && !interactionState.validity.bypassValidateResponses) {
+                    return true;
+                }
+                return interactionState.validity.isValid !== false;
             });
         }
         return true;

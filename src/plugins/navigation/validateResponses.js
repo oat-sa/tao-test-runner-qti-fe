@@ -67,6 +67,8 @@ export default pluginFactory({
             }
 
             if (isInteracting && testRunnerOptions.enableValidateResponses) {
+                let showValidationAlert = true;
+
                 const currenItem = testRunner.getCurrentItem();
                 //@deprecated use validateResponses from testMap instead of the testContext
                 const validateResponses =
@@ -74,14 +76,21 @@ export default pluginFactory({
                         ? currenItem.validateResponses
                         : testContext.validateResponses;
 
-                if (validateResponses) {
+                if (_.size(currentItemHelper.getDeclarations(testRunner)) === 0) {
+                    showValidationAlert = false;
+                } else if (validateResponses) {
+                    if (
+                        currentItemHelper.isAnswered(testRunner, false) &&
+                        currentItemHelper.isValid(testRunner, false)
+                    ) {
+                        showValidationAlert = false;
+                    }
+                } else if (currentItemHelper.isValid(testRunner, true)) {
+                    showValidationAlert = false;
+                }
+
+                if (showValidationAlert) {
                     return new Promise((resolve, reject) => {
-                        if (_.size(currentItemHelper.getDeclarations(testRunner)) === 0) {
-                            return resolve();
-                        }
-                        if (currentItemHelper.isValid(testRunner) && currentItemHelper.isAnswered(testRunner, false)) {
-                            return resolve();
-                        }
                         if (!testRunner.getState('alerted.notallowed')) {
                             // Only show one alert for itemSessionControl
                             testRunner.setState('alerted.notallowed', true);

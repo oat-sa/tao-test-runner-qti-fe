@@ -256,6 +256,29 @@ var currentItemHelper = {
     },
 
     /**
+     * Tells is the current item is valid or not.
+     * Interaction should put `{ validity: { isValid: false } }` object to `itemState` if it's invalid.
+     * - note: min/max constraints are handled by `isAnswered` method
+     * - note: doesn't check if is answered or not.
+     * @param {Object} runner - testRunner instance
+     * @returns {Boolean}
+     */
+    isValid: function isValid(runner) {
+        const itemRunner = runner.itemRunner;
+        if (itemRunner) {
+            const itemState = itemRunner && itemRunner.getState();
+            const declarations = currentItemHelper.getDeclarations(runner);
+
+            return !Object.values(declarations).some(function (declaration) {
+                const attributes = declaration.attributes || {};
+                const interactionState = itemState[attributes.identifier];
+                return interactionState && interactionState.validity && interactionState.validity.isValid === false;
+            });
+        }
+        return true;
+    },
+
+    /**
      * Gets list of shared stimuli hrefs in the current item
      *
      * @param {Object} runner - testRunner instance

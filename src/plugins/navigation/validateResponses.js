@@ -69,26 +69,31 @@ export default pluginFactory({
             if (isInteracting && testRunnerOptions.enableValidateResponses) {
                 const currenItem = testRunner.getCurrentItem();
                 //@deprecated use validateResponses from testMap instead of the testContext
-                const validateResponses = typeof currenItem.validateResponses === 'boolean' ?
-                    currenItem.validateResponses :
-                    testContext.validateResponses;
+                const validateResponses =
+                    typeof currenItem.validateResponses === 'boolean'
+                        ? currenItem.validateResponses
+                        : testContext.validateResponses;
 
                 if (validateResponses) {
                     return new Promise((resolve, reject) => {
                         if (_.size(currentItemHelper.getDeclarations(testRunner)) === 0) {
                             return resolve();
                         }
-                        if (currentItemHelper.isAnswered(testRunner, false)) {
+                        if (currentItemHelper.isValid(testRunner) && currentItemHelper.isAnswered(testRunner, false)) {
                             return resolve();
                         }
                         if (!testRunner.getState('alerted.notallowed')) {
                             // Only show one alert for itemSessionControl
                             testRunner.setState('alerted.notallowed', true);
-                            testRunner.trigger('alert.notallowed', __('A valid response to this item is required.'), () => {
-                                testRunner.trigger('resumeitem');
-                                reject();
-                                testRunner.setState('alerted.notallowed', false);
-                            });
+                            testRunner.trigger(
+                                'alert.notallowed',
+                                __('A valid response to this item is required.'),
+                                () => {
+                                    testRunner.trigger('resumeitem');
+                                    reject();
+                                    testRunner.setState('alerted.notallowed', false);
+                                }
+                            );
                         }
                     });
                 }

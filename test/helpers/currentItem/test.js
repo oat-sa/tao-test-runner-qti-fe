@@ -13,12 +13,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2022 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2025 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentItemHelper) {
+define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function (_, currentItemHelper) {
     'use strict';
 
     var messagesHelperApi = [
@@ -27,7 +27,8 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         { title: 'toResponse' },
         { title: 'isQtiValueNull' },
         { title: 'isQuestionAnswered' },
-        { title: 'isAnswered' }
+        { title: 'isAnswered' },
+        { title: 'isValid' }
     ];
 
     /**
@@ -38,7 +39,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
      * @param {Object} itemBdy
      * @returns {Object}
      */
-    function runnerMock(responses, declarations, itemId, itemBdy) {
+    function runnerMock(responses, declarations, itemId, itemBdy, itemState) {
         return {
             itemRunner: {
                 _item: {
@@ -46,8 +47,11 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
                     bdy: itemBdy,
                     itemIdentifier: itemId
                 },
-                getResponses: function() {
+                getResponses: function () {
                     return responses;
+                },
+                getState: function () {
+                    return itemState;
                 }
             }
         };
@@ -55,23 +59,23 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
 
     QUnit.module('helpers/currentItem');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', function (assert) {
         assert.expect(1);
 
         assert.equal(typeof currentItemHelper, 'object', 'The currentItem helper module exposes an object');
     });
 
-    QUnit.cases.init(messagesHelperApi).test('helpers/currentItem API ', function(data, assert) {
+    QUnit.cases.init(messagesHelperApi).test('helpers/currentItem API ', function (data, assert) {
         assert.expect(1);
 
         assert.equal(
             typeof currentItemHelper[data.title],
             'function',
-            `The currentItem helper expose a "${  data.title  }" function`
+            `The currentItem helper expose a "${data.title}" function`
         );
     });
 
-    QUnit.test('helpers/currentItem.getDeclarations', function(assert) {
+    QUnit.test('helpers/currentItem.getDeclarations', function (assert) {
         var declarations = {
             responsedeclaration1: {
                 identifier: 'RESPONSE1',
@@ -107,7 +111,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         );
     });
 
-    QUnit.test('helpers/currentItem.getResponseDeclaration', function(assert) {
+    QUnit.test('helpers/currentItem.getResponseDeclaration', function (assert) {
         var declarations = {
             responsedeclaration1: {
                 identifier: 'RESPONSE1',
@@ -148,7 +152,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         );
     });
 
-    QUnit.test('helpers/currentItem.toResponse', function(assert) {
+    QUnit.test('helpers/currentItem.toResponse', function (assert) {
         assert.expect(9);
 
         assert.deepEqual(
@@ -178,12 +182,26 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         );
         assert.deepEqual(
             currentItemHelper.toResponse(['choice_2 choice_3', 'choice_2 choice_4'], 'directedPair', 'multiple'),
-            { list: { directedPair: [['choice_2', 'choice_3'], ['choice_2', 'choice_4']] } },
+            {
+                list: {
+                    directedPair: [
+                        ['choice_2', 'choice_3'],
+                        ['choice_2', 'choice_4']
+                    ]
+                }
+            },
             'The helper has built the right response'
         );
         assert.deepEqual(
             currentItemHelper.toResponse(['choice_2 choice_3', 'choice_2 choice_4'], 'pair', 'multiple'),
-            { list: { pair: [['choice_2', 'choice_3'], ['choice_2', 'choice_4']] } },
+            {
+                list: {
+                    pair: [
+                        ['choice_2', 'choice_3'],
+                        ['choice_2', 'choice_4']
+                    ]
+                }
+            },
             'The helper has built the right response'
         );
         assert.deepEqual(
@@ -198,7 +216,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         );
     });
 
-    QUnit.test('helpers/currentItem.isQtiValueNull', function(assert) {
+    QUnit.test('helpers/currentItem.isQtiValueNull', function (assert) {
         assert.expect(5);
 
         assert.equal(currentItemHelper.isQtiValueNull(null, 'string', 'single'), true, 'The response should be null');
@@ -224,7 +242,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         );
     });
 
-    QUnit.test('helpers/currentItem.isQuestionAnswered', function(assert) {
+    QUnit.test('helpers/currentItem.isQuestionAnswered', function (assert) {
         assert.expect(21);
 
         // Null
@@ -341,7 +359,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
         );
     });
 
-    QUnit.test('helpers/currentItem.isAnswered', function(assert) {
+    QUnit.test('helpers/currentItem.isAnswered', function (assert) {
         var declarations = {
             responsedeclaration1: {
                 identifier: 'RESPONSE1',
@@ -366,7 +384,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
                 defaultValue: []
             }
         };
-        var fullyResponded = { RESPONSE1: { base:  { string: 'bar' } }, RESPONSE2: { base: { string: 'foo' } } };
+        var fullyResponded = { RESPONSE1: { base: { string: 'bar' } }, RESPONSE2: { base: { string: 'foo' } } };
         var partiallyResponded = { RESPONSE1: { base: null }, RESPONSE2: { base: { string: 'foo' } } };
         var notResponded = { RESPONSE1: { base: null }, RESPONSE2: { base: null } };
 
@@ -378,13 +396,37 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
 
         assert.expect(6);
 
-        assert.equal(currentItemHelper.isAnswered(fullyRespondedRunner), true, 'The fully answered item should be answered');
-        assert.equal(currentItemHelper.isAnswered(partiallyRespondedRunner), true, 'The partially answered item should be answered');
-        assert.equal(currentItemHelper.isAnswered(notRespondedRunner), false, 'The unanswered item should not be answered');
+        assert.equal(
+            currentItemHelper.isAnswered(fullyRespondedRunner),
+            true,
+            'The fully answered item should be answered'
+        );
+        assert.equal(
+            currentItemHelper.isAnswered(partiallyRespondedRunner),
+            true,
+            'The partially answered item should be answered'
+        );
+        assert.equal(
+            currentItemHelper.isAnswered(notRespondedRunner),
+            false,
+            'The unanswered item should not be answered'
+        );
 
-        assert.equal(currentItemHelper.isAnswered(fullyRespondedRunner, partially), true, 'The fully answered item should be answered');
-        assert.equal(currentItemHelper.isAnswered(partiallyRespondedRunner, partially), false, 'The partially answered item should not be answered');
-        assert.equal(currentItemHelper.isAnswered(notRespondedRunner, partially), false, 'The unanswered item should not be answered');
+        assert.equal(
+            currentItemHelper.isAnswered(fullyRespondedRunner, partially),
+            true,
+            'The fully answered item should be answered'
+        );
+        assert.equal(
+            currentItemHelper.isAnswered(partiallyRespondedRunner, partially),
+            false,
+            'The partially answered item should not be answered'
+        );
+        assert.equal(
+            currentItemHelper.isAnswered(notRespondedRunner, partially),
+            false,
+            'The unanswered item should not be answered'
+        );
     });
 
     QUnit.cases
@@ -425,7 +467,7 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
                 expectedResult: ['http://path/to/something.xml']
             }
         ])
-        .test('helpers/currentItem.getStimuliHrefs', function(caseData, assert) {
+        .test('helpers/currentItem.getStimuliHrefs', function (caseData, assert) {
             var runner = runnerMock(null, null, caseData.itemId, caseData.itemBdy);
             var hrefs = currentItemHelper.getStimuliHrefs(runner, caseData.itemId);
 
@@ -433,4 +475,63 @@ define(['lodash', 'taoQtiTest/runner/helpers/currentItem'], function(_, currentI
 
             assert.deepEqual(hrefs, caseData.expectedResult, 'getStimuli returns correct value');
         });
+
+    QUnit.test('helpers/currentItem.isValid', function (assert) {
+        const declarations = {
+            responsedeclaration1: {
+                identifier: 'RESPONSE1',
+                serial: 'responsedeclaration1',
+                qtiClass: 'responseDeclaration',
+                attributes: {
+                    identifier: 'RESPONSE1',
+                    cardinality: 'single',
+                    baseType: 'integer'
+                },
+                defaultValue: []
+            },
+            responsedeclaration2: {
+                identifier: 'RESPONSE2',
+                serial: 'responsedeclaration2',
+                qtiClass: 'responseDeclaration',
+                attributes: {
+                    identifier: 'RESPONSE2',
+                    cardinality: 'single',
+                    baseType: 'float'
+                },
+                defaultValue: []
+            }
+        };
+        const responses = { RESPONSE1: { base: { integer: '3' } }, RESPONSE2: { base: { float: '3.14' } } };
+
+        const oneInvalidRunner = runnerMock(responses, declarations, null, null, {
+            RESPONSE1: { response: { base: { integer: '3' } }, validity: { isValid: false } },
+            RESPONSE2: { response: { base: { float: '3.14' } } }
+        });
+        const noInvalidRunner = runnerMock(responses, declarations, null, null, {
+            RESPONSE1: { response: { base: { integer: '3' } }, validity: { isValid: true } },
+            RESPONSE2: { response: { base: { float: '3.14' } } }
+        });
+        const noInvalidNoValidityRunner = runnerMock(responses, declarations, null, null, {
+            RESPONSE1: { response: { base: { integer: '3' } } },
+            RESPONSE2: { response: { base: { float: '3.14' } } }
+        });
+        const noDeclarationsRunner = runnerMock({}, {}, null, null, {});
+
+        assert.equal(
+            currentItemHelper.isValid(oneInvalidRunner),
+            false,
+            'item with isValid:false in validity state is invalid'
+        );
+        assert.equal(
+            currentItemHelper.isValid(noInvalidRunner),
+            true,
+            'item with isValid:true in validity state is invalid'
+        );
+        assert.equal(
+            currentItemHelper.isValid(noInvalidNoValidityRunner),
+            true,
+            'item without validity state defined is valid'
+        );
+        assert.equal(currentItemHelper.isValid(noDeclarationsRunner), true, 'item without declarations is valid');
+    });
 });

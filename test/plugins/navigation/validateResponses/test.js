@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017-2021 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017-2025 (original work) Open Assessment Technologies SA ;
  */
 
 define([
@@ -30,6 +30,8 @@ define([
 
     //Mock the isAnswered helper, using testRunner property
     currentItemHelper.isAnswered = testRunner => testRunner.answered;
+
+    currentItemHelper.isValid = testRunner => testRunner.valid === false ? false : true;
 
     //Mock the getDeclarations helper, using testRunner property
     currentItemHelper.getDeclarations = testRunner => testRunner.responses;
@@ -62,31 +64,33 @@ define([
         );
     });
 
-    QUnit.cases.init([
-        { title: 'init' },
-        { title: 'render' },
-        { title: 'finish' },
-        { title: 'destroy' },
-        { title: 'trigger' },
-        { title: 'getTestRunner' },
-        { title: 'getAreaBroker' },
-        { title: 'getConfig' },
-        { title: 'setConfig' },
-        { title: 'getState' },
-        { title: 'setState' },
-        { title: 'show' },
-        { title: 'hide' },
-        { title: 'enable' },
-        { title: 'disable' }
-    ]).test('plugin API ', (data, assert) => {
-        const runner = runnerFactory(providerName);
-        const timer = pluginFactory(runner);
-        assert.equal(
-            typeof timer[data.title],
-            'function',
-            `The pluginFactory instances expose a "${data.title}" function`
-        );
-    });
+    QUnit.cases
+        .init([
+            { title: 'init' },
+            { title: 'render' },
+            { title: 'finish' },
+            { title: 'destroy' },
+            { title: 'trigger' },
+            { title: 'getTestRunner' },
+            { title: 'getAreaBroker' },
+            { title: 'getConfig' },
+            { title: 'setConfig' },
+            { title: 'getState' },
+            { title: 'setState' },
+            { title: 'show' },
+            { title: 'hide' },
+            { title: 'enable' },
+            { title: 'disable' }
+        ])
+        .test('plugin API ', (data, assert) => {
+            const runner = runnerFactory(providerName);
+            const timer = pluginFactory(runner);
+            assert.equal(
+                typeof timer[data.title],
+                'function',
+                `The pluginFactory instances expose a "${data.title}" function`
+            );
+        });
 
     QUnit.module('Behavior');
 
@@ -139,6 +143,19 @@ define([
                 validateResponses: true,
                 answered: true,
                 responses: ['foo']
+            },
+            {
+                title: 'validateResponses:false & answered & invalid',
+                context: {
+                    itemIdentifier: 'item-1'
+                },
+                options: {
+                    enableValidateResponses: true
+                },
+                validateResponses: false,
+                answered: true,
+                valid: false,
+                responses: ['foo'],
             }
         ])
         .test('Moving is allowed ', (data, assert) => {
@@ -153,19 +170,21 @@ define([
 
                     assert.expect(1);
 
-                    return plugin
-                        .init()
-                        .then(() => new Promise(resolve => {
-                            runner.setTestContext(data.context);
-                            runner.answered = data.answered;
-                            runner.responses = data.responses;
+                    return plugin.init().then(
+                        () =>
+                            new Promise(resolve => {
+                                runner.setTestContext(data.context);
+                                runner.answered = data.answered;
+                                runner.responses = data.responses;
+                                runner.valid = data.valid;
 
-                            runner.on('move', () => {
-                                assert.ok(true, 'Move is allowed');
-                                resolve();
-                            });
-                            runner.trigger('move');
-                        }));
+                                runner.on('move', () => {
+                                    assert.ok(true, 'Move is allowed');
+                                    resolve();
+                                });
+                                runner.trigger('move');
+                            })
+                    );
                 })
                 .catch(err => {
                     assert.pushResult({
@@ -189,6 +208,19 @@ define([
                 validateResponses: true,
                 answered: false,
                 responses: ['foo']
+            },
+            {
+                title: 'validateResponses:true & answered & invalid',
+                context: {
+                    itemIdentifier: 'item-1'
+                },
+                options: {
+                    enableValidateResponses: true
+                },
+                validateResponses: true,
+                answered: true,
+                valid: false,
+                responses: ['foo']
             }
         ])
         .test('Moving is prevented ', (data, assert) => {
@@ -206,31 +238,33 @@ define([
 
                     assert.expect(2);
 
-                    return plugin
-                        .init()
-                        .then(() => new Promise((resolve, reject) => {
-                            runner.setTestContext(data.context);
-                            runner.answered = data.answered;
-                            runner.responses = data.responses;
+                    return plugin.init().then(
+                        () =>
+                            new Promise((resolve, reject) => {
+                                runner.setTestContext(data.context);
+                                runner.answered = data.answered;
+                                runner.responses = data.responses;
+                                runner.valid = data.valid;
 
-                            runner.on('move', () => {
-                                assert.ok(false, 'Move is denied');
-                                reject();
-                            });
-                            runner.off('alert.notallowed').on('alert.notallowed', (message, cb) => {
-                                assert.equal(
-                                    message,
-                                    'A valid response to this item is required.',
-                                    'The user receive the correct message'
-                                );
-                                cb();
-                            });
-                            runner.on('resumeitem', () => {
-                                assert.ok(true, 'Move has been prevented');
-                                resolve();
-                            });
-                            runner.trigger('move');
-                        }));
+                                runner.on('move', () => {
+                                    assert.ok(false, 'Move is denied');
+                                    reject();
+                                });
+                                runner.off('alert.notallowed').on('alert.notallowed', (message, cb) => {
+                                    assert.equal(
+                                        message,
+                                        'A valid response to this item is required.',
+                                        'The user receive the correct message'
+                                    );
+                                    cb();
+                                });
+                                runner.on('resumeitem', () => {
+                                    assert.ok(true, 'Move has been prevented');
+                                    resolve();
+                                });
+                                runner.trigger('move');
+                            })
+                    );
                 })
                 .catch(err => {
                     assert.pushResult({
@@ -271,19 +305,20 @@ define([
 
                     assert.expect(1);
 
-                    return plugin
-                        .init()
-                        .then(() => new Promise(resolve => {
-                            runner.setTestContext(data.context);
-                            runner.answered = data.answered;
-                            runner.responses = data.responses;
+                    return plugin.init().then(
+                        () =>
+                            new Promise(resolve => {
+                                runner.setTestContext(data.context);
+                                runner.answered = data.answered;
+                                runner.responses = data.responses;
 
-                            runner.on('move', () => {
-                                assert.ok(true, 'Moving is allowed');
-                                resolve();
-                            });
-                            runner.previous();
-                        }));
+                                runner.on('move', () => {
+                                    assert.ok(true, 'Moving is allowed');
+                                    resolve();
+                                });
+                                runner.previous();
+                            })
+                    );
                 })
                 .catch(err => {
                     assert.pushResult({

@@ -85,9 +85,12 @@ export default pluginFactory({
 
                 //if the previous section is adaptive or a timed section
                 previousSection = mapHelper.getItemSection(testMap, context.itemPosition - 1);
+                // since 2025.02, empty timeConstraint can be null or []; defined timeConstraint will still be an object
+                const previousSectionHasTimeConstraint =
+                    previousSection.timeConstraint && 'allowLateSubmission' in previousSection.timeConstraint;
                 if (
                     previousSection.isCatAdaptive ||
-                    (previousSection.timeConstraint && !noExitTimedSectionWarning)
+                    (previousSectionHasTimeConstraint && !noExitTimedSectionWarning)
                 ) {
                     return false;
                 }

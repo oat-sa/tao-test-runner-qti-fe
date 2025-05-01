@@ -23,7 +23,7 @@
 import $ from 'jquery';
 import typeCaster from 'util/typeCaster';
 import pluginFactory from 'taoTests/runner/plugin';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/itemProperties';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/itemProperties';
 
 /**
  * @fires 'resized-itembody' when item body is resized

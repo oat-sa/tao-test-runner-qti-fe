@@ -26,28 +26,6 @@ import pluginFactory from 'taoTests/runner/plugin';
 import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/itemProperties';
 
 /**
- * @fires 'resized-itembody' when item body is resized
- * @param {Object} testRunner
- */
-function connectItemBodyResizeObserver(testRunner) {
-    const resizeObserver = new ResizeObserver(() => {
-        testRunner.trigger('resized-itembody');
-    });
-
-    testRunner
-        .on('renderitem', function () {
-            const $itemBody = $('.qti-itemBody');
-            resizeObserver.observe($itemBody.get(0));
-        })
-        .on('unloaditem', function () {
-            resizeObserver.disconnect();
-        })
-        .on('destroy', function () {
-            resizeObserver.disconnect();
-        });
-}
-
-/**
  * Creates the loading bar plugin.
  * Displays a loading bar when a blocking task is running
  */
@@ -64,15 +42,29 @@ export default pluginFactory({
         const gridRowBlockEndMargin = 12,
             qtiItemPadding = 30 * 2;
 
-        connectItemBodyResizeObserver(testRunner);
-
-        testRunner.on('resized-itembody', function () {
-            adaptItemBlockSize();
-        });
+        testRunner
+            .on('renderitem', function () {
+                const isVerticalWritingMode = getIsItemWritingModeVerticalRl();
+                if (isVerticalWritingMode) {
+                    // qti-itemBody is item scroll container in vertical writing mode (but not in horizontal);
+                    // window resize is not enough, because if review-panel is used, it can be closed/opened, and that affects qti-itemBody width.
+                    const $itemBody = $('.qti-itemBody');
+                    this.itemBodyResizeObserver = new ResizeObserver(() => requestAnimationFrame(adaptItemBlockSize));
+                    this.itemBodyResizeObserver.observe($itemBody.get(0));
+                } else {
+                    adaptItemBlockSize(isVerticalWritingMode);
+                    $(window).on('resize.adaptItemHeight', adaptItemBlockSize);
+                }
+            })
+            .on('unloaditem', function () {
+                $(window).off('resize.adaptItemHeight');
+                if (this.itemBodyResizeObserver) {
+                    this.itemBodyResizeObserver.disconnect();
+                }
+            });
 
         function adaptItemBlockSize() {
             const isVerticalWritingMode = getIsItemWritingModeVerticalRl();
-
             const $itemContainer = $contentArea.find('[data-scrolling="true"]');
             const contentBlockSize =
                 getItemRunnerBlockSize(isVerticalWritingMode) -
@@ -144,6 +136,12 @@ export default pluginFactory({
                 return qtiContentRect.top - testRunnerSectionsRect.top;
             }
             return 0;
+        }
+    },
+    destroy: function destroy() {
+        $(window).off('resize.adaptItemHeight');
+        if (this.itemBodyResizeObserver) {
+            this.itemBodyResizeObserver.disconnect();
         }
     }
 });

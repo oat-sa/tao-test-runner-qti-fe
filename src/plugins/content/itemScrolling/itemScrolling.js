@@ -39,9 +39,6 @@ export default pluginFactory({
         const testRunner = this.getTestRunner();
         const $contentArea = testRunner.getAreaBroker().getContentArea();
 
-        const gridRowBlockEndMargin = 12,
-            qtiItemPadding = 30 * 2;
-
         testRunner
             .on('renderitem', function () {
                 const isVerticalWritingMode = getIsItemWritingModeVerticalRl();
@@ -65,13 +62,17 @@ export default pluginFactory({
 
         function adaptItemBlockSize() {
             const isVerticalWritingMode = getIsItemWritingModeVerticalRl();
+            const gridRowBlockEndMargin = 12;
+            const qtiItemPadding = (isVerticalWritingMode ? 15 : 30) * 2;
+
             const $itemContainer = $contentArea.find('[data-scrolling="true"]');
             const contentBlockSize =
                 getItemRunnerBlockSize(isVerticalWritingMode) -
                 getExtraGridRowBlockSize(isVerticalWritingMode) -
                 getSpaceAroundQtiContent(isVerticalWritingMode) -
                 gridRowBlockEndMargin -
-                qtiItemPadding;
+                qtiItemPadding -
+                2;
 
             $itemContainer.each(function () {
                 const $item = $(this);

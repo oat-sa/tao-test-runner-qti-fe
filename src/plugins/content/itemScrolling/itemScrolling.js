@@ -23,7 +23,7 @@
 import $ from 'jquery';
 import typeCaster from 'util/typeCaster';
 import pluginFactory from 'taoTests/runner/plugin';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/itemProperties';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/verticalWriting';
 
 /**
  * Creates the loading bar plugin.

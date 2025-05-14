@@ -20,7 +20,7 @@ import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
 import { setupItemsNavigator } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/itemProperties';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/verticalWriting';
 
 /**
  * The identifier the keyNavigator group

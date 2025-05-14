@@ -23,6 +23,7 @@
 import $ from 'jquery';
 import typeCaster from 'util/typeCaster';
 import pluginFactory from 'taoTests/runner/plugin';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/verticalWriting';
 
 /**
  * Creates the loading bar plugin.
@@ -36,81 +37,112 @@ export default pluginFactory({
      */
     init: function init() {
         const testRunner = this.getTestRunner();
-        const $contentArea = testRunner
-            .getAreaBroker()
-            .getContentArea();
-
-        const gridRowBottomMargin = 12,
-            qtiItemPadding = 30 * 2;
+        const $contentArea = testRunner.getAreaBroker().getContentArea();
 
         testRunner
-            .on('renderitem', function() {
-                adaptItemHeight();
+            .on('renderitem', function () {
+                const isVerticalWritingMode = getIsItemWritingModeVerticalRl();
+                if (isVerticalWritingMode) {
+                    // qti-itemBody is item scroll container in vertical writing mode (but not in horizontal);
+                    // window resize is not enough, because if review-panel is used, it can be closed/opened, and that affects qti-itemBody width.
+                    const $itemBody = $('.qti-itemBody');
+                    this.itemBodyResizeObserver = new ResizeObserver(() => requestAnimationFrame(adaptItemBlockSize));
+                    this.itemBodyResizeObserver.observe($itemBody.get(0));
+                } else {
+                    adaptItemBlockSize(isVerticalWritingMode);
+                    $(window).on('resize.adaptItemHeight', adaptItemBlockSize);
+                }
+            })
+            .on('unloaditem', function () {
                 $(window).off('resize.adaptItemHeight');
-                $(window).on('resize.adaptItemHeight', adaptItemHeight);
+                if (this.itemBodyResizeObserver) {
+                    this.itemBodyResizeObserver.disconnect();
+                }
             });
 
+        function adaptItemBlockSize() {
+            const isVerticalWritingMode = getIsItemWritingModeVerticalRl();
+            const gridRowBlockEndMargin = 12;
+            const qtiItemPadding = (isVerticalWritingMode ? 15 : 30) * 2;
 
-        function adaptItemHeight() {
             const $itemContainer = $contentArea.find('[data-scrolling="true"]');
-            const contentHeight = getItemRunnerHeight() - getExtraGridRowHeight() - getSpaceAboveQtiContent() - gridRowBottomMargin - qtiItemPadding;
+            const contentBlockSize =
+                getItemRunnerBlockSize(isVerticalWritingMode) -
+                getExtraGridRowBlockSize(isVerticalWritingMode) -
+                getSpaceAroundQtiContent(isVerticalWritingMode) -
+                gridRowBlockEndMargin -
+                qtiItemPadding -
+                2;
 
-            $itemContainer.each(function() {
+            $itemContainer.each(function () {
                 const $item = $(this);
                 const isScrollable = typeCaster.strToBool($item.attr('data-scrolling') || 'false');
-                const selectedHeight = parseFloat($item.attr('data-scrolling-height')) || 100;
+                const selectedBlockSize = parseFloat($item.attr('data-scrolling-height')) || 100;
                 const containerParent = $item.parent().closest('[data-scrolling="true"]');
+                const containerBlockSize = isVerticalWritingMode ? containerParent.width() : containerParent.height();
+                const overflowCssProp = isVerticalWritingMode ? 'overflow-x' : 'overflow-y';
 
                 if ($item.length && isScrollable) {
                     $item.data('scrollable', true);
-                    $item.css({'overflow-y' : 'scroll'});
+                    $item.css({ [overflowCssProp]: 'scroll' });
                     if (containerParent.length > 0) {
-                        $item.css('max-height', `${containerParent.height() * (selectedHeight * 0.01)}px`);
+                        $item.css('max-block-size', `${containerBlockSize * (selectedBlockSize * 0.01)}px`);
                     } else {
-                        $item.css('max-height', `${contentHeight * (selectedHeight * 0.01)}px`);
+                        $item.css('max-block-size', `${contentBlockSize * (selectedBlockSize * 0.01)}px`);
                     }
                 }
             });
         }
-
         // depending on the context (item preview, new/old test runner...) available height is computed differently
-        function getItemRunnerHeight() {
+        function getItemRunnerBlockSize(isVerticalWritingMode) {
             var $testRunnerSections = $('.test-runner-sections');
 
             // exists only in the new test runner
             if ($testRunnerSections.length) {
-                return $testRunnerSections.get(0).getBoundingClientRect().height;
+                const rect = $testRunnerSections.get(0).getBoundingClientRect();
+                return isVerticalWritingMode ? rect.width : rect.height;
             }
             // otherwise, we assume that we are in an iframe with all space available (= item preview, old test runner)
-            return $(window).height();
+            return isVerticalWritingMode ? $(window).width() : $(window).height();
         }
 
         // extra grid row are there in case of a vertical layout (item on top/bottom of the question)
-        function getExtraGridRowHeight() {
+        function getExtraGridRowBlockSize(isVerticalWritingMode) {
             var $gridRows = $('.qti-itemBody > .grid-row'),
-                extraHeight = 0;
+                extraBlockSize = 0;
 
-            $gridRows.each(function() {
+            $gridRows.each(function () {
                 var $gridRow = $(this),
                     $itemContainer = $gridRow.find('[data-scrolling="true"]');
 
-                if (! $itemContainer.length) {
-                    extraHeight += $gridRow.outerHeight(true);
+                if (!$itemContainer.length) {
+                    extraBlockSize += isVerticalWritingMode ? $gridRow.outerWidth(true) : $gridRow.outerHeight(true);
                 }
             });
-            return extraHeight;
+            return extraBlockSize;
         }
 
-        // most of the time this will be rubrick's block height in the new test runner
-        function getSpaceAboveQtiContent() {
+        // most of the time this will be rubrick's block height in the new test runner;
+        // if vertical-writing, can also be review-panel on the left
+        function getSpaceAroundQtiContent(isVerticalWritingMode) {
             var $testRunnerSections = $('.test-runner-sections'),
                 $qtiContent = $('#qti-content');
 
             if ($testRunnerSections.length && $qtiContent.length) {
-                return ($qtiContent.get(0).getBoundingClientRect().top - $testRunnerSections.get(0).getBoundingClientRect().top);
+                const qtiContentRect = $qtiContent.get(0).getBoundingClientRect();
+                const testRunnerSectionsRect = $testRunnerSections.get(0).getBoundingClientRect();
+                if (isVerticalWritingMode) {
+                    return testRunnerSectionsRect.width - qtiContentRect.width;
+                }
+                return qtiContentRect.top - testRunnerSectionsRect.top;
             }
             return 0;
         }
+    },
+    destroy: function destroy() {
+        $(window).off('resize.adaptItemHeight');
+        if (this.itemBodyResizeObserver) {
+            this.itemBodyResizeObserver.disconnect();
+        }
     }
-
 });

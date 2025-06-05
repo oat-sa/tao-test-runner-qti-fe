@@ -19,9 +19,8 @@
 import $ from 'jquery';
 import keyNavigator from 'ui/keyNavigation/navigator';
 import navigableDomElement from 'ui/keyNavigation/navigableDomElement';
-import {
-    setupItemsNavigator
-} from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import { setupItemsNavigator } from 'taoQtiTest/runner/plugins/content/accessibility/keyNavigation/helpers';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/verticalWriting';
 
 /**
  * The identifier the keyNavigator group
@@ -43,10 +42,13 @@ export default {
      */
     init() {
         const config = this.getConfig();
+        const isVerticalWritingMode = getIsItemWritingModeVerticalRl();
         this.keyNavigators = [];
 
-        this.getTestRunner().getAreaBroker().getContainer()
-            .find('.content-wrapper')
+        this.getTestRunner()
+            .getAreaBroker()
+            .getContainer()
+            .find(isVerticalWritingMode ? '.qti-itemBody' : '.content-wrapper')
             .addClass('key-navigation-scrollable')
             .each((i, el) => {
                 const $element = $(el);

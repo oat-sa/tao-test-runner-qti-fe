@@ -62,16 +62,13 @@ export default pluginFactory({
 
         function adaptItemBlockSize() {
             const isVerticalWritingMode = getIsItemWritingModeVerticalRl();
-            const gridRowBlockEndMargin = 12;
-            const qtiItemPadding = (isVerticalWritingMode ? 15 : 30) * 2;
-
             const $itemContainer = $contentArea.find('[data-scrolling="true"]');
             const contentBlockSize =
                 getItemRunnerBlockSize(isVerticalWritingMode) -
                 getExtraGridRowBlockSize(isVerticalWritingMode) -
                 getSpaceAroundQtiContent(isVerticalWritingMode) -
-                gridRowBlockEndMargin -
-                qtiItemPadding -
+                getQtiItemAndItemBodyPadding(isVerticalWritingMode) -
+                getGridRowBlockMargin() -
                 2;
 
             $itemContainer.each(function () {
@@ -137,6 +134,32 @@ export default pluginFactory({
                 return qtiContentRect.top - testRunnerSectionsRect.top;
             }
             return 0;
+        }
+
+        function getQtiItemAndItemBodyPadding(isVerticalWritingMode) {
+            let padding = 0;
+            const propNames = isVerticalWritingMode
+                ? ['padding-left', 'padding-right']
+                : ['padding-top', 'padding-bottom'];
+            for (const $el of [$('.qti-item'), $('.qti-itemBody')]) {
+                const compStyle = getComputedStyle($el.get(0));
+                for (const propName of propNames) {
+                    padding += parseFloat(compStyle.getPropertyValue(propName) || 0);
+                }
+            }
+            return padding;
+        }
+
+        function getGridRowBlockMargin() {
+            let margin = 0;
+            const $gridRows = $('.qti-itemBody > .grid-row');
+            if ($gridRows.length > 0) {
+                margin += parseFloat(getComputedStyle($gridRows.get(0)).getPropertyValue('margin-block-start') || 0);
+                margin += parseFloat(
+                    getComputedStyle($gridRows.last().get(0)).getPropertyValue('margin-block-end') || 0
+                );
+            }
+            return margin;
         }
     },
     destroy: function destroy() {

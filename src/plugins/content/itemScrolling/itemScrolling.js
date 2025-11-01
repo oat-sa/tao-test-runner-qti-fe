@@ -28,6 +28,7 @@ import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/vertic
 //TODO: import
 const writingModeVerticalRlClass = 'writing-mode-vertical-rl';
 const writingModeHorizontalTbClass = 'writing-mode-horizontal-tb';
+const minimalAcceptableSize = 20;
 
 /**
  * Creates the loading bar plugin.
@@ -45,19 +46,23 @@ export default pluginFactory({
 
         testRunner
             .on('renderitem', function () {
-                // qti-itemBody is item scroll container in vertical writing mode (but not in horizontal);
-                // window resize is not enough, because if review-panel is used, it can be closed/opened, and that affects qti-itemBody width.
                 const isItemVerticalWriting = getIsItemWritingModeVerticalRl();
-                const $itemScrollContainer = isItemVerticalWriting ? $('.qti-itemBody') : $('.content-wrapper'); //test-runner-sections?
+                const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
 
-                this.itemResizeObserver = new ResizeObserver(() => requestAnimationFrame(adaptBlockSize));
-                this.itemResizeObserver.observe($itemScrollContainer.get(0));
+                if ($itemScrollContainer.length) {
+                    this.itemResizeObserver = new ResizeObserver(() => requestAnimationFrame(adaptBlockSize));
+                    this.itemResizeObserver.observe($itemScrollContainer.get(0));
+                }
             })
             .on('unloaditem', function () {
                 if (this.itemResizeObserver) {
                     this.itemResizeObserver.disconnect();
                 }
             });
+
+        function getItemScrollContainer(isItemVerticalWriting) {
+            return isItemVerticalWriting ? $('.qti-itemBody') : $('.test-runner-sections > .content-wrapper');
+        }
 
         function adaptBlockSize() {
             const isItemVerticalWriting = getIsItemWritingModeVerticalRl();
@@ -67,14 +72,37 @@ export default pluginFactory({
                 $blockContainer.hasClass(writingModeVerticalRlClass) ||
                 (isItemVerticalWriting && !$blockContainer.hasClass(writingModeHorizontalTbClass));
 
-            const contentBlockSize =
+            const innerItemSize =
                 getItemRunnerBlockSize(isItemVerticalWriting) -
-                // getExtraGridRowBlockSize(isItemVerticalWriting) -
-                // getSpaceAroundQtiContent(isItemVerticalWriting) -
-                // getQtiItemAndItemBodyPadding(isItemVerticalWriting) -
-                // getGridRowBlockMargin() -
+                getQtiItemAndItemBodyPadding(isItemVerticalWriting) -
+                getGridRowBlockMargin() -
                 2;
-            console.log('contentBlockSizeAA', contentBlockSize);
+            const contentBlockSize =
+                innerItemSize -
+                getExtraGridRowBlockSize(isItemVerticalWriting) -
+                getSpaceAroundQtiContent(isItemVerticalWriting);
+
+            //TODO: remove console.log
+            console.log(
+                'isItemVerticalWriting:',
+                isItemVerticalWriting,
+                'isBlockVerticalWriting:',
+                isBlockVerticalWriting,
+                'innerItemSize:',
+                innerItemSize,
+                'contentBlockSize: ',
+                contentBlockSize,
+                'getItemRunnerBlockSize: ',
+                getItemRunnerBlockSize(isItemVerticalWriting),
+                'getExtraGridRowBlockSize:',
+                getExtraGridRowBlockSize(isItemVerticalWriting),
+                'getSpaceAroundQtiContent:',
+                getSpaceAroundQtiContent(isItemVerticalWriting),
+                'getQtiItemAndItemBodyPadding',
+                getQtiItemAndItemBodyPadding(isItemVerticalWriting),
+                'getGridRowBlockMargin:',
+                getGridRowBlockMargin($blockContainer)
+            );
 
             $blockContainer.each(function () {
                 const $item = $(this);
@@ -82,7 +110,7 @@ export default pluginFactory({
                 const selectedBlockSize = parseFloat($item.attr('data-scrolling-height')) || 100;
                 const containerParent = $item.parent().closest('[data-scrolling="true"]');
                 const containerBlockSize = isItemVerticalWriting ? containerParent.width() : containerParent.height();
-                const overflowCssProp = isItemVerticalWriting ? 'overflow-x' : 'overflow-y'; //why inline style?
+                const overflowCssProp = isItemVerticalWriting ? 'overflow-x' : 'overflow-y';
                 const maxSizeCssProp = isItemVerticalWriting ? 'max-width' : 'max-height';
 
                 if ($item.length && isScrollable) {
@@ -92,94 +120,119 @@ export default pluginFactory({
                     if (containerParent.length > 0) {
                         $item.css(maxSizeCssProp, `${containerBlockSize * (selectedBlockSize * 0.01)}px`);
                     } else {
-                        $item.css(maxSizeCssProp, `${contentBlockSize * (selectedBlockSize * 0.01)}px`);
+                        const maxSize = contentBlockSize * (selectedBlockSize * 0.01);
+                        if (maxSize > minimalAcceptableSize) {
+                            $item.css(maxSizeCssProp, `${maxSize}px`);
+                        } else {
+                            // contentBlockSize could turn out to be negative or very small because of
+                            //  'getExtraGridRowBlockSize' [other grid-row's content is unexpectedly long] or 'getSpaceAroundQtiContent';
+                            // then we show block with natural size (no scrollbars);
+                            // but for block with different writing-mode need to define *some* size.
+                            if (isBlockVerticalWriting !== isItemVerticalWriting) {
+                                $item.css(maxSizeCssProp, `${innerItemSize / 2}px`);
+                            }
+                        }
                     }
 
-                    if (isBlockVerticalWriting && !isItemVerticalWriting) {
-                        $item.css('width', '100%'); //why inline style?
-                    } else if (!isBlockVerticalWriting && isItemVerticalWriting) {
-                        $item.css('height', '100%'); //why inline style?
+                    if (isBlockVerticalWriting !== isItemVerticalWriting) {
+                        $item.css('block-size', '100%');
                     }
                 }
             });
         }
-        // depending on the context (item preview, new/old test runner...) available height is computed differently
-        function getItemRunnerBlockSize(isItemVerticalWriting) {
-            // var $testRunnerSections = $('.test-runner-sections'); //content-wrapper?
-            //TEMP:
-            var $testRunnerSections = isItemVerticalWriting ? $('.qti-itemBody') : $('.content-wrapper');
 
-            // exists only in the new test runner
-            if ($testRunnerSections.length) {
-                const rect = $testRunnerSections.get(0).getBoundingClientRect();
-                return isItemVerticalWriting ? rect.width : rect.height;
-            }
-            // otherwise, we assume that we are in an iframe with all space available (= item preview, old test runner)
-            return isItemVerticalWriting ? $(window).width() : $(window).height();
+        function getItemRunnerBlockSize(isItemVerticalWriting) {
+            const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
+            const rect = $itemScrollContainer.get(0).getBoundingClientRect();
+            return isItemVerticalWriting ? rect.width : rect.height;
         }
 
-        // extra grid row are there in case of a vertical layout (item on top/bottom of the question)
+        // if layout is: text (scroll-block) on top/bottom of the question (interaction), then:
+        //   ensure whole item fits on the screen (fit interaction, and let scroll-block fill remaining space)
+        // ? - makes sense only if 'full-height' block, and maybe 2 total grid-rows? Should have been enabled by the special option.
+        // ? - did all css files and images finish loading by the time this executed? Not necessary.
         function getExtraGridRowBlockSize(isItemVerticalWriting) {
-            // ? this is NOT usual dual-column + full-width-block layout.
-            // this is two col-12 rows + half-width block layout.
-            // still, what? we should ignore height attr and make both rows fit?
             var $gridRows = $('.qti-itemBody > .grid-row'),
                 extraBlockSize = 0;
 
             $gridRows.each(function () {
                 var $gridRow = $(this),
-                    $itemContainer = $gridRow.find('[data-scrolling="true"]');
+                    $blockContainer = $gridRow.find('[data-scrolling="true"]');
 
-                //if this row doesn't have item container, then except its height.
-                //? should be then only if 'full-height' attr and maybe 2 total grid-rows
-                // [so I guess this plugin supports 2 versions: dual-column and this. Need to split to 3 scenarios: these 2, then the rest]
-                if (!$itemContainer.length) {
+                if (!$blockContainer.length) {
                     extraBlockSize += isItemVerticalWriting ? $gridRow.outerWidth(true) : $gridRow.outerHeight(true);
                 }
             });
+
             return extraBlockSize;
         }
 
-        // most of the time this will be rubrick's block height in the new test runner;
-        // if vertical-writing, can also be review-panel on the left
+        // rubrick's block height
         function getSpaceAroundQtiContent(isItemVerticalWriting) {
-            var $testRunnerSections = $('.test-runner-sections'), //content-wrapper?
-                $qtiContent = $('#qti-content');
+            if (isItemVerticalWriting) {
+                return 0;
+            }
 
-            if ($testRunnerSections.length && $qtiContent.length) {
+            const itemScrollContainer = getItemScrollContainer(isItemVerticalWriting).get(0);
+            const $qtiContent = $('#qti-content');
+
+            if ($qtiContent.length && itemScrollContainer.contains($qtiContent.get(0))) {
                 const qtiContentRect = $qtiContent.get(0).getBoundingClientRect();
-                const testRunnerSectionsRect = $testRunnerSections.get(0).getBoundingClientRect();
-                if (isItemVerticalWriting) {
-                    return testRunnerSectionsRect.width - qtiContentRect.width;
-                }
-                return qtiContentRect.top - testRunnerSectionsRect.top;
+                const itemRunnerContainerRect = itemScrollContainer.getBoundingClientRect();
+                return qtiContentRect.top - itemRunnerContainerRect.top + itemScrollContainer.scrollTop;
             }
             return 0;
         }
 
+        // all elems between item-scroll-container and itemBody, including itemBody
         function getQtiItemAndItemBodyPadding(isItemVerticalWriting) {
             let padding = 0;
+            const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
+            const $itemBody = $('.qti-itemBody');
+
             const propNames = isItemVerticalWriting
                 ? ['padding-left', 'padding-right']
                 : ['padding-top', 'padding-bottom'];
-            for (const $el of [$('.qti-item'), $('.qti-itemBody')]) {
-                const compStyle = getComputedStyle($el.get(0));
-                for (const propName of propNames) {
-                    padding += parseFloat(compStyle.getPropertyValue(propName) || 0);
+            const parentsUntil = $itemScrollContainer.get(0).contains($itemBody.get(0))
+                ? $itemBody.parentsUntil($itemScrollContainer).toArray()
+                : [];
+
+            for (const el of [...parentsUntil, $itemBody.get(0)]) {
+                if ($itemScrollContainer.get(0).contains(el)) {
+                    const compStyle = getComputedStyle(el);
+                    for (const propName of propNames) {
+                        padding += parseFloat(compStyle.getPropertyValue(propName) || 0);
+                    }
                 }
             }
             return padding;
         }
 
+        // a) dual-column: one row, 2 columns - one with full-height scrollable block, other with interaction
+        // b) 'getExtraGridRowBlockSize' where text (scroll-block) on top/bottom of the question (interaction) should fit on screen
         function getGridRowBlockMargin() {
             let margin = 0;
+
             const $gridRows = $('.qti-itemBody > .grid-row');
-            if ($gridRows.length > 0) {
-                margin += parseFloat(getComputedStyle($gridRows.get(0)).getPropertyValue('margin-block-start') || 0);
-                margin += parseFloat(
-                    getComputedStyle($gridRows.last().get(0)).getPropertyValue('margin-block-end') || 0
-                );
-            }
+            $gridRows.each(function () {
+                const $gridRow = $(this);
+                const $blockContainer = $gridRow.find('[data-scrolling="true"]');
+                if ($blockContainer.length) {
+                    // "getExtraGridRowBlockSize" includes height of rows *without* scroll containers;
+                    // here we include margins of rows *with* scroll containers
+                    const $col = $blockContainer.closest('[class*=" col-"], [class^="col-"]');
+
+                    const margins = [
+                        [$col, 'margin-block-start'],
+                        [$gridRow, 'margin-block-start'],
+                        [$col, 'margin-block-end'],
+                        [$gridRow, 'margin-block-end']
+                    ];
+                    for (const [$el, prop] of margins) {
+                        margin += $el.length ? parseFloat(getComputedStyle($el.get(0)).getPropertyValue(prop) || 0) : 0;
+                    }
+                }
+            });
             return margin;
         }
     },

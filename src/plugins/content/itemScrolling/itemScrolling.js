@@ -21,6 +21,7 @@
  */
 
 import $ from 'jquery';
+import _ from 'lodash';
 import typeCaster from 'util/typeCaster';
 import pluginFactory from 'taoTests/runner/plugin';
 import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/verticalWriting';
@@ -50,13 +51,17 @@ export default pluginFactory({
                 const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
 
                 if ($itemScrollContainer.length) {
-                    this.itemResizeObserver = new ResizeObserver(() => requestAnimationFrame(adaptBlockSize));
+                    this.itemResizeCallback = _.throttle(() => requestAnimationFrame(adaptBlockSize), 200);
+                    this.itemResizeObserver = new ResizeObserver(this.itemResizeCallback);
                     this.itemResizeObserver.observe($itemScrollContainer.get(0));
                 }
             })
             .on('unloaditem', function () {
                 if (this.itemResizeObserver) {
                     this.itemResizeObserver.disconnect();
+                }
+                if (this.itemResizeCallback && this.itemResizeCallback.cancel) {
+                    this.itemResizeCallback.cancel();
                 }
             });
 
@@ -239,6 +244,9 @@ export default pluginFactory({
     destroy: function destroy() {
         if (this.itemResizeObserver) {
             this.itemResizeObserver.disconnect();
+        }
+        if (this.itemResizeCallback && this.itemResizeCallback.cancel) {
+            this.itemResizeCallback.cancel();
         }
     }
 });

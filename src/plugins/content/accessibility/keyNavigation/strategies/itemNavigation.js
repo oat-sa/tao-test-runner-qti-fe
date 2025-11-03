@@ -163,6 +163,9 @@ export default {
                 const choiceType = $choiceInput.attr('type');
 
                 if ($itemElement.hasClass('qti-interaction')) {
+                    //interaction block may be scrollable (if writing-mode for interaction is different from writing-mode for item)
+                    addNavigator($itemElement, $itemElement);
+
                     //add navigable elements from prompt
                     $itemElement
                         .find('.key-navigation-focusable')

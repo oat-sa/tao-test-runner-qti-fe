@@ -43,10 +43,11 @@ export default pluginFactory({
      */
     init: function init() {
         const testRunner = this.getTestRunner();
-        const $contentArea = testRunner.getAreaBroker().getContentArea();
+        let $root;
 
         testRunner
             .on('renderitem', function () {
+                $root = testRunner.getAreaBroker().getContainer();
                 const isItemVerticalWriting = getIsItemWritingModeVerticalRl();
                 const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
 
@@ -66,26 +67,30 @@ export default pluginFactory({
             });
 
         function getItemScrollContainer(isItemVerticalWriting) {
-            return isItemVerticalWriting ? $('.qti-itemBody') : $('.test-runner-sections > .content-wrapper');
+            return isItemVerticalWriting
+                ? $root.find('.qti-itemBody')
+                : $root.find('.test-runner-sections > .content-wrapper');
         }
 
         function adaptBlockSize() {
             const isItemVerticalWriting = getIsItemWritingModeVerticalRl();
 
-            const $blockContainer = $contentArea.find('[data-scrolling="true"]');
+            const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
+            const $blockContainer = $itemScrollContainer.find('[data-scrolling="true"]');
             const isBlockVerticalWriting =
                 $blockContainer.hasClass(writingModeVerticalRlClass) ||
                 (isItemVerticalWriting && !$blockContainer.hasClass(writingModeHorizontalTbClass));
 
             const innerItemSize =
-                getItemRunnerBlockSize(isItemVerticalWriting) -
-                getQtiItemAndItemBodyPadding(isItemVerticalWriting) -
-                getGridRowBlockMargin() -
+                getItemRunnerBlockSize($itemScrollContainer, isItemVerticalWriting) -
+                getQtiItemAndItemBodyPadding($itemScrollContainer, isItemVerticalWriting) -
                 2;
+
             const contentBlockSize =
                 innerItemSize -
+                getGridRowBlockMargin() -
                 getExtraGridRowBlockSize(isItemVerticalWriting) -
-                getSpaceAroundQtiContent(isItemVerticalWriting);
+                getSpaceAroundQtiContent($itemScrollContainer, isItemVerticalWriting);
 
             //TODO: remove console.log
             console.log(
@@ -98,16 +103,18 @@ export default pluginFactory({
                 'contentBlockSize: ',
                 contentBlockSize,
                 'getItemRunnerBlockSize: ',
-                getItemRunnerBlockSize(isItemVerticalWriting),
+                getItemRunnerBlockSize($itemScrollContainer, isItemVerticalWriting),
                 'getExtraGridRowBlockSize:',
                 getExtraGridRowBlockSize(isItemVerticalWriting),
                 'getSpaceAroundQtiContent:',
-                getSpaceAroundQtiContent(isItemVerticalWriting),
+                getSpaceAroundQtiContent($itemScrollContainer, isItemVerticalWriting),
                 'getQtiItemAndItemBodyPadding',
-                getQtiItemAndItemBodyPadding(isItemVerticalWriting),
+                getQtiItemAndItemBodyPadding($itemScrollContainer, isItemVerticalWriting),
                 'getGridRowBlockMargin:',
                 getGridRowBlockMargin($blockContainer)
             );
+
+            defineItemBlockSizeVariable(innerItemSize);
 
             $blockContainer.each(function () {
                 const $item = $(this);
@@ -146,8 +153,14 @@ export default pluginFactory({
             });
         }
 
-        function getItemRunnerBlockSize(isItemVerticalWriting) {
-            const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
+        function defineItemBlockSizeVariable(innerItemSize) {
+            $root
+                .find('.qti-itemBody')
+                .get(0)
+                .style.setProperty('--item-container-inner-block-size', `${innerItemSize}px`);
+        }
+
+        function getItemRunnerBlockSize($itemScrollContainer, isItemVerticalWriting) {
             const rect = $itemScrollContainer.get(0).getBoundingClientRect();
             return isItemVerticalWriting ? rect.width : rect.height;
         }
@@ -157,7 +170,7 @@ export default pluginFactory({
         // ? - makes sense only if 'full-height' block, and maybe 2 total grid-rows? Should have been enabled by the special option.
         // ? - did all css files and images finish loading by the time this executed? Not necessary.
         function getExtraGridRowBlockSize(isItemVerticalWriting) {
-            var $gridRows = $('.qti-itemBody > .grid-row'),
+            var $gridRows = $root.find('.qti-itemBody > .grid-row'),
                 extraBlockSize = 0;
 
             $gridRows.each(function () {
@@ -173,13 +186,13 @@ export default pluginFactory({
         }
 
         // rubrick's block height
-        function getSpaceAroundQtiContent(isItemVerticalWriting) {
+        function getSpaceAroundQtiContent($itemScrollContainer, isItemVerticalWriting) {
             if (isItemVerticalWriting) {
                 return 0;
             }
 
-            const itemScrollContainer = getItemScrollContainer(isItemVerticalWriting).get(0);
-            const $qtiContent = $('#qti-content');
+            const itemScrollContainer = $itemScrollContainer.get(0);
+            const $qtiContent = $root.find('#qti-content');
 
             if ($qtiContent.length && itemScrollContainer.contains($qtiContent.get(0))) {
                 const qtiContentRect = $qtiContent.get(0).getBoundingClientRect();
@@ -190,10 +203,9 @@ export default pluginFactory({
         }
 
         // all elems between item-scroll-container and itemBody, including itemBody
-        function getQtiItemAndItemBodyPadding(isItemVerticalWriting) {
+        function getQtiItemAndItemBodyPadding($itemScrollContainer, isItemVerticalWriting) {
             let padding = 0;
-            const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
-            const $itemBody = $('.qti-itemBody');
+            const $itemBody = $root.find('.qti-itemBody');
 
             const propNames = isItemVerticalWriting
                 ? ['padding-left', 'padding-right']
@@ -218,7 +230,7 @@ export default pluginFactory({
         function getGridRowBlockMargin() {
             let margin = 0;
 
-            const $gridRows = $('.qti-itemBody > .grid-row');
+            const $gridRows = $root.find('.qti-itemBody > .grid-row');
             $gridRows.each(function () {
                 const $gridRow = $(this);
                 const $blockContainer = $gridRow.find('[data-scrolling="true"]');

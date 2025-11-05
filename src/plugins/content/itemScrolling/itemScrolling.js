@@ -24,11 +24,8 @@ import $ from 'jquery';
 import _ from 'lodash';
 import typeCaster from 'util/typeCaster';
 import pluginFactory from 'taoTests/runner/plugin';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/verticalWriting';
+import { getIsItemWritingModeVerticalRl, getIsWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/verticalWriting';
 
-//TODO: import
-const writingModeVerticalRlClass = 'writing-mode-vertical-rl';
-const writingModeHorizontalTbClass = 'writing-mode-horizontal-tb';
 const minimalAcceptableSize = 20;
 
 /**
@@ -46,7 +43,7 @@ export default pluginFactory({
         let $root;
 
         testRunner
-            .on('renderitem', function () {
+            .on('renderitem', () => {
                 $root = testRunner.getAreaBroker().getContainer();
                 const isItemVerticalWriting = getIsItemWritingModeVerticalRl();
                 const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
@@ -57,7 +54,7 @@ export default pluginFactory({
                     this.itemResizeObserver.observe($itemScrollContainer.get(0));
                 }
             })
-            .on('unloaditem', function () {
+            .on('unloaditem', () => {
                 if (this.itemResizeObserver) {
                     this.itemResizeObserver.disconnect();
                 }
@@ -74,12 +71,9 @@ export default pluginFactory({
 
         function adaptBlockSize() {
             const isItemVerticalWriting = getIsItemWritingModeVerticalRl();
-
             const $itemScrollContainer = getItemScrollContainer(isItemVerticalWriting);
-            const $blockContainer = $itemScrollContainer.find('[data-scrolling="true"]');
-            const isBlockVerticalWriting =
-                $blockContainer.hasClass(writingModeVerticalRlClass) ||
-                (isItemVerticalWriting && !$blockContainer.hasClass(writingModeHorizontalTbClass));
+
+            const $blockContainers = $itemScrollContainer.find('[data-scrolling="true"]');
 
             const innerItemSize =
                 getItemRunnerBlockSize($itemScrollContainer, isItemVerticalWriting) -
@@ -92,68 +86,50 @@ export default pluginFactory({
                 getExtraGridRowBlockSize(isItemVerticalWriting) -
                 getSpaceAroundQtiContent($itemScrollContainer, isItemVerticalWriting);
 
-            //TODO: remove console.log
-            console.log(
-                'isItemVerticalWriting:',
-                isItemVerticalWriting,
-                'isBlockVerticalWriting:',
-                isBlockVerticalWriting,
-                'innerItemSize:',
-                innerItemSize,
-                'contentBlockSize: ',
-                contentBlockSize,
-                'getItemRunnerBlockSize: ',
-                getItemRunnerBlockSize($itemScrollContainer, isItemVerticalWriting),
-                'getExtraGridRowBlockSize:',
-                getExtraGridRowBlockSize(isItemVerticalWriting),
-                'getSpaceAroundQtiContent:',
-                getSpaceAroundQtiContent($itemScrollContainer, isItemVerticalWriting),
-                'getQtiItemAndItemBodyPadding',
-                getQtiItemAndItemBodyPadding($itemScrollContainer, isItemVerticalWriting),
-                'getGridRowBlockMargin:',
-                getGridRowBlockMargin($blockContainer)
-            );
+            defineItemSizeVariable(innerItemSize);
 
-            defineItemBlockSizeVariable(innerItemSize);
+            $blockContainers.each(function () {
+                const $block = $(this);
+                const isBlockVerticalWriting = getIsWritingModeVerticalRl($block);
 
-            $blockContainer.each(function () {
-                const $item = $(this);
-                const isScrollable = typeCaster.strToBool($item.attr('data-scrolling') || 'false');
-                const selectedBlockSize = parseFloat($item.attr('data-scrolling-height')) || 100;
-                const containerParent = $item.parent().closest('[data-scrolling="true"]');
+                const isScrollable = typeCaster.strToBool($block.attr('data-scrolling') || 'false');
+                const selectedBlockSize = parseFloat($block.attr('data-scrolling-height')) || 100;
+                const containerParent = $block.parent().closest('[data-scrolling="true"]');
                 const containerBlockSize = isItemVerticalWriting ? containerParent.width() : containerParent.height();
                 const overflowCssProp = isItemVerticalWriting ? 'overflow-x' : 'overflow-y';
                 const maxSizeCssProp = isItemVerticalWriting ? 'max-width' : 'max-height';
 
-                if ($item.length && isScrollable) {
-                    $item.data('scrollable', true);
-                    $item.css({ [overflowCssProp]: 'auto' });
+                if ($block.length && isScrollable) {
+                    $block.data('scrollable', true);
+                    $block.css({ [overflowCssProp]: 'auto' });
 
                     if (containerParent.length > 0) {
-                        $item.css(maxSizeCssProp, `${containerBlockSize * (selectedBlockSize * 0.01)}px`);
+                        $block.css(maxSizeCssProp, `${containerBlockSize * (selectedBlockSize * 0.01)}px`);
                     } else {
                         const maxSize = contentBlockSize * (selectedBlockSize * 0.01);
                         if (maxSize > minimalAcceptableSize) {
-                            $item.css(maxSizeCssProp, `${maxSize}px`);
+                            $block.css(maxSizeCssProp, `${maxSize}px`);
                         } else {
                             // contentBlockSize could turn out to be negative or very small because of
                             //  'getExtraGridRowBlockSize' [other grid-row's content is unexpectedly long] or 'getSpaceAroundQtiContent';
                             // then we show block with natural size (no scrollbars);
                             // but for block with different writing-mode need to define *some* size.
                             if (isBlockVerticalWriting !== isItemVerticalWriting) {
-                                $item.css(maxSizeCssProp, `${innerItemSize / 2}px`);
+                                $block.css(maxSizeCssProp, `${innerItemSize / 2}px`);
                             }
                         }
                     }
 
                     if (isBlockVerticalWriting !== isItemVerticalWriting) {
-                        $item.css('block-size', '100%');
+                        $block.css('block-size', '100%');
                     }
                 }
             });
         }
 
-        function defineItemBlockSizeVariable(innerItemSize) {
+        // may be useful in custom item css,
+        // if scrollable block size must be defined more accurately than what Authoring Editor proposes
+        function defineItemSizeVariable(innerItemSize) {
             $root
                 .find('.qti-itemBody')
                 .get(0)
@@ -166,9 +142,11 @@ export default pluginFactory({
         }
 
         // if layout is: text (scroll-block) on top/bottom of the question (interaction), then:
-        //   ensure whole item fits on the screen (fit interaction, and let scroll-block fill remaining space)
-        // ? - makes sense only if 'full-height' block, and maybe 2 total grid-rows? Should have been enabled by the special option.
-        // ? - did all css files and images finish loading by the time this executed? Not necessary.
+        //   ensure whole item fits on the screen (fit interaction, and let scroll-block fill remaining space;
+        //   if there are several scroll-blocks, split this remaining space between them based on their `data-scrolling-height )
+        // notes:
+        //  - should have been enabled by the special option? it may not always be a desirable behavior!
+        //  - applies to `.grid-row`, but not to `.colrow`
         function getExtraGridRowBlockSize(isItemVerticalWriting) {
             var $gridRows = $root.find('.qti-itemBody > .grid-row'),
                 extraBlockSize = 0;

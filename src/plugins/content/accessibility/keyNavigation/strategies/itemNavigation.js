@@ -36,12 +36,8 @@ const addLabelledByAttribute = cursor => {
     const name = $element.attr('name');
 
     if (name) {
-        $element.attr(
-            'aria-labelledby',
-            `${name.replace('response-', 'choice-')}-${value}`
-        );
+        $element.attr('aria-labelledby', `${name.replace('response-', 'choice-')}-${value}`);
     }
-
 };
 
 /**
@@ -59,7 +55,7 @@ const removeLabelledByAttribute = cursor => {
  *
  * @param {Navigator} navigator
  */
-const manageLabelledByAttribute = (navigator) => {
+const manageLabelledByAttribute = navigator => {
     if (navigator) {
         navigator.on('focus', addLabelledByAttribute);
         navigator.on('blur', removeLabelledByAttribute); // applies WCAG behavior for the radio buttons
@@ -90,7 +86,7 @@ export default {
          * @param {Object} cursor - The cursor definition supplied by the keyNavigator
          * @returns {jQuery} - The selected choice element
          */
-        const getQtiChoice = function (cursor){
+        const getQtiChoice = function (cursor) {
             return cursor && cursor.navigable.getElement().closest('.qti-choice');
         };
 
@@ -133,10 +129,12 @@ export default {
 
                 // each choice is represented by more than the input, the style must be spread to the actual element
                 navigator
-                    .on('focus', cursor => scrollHelper.scrollTo(
-                        getQtiChoice(cursor).addClass('key-navigation-highlight'),
-                        $content.closest('.content-wrapper')
-                    ))
+                    .on('focus', cursor =>
+                        scrollHelper.scrollTo(
+                            getQtiChoice(cursor).addClass('key-navigation-highlight'),
+                            $content.closest('.content-wrapper')
+                        )
+                    )
                     .on('blur', cursor => getQtiChoice(cursor).removeClass('key-navigation-highlight'));
             }
             return navigator;
@@ -149,75 +147,72 @@ export default {
             .filter((i, node) => !$(node).parents('.qti-interaction').length);
 
         // the item focusable body elements are considered scrollable
-        $content
-            .find('.key-navigation-focusable')
-            .addClass('key-navigation-scrollable');
+        $content.find('.key-navigation-focusable').addClass('key-navigation-scrollable');
 
         // each navigable area will get its own keyNavigator
-        $qtiInteractions
-            .each((itemPos, itemElement) => {
-                const $itemElement = $(itemElement);
+        $qtiInteractions.each((itemPos, itemElement) => {
+            const $itemElement = $(itemElement);
 
-                // detect the type of choices: checkbox or radio
-                const $choiceInput = $itemElement.find('.qti-choice input');
-                const choiceType = $choiceInput.attr('type');
+            // detect the type of choices: checkbox or radio
+            const $choiceInput = $itemElement.find('.qti-choice input');
+            const choiceType = $choiceInput.attr('type');
 
-                if ($itemElement.hasClass('qti-interaction')) {
-                    //interaction block may be scrollable (if writing-mode for interaction is different from writing-mode for item)
+            if ($itemElement.hasClass('qti-interaction')) {
+                //interaction block may be scrollable (if writing-mode for interaction is different from writing-mode for item)
+                if ($itemElement.hasClass('key-navigation-focusable')) {
                     addNavigator($itemElement, $itemElement);
+                }
 
-                    //add navigable elements from prompt
-                    $itemElement
-                        .find('.key-navigation-focusable')
-                        .each((navPos, nav) => {
-                            const $nav = $(nav);
-                            if (!$nav.closest('.qti-choice').length) {
-                                addNavigator($nav, $nav);
+                //add navigable elements from prompt
+                $itemElement.find('.key-navigation-focusable').each((navPos, nav) => {
+                    const $nav = $(nav);
+                    if (!$nav.closest('.qti-choice').length) {
+                        addNavigator($nav, $nav);
+                    }
+                });
+
+                //reset interaction custom key navigation to override the behaviour with the new one
+                $itemElement.off('.keyNavigation');
+
+                //search for inputs that represent the interaction focusable choices
+                const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
+                if (config.flatNavigation && (config.flatRadioNavigation || choiceType !== 'radio')) {
+                    $inputs.each((i, input) => {
+                        const navigator = addInputsNavigator($(input), $itemElement);
+
+                        manageLabelledByAttribute(navigator);
+                    });
+                } else {
+                    const navigator = addInputsNavigator($inputs, $itemElement, true, () => {
+                        // keep default positioning for now
+                        let position = -1;
+
+                        // autofocus the selected radio button if any
+                        $inputs.each((index, input) => {
+                            if (input.checked) {
+                                position = index;
                             }
                         });
 
-                    //reset interaction custom key navigation to override the behaviour with the new one
-                    $itemElement.off('.keyNavigation');
+                        return position;
+                    });
 
-                    //search for inputs that represent the interaction focusable choices
-                    const $inputs = $itemElement.is(':input') ? $itemElement : $itemElement.find(':input');
-                    if (config.flatNavigation && (config.flatRadioNavigation || choiceType !== 'radio')) {
-                        $inputs.each((i, input) => {
-                            const navigator = addInputsNavigator($(input), $itemElement);
+                    manageLabelledByAttribute(navigator);
 
-                            manageLabelledByAttribute(navigator);
+                    // applies WCAG behavior for the radio buttons
+                    if (navigator && config.wcagBehavior) {
+                        navigator.on('focus', cursor => {
+                            const $element = cursor.navigable.getElement();
+                            if (!$element.is(':checked')) {
+                                $element.click();
+                            }
                         });
-                    } else {
-                        const navigator = addInputsNavigator($inputs, $itemElement, true, () => {
-                            // keep default positioning for now
-                            let position = -1;
-
-                            // autofocus the selected radio button if any
-                            $inputs.each((index, input) => {
-                                if (input.checked) {
-                                    position = index;
-                                }
-                            });
-
-                            return position;
-                        });
-
-                        manageLabelledByAttribute(navigator);
-
-                        // applies WCAG behavior for the radio buttons
-                        if (navigator && config.wcagBehavior) {
-                            navigator.on('focus', cursor => {
-                                const $element = cursor.navigable.getElement();
-                                if (!$element.is(':checked')) {
-                                    $element.click();
-                                }
-                            });
-                        }
                     }
-                } else {
-                    addNavigator($itemElement, $itemElement);
                 }
-            });
+            } else {
+                addNavigator($itemElement, $itemElement);
+            }
+        });
 
         return this;
     },

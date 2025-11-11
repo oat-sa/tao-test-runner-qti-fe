@@ -25,8 +25,9 @@ import _ from 'lodash';
 import typeCaster from 'util/typeCaster';
 import pluginFactory from 'taoTests/runner/plugin';
 import { getIsItemWritingModeVerticalRl, getIsWritingModeVerticalRl } from 'taoQtiTest/runner/helpers/verticalWriting';
+import 'taoQtiTest/runner/plugins/content/itemScrolling/css/scrolling.css';
 
-const minimalAcceptableSize = 20;
+const minimalAcceptableSizePx = 20;
 
 /**
  * Creates the loading bar plugin.
@@ -86,54 +87,43 @@ export default pluginFactory({
                 getExtraGridRowBlockSize(isItemVerticalWriting) -
                 getSpaceAroundQtiContent($itemScrollContainer, isItemVerticalWriting);
 
-            defineItemSizeVariable(innerItemSize);
-
             $blockContainers.each(function () {
                 const $block = $(this);
                 const isBlockVerticalWriting = getIsWritingModeVerticalRl($block);
+                const isDifferentWritingMode = isBlockVerticalWriting !== isItemVerticalWriting;
 
                 const isScrollable = typeCaster.strToBool($block.attr('data-scrolling') || 'false');
                 const selectedBlockSize = parseFloat($block.attr('data-scrolling-height')) || 100;
                 const containerParent = $block.parent().closest('[data-scrolling="true"]');
                 const containerBlockSize = isItemVerticalWriting ? containerParent.width() : containerParent.height();
-                const overflowCssProp = isItemVerticalWriting ? 'overflow-x' : 'overflow-y';
-                const maxSizeCssProp = isItemVerticalWriting ? 'max-width' : 'max-height';
+
+                const normalSizeProp = isItemVerticalWriting ? 'width' : 'height';
+                const maxSizeProp = isItemVerticalWriting ? 'max-width' : 'max-height';
+                const sizeProp = isDifferentWritingMode ? normalSizeProp : maxSizeProp;
 
                 if ($block.length && isScrollable) {
                     $block.data('scrollable', true);
-                    $block.css({ [overflowCssProp]: 'auto' });
 
+                    const cssObj = {};
                     if (containerParent.length > 0) {
-                        $block.css(maxSizeCssProp, `${containerBlockSize * (selectedBlockSize * 0.01)}px`);
+                        cssObj[sizeProp] = `${containerBlockSize * (selectedBlockSize * 0.01)}px`;
                     } else {
                         const maxSize = contentBlockSize * (selectedBlockSize * 0.01);
-                        if (maxSize > minimalAcceptableSize) {
-                            $block.css(maxSizeCssProp, `${maxSize}px`);
+                        if (maxSize > minimalAcceptableSizePx) {
+                            cssObj[sizeProp] = `${maxSize}px`;
                         } else {
                             // contentBlockSize could turn out to be negative or very small because of
                             //  'getExtraGridRowBlockSize' [other grid-row's content is unexpectedly long] or 'getSpaceAroundQtiContent';
                             // then we show block with natural size (no scrollbars);
                             // but for block with different writing-mode need to define *some* size.
                             if (isBlockVerticalWriting !== isItemVerticalWriting) {
-                                $block.css(maxSizeCssProp, `${innerItemSize / 2}px`);
+                                cssObj[sizeProp] = `${innerItemSize / 2}px`;
                             }
                         }
                     }
-
-                    if (isBlockVerticalWriting !== isItemVerticalWriting) {
-                        $block.css('block-size', '100%');
-                    }
+                    $block.css(cssObj);
                 }
             });
-        }
-
-        // may be useful in custom item css,
-        // if scrollable block size must be defined more accurately than what Authoring Editor proposes
-        function defineItemSizeVariable(innerItemSize) {
-            $root
-                .find('.qti-itemBody')
-                .get(0)
-                .style.setProperty('--item-container-inner-block-size', `${innerItemSize}px`);
         }
 
         function getItemRunnerBlockSize($itemScrollContainer, isItemVerticalWriting) {

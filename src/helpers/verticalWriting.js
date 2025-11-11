@@ -35,6 +35,6 @@ export const getIsWritingModeVerticalRl = $container => {
     if (!$container.length) {
         return false;
     }
-    const $wrtitingModeParent = $container.closest('.writing-mode-vertical-rl, .writing-mode-horizontal-tb');
-    return $wrtitingModeParent.length && $wrtitingModeParent.hasClass('writing-mode-vertical-rl');
+    const $writingModeParent = $container.closest('.writing-mode-vertical-rl, .writing-mode-horizontal-tb');
+    return Boolean($writingModeParent.length && $writingModeParent.hasClass('writing-mode-vertical-rl'));
 };

@@ -1,0 +1,59 @@
+[
+    {
+        "title": "Default, Scrollable blocks in the item",
+        "mode": "default",
+        "rubrics": false,
+        "item": "item-7",
+        "steps": [
+            {
+                "label": "Text scroll block",
+                "selector": ".custom-text-box[data-scrolling='true']",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Choice interaction scroll block",
+                "selector": ".qti-choiceInteraction[data-scrolling='true']",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Choice interaction choice 1",
+                "selector": ".qti-choiceInteraction input[value=\"choice_1\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Choice interaction choice 2",
+                "selector": ".qti-choiceInteraction input[value=\"choice_2\"]",
+                "key": {
+                    "keyCode": "DOWN"
+                }
+            },
+            {
+                "label": "ExtendedText interaction scroll block",
+                "selector": ".qti-extendedTextInteraction[data-scrolling='true']",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "ExtendedText interaction textarea",
+                "selector": ".qti-extendedTextInteraction textarea",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            },
+            {
+                "label": "Next button",
+                "selector": "[data-control=\"move-forward\"]",
+                "key": {
+                    "keyCode": "TAB"
+                }
+            }
+        ]
+    }
+]

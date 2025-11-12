@@ -5,17 +5,21 @@
         <title>Key Navigation component - Test Runner Plugin test</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
-            require(['/environment/config.js'], function() {
-                require(['qunitEnv'], function() {
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
                     // mock Client Config data:
                     requirejs.config({
                         config: {
                             'core/request': {
                                 noToken: true
                             }
+                        },
+                        paths: {
+                            ckeditor: '/test/mocks/ckeditorMock',
+                            'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator': '/test/mocks/ckConfiguratorMock'
                         }
                     });
-                    require(['taoQtiTest/test/runner/plugins/content/keyNavigation/keyNavigation/test'], function() {
+                    require(['taoQtiTest/test/runner/plugins/content/keyNavigation/keyNavigation/test'], function () {
                         QUnit.start();
                     });
                 });

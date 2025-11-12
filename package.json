@@ -61,7 +61,7 @@
         "@oat-sa/tao-core-sdk": "^3.0.0",
         "@oat-sa/tao-core-ui": "^3.10.0",
         "@oat-sa/tao-item-runner": "^1.0.0",
-        "@oat-sa/tao-item-runner-qti": "^2.6.0",
+        "@oat-sa/tao-item-runner-qti": "git+https://github.com/oat-sa/tao-item-runner-qti-fe.git#fix/INF-382/vertical-writing-per-block",
         "@oat-sa/tao-qunit-testrunner": "^2.0.0",
         "@oat-sa/tao-test-runner": "^1.0.0",
         "async": "0.2.10",

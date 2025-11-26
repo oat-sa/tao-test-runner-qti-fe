@@ -1,5 +1,5 @@
-@import "inc/bootstrap";
-@import "./test-dimensions";
+@import 'inc/bootstrap';
+@import './test-dimensions';
 
 .runner {
     position: relative;
@@ -12,7 +12,6 @@
 }
 
 .test-runner-scope {
-
     position: relative;
 
     display: -ms-flexbox;
@@ -32,7 +31,6 @@
     }
 
     .test-runner-sections {
-
         /* flex column value */
         -webkit-flex: 1 1 0%;
         -ms-flex: 1 1 0%;
@@ -60,31 +58,31 @@
 
         max-width: 350px;
 
-        &>.qti-panel {
+        & > .qti-panel {
             max-width: 350px;
             padding: 10px;
         }
 
-        @media only screen and (max-device-width : 800px) {
+        @media only screen and (max-device-width: 800px) {
             max-width: 200px;
 
-            &>.qti-panel {
+            & > .qti-panel {
                 max-width: 200px;
             }
         }
 
-        @media only screen and (min-device-width : 800px) and (max-device-width : 1280px) {
+        @media only screen and (min-device-width: 800px) and (max-device-width: 1280px) {
             max-width: 250px;
 
-            &>.qti-panel {
+            & > .qti-panel {
                 max-width: 250px;
             }
         }
 
-        @media only screen and (min-device-width : 1280px) and (max-device-width : 1440px) {
+        @media only screen and (min-device-width: 1280px) and (max-device-width: 1440px) {
             max-width: 300px;
 
-            &>.qti-panel {
+            & > .qti-panel {
                 max-width: 300px;
             }
         }
@@ -116,7 +114,7 @@
             top: 0;
             bottom: 0;
             width: 100%;
-            opacity: .9;
+            opacity: 0.9;
 
             &-full {
                 background-color: $uiGeneralContentBg;

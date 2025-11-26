@@ -1,11 +1,14 @@
-@import "inc/bootstrap";
+@import 'inc/bootstrap';
 
 .test-runner-scope {
     .content-wrapper {
-        p.key-navigation-group, div.key-navigation-group:not(.select2-container) {
+        p.key-navigation-group,
+        div.key-navigation-group:not(.select2-container) {
             padding: 5px !important;
         }
-        .key-navigation-group:not(.qti-extendedTextInteraction):not(.qti-textEntryInteraction):not(.qti-customInteraction) {
+        .key-navigation-group:not(.qti-extendedTextInteraction):not(.qti-textEntryInteraction):not(
+                .qti-customInteraction
+            ):not(.qti-choiceInteraction) {
             border-width: 1px !important;
             border-style: solid;
             border-color: transparent; //do not mark it as important to allow color overriding
@@ -13,15 +16,29 @@
                 border-color: $info !important;
                 outline: none;
             }
+        }
+        .key-navigation-group:not(.qti-customInteraction) {
             &.qti-interaction {
                 .qti-choice.key-navigation-highlight:not(.tts-content-node) {
-                    background: whiten($info, .9) !important;
+                    background: whiten($info, 0.9) !important;
                 }
             }
         }
-        span.key-navigation-group{
+        .key-navigation-group.focusin:focus {
+            &.qti-extendedTextInteraction,
+            &.qti-choiceInteraction {
+                outline: 1px solid $info;
+            }
+        }
+        /* focus on checkbox input */
+        .key-navigation-group.qti-choiceInteraction.focusin:not(:focus) .choice-area,
+        /* mousedown on choice -> focus on closest parent with tabindex="-1" (.choice-area) -> mouseup -> focus on checkbox input */
+        .key-navigation-group.qti-choiceInteraction .choice-area:focus {
+            outline: 1px solid $info;
+        }
+        span.key-navigation-group {
             border: none !important;
-            &.focusin{
+            &.focusin {
                 outline: solid $info 1px !important;
                 outline-offset: 1px;
             }
@@ -31,12 +48,12 @@
     .test-sidebar {
         .key-navigation-group {
             &.focusin {
-                background: whiten($info, .9);
+                background: whiten($info, 0.9);
             }
             .qti-navigator-filters {
                 .key-navigation-highlight {
                     .qti-navigator-tab {
-                        border-width:2px;
+                        border-width: 2px;
                     }
                     &:focus {
                         outline: none;
@@ -46,7 +63,6 @@
                             border-right-color: $textColor !important;
                         }
                     }
-
                 }
             }
             li.qti-navigator-item.key-navigation-highlight {
@@ -65,20 +81,20 @@
     .bottom-action-bar.content-action-bar {
         &.key-navigation-group {
             &.focusin {
-                @include box-shadow(0, 0, 6px, 2px, whiten($info, .2));
+                @include box-shadow(0, 0, 6px, 2px, whiten($info, 0.2));
             }
             .key-navigation-highlight {
                 &:focus {
                     margin-bottom: 0;
-                    border-bottom-color: whiten($info, .9) !important;
+                    border-bottom-color: whiten($info, 0.9) !important;
                     outline: none;
                     &.active {
                         border-bottom-color: transparent !important;
-                        background: whiten($info, .9) !important;
+                        background: whiten($info, 0.9) !important;
                     }
                     &:not(.active):not(:active) {
-                        .li-inner{
-                            color : whiten($info, .9);
+                        .li-inner {
+                            color: whiten($info, 0.9);
                         }
                     }
                 }
@@ -87,18 +103,18 @@
     }
 }
 
-header{
-    .settings-menu{
-        .key-navigation-group{
+header {
+    .settings-menu {
+        .key-navigation-group {
             padding-right: 5px;
-            &.focusin{
-                background-color: rgba($info, .5);
+            &.focusin {
+                background-color: rgba($info, 0.5);
                 padding-bottom: 10px;
             }
         }
-        .key-navigation-highlight{
-            &:focus{
-                height:54px;
+        .key-navigation-highlight {
+            &:focus {
+                height: 54px;
                 color: white !important;
                 border-bottom: solid 2px white !important;
             }

@@ -31,6 +31,7 @@ define([
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/rubrics.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/navigation.json',
     'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/navigationFizzy.json',
+    'json!taoQtiTest/test/runner/plugins/content/keyNavigation/data/navigationScrollable.json',
     'jquery.simulate'
 ], function (
     $,
@@ -46,7 +47,8 @@ define([
     itemsBank,
     rubricsBank,
     navigationCases,
-    navigationFizzyCases
+    navigationFizzyCases,
+    navigationScrollableCases
 ) {
     'use strict';
 
@@ -73,20 +75,22 @@ define([
         );
     });
 
-    QUnit.cases.init([
-        {title: 'init'},
-        {title: 'getTestRunner'},
-        {title: 'setMode'},
-        {title: 'getMode'},
-        {title: 'destroy'}
-    ]).test('keyNavigation API ', (data, assert) => {
-        const keyNavigation = keyNavigationFactory();
-        assert.equal(
-            typeof keyNavigation[data.title],
-            'function',
-            `The keyNavigationFactory instance exposes a "${data.title}" function`
-        );
-    });
+    QUnit.cases
+        .init([
+            { title: 'init' },
+            { title: 'getTestRunner' },
+            { title: 'setMode' },
+            { title: 'getMode' },
+            { title: 'destroy' }
+        ])
+        .test('keyNavigation API ', (data, assert) => {
+            const keyNavigation = keyNavigationFactory();
+            assert.equal(
+                typeof keyNavigation[data.title],
+                'function',
+                `The keyNavigationFactory instance exposes a "${data.title}" function`
+            );
+        });
 
     QUnit.module('Behavior');
 
@@ -121,79 +125,101 @@ define([
         assert.equal(keyNavigation.getTestRunner(), testRunner, 'The test runner is accessible');
     });
 
-    QUnit.cases.init([...navigationCases, ...navigationFizzyCases]).test('Navigation mode ', (data, assert) => {
-        const ready = assert.async();
-        const $container = $('#qunit-fixture');
-        const config = {
-            contentNavigatorType: data.mode
-        };
-        const processNavigationStep = (index, delay = stepDelay) => new Promise(resolve => {
-            const step = data.steps[index];
-            const key = Object.assign({}, step.key);
-            key.keyCode = keyCode[key.keyCode] || key.keyCode;
-            $(document.activeElement).simulate('keydown', key);
-            setTimeout(() => {
-                assert.equal(document.activeElement, $container.find(step.selector).get(0), `${step.label} got the focus`);
-                resolve(index + 1);
-            }, delay);
-        });
+    QUnit.cases
+        .init([...navigationCases, ...navigationFizzyCases, ...navigationScrollableCases])
+        .test('Navigation mode ', (data, assert) => {
+            const ready = assert.async();
+            const $container = $('#qunit-fixture');
+            const config = {
+                contentNavigatorType: data.mode
+            };
+            const processNavigationStep = (index, delay = stepDelay) =>
+                new Promise(resolve => {
+                    const step = data.steps[index];
+                    const key = Object.assign({}, step.key);
+                    key.keyCode = keyCode[key.keyCode] || key.keyCode;
+                    $(document.activeElement).simulate('keydown', key);
+                    setTimeout(() => {
+                        assert.equal(
+                            document.activeElement,
+                            $container.find(step.selector).get(0),
+                            `${step.label} got the focus`
+                        );
+                        resolve(index + 1);
+                    }, delay);
+                });
 
-        const testData = _.cloneDeep(backendMock.getTestData());
-        testData.config.review.reviewLayout = data.reviewLayout || 'default';
+            const testData = _.cloneDeep(backendMock.getTestData());
+            testData.config.review.reviewLayout = data.reviewLayout || 'default';
 
-        backendMock.setTestData(testData);
-        backendMock.setRubricsBank(data.rubrics && rubricsBank);
+            backendMock.setTestData(testData);
+            backendMock.setRubricsBank(data.rubrics && rubricsBank);
 
-        assert.expect(8 + data.steps.length);
+            backendMock.setItemsBank(itemsBank);
+            if (data.item) {
+                backendMock.setItem('item-1', itemsBank[data.item]);
+            }
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+            assert.expect(8 + data.steps.length);
 
-        Promise.resolve()
-            .then(() => new Promise((resolve, reject) => {
-                $container.html(layoutTpl());
-                assert.equal($container.children().length, 1, 'The layout is rendered');
-                assert.equal($container.find('.runner').children().length, 0, 'The test runner is not rendered yet');
+            assert.equal($container.children().length, 0, 'The container is empty');
 
-                runnerComponent($container.find('.runner'), _.cloneDeep(configData))
-                    .on('error', reject)
-                    .on('ready', runner => {
-                        assert.equal($container.find('.runner').children().length, 1, 'The test runner is rendered');
+            Promise.resolve()
+                .then(
+                    () =>
+                        new Promise((resolve, reject) => {
+                            $container.html(layoutTpl());
+                            assert.equal($container.children().length, 1, 'The layout is rendered');
+                            assert.equal(
+                                $container.find('.runner').children().length,
+                                0,
+                                'The test runner is not rendered yet'
+                            );
 
-                        runner.after('renderitem.runnerComponent', itemRef => {
-                            if (itemRef !== 'item-3') {
-                                runner.next();
-                            } else {
-                                runner.off('renderitem.runnerComponent');
-                                resolve(runner);
-                            }
-                        });
+                            runnerComponent($container.find('.runner'), _.cloneDeep(configData))
+                                .on('error', reject)
+                                .on('ready', runner => {
+                                    assert.equal(
+                                        $container.find('.runner').children().length,
+                                        1,
+                                        'The test runner is rendered'
+                                    );
+
+                                    runner.after('renderitem.runnerComponent', itemRef => {
+                                        if (itemRef !== 'item-3' && !data.item) {
+                                            runner.next();
+                                        } else {
+                                            runner.off('renderitem.runnerComponent');
+                                            resolve(runner);
+                                        }
+                                    });
+                                });
+                        })
+                )
+                .then(runner => {
+                    const keyNavigation = keyNavigationFactory(runner, config);
+                    assert.ok(true, 'Test runner up an running');
+                    keyNavigation.init();
+
+                    assert.equal(config.contentNavigatorType, data.mode, `The navigation mode is set to ${data.mode}`);
+                    assert.equal(keyNavigation.getMode(), data.mode, `The ${data.mode} mode is claimed`);
+
+                    let queue = Promise.resolve(0);
+                    document.activeElement.blur();
+                    _.times(data.steps.length, () => (queue = queue.then(processNavigationStep)));
+
+                    return queue.then(() => {
+                        keyNavigation.destroy();
+                        return runner.destroy();
                     });
-            }))
-            .then(runner => {
-                const keyNavigation = keyNavigationFactory(runner, config);
-                assert.ok(true, 'Test runner up an running');
-                keyNavigation.init();
-
-                assert.equal(config.contentNavigatorType, data.mode, `The navigation mode is set to ${data.mode}`);
-                assert.equal(keyNavigation.getMode(), data.mode, `The ${data.mode} mode is claimed`);
-
-                let queue = Promise.resolve(0);
-                document.activeElement.blur();
-                _.times(data.steps.length, () => queue = queue.then(processNavigationStep));
-
-                return queue.then(() => {
-                    keyNavigation.destroy();
-                    return runner.destroy();
-                });
-            })
-            .catch(err => {
-                assert.pushResult({
-                    result: false,
-                    message: err
-                });
-            })
-            .then(() => assert.ok(true, 'done!'))
-            .then(ready);
-    });
-
+                })
+                .catch(err => {
+                    assert.pushResult({
+                        result: false,
+                        message: err
+                    });
+                })
+                .then(() => assert.ok(true, 'done!'))
+                .then(ready);
+        });
 });

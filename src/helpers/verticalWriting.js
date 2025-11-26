@@ -25,3 +25,16 @@ export const getIsItemWritingModeVerticalRl = () => {
     const itemBody = $('.qti-itemBody');
     return itemBody.hasClass('writing-mode-vertical-rl');
 };
+
+/**
+ * If element has 'vertical-rl' writing mode
+ * @param {jQuery} $container
+ * @returns {Boolean}
+ */
+export const getIsWritingModeVerticalRl = $container => {
+    if (!$container.length) {
+        return false;
+    }
+    const $writingModeParent = $container.closest('.writing-mode-vertical-rl, .writing-mode-horizontal-tb');
+    return Boolean($writingModeParent.length && $writingModeParent.hasClass('writing-mode-vertical-rl'));
+};

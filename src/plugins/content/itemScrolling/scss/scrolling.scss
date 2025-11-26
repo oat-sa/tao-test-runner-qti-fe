@@ -1,0 +1,12 @@
+[data-scrolling='true'] {
+    overflow-y: auto;
+    overflow-x: auto;
+
+    /* block with different writing-mode from the item */
+    &.writing-mode-vertical-rl {
+        width: 100%;
+    }
+    &.writing-mode-horizontal-tb {
+        height: 100%;
+    }
+}

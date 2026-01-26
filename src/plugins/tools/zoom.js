@@ -50,11 +50,30 @@ const threshold = {
 };
 
 /**
+ * @param {jQuery} $container
+ */
+const _removeContainerCentering = $container => {
+    if ($container) {
+        $container.css('margin-left', '0');
+    }
+};
+
+/**
+ * @param {jQuery} $container
+ */
+const _restoreContainerCentering = $container => {
+    if ($container) {
+        $container.css('margin-left', '');
+    }
+};
+
+/**
  * Sets the zoom level
  * @param {jQuery} $target
+ * @param {jQuery} $container
  * @param {Number} level - Zoom percentage
  */
-const _setZoomLevel = ($target, level) => {
+const _setZoomLevel = ($target, $container, level) => {
     const $parent = $target.parent();
     const newScale = level / standard;
 
@@ -62,10 +81,10 @@ const _setZoomLevel = ($target, level) => {
 
     if (isOverZoom) {
         transformer.setTransformOrigin($target, '0 0');
-        $parent.css('margin-left', '0');
+        _removeContainerCentering($container);
     } else {
         transformer.setTransformOrigin($target, '50% 0');
-        $parent.css('margin-left', '');
+        _restoreContainerCentering($container);
     }
 
     transformer.scale($target, newScale);
@@ -74,9 +93,11 @@ const _setZoomLevel = ($target, level) => {
 /**
  * Restores the standard zoom level
  * @param {jQuery} $target
+ * @param {jQuery} $container
  */
-const _resetZoom = $target => {
+const _resetZoom = ($target, $container) => {
     transformer.reset($target);
+    _restoreContainerCentering($container);
 };
 
 /**
@@ -148,9 +169,9 @@ export default pluginFactory({
                 this.zoom = Math.max(threshold.lower, Math.min(threshold.upper, this.zoom + inc));
 
                 if (this.zoom === standard) {
-                    _resetZoom(this.$zoomTarget);
+                    _resetZoom(this.$zoomTarget, this.$container);
                 } else {
-                    _setZoomLevel(this.$zoomTarget, this.zoom);
+                    _setZoomLevel(this.$zoomTarget, this.$container, this.zoom);
                 }
 
                 testRunnerContainer.style.setProperty('--tool-zoom-level', this.zoom / standard);
@@ -185,7 +206,7 @@ export default pluginFactory({
          */
         const zoomReApply = () => {
             if (this.zoom !== standard) {
-                _setZoomLevel(this.$zoomTarget, this.zoom);
+                _setZoomLevel(this.$zoomTarget, this.$container, this.zoom);
             }
         };
 
@@ -265,8 +286,12 @@ export default pluginFactory({
             .on('enabletools', () => {
                 this.enable();
             })
-            .on('disabletools unloaditem', () => {
+            .on('disabletools', () => {
                 this.disable();
+            })
+            .on('unloaditem', () => {
+                this.disable();
+                _restoreContainerCentering(this.$container);
             })
             .on('tool-zoomin', zoomIn)
             .on('tool-zoomout', zoomOut)
@@ -276,7 +301,7 @@ export default pluginFactory({
      * Called during the runner's destroy phase
      */
     destroy() {
-        shortcut.remove(`.${  this.getName()}`);
+        shortcut.remove(`.${this.getName()}`);
     },
     /**
      * Enable the button

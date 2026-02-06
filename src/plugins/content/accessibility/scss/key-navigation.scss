@@ -2,9 +2,11 @@
 
 .test-runner-scope {
     .content-wrapper {
-        p.key-navigation-group,
-        div.key-navigation-group:not(.select2-container) {
-            padding: 5px !important;
+        :not(.writing-mode-vertical-rl) {
+            p.key-navigation-group,
+            div.key-navigation-group:not(.select2-container):not(.writing-mode-vertical-rl):not(:has) {
+                padding: 5px !important;
+            }
         }
         .key-navigation-group:not(.qti-extendedTextInteraction):not(.qti-textEntryInteraction):not(
                 .qti-customInteraction

@@ -36,13 +36,13 @@ import mapHelper from 'taoQtiTest/runner/helpers/map';
 var buttonData = {
     skip: {
         control: 'skip',
-        title: __('Skip and go to the next item'),
+        title: __.plainTextFromRuby(__('Skip and go to the next item')),
         icon: 'external',
         text: __('Skip')
     },
     end: {
         control: 'skip-end',
-        title: __('Skip and go to the end of the test'),
+        title: __.plainTextFromRuby(__('Skip and go to the end of the test')),
         icon: 'external',
         text: __('Skip and end test')
     }
@@ -74,7 +74,7 @@ const updateElement = function updateElement($element, isLast = false) {
             .attr('data-control', button.control)
             .attr('title', button.title)
             .find('.text')
-            .text(button.text);
+            .html(button.text);
     }
 };
 

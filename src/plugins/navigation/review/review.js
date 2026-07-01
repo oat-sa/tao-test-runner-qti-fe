@@ -106,10 +106,10 @@ function updateButton(button, data) {
     var $button = button.getElement();
     if (button.is('rendered')) {
         if ($button.data('control') !== data.control) {
-            $button.data('control', data.control).attr('title', data.title);
+            $button.data('control', data.control).attr('title', __.plainTextFromRuby(data.title));
 
             $button.find('.icon').attr('class', `icon icon-${data.icon}`);
-            $button.find('.text').text(data.text);
+            $button.find('.text').html(data.text);
 
             if (data.control.includes('flag') || data.control.includes('overview')) {
                 if (button.is('active')) {

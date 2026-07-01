@@ -40,14 +40,14 @@ import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
 const buttonData = {
     next: {
         control: 'move-forward',
-        title: __('Submit and go to the next item'),
+        title: __.plainTextFromRuby(__('Submit and go to the next item')),
         specificTitle: __('Submit and go to the item %s'),
         icon: 'forward',
         text: __('Next')
     },
     end: {
         control: 'move-end',
-        title: __('Submit and go to the end of the test'),
+        title: __.plainTextFromRuby(__('Submit and go to the end of the test')),
         icon: 'fast-forward',
         text: __('End test')
     }
@@ -90,7 +90,7 @@ const updateElement = ($element, testRunner, isLast = false) => {
     if (dataType === 'next' && !testContext.isAdaptive && !testContext.isCatAdaptive) {
         const testMap = testRunner.getTestMap();
         const nextItem = navigationHelper.getNextItem(testMap, testContext.itemPosition);
-        $element.attr('title', __(buttonData.next.specificTitle, nextItem.label));
+        $element.attr('title', __.plainTextFromRuby(__(buttonData.next.specificTitle, nextItem.label)));
     } else {
         $element.attr('title', buttonData[dataType].title);
     }
@@ -99,7 +99,7 @@ const updateElement = ($element, testRunner, isLast = false) => {
         $element
             .attr('data-control', buttonData[dataType].control)
             .find('.text')
-            .text(buttonData[dataType].text);
+            .html(buttonData[dataType].text);
 
         if (dataType === 'next') {
             $element

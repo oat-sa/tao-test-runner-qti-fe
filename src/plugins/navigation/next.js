@@ -33,6 +33,7 @@ import statsHelper from 'taoQtiTest/runner/helpers/stats';
 import shortcut from 'util/shortcut';
 import namespaceHelper from 'util/namespace';
 import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
+import plainTextFromRuby from 'taoQtiTest/runner/helpers/plainTextFromRuby';
 
 /**
  * The display of the next button
@@ -40,14 +41,14 @@ import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
 const buttonData = {
     next: {
         control: 'move-forward',
-        title: __.plainTextFromRuby(__('Submit and go to the next item')),
+        title: plainTextFromRuby(__('Submit and go to the next item')),
         specificTitle: __('Submit and go to the item %s'),
         icon: 'forward',
         text: __('Next')
     },
     end: {
         control: 'move-end',
-        title: __.plainTextFromRuby(__('Submit and go to the end of the test')),
+        title: plainTextFromRuby(__('Submit and go to the end of the test')),
         icon: 'fast-forward',
         text: __('End test')
     }
@@ -90,7 +91,7 @@ const updateElement = ($element, testRunner, isLast = false) => {
     if (dataType === 'next' && !testContext.isAdaptive && !testContext.isCatAdaptive) {
         const testMap = testRunner.getTestMap();
         const nextItem = navigationHelper.getNextItem(testMap, testContext.itemPosition);
-        $element.attr('title', __.plainTextFromRuby(__(buttonData.next.specificTitle, nextItem.label)));
+        $element.attr('title', plainTextFromRuby(__(buttonData.next.specificTitle, nextItem.label)));
     } else {
         $element.attr('title', buttonData[dataType].title);
     }

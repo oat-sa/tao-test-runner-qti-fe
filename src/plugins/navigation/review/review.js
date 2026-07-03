@@ -31,6 +31,7 @@ import pluginFactory from 'taoTests/runner/plugin';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
 import defaultNavigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigator';
 import fizzyNavigatorFactory from 'taoQtiTest/runner/plugins/navigation/review/navigatorFizzy';
+import plainTextFromRuby from 'taoQtiTest/runner/helpers/plainTextFromRuby';
 
 /**
  * The display states of the buttons
@@ -106,7 +107,7 @@ function updateButton(button, data) {
     var $button = button.getElement();
     if (button.is('rendered')) {
         if ($button.data('control') !== data.control) {
-            $button.data('control', data.control).attr('title', __.plainTextFromRuby(data.title));
+            $button.data('control', data.control).attr('title', plainTextFromRuby(data.title));
 
             $button.find('.icon').attr('class', `icon icon-${data.icon}`);
             $button.find('.text').html(data.text);

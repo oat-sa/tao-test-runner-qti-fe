@@ -29,6 +29,7 @@ import messages from 'taoQtiTest/runner/helpers/messages';
 import buttonTpl from 'taoQtiTest/runner/plugins/templates/button';
 import navigationHelper from 'taoQtiTest/runner/helpers/navigation';
 import mapHelper from 'taoQtiTest/runner/helpers/map';
+import plainTextFromRuby from 'taoQtiTest/runner/helpers/plainTextFromRuby';
 
 /**
  * The display of the skip
@@ -36,13 +37,13 @@ import mapHelper from 'taoQtiTest/runner/helpers/map';
 var buttonData = {
     skip: {
         control: 'skip',
-        title: __.plainTextFromRuby(__('Skip and go to the next item')),
+        title: plainTextFromRuby(__('Skip and go to the next item')),
         icon: 'external',
         text: __('Skip')
     },
     end: {
         control: 'skip-end',
-        title: __.plainTextFromRuby(__('Skip and go to the end of the test')),
+        title: plainTextFromRuby(__('Skip and go to the end of the test')),
         icon: 'external',
         text: __('Skip and end test')
     }

@@ -1,1 +1,1 @@
-{{#if header}}<b>{{header}}</b><br><br>{{/if}}
+{{#if header}}<b>{{{header}}}</b><br><br>{{/if}}

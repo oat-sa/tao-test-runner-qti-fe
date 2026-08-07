@@ -20,6 +20,7 @@ import context from 'context';
 import loggerFactory from 'core/logger';
 import __ from 'i18n';
 import states from 'taoQtiTest/runner/config/states';
+import { createStorageSignalWatcher, emitStorageSignal } from 'taoQtiTest/runner/services/localStorageSignal';
 import { getSequenceNumber, getSequenceStore } from 'taoQtiTest/runner/services/sequenceStore';
 import pluginFactory from 'taoTests/runner/plugin';
 
@@ -27,6 +28,15 @@ const logger = loggerFactory('taoQtiTest/runner/plugins/controls/session/prevent
 
 const FEATURE_FLAG = 'FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS';
 const CONCURRENCY_RESUME_SIGNAL_KEY = 'taoQtiTest.concurrency.resumeSignal';
+const DIALOG_MESSAGE_SELECTOR = '.preview-modal-feedback.modal .message';
+
+function setCurrentDialogMessage(text) {
+    document.querySelectorAll(DIALOG_MESSAGE_SELECTOR).forEach(element => {
+        if (element && element.textContent !== text) {
+            element.textContent = text;
+        }
+    });
+}
 
 /**
  * Test Runner Control Plugin : detect concurrent deliveries launched from the same user session.
@@ -45,24 +55,13 @@ export default pluginFactory({
         return Promise.all([getSequenceNumber(testRunner), getSequenceStore()]).then(
             ([sequenceNumber, sequenceStore]) =>
                 sequenceStore.setSequenceNumber(sequenceNumber).then(() => {
-                    const emitResumeSignal = () => {
-                        try {
-                            window.localStorage.setItem(
-                                CONCURRENCY_RESUME_SIGNAL_KEY,
-                                `${sequenceNumber}:${Date.now()}`
-                            );
-                        } catch (error) {
-                            // Ignore localStorage failures in restricted browser modes.
-                        }
-                    };
-
                     // Notify other tabs that the latest owner sequence has changed.
-                    emitResumeSignal();
+                    emitStorageSignal(CONCURRENCY_RESUME_SIGNAL_KEY, sequenceNumber);
 
                     const releaseOwnershipOnClose = () =>
                         sequenceStore.getSequenceNumber().then(lastSequenceNumber => {
                             if (lastSequenceNumber === sequenceNumber) {
-                                emitResumeSignal();
+                                emitStorageSignal(CONCURRENCY_RESUME_SIGNAL_KEY, sequenceNumber);
                                 return sequenceStore.clearSequenceNumber();
                             }
                         });
@@ -105,25 +104,6 @@ export default pluginFactory({
                                 }
                             };
 
-                            const setCurrentDialogMessage = text => {
-                                const selectors = [
-                                    '.feedback-error .message',
-                                    '.feedback-warning .message',
-                                    '.feedback-info .message',
-                                    '.feedback .message',
-                                    '.modal .message',
-                                    '.ui-dialog .message'
-                                ];
-
-                                selectors.forEach(selector => {
-                                    document.querySelectorAll(selector).forEach(element => {
-                                        if (element && element.textContent !== text) {
-                                            element.textContent = text;
-                                        }
-                                    });
-                                });
-                            };
-
                             const checkIfCanResume = () =>
                                 sequenceStore.getSequenceNumber().then(lastSequenceNumber => {
                                     if (!lastSequenceNumber || lastSequenceNumber === sequenceNumber) {
@@ -135,23 +115,6 @@ export default pluginFactory({
                                     canResumeHere = false;
                                     setCurrentDialogMessage(message);
                                 });
-
-                            const startWatcher = () => {
-                                const onStorageChanged = event => {
-                                    if (event && event.key && event.key !== CONCURRENCY_RESUME_SIGNAL_KEY) {
-                                        return;
-                                    }
-
-                                    checkIfCanResume();
-                                    setTimeout(checkIfCanResume, 120);
-                                };
-
-                                window.addEventListener('storage', onStorageChanged);
-
-                                return () => {
-                                    window.removeEventListener('storage', onStorageChanged);
-                                };
-                            };
 
                             if (skipPausedAssessmentDialog) {
                                 testRunner.trigger('leave', {
@@ -189,7 +152,10 @@ export default pluginFactory({
                                     });
                                 });
 
-                            unregisterResumeWatchers = startWatcher();
+                            unregisterResumeWatchers = createStorageSignalWatcher(
+                                CONCURRENCY_RESUME_SIGNAL_KEY,
+                                checkIfCanResume
+                            );
                         });
                 })
         );

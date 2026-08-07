@@ -42,6 +42,14 @@ export default {
              */
             getSequenceNumber() {
                 return sequenceStore.getItem(SEQUENCE_NUMBER);
+            },
+
+            /**
+             * Clears the sequence owner for the session.
+             * @returns {Promise} - Resolved once the sequence owner has been cleared.
+             */
+            clearSequenceNumber() {
+                return sequenceStore.setItem(SEQUENCE_NUMBER, null);
             }
         }));
     },

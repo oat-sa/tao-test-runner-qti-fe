@@ -15,6 +15,7 @@
  *
  * Copyright (c) 2023 (original work) Open Assessment Technologies SA ;
  */
+
 import context from 'context';
 import loggerFactory from 'core/logger';
 import __ from 'i18n';
@@ -43,6 +44,15 @@ export default pluginFactory({
         return Promise.all([getSequenceNumber(testRunner), getSequenceStore()]).then(
             ([sequenceNumber, sequenceStore]) =>
                 sequenceStore.setSequenceNumber(sequenceNumber).then(() => {
+                    const releaseOwnershipOnClose = () =>
+                        sequenceStore.getSequenceNumber().then(lastSequenceNumber => {
+                            if (lastSequenceNumber === sequenceNumber) {
+                                return sequenceStore.clearSequenceNumber();
+                            }
+                        });
+
+                    window.addEventListener('pagehide', releaseOwnershipOnClose);
+
                     testRunner
                         .on('tick', () => {
                             if (context.featureFlags[FEATURE_FLAG]) {
@@ -59,16 +69,51 @@ export default pluginFactory({
                             }
                         })
                         .on('concurrency', () => {
+                            const message = __(
+                                'A concurrent delivery has been detected. Please use the last open session. The present window can be closed.'
+                            );
+
                             logger.warn(
                                 `The sequence number has changed. Was another delivery opened in the same browser?`
                             );
-                            testRunner.trigger('leave', {
-                                code: states.testSession.suspended,
-                                message: __(
-                                    'A concurrent delivery has been detected. Please use the last open session. The present window can be closed.'
-                                ),
-                                skipExitMessage: skipPausedAssessmentDialog
-                            });
+
+                            if (skipPausedAssessmentDialog) {
+                                testRunner.trigger('leave', {
+                                    code: states.testSession.suspended,
+                                    message,
+                                    skipExitMessage: true
+                                });
+                                return;
+                            }
+
+                            testRunner
+                                .trigger('disablefeedbackalerts')
+                                .trigger('alert.leave', message, () => {
+                                    testRunner.trigger('enablefeedbackalerts');
+
+                                    sequenceStore
+                                        .getSequenceNumber()
+                                        .then(lastSequenceNumber => {
+                                            if (!lastSequenceNumber || lastSequenceNumber === sequenceNumber) {
+                                                sequenceStore.setSequenceNumber(sequenceNumber);
+                                                window.location.reload();
+                                                return;
+                                            }
+
+                                            testRunner.trigger('leave', {
+                                                code: states.testSession.suspended,
+                                                message,
+                                                skipExitMessage: true
+                                            });
+                                        })
+                                        .catch(() => {
+                                            testRunner.trigger('leave', {
+                                                code: states.testSession.suspended,
+                                                message,
+                                                skipExitMessage: true
+                                            });
+                                        });
+                                });
                         });
                 })
         );

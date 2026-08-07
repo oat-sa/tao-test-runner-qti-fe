@@ -9,7 +9,10 @@
                 require(['qunitEnv'], function() {
                     requirejs.config({
                         paths: {
-                            'taoQtiTest/runner/services/sequenceStore': '/test/plugins/controls/preventConcurrency/mocks/sequenceStore'
+                            'taoQtiTest/runner/services/sequenceStore':
+                                '/test/plugins/controls/preventConcurrency/mocks/sequenceStore',
+                            'taoQtiTest/runner/services/localStorageSignal':
+                                '/test/plugins/controls/preventConcurrency/mocks/localStorageSignal'
                         }
                     });
                     require(['taoQtiTest/test/runner/plugins/controls/preventConcurrency/test'], function() {

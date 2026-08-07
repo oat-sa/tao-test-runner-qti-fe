@@ -13,6 +13,11 @@ define(function () {
 
                 getSequenceNumber() {
                     return Promise.resolve(sequenceNumber);
+                },
+
+                clearSequenceNumber() {
+                    sequenceNumber = null;
+                    return Promise.resolve();
                 }
             });
         },

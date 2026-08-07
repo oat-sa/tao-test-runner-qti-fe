@@ -87,6 +87,7 @@ export default inputs.map(input => {
             'module',
             'nouislider',
             'i18n',
+            'context',
             'ckeditor',
             'layout/loading-bar'
         ],

@@ -162,7 +162,7 @@ define([
     QUnit.test('detect concurrency', assert => {
         const ready = assert.async();
         context.featureFlags.FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS = true;
-        getTestRunner()
+        getTestRunner({ skipPausedAssessmentDialog: true })
             .then(runner => {
                 const plugin = pluginFactory(runner);
 
@@ -181,6 +181,11 @@ define([
                             () =>
                                 new Promise(resolve => {
                                     runner.on('concurrency', () => assert.ok('true', 'Concurrency detected'));
+                                    runner.on('alert.leave', (message, onClose) => {
+                                        if (typeof onClose === 'function') {
+                                            onClose();
+                                        }
+                                    });
                                     runner.on('leave', () => {
                                         assert.ok('true', 'Test runner leaving');
                                         resolve();

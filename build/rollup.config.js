@@ -49,7 +49,10 @@ Handlebars.Visitor.prototype.accept = function() {
 /* --------------------------------------------------------- */
 
 const globPath = p => p.replace(/\\/g, '/');
-const inputs = glob.sync(globPath(path.join(srcDir, '**', '*.js')));
+const workerFiles = glob.sync(globPath(path.join(srcDir, '**', '*.worker.js')));
+const inputs = glob
+    .sync(globPath(path.join(srcDir, '**', '*.js')))
+    .filter(input => !input.endsWith('.worker.js'));
 
 /**
  * Define all modules as external, so rollup won't bundle them together.
@@ -138,4 +141,13 @@ glob(globPath(path.join(srcDir, '**', '*.tpl'))).then(files => {
         await mkdirp(path.dirname(targetFile));
         copyFile(file, targetFile);
     });
+});
+
+/**
+ * copy worker files into dist as plain scripts, because SharedWorker expects a direct script URL.
+ */
+workerFiles.forEach(async (file) => {
+    const targetFile = path.resolve(outputDir, path.relative(srcDir, file));
+    await mkdirp(path.dirname(targetFile));
+    copyFile(file, targetFile);
 });

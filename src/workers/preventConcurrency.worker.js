@@ -11,21 +11,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 31 Milk St # 960789 Boston, MA 02196 USA.
  *
- * Copyright (c) 2023 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2026 (original work) Open Assessment Technologies SA.
  */
-(function() {
-    const MESSAGE_TYPE = {
-        REGISTER: 'REGISTER',
-        ACTIVE: 'ACTIVE',
-        PAUSED: 'PAUSED',
-        FOCUS: 'FOCUS',
-        BLUR: 'BLUR',
-        CLOSING: 'CLOSING',
-        UNPAUSE: 'UNPAUSE'
-    };
 
+(function() {
     const tabs = new Map();
     let activeTabId = null;
     let focusedPausedTabId = null;
@@ -54,10 +45,10 @@
 
         waitingForFocusedPausedTab = false;
         focusedPausedTabId = null;
-        candidate.port.postMessage({ type: MESSAGE_TYPE.UNPAUSE });
+        candidate.port.postMessage({ type: 'UNPAUSE' });
     };
 
-    onconnect = event => {
+    self.onconnect = event => {
         const port = event.ports[0];
         let tabId = null;
 
@@ -66,7 +57,7 @@
                 return;
             }
 
-            if (data.type === MESSAGE_TYPE.REGISTER) {
+            if (data.type === 'REGISTER') {
                 tabId = data.tabId;
                 const tab = ensureTab(tabId);
                 tab.port = port;
@@ -79,7 +70,7 @@
 
             const tab = ensureTab(tabId);
 
-            if (data.type === MESSAGE_TYPE.ACTIVE) {
+            if (data.type === 'ACTIVE') {
                 activeTabId = tabId;
                 tab.isPaused = false;
                 waitingForFocusedPausedTab = false;
@@ -89,7 +80,7 @@
                 return;
             }
 
-            if (data.type === MESSAGE_TYPE.PAUSED) {
+            if (data.type === 'PAUSED') {
                 tab.isPaused = true;
                 if (activeTabId === tabId) {
                     activeTabId = null;
@@ -97,7 +88,7 @@
                 return;
             }
 
-            if (data.type === MESSAGE_TYPE.FOCUS) {
+            if (data.type === 'FOCUS') {
                 tab.isFocused = true;
                 if (tab.isPaused) {
                     focusedPausedTabId = tabId;
@@ -106,7 +97,7 @@
                 return;
             }
 
-            if (data.type === MESSAGE_TYPE.BLUR) {
+            if (data.type === 'BLUR') {
                 tab.isFocused = false;
                 if (focusedPausedTabId === tabId) {
                     focusedPausedTabId = null;
@@ -114,7 +105,7 @@
                 return;
             }
 
-            if (data.type === MESSAGE_TYPE.CLOSING) {
+            if (data.type === 'CLOSING') {
                 const wasActive = activeTabId === tabId;
                 tabs.delete(tabId);
                 if (focusedPausedTabId === tabId) {

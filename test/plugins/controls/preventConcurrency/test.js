@@ -22,8 +22,18 @@ define([
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoQtiTest/test/runner/mocks/proxyMock',
     'taoQtiTest/runner/plugins/controls/session/preventConcurrency',
-    'taoQtiTest/runner/services/sequenceStore'
-], function (context, runnerFactory, proxyFactory, providerMock, providerProxyMock, pluginFactory, sequenceStore) {
+    'taoQtiTest/runner/services/sequenceStore',
+    'taoQtiTest/runner/plugins/controls/session/preventConcurrencySharedWorker'
+], function (
+    context,
+    runnerFactory,
+    proxyFactory,
+    providerMock,
+    providerProxyMock,
+    pluginFactory,
+    sequenceStore,
+    preventConcurrencySharedWorker
+) {
     'use strict';
 
     const providerName = 'mock';
@@ -127,6 +137,7 @@ define([
     QUnit.module('Plugin', {
         beforeEach() {
             context.featureFlags = {};
+            preventConcurrencySharedWorker.reset();
         }
     });
 
@@ -138,7 +149,7 @@ define([
 
                 runner.sequenceNumber = '1234-5678';
 
-                assert.expect(1);
+                assert.expect(3);
 
                 return sequenceStore.getSequenceStore().then(store =>
                     store
@@ -147,6 +158,8 @@ define([
                         .then(() => store.getSequenceNumber())
                         .then(sequenceNumber => {
                             assert.equal(sequenceNumber, runner.sequenceNumber);
+                            assert.equal(preventConcurrencySharedWorker.getStats().createCalls, 0);
+                            assert.equal(preventConcurrencySharedWorker.getStats().markActiveCalls, 0);
                         })
                 );
             })
@@ -168,7 +181,7 @@ define([
 
                 runner.sequenceNumber = '1234-5678';
 
-                assert.expect(3);
+                assert.expect(5);
 
                 return sequenceStore.getSequenceStore().then(store =>
                     plugin
@@ -176,12 +189,15 @@ define([
                         .then(() => store.getSequenceNumber())
                         .then(sequenceNumber => {
                             assert.equal(sequenceNumber, runner.sequenceNumber);
+                            assert.equal(preventConcurrencySharedWorker.getStats().createCalls, 1);
+                            assert.equal(preventConcurrencySharedWorker.getStats().markActiveCalls, 1);
                         })
                         .then(
                             () =>
                                 new Promise(resolve => {
                                     runner.on('concurrency', () => assert.ok('true', 'Concurrency detected'));
                                     runner.on('leave', () => {
+                                        assert.equal(preventConcurrencySharedWorker.getStats().markPausedCalls, 1);
                                         assert.ok('true', 'Test runner leaving');
                                         resolve();
                                     });
@@ -209,7 +225,7 @@ define([
 
                 runner.sequenceNumber = '1234-5678';
 
-                assert.expect(1);
+                assert.expect(3);
 
                 return sequenceStore.getSequenceStore().then(store =>
                     plugin
@@ -217,6 +233,8 @@ define([
                         .then(() => store.getSequenceNumber())
                         .then(sequenceNumber => {
                             assert.equal(sequenceNumber, runner.sequenceNumber);
+                            assert.equal(preventConcurrencySharedWorker.getStats().createCalls, 1);
+                            assert.equal(preventConcurrencySharedWorker.getStats().markActiveCalls, 1);
                         })
                         .then(
                             () =>
@@ -249,7 +267,7 @@ define([
 
                 runner.sequenceNumber = '1234-5678';
 
-                assert.expect(1);
+                assert.expect(4);
 
                 return sequenceStore.getSequenceStore().then(store =>
                     plugin
@@ -257,6 +275,9 @@ define([
                         .then(() => store.getSequenceNumber())
                         .then(sequenceNumber => {
                             assert.equal(sequenceNumber, runner.sequenceNumber);
+                            assert.equal(preventConcurrencySharedWorker.getStats().createCalls, 0);
+                            assert.equal(preventConcurrencySharedWorker.getStats().markActiveCalls, 0);
+                            assert.equal(preventConcurrencySharedWorker.getStats().markPausedCalls, 0);
                         })
                         .then(
                             () =>

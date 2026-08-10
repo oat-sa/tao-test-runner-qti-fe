@@ -46,11 +46,11 @@ export default pluginFactory({
         let refreshTriggered = false;
         const sharedWorkerClient = isConcurrencyFeatureEnabled
             ? createSharedWorkerClient(() => {
-                  if (isPaused && !refreshTriggered && typeof window !== 'undefined') {
-                      refreshTriggered = true;
-                      window.location.reload();
-                  }
-              })
+                if (isPaused && !refreshTriggered && typeof window !== 'undefined') {
+                    refreshTriggered = true;
+                    window.location.reload();
+                }
+            })
             : null;
 
         return Promise.all([getSequenceNumber(testRunner), getSequenceStore()]).then(

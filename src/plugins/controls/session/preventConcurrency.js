@@ -20,22 +20,69 @@ import context from 'context';
 import loggerFactory from 'core/logger';
 import __ from 'i18n';
 import states from 'taoQtiTest/runner/config/states';
-import { createStorageSignalWatcher, emitStorageSignal } from 'taoQtiTest/runner/services/localStorageSignal';
 import { getSequenceNumber, getSequenceStore } from 'taoQtiTest/runner/services/sequenceStore';
 import pluginFactory from 'taoTests/runner/plugin';
 
 const logger = loggerFactory('taoQtiTest/runner/plugins/controls/session/preventConcurrency');
 
 const FEATURE_FLAG = 'FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS';
-const CONCURRENCY_RESUME_SIGNAL_KEY = 'taoQtiTest.concurrency.resumeSignal';
-const DIALOG_MESSAGE_SELECTOR = '.preview-modal-feedback.modal .message';
+const CONCURRENCY_SIGNAL_KEY = 'taoQtiTest.concurrency.signal';
+const CONCURRENCY_BROADCAST_CHANNEL = 'taoQtiTest.concurrency.channel';
 
-function setCurrentDialogMessage(text) {
-    document.querySelectorAll(DIALOG_MESSAGE_SELECTOR).forEach(element => {
-        if (element && element.textContent !== text) {
-            element.textContent = text;
+function emitConcurrencySignal(sequenceNumber) {
+    try {
+        window.localStorage.setItem(CONCURRENCY_SIGNAL_KEY, `${sequenceNumber}:${Date.now()}`);
+    } catch (error) {
+        logger.warn('Unable to emit concurrency signal to localStorage.', error);
+    }
+}
+
+function createConcurrencyBroadcastChannel() {
+    if (typeof window.BroadcastChannel !== 'function') {
+        return null;
+    }
+
+    try {
+        return new window.BroadcastChannel(CONCURRENCY_BROADCAST_CHANNEL);
+    } catch (error) {
+        logger.warn('Unable to open BroadcastChannel for concurrency signals.', error);
+        return null;
+    }
+}
+
+function emitConcurrencyBroadcastSignal(channel, sequenceNumber) {
+    if (!channel) {
+        return;
+    }
+
+    try {
+        channel.postMessage({
+            sequenceNumber,
+            timestamp: Date.now()
+        });
+    } catch (error) {
+        logger.warn('Unable to emit concurrency signal to BroadcastChannel.', error);
+    }
+}
+
+function bindResumeWatchers({ onStorageChanged, onBroadcastSignal, onFocus, onVisibilityChanged, broadcastChannel }) {
+    window.addEventListener('storage', onStorageChanged);
+    if (broadcastChannel) {
+        broadcastChannel.addEventListener('message', onBroadcastSignal);
+    }
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('pageshow', onFocus);
+    document.addEventListener('visibilitychange', onVisibilityChanged);
+
+    return () => {
+        window.removeEventListener('storage', onStorageChanged);
+        if (broadcastChannel) {
+            broadcastChannel.removeEventListener('message', onBroadcastSignal);
         }
-    });
+        window.removeEventListener('focus', onFocus);
+        window.removeEventListener('pageshow', onFocus);
+        document.removeEventListener('visibilitychange', onVisibilityChanged);
+    };
 }
 
 /**
@@ -51,22 +98,37 @@ export default pluginFactory({
         const testRunner = this.getTestRunner();
         const options = testRunner.getOptions();
         const skipPausedAssessmentDialog = !!options.skipPausedAssessmentDialog;
+        let broadcastChannel = null;
 
         return Promise.all([getSequenceNumber(testRunner), getSequenceStore()]).then(
             ([sequenceNumber, sequenceStore]) =>
                 sequenceStore.setSequenceNumber(sequenceNumber).then(() => {
-                    // Notify other tabs that the latest owner sequence has changed.
-                    emitStorageSignal(CONCURRENCY_RESUME_SIGNAL_KEY, sequenceNumber);
+                    let isResumeReloadInProgress = false;
+                    broadcastChannel = createConcurrencyBroadcastChannel();
 
-                    const releaseOwnershipOnClose = () =>
-                        sequenceStore.getSequenceNumber().then(lastSequenceNumber => {
+                    emitConcurrencySignal(sequenceNumber);
+                    emitConcurrencyBroadcastSignal(broadcastChannel, sequenceNumber);
+
+                    const releaseOwnershipOnClose = () => {
+                        if (isResumeReloadInProgress) {
+                            return Promise.resolve();
+                        }
+
+                        return sequenceStore.getSequenceNumber().then(lastSequenceNumber => {
                             if (lastSequenceNumber === sequenceNumber) {
-                                emitStorageSignal(CONCURRENCY_RESUME_SIGNAL_KEY, sequenceNumber);
-                                return sequenceStore.clearSequenceNumber();
+                                emitConcurrencySignal(sequenceNumber);
+                                emitConcurrencyBroadcastSignal(broadcastChannel, sequenceNumber);
+                                return sequenceStore.clearSequenceNumber().then(() => {
+                                    emitConcurrencySignal(sequenceNumber);
+                                    emitConcurrencyBroadcastSignal(broadcastChannel, sequenceNumber);
+                                });
                             }
                         });
+                    };
 
                     window.addEventListener('pagehide', releaseOwnershipOnClose);
+                    window.addEventListener('beforeunload', releaseOwnershipOnClose);
+                    window.addEventListener('unload', releaseOwnershipOnClose);
 
                     testRunner
                         .on('tick', () => {
@@ -87,10 +149,7 @@ export default pluginFactory({
                             const message = __(
                                 'A concurrent delivery has been detected. Please use the last open session. The present window can be closed.'
                             );
-                            const resumeMessage = __(
-                                'This delivery was paused because it was opened in another tab. The other tab is now closed. Click OK to continue here.'
-                            );
-                            let canResumeHere = false;
+                            let isResuming = false;
                             let unregisterResumeWatchers = null;
 
                             logger.warn(
@@ -104,17 +163,78 @@ export default pluginFactory({
                                 }
                             };
 
-                            const checkIfCanResume = () =>
-                                sequenceStore.getSequenceNumber().then(lastSequenceNumber => {
-                                    if (!lastSequenceNumber || lastSequenceNumber === sequenceNumber) {
-                                        canResumeHere = true;
-                                        setCurrentDialogMessage(resumeMessage);
+                            const tryResumeHere = () => {
+                                if (isResuming) {
+                                    return Promise.resolve(false);
+                                }
+
+                                isResuming = true;
+
+                                return sequenceStore
+                                    .getSequenceNumber()
+                                    .then(lastSequenceNumber => {
+                                        if (lastSequenceNumber && lastSequenceNumber !== sequenceNumber) {
+                                            return false;
+                                        }
+
+                                        return sequenceStore
+                                            .setSequenceNumber(sequenceNumber)
+                                            .then(() => sequenceStore.getSequenceNumber())
+                                            .then(currentSequenceNumber => {
+                                                if (currentSequenceNumber !== sequenceNumber) {
+                                                    return false;
+                                                }
+
+                                                stopWatcher();
+                                                isResumeReloadInProgress = true;
+                                                window.location.reload();
+                                                return true;
+                                            });
+                                    })
+                                    .finally(() => {
+                                        isResuming = false;
+                                    });
+                            };
+
+                            const startWatcher = () => {
+                                const canAutoResumeFromSignal = () => document.visibilityState === 'visible';
+
+                                const onFocus = () => {
+                                    tryResumeHere();
+                                };
+
+                                const onStorageChanged = event => {
+                                    if (event && event.key && event.key !== CONCURRENCY_SIGNAL_KEY) {
                                         return;
                                     }
 
-                                    canResumeHere = false;
-                                    setCurrentDialogMessage(message);
+                                    // Only the active tab auto-resumes on cross-tab close/change signals.
+                                    // Background tabs wait until they receive focus.
+                                    if (canAutoResumeFromSignal()) {
+                                        tryResumeHere();
+                                    }
+                                };
+
+                                const onBroadcastSignal = () => {
+                                    if (canAutoResumeFromSignal()) {
+                                        tryResumeHere();
+                                    }
+                                };
+
+                                const onVisibilityChanged = () => {
+                                    if (document.visibilityState === 'visible') {
+                                        tryResumeHere();
+                                    }
+                                };
+
+                                return bindResumeWatchers({
+                                    onStorageChanged,
+                                    onBroadcastSignal,
+                                    onFocus,
+                                    onVisibilityChanged,
+                                    broadcastChannel
                                 });
+                            };
 
                             if (skipPausedAssessmentDialog) {
                                 testRunner.trigger('leave', {
@@ -131,16 +251,8 @@ export default pluginFactory({
                                     stopWatcher();
                                     testRunner.trigger('enablefeedbackalerts');
 
-                                    if (canResumeHere) {
-                                        sequenceStore.setSequenceNumber(sequenceNumber);
-                                        window.location.reload();
-                                        return;
-                                    }
-
-                                    checkIfCanResume().then(() => {
-                                        if (canResumeHere) {
-                                            sequenceStore.setSequenceNumber(sequenceNumber);
-                                            window.location.reload();
+                                    tryResumeHere().then(isResumed => {
+                                        if (isResumed) {
                                             return;
                                         }
 
@@ -152,11 +264,13 @@ export default pluginFactory({
                                     });
                                 });
 
-                            unregisterResumeWatchers = createStorageSignalWatcher(
-                                CONCURRENCY_RESUME_SIGNAL_KEY,
-                                checkIfCanResume
-                            );
+                            unregisterResumeWatchers = startWatcher();
                         });
+                })
+                .finally(() => {
+                    if (broadcastChannel) {
+                        broadcastChannel.close();
+                    }
                 })
         );
     }

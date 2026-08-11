@@ -22,6 +22,7 @@ import __ from 'i18n';
 import states from 'taoQtiTest/runner/config/states';
 import { getSequenceNumber, getSequenceStore } from 'taoQtiTest/runner/services/sequenceStore';
 import pluginFactory from 'taoTests/runner/plugin';
+import uuid from 'lib/uuid';
 
 const logger = loggerFactory('taoQtiTest/runner/plugins/controls/session/preventConcurrency');
 
@@ -35,9 +36,7 @@ const TAB_SYNC_EVENTS = Object.freeze({
 
 function createTabSynchronization(testRunner, concurrencyState) {
     const channel = new window.BroadcastChannel(TAB_SYNC_CHANNEL_NAME);
-    const tabId = Math.random()
-        .toString(36)
-        .substring(2, 9);
+    const tabId = uuid(8);
     let isClaimingActiveTab = false;
     let reloadOnFocusListener = null;
     let reloadOnVisibleListener = null;

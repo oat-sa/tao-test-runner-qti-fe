@@ -79,6 +79,7 @@ export default inputs.map(input => {
         },
         external: [
             ...localExternals,
+            'context',
             'handlebars',
             'interact',
             'jquery',

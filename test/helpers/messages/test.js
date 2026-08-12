@@ -24,6 +24,11 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
     var messagesHelperApi = [{ title: 'getExitMessage' }];
     var testActionMessage = 'You will not be able to access this test once submitted. Click "OK" to continue and submit the test.';
     var actionMessage = 'Click "OK" to continue.';
+    var formatExpectedExitMessage = function(message) {
+        return message
+            .replace(/<br><br> /g, '<br><br>\n ')
+            .replace(/<br><br>(\S)/g, '<br><br>\n$1');
+    };
 
     QUnit.module('helpers/messages');
 
@@ -250,22 +255,22 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
 
             assert.equal(
                 messagesHelper.getExitMessage('test', runner),
-                `${testData.testMessage} ${testActionMessage}${message}`,
+                formatExpectedExitMessage(`${testData.testMessage} ${testActionMessage}${message}`),
                 'message include the right stats for test scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('part', runner),
-                `${testData.partMessage} ${actionMessage}${message}`,
+                formatExpectedExitMessage(`${testData.partMessage} ${actionMessage}${message}`),
                 'message include the right stats for part scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('section', runner),
-                `${testData.sectionMessage} ${actionMessage}${message}`,
+                formatExpectedExitMessage(`${testData.sectionMessage} ${actionMessage}${message}`),
                 'message include the right stats for section scope'
             );
             assert.equal(
                 messagesHelper.getExitMessage('testWithoutInaccessibleItems', runner),
-                `${testData.testMessage} ${testActionMessage}${message}`,
+                formatExpectedExitMessage(`${testData.testMessage} ${testActionMessage}${message}`),
                 'message include the right stats for testWithoutInaccessibleItems scope'
             );
 
@@ -273,17 +278,17 @@ define(['lodash', 'taoQtiTest/runner/helpers/messages'], function(_, messagesHel
 
             assert.equal(
                 messagesHelper.getExitMessage('test', runner),
-                messageEntTestNoStat,
+                formatExpectedExitMessage(messageEntTestNoStat),
                 'no stats in test scope when option is disabled'
             );
             assert.equal(
                 messagesHelper.getExitMessage('part', runner),
-                messageEntTestPartNoStat,
+                formatExpectedExitMessage(messageEntTestPartNoStat),
                 'no stats in part scope when option is disabled'
             );
             assert.equal(
                 messagesHelper.getExitMessage('section', runner),
-                messageEntSectionNoStat,
+                formatExpectedExitMessage(messageEntSectionNoStat),
                 'no stats in session scope when option is disabled'
             );
         });

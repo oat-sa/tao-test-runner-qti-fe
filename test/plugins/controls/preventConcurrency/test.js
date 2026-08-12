@@ -27,6 +27,10 @@ define([
     'use strict';
 
     const providerName = 'mock';
+    const TAB_SYNC_EVENTS = {
+        becameActive: 'TAO_QTI_RUNNER_CONCURRENCY_TAB_BECAME_ACTIVE',
+        activeTabClosed: 'TAO_QTI_RUNNER_CONCURRENCY_ACTIVE_TAB_CLOSED'
+    };
     proxyFactory.registerProvider(providerName, providerProxyMock());
     runnerFactory.registerProvider(providerName, providerMock());
 
@@ -127,8 +131,68 @@ define([
     QUnit.module('Plugin', {
         beforeEach() {
             context.featureFlags = {};
+            this.originalBroadcastChannel = window.BroadcastChannel;
+            this.originalHasFocus = document.hasFocus;
+            this.originalVisibilityStateDescriptor = Object.getOwnPropertyDescriptor(
+                Document.prototype,
+                'visibilityState'
+            );
+
+            this.focused = true;
+            this.visibilityState = 'visible';
+            this.broadcastChannelInstances = [];
+
+            document.hasFocus = () => this.focused;
+            Object.defineProperty(Document.prototype, 'visibilityState', {
+                configurable: true,
+                get: () => this.visibilityState
+            });
+
+            const testState = this;
+            window.BroadcastChannel = function BroadcastChannelMock(name) {
+                this.name = name;
+                this.listeners = {
+                    message: []
+                };
+                this.messages = [];
+                this.closed = false;
+                testState.broadcastChannelInstances.push(this);
+            };
+
+            window.BroadcastChannel.prototype.addEventListener = function addEventListener(event, listener) {
+                if (!this.listeners[event]) {
+                    this.listeners[event] = [];
+                }
+                this.listeners[event].push(listener);
+            };
+
+            window.BroadcastChannel.prototype.removeEventListener = function removeEventListener(event, listener) {
+                if (!this.listeners[event]) {
+                    return;
+                }
+                this.listeners[event] = this.listeners[event].filter(currentListener => currentListener !== listener);
+            };
+
+            window.BroadcastChannel.prototype.postMessage = function postMessage(message) {
+                this.messages.push(message);
+            };
+
+            window.BroadcastChannel.prototype.close = function close() {
+                this.closed = true;
+            };
+        },
+        afterEach() {
+            window.BroadcastChannel = this.originalBroadcastChannel;
+            document.hasFocus = this.originalHasFocus;
+            if (this.originalVisibilityStateDescriptor) {
+                Object.defineProperty(Document.prototype, 'visibilityState', this.originalVisibilityStateDescriptor);
+            }
         }
     });
+
+    function emitBroadcastMessage(channel, data) {
+        (channel.listeners.message || []).forEach(listener => listener({ data }));
+    }
 
     QUnit.test('set sequence number', assert => {
         const ready = assert.async();
@@ -272,6 +336,68 @@ define([
                                 })
                         )
                 );
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
+    });
+
+    QUnit.test('active tab signal triggers concurrency flow', function(assert) {
+        const ready = assert.async();
+        const testState = this;
+        context.featureFlags.FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS = true;
+
+        getTestRunner()
+            .then(runner => {
+                const plugin = pluginFactory(runner);
+                runner.sequenceNumber = '1234-5678';
+
+                assert.expect(2);
+
+                return plugin.init().then(() => {
+                    const channel = testState.broadcastChannelInstances[0];
+                    channel.messages = [];
+                    runner.on('leave', () => assert.ok(true, 'Concurrency still goes through leave flow'));
+
+                    emitBroadcastMessage(channel, {
+                        type: TAB_SYNC_EVENTS.becameActive,
+                        tabId: 'another-tab'
+                    });
+
+                    assert.equal(channel.messages.length, 0, 'Paused tab does not re-announce active status');
+                });
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
+    });
+
+    QUnit.test('destroy closes synchronization channel', function(assert) {
+        const ready = assert.async();
+        const testState = this;
+        context.featureFlags.FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS = true;
+
+        getTestRunner()
+            .then(runner => {
+                const plugin = pluginFactory(runner);
+                runner.sequenceNumber = '1234-5678';
+
+                assert.expect(2);
+
+                return plugin.init().then(() => {
+                    const channel = testState.broadcastChannelInstances[0];
+                    plugin.destroy();
+                    assert.ok(channel.closed, 'Broadcast channel is closed on destroy');
+                    assert.equal((channel.listeners.message || []).length, 0, 'Message listener is removed');
+                });
             })
             .catch(err => {
                 assert.pushResult({

@@ -66,7 +66,7 @@
         "@oat-sa/tao-test-runner": "^1.0.0",
         "async": "0.2.10",
         "autoprefixer": "^10.4.14",
-        "dompurify": "^2.4.0",
+        "dompurify": "^3.4.13",
         "eslint": "^8.39.0",
         "gamp": "0.2.1",
         "glob": "^8.1.0",

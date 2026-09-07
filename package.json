@@ -71,7 +71,7 @@
         "gamp": "0.2.1",
         "glob": "^8.1.0",
         "glob-promise": "^5.0.0",
-        "handlebars": "^4.7.9",
+        "handlebars": "1.3.0",
         "interactjs": "1.3.4",
         "jquery": "1.9.1",
         "jquery-mockjax": "^2.5.0",
@@ -97,6 +97,9 @@
         "rollup-plugin-istanbul": "^3.0.0",
         "select2": "3.5.1",
         "tooltip.js": "1.3.3"
+    },
+    "overrides": {
+        "uglify-js": "^3.19.3"
     },
     "prettier": "@oat-sa/prettier-config",
     "browserslist": [

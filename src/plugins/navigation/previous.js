@@ -233,17 +233,28 @@ export default pluginFactory({
     },
 
     /**
+     * Use to avoid blinking on often change conditions of button en./dis. status
+     */
+    throttledEnabledDisabled: _.throttle(function throttledEnabledDisabled(val) {
+        if (val) {
+            this.$element.removeProp('disabled').removeClass('disabled');
+        } else {
+            this.$element.prop('disabled', true).addClass('disabled');
+        }
+    }, 100),
+
+    /**
      * Enable the button
      */
     enable: function enable() {
-        this.$element.removeProp('disabled').removeClass('disabled');
+        this.throttledEnabledDisabled(true);
     },
 
     /**
      * Disable the button
      */
     disable: function disable() {
-        this.$element.prop('disabled', true).addClass('disabled');
+        this.throttledEnabledDisabled(true);
     },
 
     /**
